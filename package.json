@@ -18,7 +18,9 @@
   },
   "scripts": {
     "dev": "vite --port 3000",
+    "prebuild": "node scripts/clean-routetree.cjs",
     "build": "vite build",
+    "postbuild": "node scripts/clean-routetree.cjs",
     "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

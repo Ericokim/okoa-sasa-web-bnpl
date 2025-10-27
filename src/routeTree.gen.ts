@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedHowItWorksRouteImport } from './routes/_protected/how-it-works'
 import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
 import { Route as ProtectedCartRouteImport } from './routes/_protected/cart'
+import { Route as ProtectedAboutRouteImport } from './routes/_protected/about'
 import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AuthOtpRouteImport } from './routes/_auth/otp'
@@ -39,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedHowItWorksRoute = ProtectedHowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
   id: '/change-password',
   path: '/change-password',
@@ -47,6 +54,11 @@ const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
 const ProtectedCartRoute = ProtectedCartRouteImport.update({
   id: '/cart',
   path: '/cart',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedAboutRoute = ProtectedAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const AuthSignupRoute = AuthSignupRouteImport.update({
@@ -113,8 +125,10 @@ export interface FileRoutesByFullPath {
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/about': typeof ProtectedAboutRoute
   '/cart': typeof ProtectedCartRoute
   '/change-password': typeof ProtectedChangePasswordRoute
+  '/how-it-works': typeof ProtectedHowItWorksRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/products/$productId': typeof ProtectedProductsProductIdRoute
   '/checkout': typeof ProtectedCheckoutIndexRoute
@@ -129,8 +143,10 @@ export interface FileRoutesByTo {
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
   '/signup': typeof AuthSignupRoute
+  '/about': typeof ProtectedAboutRoute
   '/cart': typeof ProtectedCartRoute
   '/change-password': typeof ProtectedChangePasswordRoute
+  '/how-it-works': typeof ProtectedHowItWorksRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/products/$productId': typeof ProtectedProductsProductIdRoute
   '/checkout': typeof ProtectedCheckoutIndexRoute
@@ -148,8 +164,10 @@ export interface FileRoutesById {
   '/_auth/otp': typeof AuthOtpRoute
   '/_auth/signin': typeof AuthSigninRoute
   '/_auth/signup': typeof AuthSignupRoute
+  '/_protected/about': typeof ProtectedAboutRoute
   '/_protected/cart': typeof ProtectedCartRoute
   '/_protected/change-password': typeof ProtectedChangePasswordRoute
+  '/_protected/how-it-works': typeof ProtectedHowItWorksRoute
   '/_protected/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/_protected/products/$productId': typeof ProtectedProductsProductIdRoute
   '/_protected/checkout/': typeof ProtectedCheckoutIndexRoute
@@ -166,8 +184,10 @@ export interface FileRouteTypes {
     | '/otp'
     | '/signin'
     | '/signup'
+    | '/about'
     | '/cart'
     | '/change-password'
+    | '/how-it-works'
     | '/orders/$orderId'
     | '/products/$productId'
     | '/checkout'
@@ -182,8 +202,10 @@ export interface FileRouteTypes {
     | '/otp'
     | '/signin'
     | '/signup'
+    | '/about'
     | '/cart'
     | '/change-password'
+    | '/how-it-works'
     | '/orders/$orderId'
     | '/products/$productId'
     | '/checkout'
@@ -200,8 +222,10 @@ export interface FileRouteTypes {
     | '/_auth/otp'
     | '/_auth/signin'
     | '/_auth/signup'
+    | '/_protected/about'
     | '/_protected/cart'
     | '/_protected/change-password'
+    | '/_protected/how-it-works'
     | '/_protected/orders/$orderId'
     | '/_protected/products/$productId'
     | '/_protected/checkout/'
@@ -239,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/how-it-works': {
+      id: '/_protected/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof ProtectedHowItWorksRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/change-password': {
       id: '/_protected/change-password'
       path: '/change-password'
@@ -251,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/cart'
       fullPath: '/cart'
       preLoaderRoute: typeof ProtectedCartRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/about': {
+      id: '/_protected/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof ProtectedAboutRouteImport
       parentRoute: typeof ProtectedRoute
     }
     '/_auth/signup': {
@@ -352,8 +390,10 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface ProtectedRouteChildren {
+  ProtectedAboutRoute: typeof ProtectedAboutRoute
   ProtectedCartRoute: typeof ProtectedCartRoute
   ProtectedChangePasswordRoute: typeof ProtectedChangePasswordRoute
+  ProtectedHowItWorksRoute: typeof ProtectedHowItWorksRoute
   ProtectedOrdersOrderIdRoute: typeof ProtectedOrdersOrderIdRoute
   ProtectedProductsProductIdRoute: typeof ProtectedProductsProductIdRoute
   ProtectedCheckoutIndexRoute: typeof ProtectedCheckoutIndexRoute
@@ -363,8 +403,10 @@ interface ProtectedRouteChildren {
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedAboutRoute: ProtectedAboutRoute,
   ProtectedCartRoute: ProtectedCartRoute,
   ProtectedChangePasswordRoute: ProtectedChangePasswordRoute,
+  ProtectedHowItWorksRoute: ProtectedHowItWorksRoute,
   ProtectedOrdersOrderIdRoute: ProtectedOrdersOrderIdRoute,
   ProtectedProductsProductIdRoute: ProtectedProductsProductIdRoute,
   ProtectedCheckoutIndexRoute: ProtectedCheckoutIndexRoute,

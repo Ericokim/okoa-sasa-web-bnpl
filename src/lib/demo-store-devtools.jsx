@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react'
 
 import { store, fullName } from './demo-store'
 
-
 class StoreDevtoolsEventClient extends EventClient {
   constructor() {
     super({

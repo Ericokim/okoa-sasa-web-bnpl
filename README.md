@@ -9,6 +9,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 ## ✨ Key Features
 
 ### For Consumers
+
 - **Instant Credit Approval** - Quick assessment and approval process
 - **Flexible Payment Plans** - Multiple installment options
 - **Real-time Payment Tracking** - Monitor payment schedules and history
@@ -17,6 +18,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 - **Digital Wallet Integration** - Seamless payment processing
 
 ### For Merchants
+
 - **Merchant Dashboard** - Comprehensive analytics and reporting
 - **Transaction Management** - Real-time transaction monitoring
 - **Customer Insights** - Detailed customer analytics
@@ -24,6 +26,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 - **API Integration** - Easy integration with existing systems
 
 ### Technical Features
+
 - **Progressive Web App (PWA)** - Native app-like experience
 - **Offline Capability** - Core features work offline
 - **Real-time Updates** - Live data synchronization
@@ -34,6 +37,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework**: React 19.2.0 with JSX/TSX support
 - **Router**: TanStack Router (file-based routing)
 - **State Management**: TanStack Store + React Query
@@ -43,6 +47,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 - **Icons**: Lucide React + Tabler Icons
 
 ### Development Tools
+
 - **Language**: JavaScript/TypeScript with JSX/TSX
 - **Testing**: Vitest (unit) + Playwright (E2E)
 - **Linting**: ESLint with Prettier
@@ -51,6 +56,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 - **Node Version**: >= 18.0.0
 
 ### Key Libraries
+
 - **HTTP Client**: Axios for API communication
 - **Forms**: React Hook Form with Zod validation
 - **Data Visualization**: Recharts for analytics
@@ -64,6 +70,7 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js >= 18.0.0
 - npm >= 8.0.0
 - Git
@@ -71,23 +78,27 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone <repository-url>
    cd okoa-sasa-web-bnpl
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -96,31 +107,33 @@ Okoa Sasa Web BNPL is a comprehensive fintech application that enables customers
 
 ### Available Scripts
 
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server on port 3000 |
-| `npm run build` | Build for production |
-| `npm run serve` | Preview production build locally |
-| `npm test` | Run unit tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:e2e` | Run end-to-end tests |
-| `npm run test:e2e:ui` | Run E2E tests with UI |
-| `npm run test:all` | Run all tests (unit + E2E) |
-| `npm run lint` | Lint code with ESLint |
-| `npm run lint:fix` | Fix linting issues |
-| `npm run format` | Format code with Prettier |
-| `npm run check` | Format and lint code |
-| `npm run type-check` | Run TypeScript type checking |
+| Script                | Description                           |
+| --------------------- | ------------------------------------- |
+| `npm run dev`         | Start development server on port 3000 |
+| `npm run build`       | Build for production                  |
+| `npm run serve`       | Preview production build locally      |
+| `npm test`            | Run unit tests                        |
+| `npm run test:watch`  | Run tests in watch mode               |
+| `npm run test:e2e`    | Run end-to-end tests                  |
+| `npm run test:e2e:ui` | Run E2E tests with UI                 |
+| `npm run test:all`    | Run all tests (unit + E2E)            |
+| `npm run lint`        | Lint code with ESLint                 |
+| `npm run lint:fix`    | Fix linting issues                    |
+| `npm run format`      | Format code with Prettier             |
+| `npm run check`       | Format and lint code                  |
+| `npm run type-check`  | Run TypeScript type checking          |
 
 ## 🧪 Testing
 
 ### Unit Testing (Vitest)
+
 ```bash
 npm test                    # Run once
 npm run test:watch         # Watch mode
 ```
 
 ### End-to-End Testing (Playwright)
+
 ```bash
 npm run test:e2e           # Headless mode
 npm run test:e2e:headed    # With browser UI
@@ -128,6 +141,7 @@ npm run test:e2e:ui        # Interactive UI mode
 ```
 
 ### Full Test Suite
+
 ```bash
 npm run test:all           # Run all tests
 ```
@@ -135,13 +149,16 @@ npm run test:all           # Run all tests
 ## 🎨 UI/UX Design System
 
 ### Design Tokens
+
 - **Base Color**: Zinc
 - **CSS Variables**: Enabled for dynamic theming
 - **Icon Library**: Lucide React
 - **Animation**: Tailwind CSS animations + Framer Motion
 
 ### Component Library
+
 Built with Shadcn/ui and Radix UI primitives:
+
 - **Forms**: Input, Select, Checkbox, Radio, etc.
 - **Layout**: Card, Separator, Tabs, etc.
 - **Feedback**: Alert, Toast, Progress, etc.
@@ -149,6 +166,7 @@ Built with Shadcn/ui and Radix UI primitives:
 - **Data Display**: Table, Avatar, Badge, etc.
 
 ### Responsive Design
+
 - **Mobile First**: Optimized for mobile devices
 - **Breakpoints**: Following Tailwind CSS standard breakpoints
 - **Touch Friendly**: Appropriate touch targets and gestures
@@ -187,18 +205,23 @@ Built with Shadcn/ui and Radix UI primitives:
 ## 🚀 Deployment
 
 ### Build for Production
+
 ```bash
 npm run build
 ```
 
 ### Environment Configuration
+
 Create appropriate `.env` files for different environments:
+
 - `.env.development` - Development settings
 - `.env.staging` - Staging environment
 - `.env.production` - Production settings
 
 ### Deployment Platforms
+
 The application can be deployed to:
+
 - **Vercel** (Recommended for React apps)
 - **Netlify** (Static site hosting)
 - **AWS S3 + CloudFront** (Enterprise solution)
@@ -213,6 +236,7 @@ The application can be deployed to:
 5. Open a Pull Request
 
 ### Code Standards
+
 - Follow ESLint and Prettier configurations
 - Write tests for new features
 - Use conventional commit messages
@@ -232,6 +256,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🏗️ Roadmap
 
 ### Phase 1 (Current)
+
 - [x] Project setup and architecture
 - [x] Core UI components
 - [x] Authentication system
@@ -239,12 +264,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [ ] User dashboard
 
 ### Phase 2
+
 - [ ] Merchant portal
 - [ ] Advanced analytics
 - [ ] Mobile app companion
 - [ ] API integrations
 
 ### Phase 3
+
 - [ ] AI-powered risk assessment
 - [ ] Multi-currency support
 - [ ] Advanced reporting
@@ -254,4 +281,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by the Okoa Sasa Team**
 
-*For more information, visit our [website](https://okoasasa.com) or contact us at [eric@libertyafrika.co.ke]*
+_For more information, visit our [website](https://okoasasa.com) or contact us at [eric@libertyafrika.co.ke]_

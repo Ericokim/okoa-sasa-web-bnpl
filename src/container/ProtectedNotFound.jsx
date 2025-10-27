@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router'
 
 export default function ProtectedNotFound() {
   return (
@@ -17,5 +17,5 @@ export default function ProtectedNotFound() {
         </Link>
       </div>
     </div>
-  );
+  )
 }

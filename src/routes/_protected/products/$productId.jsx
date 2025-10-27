@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router'
 
 function ProductDetailPage() {
-  const { productId } = Route.useParams();
-  
+  const { productId } = Route.useParams()
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -14,25 +14,28 @@ function ProductDetailPage() {
             ))}
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <div>
             <h1 className="text-3xl font-bold">Product {productId}</h1>
             <p className="text-muted-foreground mt-2">SKU: PROD-{productId}</p>
           </div>
-          
+
           <div className="space-y-2">
             <p className="text-3xl font-bold">KES 5,000</p>
-            <p className="text-lg text-primary">Or pay KES 1,250/month for 4 months</p>
+            <p className="text-lg text-primary">
+              Or pay KES 1,250/month for 4 months
+            </p>
           </div>
-          
+
           <div className="space-y-2">
             <h3 className="font-semibold">Description</h3>
             <p className="text-muted-foreground">
-              High-quality product with flexible payment options. Buy now and pay in installments with zero interest.
+              High-quality product with flexible payment options. Buy now and
+              pay in installments with zero interest.
             </p>
           </div>
-          
+
           <div className="space-y-2">
             <h3 className="font-semibold">Payment Plans</h3>
             <div className="space-y-2">
@@ -46,7 +49,7 @@ function ProductDetailPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex gap-4">
             <button className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
               Add to Cart
@@ -58,9 +61,9 @@ function ProductDetailPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export const Route = createFileRoute('/_protected/products/$productId')({
   component: ProductDetailPage,
-});
+})

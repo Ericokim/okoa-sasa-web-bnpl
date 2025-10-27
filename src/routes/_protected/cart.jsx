@@ -1,10 +1,10 @@
-import { Link, createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router'
 
 function CartPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Shopping Cart</h1>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-4">
           {[1, 2].map((i) => (
@@ -23,7 +23,7 @@ function CartPage() {
             </div>
           ))}
         </div>
-        
+
         <div className="border rounded-lg p-6 space-y-4 h-fit">
           <h2 className="text-xl font-semibold">Order Summary</h2>
           <div className="space-y-2">
@@ -48,9 +48,9 @@ function CartPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export const Route = createFileRoute('/_protected/cart')({
   component: CartPage,
-});
+})

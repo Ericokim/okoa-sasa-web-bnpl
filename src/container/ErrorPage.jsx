@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router'
 
 export default function ErrorPage({ error }) {
   return (
@@ -25,5 +25,5 @@ export default function ErrorPage({ error }) {
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -34,7 +34,9 @@ test('table demo functionality', async ({ page }) => {
   await expect(page.locator('table')).toBeVisible()
 
   // Check if search input is present
-  await expect(page.locator('input[placeholder="Search all columns..."]')).toBeVisible()
+  await expect(
+    page.locator('input[placeholder="Search all columns..."]'),
+  ).toBeVisible()
 
   // Test search functionality
   await page.fill('input[placeholder="Search all columns..."]', 'test')
@@ -65,7 +67,9 @@ test('tanstack query demo', async ({ page }) => {
   await page.goto('/demo/tanstack-query')
 
   // Check if the demo content is loaded
-  await expect(page.locator('text=TanStack Query Simple Promise Handling')).toBeVisible()
+  await expect(
+    page.locator('text=TanStack Query Simple Promise Handling'),
+  ).toBeVisible()
 
   // Check if the mock data is displayed
   await expect(page.locator('text=Alice')).toBeVisible()

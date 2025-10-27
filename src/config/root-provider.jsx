@@ -1,12 +1,12 @@
-import React from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Cross2Icon } from '@radix-ui/react-icons';
-import { cn } from '@/lib/utils';
-import { SnackbarProvider, useSnackbar } from 'notistack';
-import { ThemeProvider } from '@/context/theme-context';
-import { ContextProvider } from '@/context/state-context';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import React from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Cross2Icon } from '@radix-ui/react-icons'
+import { cn } from '@/lib/utils'
+import { SnackbarProvider, useSnackbar } from 'notistack'
+import { ThemeProvider } from '@/context/theme-context'
+import { ContextProvider } from '@/context/state-context'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { TooltipProvider } from '@/components/ui/tooltip'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,19 +16,19 @@ const queryClient = new QueryClient({
       staleTime: 10000, // -> refetches data after 10 seconds
     },
   },
-});
+})
 
-export { queryClient };
+export { queryClient }
 
 export function getContext() {
   return {
     queryClient,
-  };
+  }
 }
 
 export function Provider({ children }) {
   const CloseButton = ({ snackbarKey }) => {
-    const { closeSnackbar } = useSnackbar();
+    const { closeSnackbar } = useSnackbar()
     return (
       <button
         aria-label="Close notification"
@@ -37,8 +37,8 @@ export function Provider({ children }) {
       >
         <Cross2Icon className={cn('h-4 w-4 text-white')} />
       </button>
-    );
-  };
+    )
+  }
 
   return (
     <ContextProvider>
@@ -66,5 +66,5 @@ export function Provider({ children }) {
         </QueryClientProvider>
       </ThemeProvider>
     </ContextProvider>
-  );
+  )
 }

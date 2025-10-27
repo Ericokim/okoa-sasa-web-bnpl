@@ -1,8 +1,8 @@
-import React, { lazy, Suspense } from 'react';
-import { Outlet, useNavigate } from '@tanstack/react-router';
-import { ThemedSuspense, LoadingSpinner } from '@/components/shared/Loading';
-import { useStateContext } from '@/context/state-context';
-import Layout from '@/container/Layout';
+import React, { lazy, Suspense } from 'react'
+import { Outlet, useNavigate } from '@tanstack/react-router'
+import { ThemedSuspense, LoadingSpinner } from '@/components/shared/Loading'
+import { useStateContext } from '@/context/state-context'
+import Layout from '@/container/Layout'
 
 /**
  * Lazy load helper with suspense fallback
@@ -12,34 +12,34 @@ export const lazyLoad = (fn) => (props) => (
   <Suspense fallback={<ThemedSuspense />}>
     {React.createElement(lazy(fn), props)}
   </Suspense>
-);
+)
 
 /**
  * Protected Route Wrapper - Redirects to signin if not authenticated
  */
 export function ProtectedRoute({ children }) {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useStateContext();
+  const navigate = useNavigate()
+  const { isAuthenticated } = useStateContext()
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      navigate({ to: '/signin' });
+      navigate({ to: '/signin' })
     }
-  }, [navigate, isAuthenticated]);
+  }, [navigate, isAuthenticated])
 
   // Show loading spinner while redirecting
   if (!isAuthenticated) {
-    return <LoadingSpinner />;
+    return <LoadingSpinner />
   }
 
-  return children;
+  return children
 }
 
 /**
  * Root Layout - Simple outlet wrapper for top-level routes
  */
 export function RootLayout() {
-  return <Outlet />;
+  return <Outlet />
 }
 
 /**
@@ -50,12 +50,12 @@ export function ProtectedLayout() {
     <ProtectedRoute>
       <Layout />
     </ProtectedRoute>
-  );
+  )
 }
 
 /**
  * Auth Layout - Simple outlet wrapper for authentication pages
  */
 export function AuthLayout() {
-  return <Outlet />;
+  return <Outlet />
 }

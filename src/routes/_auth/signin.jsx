@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router'
 
 function SigninOTPScreen() {
   return (
@@ -10,9 +10,9 @@ function SigninOTPScreen() {
         </p>
       </div>
     </div>
-  );
+  )
 }
 
 export const Route = createFileRoute('/_auth/signin')({
   component: SigninOTPScreen,
-});
+})

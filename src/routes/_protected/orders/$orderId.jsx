@@ -1,8 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router'
 
 function OrderDetailPage() {
-  const { orderId } = Route.useParams();
-  
+  const { orderId } = Route.useParams()
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div className="flex justify-between items-start">
@@ -10,9 +10,11 @@ function OrderDetailPage() {
           <h1 className="text-3xl font-bold">Order #{orderId}</h1>
           <p className="text-muted-foreground">Placed on October 20, 2025</p>
         </div>
-        <span className="px-4 py-2 bg-success/10 text-success rounded-full">Delivered</span>
+        <span className="px-4 py-2 bg-success/10 text-success rounded-full">
+          Delivered
+        </span>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
           <div className="border rounded-lg p-6 space-y-4">
@@ -28,10 +30,12 @@ function OrderDetailPage() {
               </div>
             ))}
           </div>
-          
+
           <div className="border rounded-lg p-6 space-y-4">
             <h2 className="text-xl font-semibold">Payment Schedule</h2>
-            <p className="text-sm text-muted-foreground">4 monthly installments of KES 800</p>
+            <p className="text-sm text-muted-foreground">
+              4 monthly installments of KES 800
+            </p>
             <div className="space-y-2">
               <div className="flex justify-between py-2 border-b">
                 <span>Payment 1 - Paid</span>
@@ -52,7 +56,7 @@ function OrderDetailPage() {
             </div>
           </div>
         </div>
-        
+
         <div className="space-y-6">
           <div className="border rounded-lg p-6 space-y-4">
             <h2 className="text-xl font-semibold">Order Summary</h2>
@@ -71,22 +75,24 @@ function OrderDetailPage() {
               </div>
             </div>
           </div>
-          
+
           <div className="border rounded-lg p-6 space-y-2">
             <h2 className="font-semibold">Shipping Address</h2>
             <p className="text-sm">John Doe</p>
             <p className="text-sm text-muted-foreground">
-              123 Main Street<br />
-              Nairobi, 00100<br />
+              123 Main Street
+              <br />
+              Nairobi, 00100
+              <br />
               Kenya
             </p>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export const Route = createFileRoute('/_protected/orders/$orderId')({
   component: OrderDetailPage,
-});
+})
