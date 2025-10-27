@@ -59,7 +59,7 @@ export const useLogin = () => {
           type: 'SET_USER',
           payload: null,
         })
-        navigate({ to: '/login' })
+        navigate({ to: '/signin' })
       }
     },
     onError: (error) => {
@@ -116,7 +116,7 @@ export const useLogout = () => {
       })
 
       // Navigate to login after logout using React Router
-      navigate({ to: '/login' })
+      navigate({ to: '/signin' })
     },
     onError: () => {
       // Even if logout fails, clear local data
@@ -125,7 +125,7 @@ export const useLogout = () => {
         type: 'SET_USER',
         payload: null,
       })
-      navigate({ to: '/login' })
+      navigate({ to: '/signin' })
     },
   })
 }

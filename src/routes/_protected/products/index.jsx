@@ -2,7 +2,13 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
-import { ShoppingCart, X, Settings, ChevronDown } from 'lucide-react'
+import {
+  ShoppingCart,
+  X,
+  Settings,
+  ChevronDown,
+  SlidersHorizontal,
+} from 'lucide-react'
 
 // Mock product data to match Figma design
 const products = [
@@ -69,7 +75,7 @@ function ProductsPage() {
             className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal cursor-pointer"
           >
             All Filters
-            <Settings className="ml-2 h-4 w-4" />
+            <SlidersHorizontal className="ml-2 h-4 w-4" />
           </Badge>
         </div>
 
@@ -99,48 +105,54 @@ function ProductsPage() {
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {[...products, ...products, ...products].map((product, index) => (
-          <Card
+        {[...products, ...products].map((product, index) => (
+          <Link
             key={`${product.id}-${index}`}
-            className="border-none shadow-none"
+            to={product.id}
+            className="hover:brand-primary-end"
           >
-            <CardContent className="p-0 space-y-4">
-              {/* Product Image */}
-              <div className="relative bg-brand-bg-2 rounded-2xl h-70 flex items-center justify-center overflow-hidden">
-                <div className="w-56 h-56 bg-gray-200 rounded-xl flex items-center justify-center">
-                  <span className="text-gray-400 text-sm">Phone Image</span>
-                </div>
-
-                {/* Add to Cart Button */}
-                {product.inCart && (
-                  <div className="absolute top-4 right-4">
-                    <Button
-                      size="icon"
-                      variant="gradient"
-                      className="h-12 w-12 rounded-full shadow-lg"
-                    >
-                      <ShoppingCart className="h-6 w-6" />
-                    </Button>
+            <Card
+              key={`${product.id}-${index}`}
+              className="border-none shadow-none"
+            >
+              <CardContent className="p-0 space-y-4">
+                {/* Product Image */}
+                <div className="relative bg-brand-bg-2 rounded-2xl h-70 flex items-center justify-center overflow-hidden">
+                  <div className="w-56 h-56 bg-gray-200 rounded-xl flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">Phone Image</span>
                   </div>
-                )}
-              </div>
 
-              {/* Product Info */}
-              <div className="space-y-2">
-                <h3 className="text-base font-medium text-brand-black leading-relaxed line-clamp-2">
-                  {product.name}
-                </h3>
-                <div className="flex items-center gap-3">
-                  <span className="text-base font-semibold text-brand-black">
-                    KES {product.price.toLocaleString()}
-                  </span>
-                  <span className="text-sm font-medium text-brand-mid-gray line-through">
-                    KES {product.originalPrice.toLocaleString()}
-                  </span>
+                  {/* Add to Cart Button */}
+                  {product.inCart && (
+                    <div className="absolute top-4 right-4">
+                      <Button
+                        size="icon"
+                        variant="gradient"
+                        className="h-12 w-12 rounded-full shadow-lg"
+                      >
+                        <ShoppingCart className="h-6 w-6" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+
+                {/* Product Info */}
+                <div className="space-y-2">
+                  <h3 className="text-base font-medium text-brand-black leading-relaxed line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-base font-semibold text-brand-black">
+                      KES {product.price.toLocaleString()}
+                    </span>
+                    <span className="text-sm font-medium text-brand-mid-gray line-through">
+                      KES {product.originalPrice.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>{' '}
+          </Link>
         ))}
       </div>
 

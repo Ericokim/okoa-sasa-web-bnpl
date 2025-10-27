@@ -1,181 +1,148 @@
 import { Link } from '@tanstack/react-router'
-import { Facebook, Instagram, Linkedin, Twitter } from 'lucide-react'
+import { Facebook, Instagram, X, MessageCircle } from 'lucide-react'
+import { SiTiktok } from 'react-icons/si'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
-
-const footerLinks = {
-  shop: [
-    { label: 'All Products', href: '/products' },
-    { label: 'Categories', href: '/products/categories' },
-    { label: 'New Arrivals', href: '/products' },
-    { label: 'Best Sellers', href: '/products' },
-  ],
-  support: [
-    { label: 'Help Center', href: '#' },
-    { label: 'Track Order', href: '/orders' },
-    { label: 'Returns', href: '#' },
-    { label: 'Contact Us', href: '#' },
-  ],
-  company: [
-    { label: 'About Us', href: '#' },
-    { label: 'Careers', href: '#' },
-    { label: 'Press', href: '#' },
-    { label: 'Partners', href: '#' },
-  ],
-  legal: [
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
-    { label: 'Cookie Policy', href: '#' },
-    { label: 'GDPR', href: '#' },
-  ],
-}
-
-const socialLinks = [
-  { icon: Facebook, href: '#', label: 'Facebook' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-]
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-background">
-      <div className="container py-10 md:py-16">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-6">
-          {/* Brand Section */}
-          <div className="lg:col-span-2">
-            <h3 className="mb-3 text-xl font-bold text-foreground">
-              Okoa Sasa
+    <footer className="bg-neutral-900 py-10 px-4 sm:px-6 md:px-20">
+      <div className="max-w-[1280px] mx-auto">
+        {/* Header Section with Logo and Social Media */}
+        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6 md:gap-0">
+          {/* Logo */}
+          <div className="w-full md:w-[395px] h-auto md:h-[109px]">
+            <img
+              src="/primaryLogoHorizontal.png"
+              alt="Okoa Sasa"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          {/* Social Media Icons */}
+          <div className="flex items-center gap-4 md:gap-5">
+            <a
+              href="#"
+              className="w-[50px] h-[50px] md:w-[63px] md:h-[63px] bg-white/10 rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors"
+            >
+              <Facebook className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </a>
+            <a
+              href="#"
+              className="w-[50px] h-[50px] md:w-[63px] md:h-[63px] bg-white/10 rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors"
+            >
+              <X className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </a>
+            <a
+              href="#"
+              className="w-[50px] h-[50px] md:w-[63px] md:h-[63px] bg-white/10 rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors"
+            >
+              <Instagram className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </a>
+            <a
+              href="#"
+              className="w-[50px] h-[50px] md:w-[63px] md:h-[63px] bg-white/10 rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors"
+            >
+              <MessageCircle className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </a>
+            <a
+              href="#"
+              className="w-[50px] h-[50px] md:w-[63px] md:h-[63px] bg-white/10 rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors"
+            >
+              <SiTiktok className="w-5 h-5 md:w-6 md:h-6 text-white" />
+            </a>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-0">
+          {/* Useful Links */}
+          <div className="flex-1">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+              Useful Links
             </h3>
-            <p className="mb-4 text-sm text-foreground/70">
-              Buy Now, Pay Later. Shop with flexible payment options that work
-              for you.
-            </p>
-            <div className="flex gap-3">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  aria-label={social.label}
-                  className="rounded-md p-2 text-foreground/70 transition-colors hover:bg-muted hover:text-primary"
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
+            <div className="space-y-2 md:space-y-3">
+              <Link
+                to="/how-it-works"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+                How it Works
+              </Link>
+              <Link
+                to="/faqs"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+                FAQs
+              </Link>
+              <Link
+                to="/terms"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+                Terms & Conditions
+              </Link>
             </div>
           </div>
 
-          {/* Shop Links */}
-          <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">Shop</h4>
-            <ul className="space-y-2">
-              {footerLinks.shop.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Other Links */}
+          <div className="flex-1">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+              Other Links
+            </h3>
+            <div className="space-y-2 md:space-y-3">
+              <div className="text-white text-base font-medium">
+                USSD code *884#
+              </div>
+              <Link
+                to="/privacy"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+                Privacy Policy
+              </Link>
+              <Link
+                to="/insurance"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+                Insurance Policy
+              </Link>
+            </div>
           </div>
 
-          {/* Support Links */}
-          <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">
-              Support
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Contact Us */}
+          <div className="flex-1">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+              Contact Us
+            </h3>
+            <div className="space-y-2 md:space-y-3">
+              <div className="text-white text-base font-medium">
+                +09 456 789
+              </div>
+              <div className="text-white text-base font-medium">
+                OkoaSASA@gmail.com
+              </div>
+              <div className="text-white text-base font-medium">
+                1234 Building, Kenya
+              </div>
+            </div>
           </div>
 
-          {/* Company Links */}
-          <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">
-              Company
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Legal Links */}
-          <div>
-            <h4 className="mb-3 text-sm font-semibold text-foreground">
-              Legal
-            </h4>
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    to={link.href}
-                    className="text-sm text-foreground/70 transition-colors hover:text-primary"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Newsletter Section */}
-        <div className="mt-12 border-t border-border pt-8">
-          <div className="mx-auto max-w-md">
-            <h4 className="mb-2 text-center text-sm font-semibold text-foreground">
-              Stay Updated
-            </h4>
-            <p className="mb-4 text-center text-sm text-foreground/70">
-              Subscribe to get special offers and updates
-            </p>
-            <form className="flex flex-col gap-2 sm:flex-row">
+          {/* Newsletter Section */}
+          <div className="w-full md:w-[400px]">
+            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize text-center md:text-left">
+              You Can Find Us On!
+            </h3>
+            <div className="flex flex-col sm:flex-row gap-2.5">
               <Input
                 type="email"
-                placeholder="Enter your email"
-                className="flex-1"
-                required
+                placeholder="Enter Your Email"
+                className="bg-[#2c2d2f] border-none text-brand-mid-gray placeholder:text-brand-mid-gray rounded-2xl px-4 md:px-6 py-3 h-auto flex-1"
               />
-              <Button type="submit" size="sm" className="sm:w-auto">
-                Subscribe
+              <Button
+                variant="gradient"
+                className="rounded-3xl px-4 md:px-6 py-3 h-auto text-base font-medium"
+              >
+                Contact Us
               </Button>
-            </form>
-          </div>
-        </div>
-
-        <Separator className="my-8" />
-
-        {/* Bottom Legal Bar */}
-        <div className="flex flex-col items-center justify-between gap-4 text-sm text-foreground/70 sm:flex-row">
-          <p>© 2025 Okoa Sasa. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link to="#" className="transition-colors hover:text-primary">
-              Privacy Policy
-            </Link>
-            <Link to="#" className="transition-colors hover:text-primary">
-              Terms of Service
-            </Link>
+            </div>
           </div>
         </div>
       </div>

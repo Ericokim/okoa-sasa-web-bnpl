@@ -42,7 +42,7 @@ function RegisterScreen() {
       <Card className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-xl">
         <CardContent className="p-8">
           {/* Close Button */}
-          <div className="flex justify-end mb-6">
+          {/* <div className="flex justify-end mb-6">
             <Button
               variant="ghost"
               size="icon"
@@ -51,14 +51,16 @@ function RegisterScreen() {
             >
               <X className="h-4 w-4" />
             </Button>
-          </div>
+          </div> */}
 
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-48 h-32 flex items-center justify-center">
-              <div className="text-2xl font-bold text-brand-primary-start">
-                OKOA SASA
-              </div>
+            <div className="w-[202px] h-[184px] flex items-center justify-center">
+              <img
+                src="/primaryLogoVertical.png"
+                alt="Okoa Sasa"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
 
@@ -210,7 +212,7 @@ function RegisterScreen() {
             <p className="text-sm text-brand-gray">
               Already have an account?{' '}
               <Link
-                to="/login"
+                to="/signin"
                 className="text-brand-primary-start hover:text-brand-primary-end font-medium"
               >
                 Sign In

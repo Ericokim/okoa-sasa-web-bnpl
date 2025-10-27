@@ -44,7 +44,7 @@ function OTPScreen() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate({ to: '/login' })}
+              onClick={() => navigate({ to: '/signin' })}
               className="h-6 w-6 p-0"
             >
               <ArrowLeft className="h-4 w-4" />

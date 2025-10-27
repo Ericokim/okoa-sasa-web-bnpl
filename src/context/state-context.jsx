@@ -5,6 +5,7 @@ const StateContext = createContext(null)
 export function ContextProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
+  const [cart, setCart] = useState([])
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -33,11 +34,27 @@ export function ContextProvider({ children }) {
     localStorage.removeItem('user')
   }
 
+  const addToCart = (item) => {
+    setCart(prevCart => [...prevCart, item])
+  }
+
+  const removeFromCart = (itemId) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== itemId))
+  }
+
+  const clearCart = () => {
+    setCart([])
+  }
+
   const value = {
     isAuthenticated,
     user,
+    cart,
     login,
     logout,
+    addToCart,
+    removeFromCart,
+    clearCart,
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>
