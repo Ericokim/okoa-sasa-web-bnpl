@@ -1,54 +1,23 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import {
-  Outlet,
-  RouterProvider,
-  createRootRoute,
-  createRoute,
-  createRouter,
-} from '@tanstack/react-router'
+import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import TableDemo from './routes/demo/table.jsx'
-import StoreDemo from './routes/demo/store.jsx'
-import TanStackQueryDemo from './routes/demo/tanstack-query.jsx'
+import { Provider, getContext } from './config/root-provider.jsx'
 
-import Header from './components/Header'
-
-import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.jsx'
+// Import the generated route tree
+import { routeTree } from './routeTree.gen'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.js'
 
-import App from './App.jsx'
+// Get context from root provider
+const providerContext = getContext()
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Header />
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-})
-
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: App,
-})
-
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  TableDemo(rootRoute),
-  StoreDemo(rootRoute),
-  TanStackQueryDemo(rootRoute),
-])
-
-const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
+// Create router with file-based routes
 const router = createRouter({
   routeTree,
   context: {
-    ...TanStackQueryProviderContext,
+    ...providerContext,
   },
   defaultPreload: 'intent',
   scrollRestoration: true,
@@ -61,9 +30,10 @@ if (rootElement && !rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+      <Provider>
         <RouterProvider router={router} />
-      </TanStackQueryProvider.Provider>
+        {import.meta.env.DEV && <TanStackRouterDevtools router={router} />}
+      </Provider>
     </StrictMode>,
   )
 }
