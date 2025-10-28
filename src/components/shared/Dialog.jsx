@@ -1,6 +1,6 @@
-import React from "react";
-import * as Dg from "@/components/ui/dialog.jsx";
-import * as At from "@/components/ui/alert-dialog.jsx";
+import React from 'react'
+import * as Dg from '@/components/ui/dialog.jsx'
+import * as At from '@/components/ui/alert-dialog.jsx'
 import {
   Loader2,
   AlertTriangle,
@@ -8,10 +8,10 @@ import {
   XCircle,
   Info,
   HelpCircle,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useStateContext } from "@/context/state-context";
-import { Input } from "@/components/ui/input";
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { useStateContext } from '@/context/state-context'
+import { Input } from '@/components/ui/input'
 
 export const Dialog = React.forwardRef(
   (
@@ -23,6 +23,8 @@ export const Dialog = React.forwardRef(
       contentClassName,
       children,
       closeIcon,
+      image,
+      DialogHeaderClassName,
       ...props
     },
     ref,
@@ -38,31 +40,32 @@ export const Dialog = React.forwardRef(
       >
         <Dg.DialogContent
           closeIcon={closeIcon}
-          className={cn("max-w-3xl", contentClassName)}
+          className={cn('max-w-3xl', contentClassName)}
         >
-          <Dg.DialogHeader>
+          {image}
+          <Dg.DialogHeader className={DialogHeaderClassName}>
             <Dg.DialogTitle className="-mt-2">{title}</Dg.DialogTitle>
             <Dg.DialogDescription>{description}</Dg.DialogDescription>
           </Dg.DialogHeader>
           {children}
         </Dg.DialogContent>
       </Dg.Dialog>
-    );
+    )
   },
-);
+)
 
 export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
-  const { alert } = useStateContext();
-  const [confirmationInput, setConfirmationInput] = React.useState("");
-  const [isConfirmationValid, setIsConfirmationValid] = React.useState(false);
+  const { alert } = useStateContext()
+  const [confirmationInput, setConfirmationInput] = React.useState('')
+  const [isConfirmationValid, setIsConfirmationValid] = React.useState(false)
 
   // Reset confirmation input when dialog opens/closes
   React.useEffect(() => {
     if (!alert.open) {
-      setConfirmationInput("");
-      setIsConfirmationValid(false);
+      setConfirmationInput('')
+      setIsConfirmationValid(false)
     }
-  }, [alert.open]);
+  }, [alert.open])
 
   // Check if confirmation input matches required text
   React.useEffect(() => {
@@ -70,57 +73,57 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
       setIsConfirmationValid(
         confirmationInput.toLowerCase().trim() ===
           alert.confirmationMatch.toLowerCase().trim(),
-      );
+      )
     } else {
-      setIsConfirmationValid(true);
+      setIsConfirmationValid(true)
     }
-  }, [confirmationInput, alert.requiresConfirmation, alert.confirmationMatch]);
+  }, [confirmationInput, alert.requiresConfirmation, alert.confirmationMatch])
 
   // Handle action with confirmation check
   const handleAction = () => {
     if (alert.requiresConfirmation && !isConfirmationValid) {
-      return;
+      return
     }
-    alert.onAction();
-  };
+    alert.onAction()
+  }
 
   // Get appropriate icon based on alert style
   const getAlertIcon = () => {
     switch (alert.actionStyle) {
-      case "destructive":
+      case 'destructive':
         return (
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
             <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
           </div>
-        );
-      case "success":
+        )
+      case 'success':
         return (
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
             <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
-        );
-      case "warning":
+        )
+      case 'warning':
         return (
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/20">
             <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
           </div>
-        );
-      case "info":
-      case "default":
-      case "primary":
+        )
+      case 'info':
+      case 'default':
+      case 'primary':
         return (
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
             <Info className="h-6 w-6 text-primary" />
           </div>
-        );
+        )
       default:
         return (
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-800">
             <HelpCircle className="h-6 w-6 text-gray-600 dark:text-gray-400" />
           </div>
-        );
+        )
     }
-  };
+  }
 
   return (
     <At.AlertDialog
@@ -159,12 +162,12 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
                     value={confirmationInput}
                     onChange={(e) => setConfirmationInput(e.target.value)}
                     className={cn(
-                      "text-center font-mono",
+                      'text-center font-mono',
                       isConfirmationValid
-                        ? "border-green-300 focus:border-green-500 focus:ring-green-500"
+                        ? 'border-green-300 focus:border-green-500 focus:ring-green-500'
                         : confirmationInput.length > 0
-                          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
-                          : "",
+                          ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                          : '',
                     )}
                   />
                   {alert.confirmationMatch && (
@@ -185,15 +188,15 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
             <At.AlertDialogFooter className="flex gap-3 justify-center">
               <At.AlertDialogCancel
                 className={cn(
-                  "inline-flex items-center justify-center",
-                  "px-4 py-2 min-w-[80px] h-9",
-                  "text-sm font-medium rounded-md",
-                  "border border-gray-300 dark:border-gray-600",
-                  "bg-white dark:bg-gray-800",
-                  "text-gray-700 dark:text-gray-300",
-                  "hover:bg-gray-50 dark:hover:bg-gray-700",
-                  "focus:outline-none focus:ring-2 focus:ring-gray-500",
-                  "transition-colors duration-150",
+                  'inline-flex items-center justify-center',
+                  'px-4 py-2 min-w-[80px] h-9',
+                  'text-sm font-medium rounded-md',
+                  'border border-gray-300 dark:border-gray-600',
+                  'bg-white dark:bg-gray-800',
+                  'text-gray-700 dark:text-gray-300',
+                  'hover:bg-gray-50 dark:hover:bg-gray-700',
+                  'focus:outline-none focus:ring-2 focus:ring-gray-500',
+                  'transition-colors duration-150',
                 )}
                 onClick={alert.onCancel}
               >
@@ -202,19 +205,19 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
 
               <At.AlertDialogAction
                 className={cn(
-                  "inline-flex items-center justify-center",
-                  "px-4 py-2 min-w-[80px] h-9",
-                  "text-sm font-medium rounded-md",
-                  "focus:outline-none focus:ring-2",
-                  "transition-colors duration-150",
-                  "disabled:opacity-50 disabled:cursor-not-allowed",
-                  alert.actionStyle === "destructive"
-                    ? "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500"
-                    : alert.actionStyle === "success"
-                      ? "bg-green-600 hover:bg-green-700 text-white focus:ring-green-500"
-                      : alert.actionStyle === "warning"
-                        ? "bg-yellow-600 hover:bg-yellow-700 text-white focus:ring-yellow-500"
-                        : "bg-primary hover:bg-primary/90 text-white focus:ring-primary/80",
+                  'inline-flex items-center justify-center',
+                  'px-4 py-2 min-w-[80px] h-9',
+                  'text-sm font-medium rounded-md',
+                  'focus:outline-none focus:ring-2',
+                  'transition-colors duration-150',
+                  'disabled:opacity-50 disabled:cursor-not-allowed',
+                  alert.actionStyle === 'destructive'
+                    ? 'bg-red-600 hover:bg-red-700 text-white focus:ring-red-500'
+                    : alert.actionStyle === 'success'
+                      ? 'bg-green-600 hover:bg-green-700 text-white focus:ring-green-500'
+                      : alert.actionStyle === 'warning'
+                        ? 'bg-yellow-600 hover:bg-yellow-700 text-white focus:ring-yellow-500'
+                        : 'bg-primary hover:bg-primary/90 text-white focus:ring-primary/80',
                 )}
                 disabled={
                   alert.loading ||
@@ -236,10 +239,10 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
         </div>
       </At.AlertDialogContent>
     </At.AlertDialog>
-  );
-});
+  )
+})
 
-export const CreateDialog = ({ align = "left", title, icon, children }) => {
+export const CreateDialog = ({ align = 'left', title, icon, children }) => {
   return (
     <fieldset className="w-full rounded-lg border bg-card text-card-foreground shadow hover:shadow-md p-4">
       <legend align={align} className="-ml-1 px-2 text-lg font-medium">
@@ -250,5 +253,5 @@ export const CreateDialog = ({ align = "left", title, icon, children }) => {
       </legend>
       {children}
     </fieldset>
-  );
-};
+  )
+}

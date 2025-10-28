@@ -13,8 +13,10 @@ import {
 import { useStateContext } from '@/context/state-context'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
+import { AuthDialog } from '@/components/shared/AuthDialog'
 
 export function Header() {
+  const navigate = useNavigate()
   const { user, cart, logout } = useStateContext()
   const cartCount = cart?.length || 0
   const isAuthenticated = !!user
