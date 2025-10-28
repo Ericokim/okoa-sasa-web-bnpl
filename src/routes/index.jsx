@@ -100,8 +100,12 @@ const products = [
   },
 ]
 
-const brandOptions = Array.from(new Set(products.map((product) => product.brand))).sort()
-const deviceTypeOptions = Array.from(new Set(products.map((product) => product.deviceType))).sort()
+const brandOptions = Array.from(
+  new Set(products.map((product) => product.brand)),
+).sort()
+const deviceTypeOptions = Array.from(
+  new Set(products.map((product) => product.deviceType)),
+).sort()
 
 const priceBounds = products.reduce(
   (acc, product) => ({
@@ -223,12 +227,14 @@ function IndexPage() {
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchBrand =
-        activeFilters.brand.length === 0 || activeFilters.brand.includes(product.brand)
+        activeFilters.brand.length === 0 ||
+        activeFilters.brand.includes(product.brand)
       const matchPrice =
         product.price >= activeFilters.priceRange[0] &&
         product.price <= activeFilters.priceRange[1]
       const matchDevice =
-        activeFilters.deviceType.length === 0 || activeFilters.deviceType.includes(product.deviceType)
+        activeFilters.deviceType.length === 0 ||
+        activeFilters.deviceType.includes(product.deviceType)
 
       return matchBrand && matchPrice && matchDevice
     })
@@ -244,37 +250,39 @@ function IndexPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <div className="flex items-center justify-between py-6">
           <div className="flex items-center gap-6">
-            {(hasActiveFilters ? activeFilterChips : baseFilterBadges).map((chip) => (
-              <Badge
-                key={chip.id}
-                asChild
-                variant="secondary"
-                className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal"
-              >
-                <div
-                  role="button"
-                  tabIndex={0}
-                  onClick={openFilters}
-                  onKeyDown={handleChipKeyDown}
-                  className="inline-flex items-center gap-2 focus:outline-none"
+            {(hasActiveFilters ? activeFilterChips : baseFilterBadges).map(
+              (chip) => (
+                <Badge
+                  key={chip.id}
+                  asChild
+                  variant="secondary"
+                  className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal"
                 >
-                  <span>{chip.label}</span>
-                  {chip.removable && (
-                    <button
-                      type="button"
-                      onClick={(event) => {
-                        event.stopPropagation()
-                        handleRemoveChip(chip)
-                      }}
-                      className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-bg-1 text-brand-black/60 transition-colors hover:bg-brand-primary-start/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start"
-                      aria-label={`Remove ${chip.label}`}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </div>
-              </Badge>
-            ))}
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={openFilters}
+                    onKeyDown={handleChipKeyDown}
+                    className="inline-flex items-center gap-2 focus:outline-none"
+                  >
+                    <span>{chip.label}</span>
+                    {chip.removable && (
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          handleRemoveChip(chip)
+                        }}
+                        className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-bg-1 text-brand-black/60 transition-colors hover:bg-brand-primary-start/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start"
+                        aria-label={`Remove ${chip.label}`}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    )}
+                  </div>
+                </Badge>
+              ),
+            )}
 
             <DialogTrigger asChild>
               <Badge
@@ -282,7 +290,10 @@ function IndexPage() {
                 variant="outline"
                 className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal cursor-pointer"
               >
-                <button type="button" className="inline-flex items-center gap-2">
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2"
+                >
                   All Filters
                   <SlidersHorizontal className="ml-2 h-4 w-4" />
                 </button>
@@ -291,12 +302,14 @@ function IndexPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-brand-primary-start text-brand-primary-start rounded-3xl px-4 py-2 bg-gradient-to-b from-transparent to-transparent hover:from-brand-primary-start/10 hover:to-brand-primary-end/10"
-            >
-              How it works
-            </Button>
+            <Link to={`/FAQs`}>
+              <Button
+                variant="outline"
+                className="border-brand-primary-start text-brand-primary-start rounded-3xl px-4 py-2 bg-gradient-to-b from-transparent to-transparent hover:from-brand-primary-start/10 hover:to-brand-primary-end/10"
+              >
+                How it works
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="border-brand-stroke text-brand-black rounded-3xl px-4 py-2"
@@ -316,15 +329,20 @@ function IndexPage() {
 
         <DialogContent className="h-[90vh] max-w-[calc(100%-1.5rem)] overflow-y-auto rounded-[32px] border border-brand-stroke/40 bg-white p-6 sm:h-auto sm:max-w-xl sm:p-8">
           <DialogHeader className="space-y-2 text-left">
-            <DialogTitle className="text-lg font-semibold text-brand-black">All Filters</DialogTitle>
+            <DialogTitle className="text-lg font-semibold text-brand-black">
+              All Filters
+            </DialogTitle>
             <DialogDescription className="text-sm text-brand-mid-gray">
-              Refine products by brand, price, or device type to match what you need.
+              Refine products by brand, price, or device type to match what you
+              need.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-8 py-4">
             <section className="space-y-3">
-              <h4 className="text-sm font-semibold uppercase tracking-wide text-brand-mid-gray">Brand</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-brand-mid-gray">
+                Brand
+              </h4>
               <div className="space-y-2">
                 {brandOptions.map((brand) => {
                   const id = toControlId('brand', brand)
@@ -345,7 +363,10 @@ function IndexPage() {
                           }))
                         }}
                       />
-                      <Label htmlFor={id} className="text-sm font-medium text-brand-black">
+                      <Label
+                        htmlFor={id}
+                        className="text-sm font-medium text-brand-black"
+                      >
                         {brand}
                       </Label>
                     </div>
@@ -355,7 +376,9 @@ function IndexPage() {
             </section>
 
             <section className="space-y-4">
-              <h4 className="text-sm font-semibold uppercase tracking-wide text-brand-mid-gray">Price Range</h4>
+              <h4 className="text-sm font-semibold uppercase tracking-wide text-brand-mid-gray">
+                Price Range
+              </h4>
               <Slider
                 min={sliderMin}
                 max={sliderMax}
@@ -394,12 +417,19 @@ function IndexPage() {
                           setActiveFilters((prev) => ({
                             ...prev,
                             deviceType: isChecked
-                              ? Array.from(new Set([...prev.deviceType, device]))
-                              : prev.deviceType.filter((item) => item !== device),
+                              ? Array.from(
+                                  new Set([...prev.deviceType, device]),
+                                )
+                              : prev.deviceType.filter(
+                                  (item) => item !== device,
+                                ),
                           }))
                         }}
                       />
-                      <Label htmlFor={id} className="text-sm font-medium text-brand-black">
+                      <Label
+                        htmlFor={id}
+                        className="text-sm font-medium text-brand-black"
+                      >
                         {device}
                       </Label>
                     </div>
@@ -410,10 +440,17 @@ function IndexPage() {
           </div>
 
           <DialogFooter className="flex w-full flex-col gap-3 pt-2 sm:flex-row sm:justify-between sm:pt-4">
-            <Button variant="outline" className="sm:w-auto" onClick={handleResetFilters}>
+            <Button
+              variant="outline"
+              className="sm:w-auto"
+              onClick={handleResetFilters}
+            >
               Reset
             </Button>
-            <Button className="sm:w-auto" onClick={() => setIsDialogOpen(false)}>
+            <Button
+              className="sm:w-auto"
+              onClick={() => setIsDialogOpen(false)}
+            >
               Apply Filters
             </Button>
           </DialogFooter>
@@ -423,7 +460,9 @@ function IndexPage() {
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         {noResults ? (
           <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-stroke/50 bg-brand-bg-2/30 px-6 py-16 text-center">
-            <p className="text-base font-medium text-brand-black">No products match your filters yet.</p>
+            <p className="text-base font-medium text-brand-black">
+              No products match your filters yet.
+            </p>
             <p className="mt-2 text-sm text-brand-mid-gray">
               Try adjusting the filters or reset them to explore more devices.
             </p>
@@ -449,7 +488,9 @@ function IndexPage() {
                 <CardContent className="space-y-4 p-0">
                   <div className="relative flex h-70 items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2">
                     <div className="flex h-56 w-56 items-center justify-center rounded-xl bg-gray-200">
-                      <span className="text-sm text-gray-400">Product Image</span>
+                      <span className="text-sm text-gray-400">
+                        Product Image
+                      </span>
                     </div>
 
                     {product.inCart && (
