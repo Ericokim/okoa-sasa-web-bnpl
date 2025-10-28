@@ -64,6 +64,6 @@ function ProductDetailPage() {
   )
 }
 
-export const Route = createFileRoute('/_protected/products/$productId')({
+export const Route = createFileRoute('/products/$productId')({
   component: ProductDetailPage,
 })

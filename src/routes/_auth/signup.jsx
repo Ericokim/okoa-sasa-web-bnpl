@@ -42,7 +42,7 @@ function RegisterScreen() {
       <Card className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-xl">
         <CardContent className="p-8">
           {/* Close Button */}
-          {/* <div className="flex justify-end mb-6">
+          <div className="flex justify-end mb-6">
             <Button
               variant="ghost"
               size="icon"
@@ -51,7 +51,7 @@ function RegisterScreen() {
             >
               <X className="h-4 w-4" />
             </Button>
-          </div> */}
+          </div>
 
           {/* Logo */}
           <div className="flex justify-center mb-8">
