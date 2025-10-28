@@ -22,15 +22,11 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgotPas
 import { Route as ProtectedProfileIndexRouteImport } from './routes/_protected/profile/index'
 import { Route as ProtectedOrdersIndexRouteImport } from './routes/_protected/orders/index'
 import { Route as ProtectedCheckoutIndexRouteImport } from './routes/_protected/checkout/index'
-<<<<<<< HEAD
 import { Route as ProtectedProfilePersonalInfoCardRouteImport } from './routes/_protected/profile/PersonalInfoCard'
 import { Route as ProtectedProfileNotificationPreferencesCardRouteImport } from './routes/_protected/profile/NotificationPreferencesCard'
 import { Route as ProtectedProfileDangerZoneCardRouteImport } from './routes/_protected/profile/DangerZoneCard'
 import { Route as ProtectedProfileAddressInfoCardRouteImport } from './routes/_protected/profile/AddressInfoCard'
 import { Route as ProtectedProfileAccountProfileCardRouteImport } from './routes/_protected/profile/AccountProfileCard'
-import { Route as ProtectedProductsProductIdRouteImport } from './routes/_protected/products/$productId'
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
 import { Route as ProtectedOrdersOrderIdRouteImport } from './routes/_protected/orders/$orderId'
 
 const CartRoute = CartRouteImport.update({
@@ -96,7 +92,6 @@ const ProtectedCheckoutIndexRoute = ProtectedCheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => ProtectedRoute,
 } as any)
-<<<<<<< HEAD
 const ProtectedProfilePersonalInfoCardRoute =
   ProtectedProfilePersonalInfoCardRouteImport.update({
     id: '/profile/PersonalInfoCard',
@@ -127,14 +122,6 @@ const ProtectedProfileAccountProfileCardRoute =
     path: '/profile/AccountProfileCard',
     getParentRoute: () => ProtectedRoute,
   } as any)
-const ProtectedProductsProductIdRoute =
-  ProtectedProductsProductIdRouteImport.update({
-    id: '/products/$productId',
-    path: '/products/$productId',
-    getParentRoute: () => ProtectedRoute,
-  } as any)
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
 const ProtectedOrdersOrderIdRoute = ProtectedOrdersOrderIdRouteImport.update({
   id: '/orders/$orderId',
   path: '/orders/$orderId',
@@ -151,15 +138,11 @@ export interface FileRoutesByFullPath {
   '/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
-<<<<<<< HEAD
-  '/products/$productId': typeof ProtectedProductsProductIdRoute
   '/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
   '/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
   '/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
   '/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
   '/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
   '/checkout': typeof ProtectedCheckoutIndexRoute
   '/orders': typeof ProtectedOrdersIndexRoute
   '/profile': typeof ProtectedProfileIndexRoute
@@ -174,15 +157,11 @@ export interface FileRoutesByTo {
   '/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
-<<<<<<< HEAD
-  '/products/$productId': typeof ProtectedProductsProductIdRoute
   '/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
   '/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
   '/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
   '/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
   '/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
   '/checkout': typeof ProtectedCheckoutIndexRoute
   '/orders': typeof ProtectedOrdersIndexRoute
   '/profile': typeof ProtectedProfileIndexRoute
@@ -200,15 +179,11 @@ export interface FileRoutesById {
   '/_protected/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/_protected/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
-<<<<<<< HEAD
-  '/_protected/products/$productId': typeof ProtectedProductsProductIdRoute
   '/_protected/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
   '/_protected/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
   '/_protected/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
   '/_protected/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
   '/_protected/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
   '/_protected/checkout/': typeof ProtectedCheckoutIndexRoute
   '/_protected/orders/': typeof ProtectedOrdersIndexRoute
   '/_protected/profile/': typeof ProtectedProfileIndexRoute
@@ -224,15 +199,12 @@ export interface FileRouteTypes {
     | '/signup'
     | '/change-password'
     | '/products/$productId'
-<<<<<<< HEAD
+    | '/orders/$orderId'
     | '/profile/AccountProfileCard'
     | '/profile/AddressInfoCard'
     | '/profile/DangerZoneCard'
     | '/profile/NotificationPreferencesCard'
     | '/profile/PersonalInfoCard'
-=======
-    | '/orders/$orderId'
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
     | '/checkout'
     | '/orders'
     | '/profile'
@@ -246,15 +218,12 @@ export interface FileRouteTypes {
     | '/signup'
     | '/change-password'
     | '/products/$productId'
-<<<<<<< HEAD
+    | '/orders/$orderId'
     | '/profile/AccountProfileCard'
     | '/profile/AddressInfoCard'
     | '/profile/DangerZoneCard'
     | '/profile/NotificationPreferencesCard'
     | '/profile/PersonalInfoCard'
-=======
-    | '/orders/$orderId'
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
     | '/checkout'
     | '/orders'
     | '/profile'
@@ -271,15 +240,11 @@ export interface FileRouteTypes {
     | '/_protected/change-password'
     | '/products/$productId'
     | '/_protected/orders/$orderId'
-<<<<<<< HEAD
-    | '/_protected/products/$productId'
     | '/_protected/profile/AccountProfileCard'
     | '/_protected/profile/AddressInfoCard'
     | '/_protected/profile/DangerZoneCard'
     | '/_protected/profile/NotificationPreferencesCard'
     | '/_protected/profile/PersonalInfoCard'
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
     | '/_protected/checkout/'
     | '/_protected/orders/'
     | '/_protected/profile/'
@@ -386,7 +351,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCheckoutIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
-<<<<<<< HEAD
     '/_protected/profile/PersonalInfoCard': {
       id: '/_protected/profile/PersonalInfoCard'
       path: '/profile/PersonalInfoCard'
@@ -422,15 +386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProfileAccountProfileCardRouteImport
       parentRoute: typeof ProtectedRoute
     }
-    '/_protected/products/$productId': {
-      id: '/_protected/products/$productId'
-      path: '/products/$productId'
-      fullPath: '/products/$productId'
-      preLoaderRoute: typeof ProtectedProductsProductIdRouteImport
-      parentRoute: typeof ProtectedRoute
-    }
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
     '/_protected/orders/$orderId': {
       id: '/_protected/orders/$orderId'
       path: '/orders/$orderId'
@@ -460,15 +415,11 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 interface ProtectedRouteChildren {
   ProtectedChangePasswordRoute: typeof ProtectedChangePasswordRoute
   ProtectedOrdersOrderIdRoute: typeof ProtectedOrdersOrderIdRoute
-<<<<<<< HEAD
-  ProtectedProductsProductIdRoute: typeof ProtectedProductsProductIdRoute
   ProtectedProfileAccountProfileCardRoute: typeof ProtectedProfileAccountProfileCardRoute
   ProtectedProfileAddressInfoCardRoute: typeof ProtectedProfileAddressInfoCardRoute
   ProtectedProfileDangerZoneCardRoute: typeof ProtectedProfileDangerZoneCardRoute
   ProtectedProfileNotificationPreferencesCardRoute: typeof ProtectedProfileNotificationPreferencesCardRoute
   ProtectedProfilePersonalInfoCardRoute: typeof ProtectedProfilePersonalInfoCardRoute
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
   ProtectedCheckoutIndexRoute: typeof ProtectedCheckoutIndexRoute
   ProtectedOrdersIndexRoute: typeof ProtectedOrdersIndexRoute
   ProtectedProfileIndexRoute: typeof ProtectedProfileIndexRoute
@@ -477,8 +428,6 @@ interface ProtectedRouteChildren {
 const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedChangePasswordRoute: ProtectedChangePasswordRoute,
   ProtectedOrdersOrderIdRoute: ProtectedOrdersOrderIdRoute,
-<<<<<<< HEAD
-  ProtectedProductsProductIdRoute: ProtectedProductsProductIdRoute,
   ProtectedProfileAccountProfileCardRoute:
     ProtectedProfileAccountProfileCardRoute,
   ProtectedProfileAddressInfoCardRoute: ProtectedProfileAddressInfoCardRoute,
@@ -486,8 +435,6 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedProfileNotificationPreferencesCardRoute:
     ProtectedProfileNotificationPreferencesCardRoute,
   ProtectedProfilePersonalInfoCardRoute: ProtectedProfilePersonalInfoCardRoute,
-=======
->>>>>>> 05a3608d0060baf7ab9abc7a402b881773169531
   ProtectedCheckoutIndexRoute: ProtectedCheckoutIndexRoute,
   ProtectedOrdersIndexRoute: ProtectedOrdersIndexRoute,
   ProtectedProfileIndexRoute: ProtectedProfileIndexRoute,
