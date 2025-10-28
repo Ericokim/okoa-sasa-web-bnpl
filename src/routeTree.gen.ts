@@ -24,6 +24,11 @@ import { Route as ProtectedProfileIndexRouteImport } from './routes/_protected/p
 import { Route as ProtectedProductsIndexRouteImport } from './routes/_protected/products/index'
 import { Route as ProtectedOrdersIndexRouteImport } from './routes/_protected/orders/index'
 import { Route as ProtectedCheckoutIndexRouteImport } from './routes/_protected/checkout/index'
+import { Route as ProtectedProfilePersonalInfoCardRouteImport } from './routes/_protected/profile/PersonalInfoCard'
+import { Route as ProtectedProfileNotificationPreferencesCardRouteImport } from './routes/_protected/profile/NotificationPreferencesCard'
+import { Route as ProtectedProfileDangerZoneCardRouteImport } from './routes/_protected/profile/DangerZoneCard'
+import { Route as ProtectedProfileAddressInfoCardRouteImport } from './routes/_protected/profile/AddressInfoCard'
+import { Route as ProtectedProfileAccountProfileCardRouteImport } from './routes/_protected/profile/AccountProfileCard'
 import { Route as ProtectedProductsProductIdRouteImport } from './routes/_protected/products/$productId'
 import { Route as ProtectedOrdersOrderIdRouteImport } from './routes/_protected/orders/$orderId'
 
@@ -100,6 +105,36 @@ const ProtectedCheckoutIndexRoute = ProtectedCheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedProfilePersonalInfoCardRoute =
+  ProtectedProfilePersonalInfoCardRouteImport.update({
+    id: '/profile/PersonalInfoCard',
+    path: '/profile/PersonalInfoCard',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedProfileNotificationPreferencesCardRoute =
+  ProtectedProfileNotificationPreferencesCardRouteImport.update({
+    id: '/profile/NotificationPreferencesCard',
+    path: '/profile/NotificationPreferencesCard',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedProfileDangerZoneCardRoute =
+  ProtectedProfileDangerZoneCardRouteImport.update({
+    id: '/profile/DangerZoneCard',
+    path: '/profile/DangerZoneCard',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedProfileAddressInfoCardRoute =
+  ProtectedProfileAddressInfoCardRouteImport.update({
+    id: '/profile/AddressInfoCard',
+    path: '/profile/AddressInfoCard',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
+const ProtectedProfileAccountProfileCardRoute =
+  ProtectedProfileAccountProfileCardRouteImport.update({
+    id: '/profile/AccountProfileCard',
+    path: '/profile/AccountProfileCard',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ProtectedProductsProductIdRoute =
   ProtectedProductsProductIdRouteImport.update({
     id: '/products/$productId',
@@ -124,6 +159,11 @@ export interface FileRoutesByFullPath {
   '/how-it-works': typeof ProtectedHowItWorksRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/products/$productId': typeof ProtectedProductsProductIdRoute
+  '/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
+  '/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
+  '/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
+  '/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
+  '/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
   '/checkout': typeof ProtectedCheckoutIndexRoute
   '/orders': typeof ProtectedOrdersIndexRoute
   '/products': typeof ProtectedProductsIndexRoute
@@ -141,6 +181,11 @@ export interface FileRoutesByTo {
   '/how-it-works': typeof ProtectedHowItWorksRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/products/$productId': typeof ProtectedProductsProductIdRoute
+  '/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
+  '/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
+  '/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
+  '/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
+  '/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
   '/checkout': typeof ProtectedCheckoutIndexRoute
   '/orders': typeof ProtectedOrdersIndexRoute
   '/products': typeof ProtectedProductsIndexRoute
@@ -161,6 +206,11 @@ export interface FileRoutesById {
   '/_protected/how-it-works': typeof ProtectedHowItWorksRoute
   '/_protected/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
   '/_protected/products/$productId': typeof ProtectedProductsProductIdRoute
+  '/_protected/profile/AccountProfileCard': typeof ProtectedProfileAccountProfileCardRoute
+  '/_protected/profile/AddressInfoCard': typeof ProtectedProfileAddressInfoCardRoute
+  '/_protected/profile/DangerZoneCard': typeof ProtectedProfileDangerZoneCardRoute
+  '/_protected/profile/NotificationPreferencesCard': typeof ProtectedProfileNotificationPreferencesCardRoute
+  '/_protected/profile/PersonalInfoCard': typeof ProtectedProfilePersonalInfoCardRoute
   '/_protected/checkout/': typeof ProtectedCheckoutIndexRoute
   '/_protected/orders/': typeof ProtectedOrdersIndexRoute
   '/_protected/products/': typeof ProtectedProductsIndexRoute
@@ -180,6 +230,11 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/orders/$orderId'
     | '/products/$productId'
+    | '/profile/AccountProfileCard'
+    | '/profile/AddressInfoCard'
+    | '/profile/DangerZoneCard'
+    | '/profile/NotificationPreferencesCard'
+    | '/profile/PersonalInfoCard'
     | '/checkout'
     | '/orders'
     | '/products'
@@ -197,6 +252,11 @@ export interface FileRouteTypes {
     | '/how-it-works'
     | '/orders/$orderId'
     | '/products/$productId'
+    | '/profile/AccountProfileCard'
+    | '/profile/AddressInfoCard'
+    | '/profile/DangerZoneCard'
+    | '/profile/NotificationPreferencesCard'
+    | '/profile/PersonalInfoCard'
     | '/checkout'
     | '/orders'
     | '/products'
@@ -216,6 +276,11 @@ export interface FileRouteTypes {
     | '/_protected/how-it-works'
     | '/_protected/orders/$orderId'
     | '/_protected/products/$productId'
+    | '/_protected/profile/AccountProfileCard'
+    | '/_protected/profile/AddressInfoCard'
+    | '/_protected/profile/DangerZoneCard'
+    | '/_protected/profile/NotificationPreferencesCard'
+    | '/_protected/profile/PersonalInfoCard'
     | '/_protected/checkout/'
     | '/_protected/orders/'
     | '/_protected/products/'
@@ -335,6 +400,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedCheckoutIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/profile/PersonalInfoCard': {
+      id: '/_protected/profile/PersonalInfoCard'
+      path: '/profile/PersonalInfoCard'
+      fullPath: '/profile/PersonalInfoCard'
+      preLoaderRoute: typeof ProtectedProfilePersonalInfoCardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/profile/NotificationPreferencesCard': {
+      id: '/_protected/profile/NotificationPreferencesCard'
+      path: '/profile/NotificationPreferencesCard'
+      fullPath: '/profile/NotificationPreferencesCard'
+      preLoaderRoute: typeof ProtectedProfileNotificationPreferencesCardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/profile/DangerZoneCard': {
+      id: '/_protected/profile/DangerZoneCard'
+      path: '/profile/DangerZoneCard'
+      fullPath: '/profile/DangerZoneCard'
+      preLoaderRoute: typeof ProtectedProfileDangerZoneCardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/profile/AddressInfoCard': {
+      id: '/_protected/profile/AddressInfoCard'
+      path: '/profile/AddressInfoCard'
+      fullPath: '/profile/AddressInfoCard'
+      preLoaderRoute: typeof ProtectedProfileAddressInfoCardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/profile/AccountProfileCard': {
+      id: '/_protected/profile/AccountProfileCard'
+      path: '/profile/AccountProfileCard'
+      fullPath: '/profile/AccountProfileCard'
+      preLoaderRoute: typeof ProtectedProfileAccountProfileCardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/products/$productId': {
       id: '/_protected/products/$productId'
       path: '/products/$productId'
@@ -375,6 +475,11 @@ interface ProtectedRouteChildren {
   ProtectedHowItWorksRoute: typeof ProtectedHowItWorksRoute
   ProtectedOrdersOrderIdRoute: typeof ProtectedOrdersOrderIdRoute
   ProtectedProductsProductIdRoute: typeof ProtectedProductsProductIdRoute
+  ProtectedProfileAccountProfileCardRoute: typeof ProtectedProfileAccountProfileCardRoute
+  ProtectedProfileAddressInfoCardRoute: typeof ProtectedProfileAddressInfoCardRoute
+  ProtectedProfileDangerZoneCardRoute: typeof ProtectedProfileDangerZoneCardRoute
+  ProtectedProfileNotificationPreferencesCardRoute: typeof ProtectedProfileNotificationPreferencesCardRoute
+  ProtectedProfilePersonalInfoCardRoute: typeof ProtectedProfilePersonalInfoCardRoute
   ProtectedCheckoutIndexRoute: typeof ProtectedCheckoutIndexRoute
   ProtectedOrdersIndexRoute: typeof ProtectedOrdersIndexRoute
   ProtectedProductsIndexRoute: typeof ProtectedProductsIndexRoute
@@ -388,6 +493,13 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedHowItWorksRoute: ProtectedHowItWorksRoute,
   ProtectedOrdersOrderIdRoute: ProtectedOrdersOrderIdRoute,
   ProtectedProductsProductIdRoute: ProtectedProductsProductIdRoute,
+  ProtectedProfileAccountProfileCardRoute:
+    ProtectedProfileAccountProfileCardRoute,
+  ProtectedProfileAddressInfoCardRoute: ProtectedProfileAddressInfoCardRoute,
+  ProtectedProfileDangerZoneCardRoute: ProtectedProfileDangerZoneCardRoute,
+  ProtectedProfileNotificationPreferencesCardRoute:
+    ProtectedProfileNotificationPreferencesCardRoute,
+  ProtectedProfilePersonalInfoCardRoute: ProtectedProfilePersonalInfoCardRoute,
   ProtectedCheckoutIndexRoute: ProtectedCheckoutIndexRoute,
   ProtectedOrdersIndexRoute: ProtectedOrdersIndexRoute,
   ProtectedProductsIndexRoute: ProtectedProductsIndexRoute,
