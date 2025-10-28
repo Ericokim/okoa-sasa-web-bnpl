@@ -43,12 +43,12 @@ export function RootLayout() {
 }
 
 /**
- * Protected Layout - Wraps authenticated routes with main layout + auth guard
+ * Protected Layout - Wraps authenticated routes with auth guard only (Layout comes from root)
  */
 export function ProtectedLayout() {
   return (
     <ProtectedRoute>
-      <Layout />
+      <Outlet />
     </ProtectedRoute>
   )
 }
@@ -58,4 +58,13 @@ export function ProtectedLayout() {
  */
 export function AuthLayout() {
   return <Outlet />
+}
+
+/** Public Layout (for /) */
+export function PublicLayout() {
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  )
 }

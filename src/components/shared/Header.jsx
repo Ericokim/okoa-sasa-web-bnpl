@@ -13,8 +13,9 @@ import { useStateContext } from '@/context/state-context'
 
 export function Header() {
   const { user, cart, logout } = useStateContext()
+  const cartCount = cart?.length || 0
   const isAuthenticated = !!user
-  const cartItemCount = cart?.length || 0
+  const cartItemCount = cartCount || 0
 
   return (
     <header className="w-full border-b border-[#e8ecf4] bg-white">
@@ -108,7 +109,7 @@ export function Header() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Link to="/singin" className="flex items-center gap-1 px-2 py-1">
+              <Link to="/signin" className="flex items-center gap-1 px-2 py-1">
                 <User className="h-6 w-6 text-black" />
                 <span className="text-base font-normal text-black hidden sm:inline">
                   Account

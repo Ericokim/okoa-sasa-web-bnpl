@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Card, CardContent } from '@/components/ui/card'
-import { Phone } from 'lucide-react'
+import { Phone, X } from 'lucide-react'
 
-function SigninOTPScreen() {
+function SigninScreen() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
   const navigate = useNavigate()
@@ -24,7 +24,7 @@ function SigninOTPScreen() {
       <Card className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-xl">
         <CardContent className="p-8">
           {/* Close Button */}
-          {/* <div className="flex justify-end mb-6">
+          <div className="flex justify-end mb-6">
             <Button
               variant="ghost"
               size="icon"
@@ -33,7 +33,7 @@ function SigninOTPScreen() {
             >
               <X className="h-4 w-4" />
             </Button>
-          </div> */}
+          </div>
 
           {/* Logo */}
           <div className="flex justify-center mb-8">
@@ -125,5 +125,5 @@ function SigninOTPScreen() {
 }
 
 export const Route = createFileRoute('/_auth/signin')({
-  component: SigninOTPScreen,
+  component: SigninScreen,
 })

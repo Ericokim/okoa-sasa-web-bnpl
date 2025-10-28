@@ -8,7 +8,7 @@ import { ContextProvider } from '@/context/state-context'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TooltipProvider } from '@/components/ui/tooltip'
 
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 3,
@@ -17,8 +17,6 @@ const queryClient = new QueryClient({
     },
   },
 })
-
-export { queryClient }
 
 export function getContext() {
   return {

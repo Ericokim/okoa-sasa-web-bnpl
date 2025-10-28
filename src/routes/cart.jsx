@@ -1,6 +1,20 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import { useStateContext } from '@/context/state-context'
+import { AuthDialog } from '@/components/shared/AuthDialog'
 
 function CartPage() {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useStateContext()
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true)
+    } else {
+      navigate({ to: '/checkout' })
+    }
+  }
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">Shopping Cart</h1>
@@ -40,17 +54,25 @@ function CartPage() {
               <span>KES 3,200</span>
             </div>
           </div>
-          <Link to="/checkout">
-            <button className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-              Proceed to Checkout
-            </button>
-          </Link>
+          <button 
+            onClick={handleCheckout}
+            className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+          >
+            Proceed to Checkout
+          </button>
         </div>
       </div>
+
+      {/* Auth Dialog */}
+      <AuthDialog
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+        redirectTo="/checkout"
+      />
     </div>
   )
 }
 
-export const Route = createFileRoute('/_protected/cart')({
+export const Route = createFileRoute('/cart')({
   component: CartPage,
 })

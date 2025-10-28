@@ -1,108 +1,199 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { useStateContext } from '@/context/state-context'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import {
-  Smartphone,
-  CreditCard,
-  CheckCircle,
-  Truck,
-  ArrowRight,
-} from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
+import { ShoppingCart, X, ChevronDown, SlidersHorizontal } from 'lucide-react'
+
+// Mock product data to match Figma design
+const products = [
+  {
+    id: 1,
+    name: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover+...)',
+    price: 87696,
+    originalPrice: 97696,
+    image: '/placeholder-phone.jpg',
+    inCart: false,
+  },
+  {
+    id: 2,
+    name: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover+...)',
+    price: 87696,
+    originalPrice: 97696,
+    image: '/placeholder-phone.jpg',
+    inCart: true,
+  },
+  {
+    id: 3,
+    name: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover+...)',
+    price: 87696,
+    originalPrice: 97696,
+    image: '/placeholder-phone.jpg',
+    inCart: false,
+  },
+  {
+    id: 4,
+    name: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover+...)',
+    price: 87696,
+    originalPrice: 97696,
+    image: '/placeholder-phone.jpg',
+    inCart: true,
+  },
+]
+
+const filters = [
+  { label: 'Brand', removable: true },
+  { label: 'Price Range', removable: true },
+  { label: 'Device Type', removable: true },
+]
 
 function IndexPage() {
-  const { isAuthenticated } = useStateContext()
-
-  const features = [
-    {
-      icon: <Smartphone className="h-12 w-12" />,
-      title: 'Browse and choose your device',
-      step: 1,
-    },
-    {
-      icon: <CreditCard className="h-12 w-12" />,
-      title: 'Fill in your details and employer info',
-      step: 2,
-    },
-    {
-      icon: <CheckCircle className="h-12 w-12" />,
-      title: 'We review your loan request',
-      step: 3,
-    },
-    {
-      icon: <Truck className="h-12 w-12" />,
-      title: 'Once approved, your device is delivered',
-      step: 4,
-    },
-  ]
-
   return (
-    <div className="min-h-screen">
-      {/* Featured Products Preview */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-brand-black mb-4">
-              Featured Products
-            </h2>
-            <p className="text-lg text-brand-gray">
-              Browse our latest smartphone collection
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-            {[1, 2, 3].map((i) => (
-              <Card key={i} className="border-brand-stroke">
-                <CardContent className="p-6">
-                  <div className="bg-brand-bg-2 rounded-xl h-48 mb-4 flex items-center justify-center">
-                    <span className="text-brand-mid-gray">Product Image</span>
-                  </div>
-                  <h3 className="font-semibold text-brand-black mb-2">
-                    iPhone 14 - 128GB
-                  </h3>
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-brand-black">
-                      KES 87,696
-                    </span>
-                    <span className="text-sm text-brand-mid-gray line-through">
-                      KES 97,696
-                    </span>
-                  </div>
-                  <p className="text-sm text-brand-secondary mt-2">
-                    Or pay KES 21,924/month
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Button asChild variant="gradient" size="lg">
-              <Link to="/products">
-                View All Products
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-          </div>
+    <div className="space-y-10">
+      {/* Filter Bar */}
+      <div className="flex justify-between items-center py-6">
+        <div className="flex items-center gap-6">
+          {filters.map((filter, index) => (
+            <Badge
+              key={index}
+              variant="secondary"
+              className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal"
+            >
+              {filter.label}
+              {filter.removable && (
+                <X className="ml-2 h-4 w-4 cursor-pointer" />
+              )}
+            </Badge>
+          ))}
+          <Badge
+            variant="outline"
+            className="bg-brand-bg-2 text-brand-black border-none rounded-3xl px-4 py-2 text-base font-normal cursor-pointer"
+          >
+            All Filters
+            <SlidersHorizontal className="ml-2 h-4 w-4" />
+          </Badge>
         </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="bg-brand-black text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of satisfied customers using Okoa Sasa
-          </p>
-          <Button asChild variant="gradient" size="lg">
-            <Link to="/signup">
-              Start Shopping Today
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            className="border-brand-primary-start text-brand-primary-start rounded-3xl px-4 py-2 bg-gradient-to-b from-transparent to-transparent hover:from-brand-primary-start/10 hover:to-brand-primary-end/10"
+          >
+            How it works
+          </Button>
+          <Button
+            variant="outline"
+            className="border-brand-stroke text-brand-black rounded-3xl px-4 py-2"
+          >
+            My Loan Limit
+            <ChevronDown className="ml-2 h-4 w-4" />
+          </Button>
+          <Button
+            variant="outline"
+            className="border-brand-stroke text-brand-black rounded-3xl px-4 py-2"
+          >
+            Sort By
+            <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
         </div>
-      </section>
+      </div>
+
+      {/* Product Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[...products, ...products].map((product, index) => (
+          <Link
+            key={`${product.id}-${index}`}
+            to={`/products/${product.id}`}
+            className="hover:brand-primary-end"
+          >
+            <Card className="border-none shadow-none">
+              <CardContent className="p-0 space-y-4">
+                {/* Product Image */}
+                <div className="relative bg-brand-bg-2 rounded-2xl h-70 flex items-center justify-center overflow-hidden">
+                  <div className="w-56 h-56 bg-gray-200 rounded-xl flex items-center justify-center">
+                    <span className="text-gray-400 text-sm">Phone Image</span>
+                  </div>
+
+                  {/* Add to Cart Button */}
+                  {product.inCart && (
+                    <div className="absolute top-4 right-4">
+                      <Button
+                        size="icon"
+                        variant="gradient"
+                        className="h-12 w-12 rounded-full shadow-lg"
+                      >
+                        <ShoppingCart className="h-6 w-6" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Product Info */}
+                <div className="space-y-2">
+                  <h3 className="text-base font-medium text-brand-black leading-relaxed line-clamp-2">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-center gap-3">
+                    <span className="text-base font-semibold text-brand-black">
+                      KES {product.price.toLocaleString()}
+                    </span>
+                    <span className="text-sm font-medium text-brand-mid-gray line-through">
+                      KES {product.originalPrice.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4 py-8">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 rounded-2xl border-brand-stroke opacity-30"
+          disabled
+        >
+          <ChevronDown className="h-4 w-4 rotate-90" />
+        </Button>
+
+        <Button
+          size="icon"
+          className="h-10 w-10 rounded-2xl bg-gradient-to-b from-brand-primary-start/12 to-brand-primary-end/12 border border-brand-primary-start text-brand-primary-start"
+        >
+          1
+        </Button>
+
+        {[2, 3].map((page) => (
+          <Button
+            key={page}
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-2xl border-brand-stroke text-brand-black"
+          >
+            {page}
+          </Button>
+        ))}
+
+        <span className="text-brand-black font-semibold">...</span>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 rounded-2xl border-brand-stroke text-brand-black"
+        >
+          7
+        </Button>
+
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-10 w-10 rounded-2xl border-brand-stroke"
+        >
+          <ChevronDown className="h-4 w-4 -rotate-90" />
+        </Button>
+      </div>
     </div>
   )
 }
