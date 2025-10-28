@@ -149,7 +149,6 @@ export const QUERY_KEYS = {
   // Authentication
   AUTH_LOGIN: 'auth/login',
   AUTH_LOGOUT: 'auth/logout',
-  AUTH_REGISTER: 'auth/register',
   AUTH_VALIDATE_OTP: 'auth/validate-otp',
   AUTH_RESET_PASSWORD: 'auth/reset-password',
 

@@ -270,7 +270,7 @@ function CartPage() {
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
-        redirectTo="/checkout"
+        redirectTo="/otp"
       />
     </div>
   )

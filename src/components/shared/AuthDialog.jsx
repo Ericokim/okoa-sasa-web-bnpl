@@ -141,17 +141,6 @@ export function AuthDialog({ open, onOpenChange, redirectTo = '/' }) {
             >
               Login
             </Button>
-
-            <p className="text-center text-sm text-brand-gray">
-              Don’t have an account?{' '}
-              <button
-                type="button"
-                onClick={() => switchMode('signup')}
-                className="text-brand-primary-start hover:text-brand-primary-end font-medium"
-              >
-                Sign Up
-              </button>
-            </p>
           </form>
         ) : (
           /* --- SIGN UP --- */

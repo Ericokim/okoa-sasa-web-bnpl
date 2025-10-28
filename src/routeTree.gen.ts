@@ -15,7 +15,6 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductsProductIdRouteImport } from './routes/products/$productId'
 import { Route as ProtectedChangePasswordRouteImport } from './routes/_protected/change-password'
-import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AuthOtpRouteImport } from './routes/_auth/otp'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgotPassword'
@@ -52,11 +51,6 @@ const ProtectedChangePasswordRoute = ProtectedChangePasswordRouteImport.update({
   id: '/change-password',
   path: '/change-password',
   getParentRoute: () => ProtectedRoute,
-} as any)
-const AuthSignupRoute = AuthSignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => AuthRoute,
 } as any)
 const AuthSigninRoute = AuthSigninRouteImport.update({
   id: '/signin',
@@ -106,7 +100,6 @@ export interface FileRoutesByFullPath {
   '/forgotPassword': typeof AuthForgotPasswordRoute
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
-  '/signup': typeof AuthSignupRoute
   '/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
@@ -121,7 +114,6 @@ export interface FileRoutesByTo {
   '/forgotPassword': typeof AuthForgotPasswordRoute
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
-  '/signup': typeof AuthSignupRoute
   '/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
@@ -139,7 +131,6 @@ export interface FileRoutesById {
   '/_auth/forgotPassword': typeof AuthForgotPasswordRoute
   '/_auth/otp': typeof AuthOtpRoute
   '/_auth/signin': typeof AuthSigninRoute
-  '/_auth/signup': typeof AuthSignupRoute
   '/_protected/change-password': typeof ProtectedChangePasswordRoute
   '/products/$productId': typeof ProductsProductIdRoute
   '/_protected/orders/$orderId': typeof ProtectedOrdersOrderIdRoute
@@ -156,7 +147,6 @@ export interface FileRouteTypes {
     | '/forgotPassword'
     | '/otp'
     | '/signin'
-    | '/signup'
     | '/change-password'
     | '/products/$productId'
     | '/orders/$orderId'
@@ -171,7 +161,6 @@ export interface FileRouteTypes {
     | '/forgotPassword'
     | '/otp'
     | '/signin'
-    | '/signup'
     | '/change-password'
     | '/products/$productId'
     | '/orders/$orderId'
@@ -188,7 +177,6 @@ export interface FileRouteTypes {
     | '/_auth/forgotPassword'
     | '/_auth/otp'
     | '/_auth/signin'
-    | '/_auth/signup'
     | '/_protected/change-password'
     | '/products/$productId'
     | '/_protected/orders/$orderId'
@@ -249,13 +237,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/change-password'
       preLoaderRoute: typeof ProtectedChangePasswordRouteImport
       parentRoute: typeof ProtectedRoute
-    }
-    '/_auth/signup': {
-      id: '/_auth/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof AuthSignupRouteImport
-      parentRoute: typeof AuthRoute
     }
     '/_auth/signin': {
       id: '/_auth/signin'
@@ -320,14 +301,12 @@ interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthOtpRoute: typeof AuthOtpRoute
   AuthSigninRoute: typeof AuthSigninRoute
-  AuthSignupRoute: typeof AuthSignupRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthOtpRoute: AuthOtpRoute,
   AuthSigninRoute: AuthSigninRoute,
-  AuthSignupRoute: AuthSignupRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
