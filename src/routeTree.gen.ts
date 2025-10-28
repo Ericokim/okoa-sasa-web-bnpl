@@ -19,6 +19,7 @@ import { Route as AuthSignupRouteImport } from './routes/_auth/signup'
 import { Route as AuthSigninRouteImport } from './routes/_auth/signin'
 import { Route as AuthOtpRouteImport } from './routes/_auth/otp'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgotPassword'
+import { Route as FAQsFAQsRouteImport } from './routes/_FAQs/FAQs'
 import { Route as ProtectedProfileIndexRouteImport } from './routes/_protected/profile/index'
 import { Route as ProtectedOrdersIndexRouteImport } from './routes/_protected/orders/index'
 import { Route as ProtectedCheckoutIndexRouteImport } from './routes/_protected/checkout/index'
@@ -72,6 +73,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgotPassword',
   getParentRoute: () => AuthRoute,
 } as any)
+const FAQsFAQsRoute = FAQsFAQsRouteImport.update({
+  id: '/_FAQs/FAQs',
+  path: '/FAQs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedProfileIndexRoute = ProtectedProfileIndexRouteImport.update({
   id: '/profile/',
   path: '/profile/',
@@ -96,6 +102,7 @@ const ProtectedOrdersOrderIdRoute = ProtectedOrdersOrderIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
+  '/FAQs': typeof FAQsFAQsRoute
   '/forgotPassword': typeof AuthForgotPasswordRoute
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/cart': typeof CartRoute
+  '/FAQs': typeof FAQsFAQsRoute
   '/forgotPassword': typeof AuthForgotPasswordRoute
   '/otp': typeof AuthOtpRoute
   '/signin': typeof AuthSigninRoute
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteWithChildren
   '/_protected': typeof ProtectedRouteWithChildren
   '/cart': typeof CartRoute
+  '/_FAQs/FAQs': typeof FAQsFAQsRoute
   '/_auth/forgotPassword': typeof AuthForgotPasswordRoute
   '/_auth/otp': typeof AuthOtpRoute
   '/_auth/signin': typeof AuthSigninRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/cart'
+    | '/FAQs'
     | '/forgotPassword'
     | '/otp'
     | '/signin'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/cart'
+    | '/FAQs'
     | '/forgotPassword'
     | '/otp'
     | '/signin'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/_auth'
     | '/_protected'
     | '/cart'
+    | '/_FAQs/FAQs'
     | '/_auth/forgotPassword'
     | '/_auth/otp'
     | '/_auth/signin'
@@ -190,6 +202,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   ProtectedRoute: typeof ProtectedRouteWithChildren
   CartRoute: typeof CartRoute
+  FAQsFAQsRoute: typeof FAQsFAQsRoute
   ProductsProductIdRoute: typeof ProductsProductIdRoute
 }
 
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_FAQs/FAQs': {
+      id: '/_FAQs/FAQs'
+      path: '/FAQs'
+      fullPath: '/FAQs'
+      preLoaderRoute: typeof FAQsFAQsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected/profile/': {
       id: '/_protected/profile/'
       path: '/profile'
@@ -337,6 +357,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   ProtectedRoute: ProtectedRouteWithChildren,
   CartRoute: CartRoute,
+  FAQsFAQsRoute: FAQsFAQsRoute,
   ProductsProductIdRoute: ProductsProductIdRoute,
 }
 export const routeTree = rootRouteImport
