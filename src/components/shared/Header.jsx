@@ -44,7 +44,7 @@ export function Header() {
           </Link>
 
           {/* Search Bar - Desktop */}
-          <div className="hidden lg:flex items-center bg-[#f3f3f3] rounded-[24px] px-4 py-3 w-[690px] gap-3 mx-4">
+          <div className="hidden lg:flex items-center bg-[#f3f3f3] rounded-3xl  px-4 py-3 w-[690px] gap-3 mx-4">
             <Search className="h-6 w-6 text-[#a0a4ac] shrink-0" />
             <input
               type="text"
@@ -79,7 +79,7 @@ export function Header() {
                   <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200">
                     <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white text-sm font-medium">
+                      <AvatarFallback className="bg-linear-to-br from-orange-400 to-orange-600 text-white text-sm font-medium">
                         {user?.name ? getInitials(user.name) : 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -105,7 +105,7 @@ export function Header() {
                   <div className="flex items-center gap-3 px-2 py-3">
                     <Avatar className="h-10 w-10">
                       <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-orange-400 to-orange-600 text-white font-medium">
+                      <AvatarFallback className="bg-linear-to-br from-orange-400 to-orange-600 text-white font-medium">
                         {user?.name ? getInitials(user.name) : 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -179,7 +179,7 @@ export function Header() {
 
         {/* Search Bar - Mobile */}
         <div className="lg:hidden pb-4">
-          <div className="flex items-center bg-[#f9fafb] rounded-[24px] px-4 py-3 gap-3">
+          <div className="flex items-center bg-[#f9fafb] rounded-3xl px-4 py-3 gap-3">
             <Search className="h-6 w-6 text-[#a0a4ac] shrink-0" />
             <input
               type="text"
