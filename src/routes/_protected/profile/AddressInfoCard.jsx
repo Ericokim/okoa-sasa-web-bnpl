@@ -33,7 +33,7 @@ export function AddressInfoCard() {
   const home = addresses.find((a) => a.type === 'home')
 
   return (
-    <div className="border rounded-xl shadow-sm p-6 bg-white">
+    <div className="border rounded-xl p-6 bg-white">
       <h3 className="text-xl font-semibold text-gray-900 mb-4">Address</h3>
 
       {/* Office */}
@@ -41,7 +41,7 @@ export function AddressInfoCard() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-orange-600" />
+              {/* <MapPin className="w-5 h-5 text-orange-600" /> */}
               <h4 className="text-1xl text-gray-500">Office Address</h4>
             </div>
             {editing !== 'office' && (
@@ -91,7 +91,7 @@ export function AddressInfoCard() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-gray-500" />
+              {/* <MapPin className="w-5 h-5 text-gray-500" /> */}
               <h4 className=" text-1xl text-gray-500">Home Address</h4>
             </div>
             {editing !== 'home' && (

@@ -31,7 +31,7 @@ export function PersonalInfoCard() {
   };
 
   return (
-    <div className="border rounded-xl shadow-sm p-6 bg-white">
+    <div className="border rounded-xl p-6 bg-white">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Personal Information</h3>
         {!editing && (
@@ -48,23 +48,23 @@ export function PersonalInfoCard() {
       {!editing ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="text-gray-500 uppercase text-xs font-medium">First Name</p>
+            <p className="text-gray-500 capitalize text-md font-medium">First Name</p>
             <p className="font-medium text-gray-900">{personalInfo.firstName}</p>
           </div>
           <div>
-            <p className="text-gray-500 uppercase text-xs font-medium">Last Name</p>
+            <p className="text-gray-500 capitalize text-md font-medium">Last Name</p>
             <p className="font-medium text-gray-900">{personalInfo.lastName}</p>
           </div>
           <div>
-            <p className="text-gray-500 uppercase text-xs font-medium">Designation</p>
+            <p className="text-gray-500 capitalize text-md font-medium">Designation</p>
             <p className="font-medium text-gray-900">{personalInfo.role}</p>
           </div>
           <div>
-            <p className="text-gray-500 uppercase text-xs font-medium">Email Address</p>
+            <p className="text-gray-500 capitalize text-md font-medium">Email Address</p>
             <p className="font-medium text-gray-900">{personalInfo.email}</p>
           </div>
           <div>
-            <p className="text-gray-500 uppercase text-xs font-medium">Phone Number</p>
+            <p className="text-gray-500 capitalize text-md font-medium">Phone Number</p>
             <p className="font-medium text-gray-900">{personalInfo.phone}</p>
           </div>
         </div>

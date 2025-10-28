@@ -15,7 +15,7 @@ export function AccountProfileCard() {
   const { personalInfo } = useAccountStore();
 
   return (
-    <div className="border rounded-xl shadow-sm p-6 bg-white">
+    <div className="border rounded-xl p-6 bg-white">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-xl font-semibold text-gray-900">Profile</h3>
         <button className="flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm">

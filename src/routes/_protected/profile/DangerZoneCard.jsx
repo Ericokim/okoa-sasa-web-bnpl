@@ -28,13 +28,12 @@ export function DangerZoneCard() {
   return (
     <>
       {/* Danger Zone Card */}
-      <div className="border-2  rounded-xl shadow-sm p-6 ">
+      <div className="border-2  rounded-xl p-6 ">
         <div className="flex items-start justify-between">
           {/* Left: Title + Description */}
           <div className="flex-1 pr-8">
             <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="text-xl  text-red-400">
                 Delete My Account
               </h3>
             </div>

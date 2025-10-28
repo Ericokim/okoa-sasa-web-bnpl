@@ -39,9 +39,9 @@ export function NotificationPreferencesCard() {
   ];
 
   return (
-    <div className="border rounded-xl shadow-sm p-6 bg-white">
+    <div className="border rounded-xl p-6 bg-white">
       <div className="flex items-center gap-2 mb-4">
-        <Bell className="w-5 h-5 text-orange-600" />
+        {/* <Bell className="w-5 h-5 text-orange-600" /> */}
         <h3 className="text-xl font-semibold text-gray-900">
           Notification Preferences
         </h3>
