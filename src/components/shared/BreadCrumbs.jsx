@@ -1,260 +1,185 @@
-import React, { useState } from "react";
+import React from 'react'
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
+  BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import { Ellipsis, Home, ChevronRight } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useNavigate, useLocation } from "@tanstack/react-router";
+} from '@/components/ui/breadcrumb'
+import { cn } from '@/lib/utils'
+import { useLocation, useNavigate } from '@tanstack/react-router'
+import { ChevronRight, Home } from 'lucide-react'
 
-// Simple route name mapping for PavRisk CRM
-const ROUTE_NAMES = {
-  "/": "",
-  "/dashboard": "Dashboard",
-  "/analytics": "Analytics",
-  "/reports": "Reports",
-  "/collections": "Collections",
-  "/payments": "Payments",
-  "/invoices": "Invoices",
-  "/receipts": "Receipts",
-  "/customers": "Customers",
-  "/customer-groups": "Customer Groups",
-  "/communication": "Communication",
-  "/users": "Users",
-  "/roles": "Roles",
-  "/ussd-logs": "USSD Logs",
-  "/web-logs": "Web Logs",
-};
+const PATH_LABELS = {
+  '/': 'Home',
+  '/products': 'Products',
+  '/products/categories': 'Categories',
+  '/products/cart': 'My Cart',
+  '/checkout': 'Checkout',
+  '/loans': 'Loan Dashboard',
+  '/loans/apply': 'Apply',
+  '/loans/faq': 'Loan FAQ',
+  '/account': 'My Account',
+  '/account/orders': 'Orders',
+  '/account/settings': 'Settings',
+  '/support': 'Support',
+}
 
-// Convert path to readable label
-const getPageLabel = (path) => {
-  if (ROUTE_NAMES[path]) {
-    return ROUTE_NAMES[path];
+const formatSegment = (segment) => {
+  const decoded = decodeURIComponent(segment)
+
+  if (!decoded) return ''
+  if (/^\d+$/.test(decoded)) return `#${decoded}`
+
+  return decoded
+    .replace(/-/g, ' ')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+const buildTrailFromPath = (pathname) => {
+  if (!pathname || pathname === '/') {
+    return [
+      {
+        id: 'home',
+        path: '/',
+        label: PATH_LABELS['/'] ?? 'Home',
+        isCurrent: true,
+        icon: Home,
+      },
+    ]
   }
 
-  // Fallback: convert path segments to readable text
-  const segments = path.split("/").filter(Boolean);
-  const lastSegment = segments[segments.length - 1];
+  const segments = pathname.split('/').filter(Boolean)
+  const crumbs = []
+  let currentPath = ''
 
-  return lastSegment
-    ? lastSegment.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-    : "Home";
-};
+  segments.forEach((segment, index) => {
+    currentPath += `/${segment}`
+    const label = PATH_LABELS[currentPath] ?? formatSegment(segment)
+    const isCurrent = index === segments.length - 1
 
-export const BreadCrumbs = () => {
-  const [showAllCrumbs, setShowAllCrumbs] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+    crumbs.push({
+      id: currentPath,
+      path: currentPath,
+      label,
+      isCurrent,
+    })
+  })
 
-  const handleNavigation = React.useCallback(
-    (path) => {
+  return [
+    {
+      id: 'home',
+      path: '/',
+      label: PATH_LABELS['/'] ?? 'Home',
+      isCurrent: false,
+      icon: Home,
+    },
+    ...crumbs,
+  ]
+}
+
+export const BreadCrumbs = ({
+  title,
+  description,
+  items,
+  className,
+}) => {
+  const location = useLocation()
+  const navigate = useNavigate()
+
+  const crumbs = React.useMemo(() => {
+    if (Array.isArray(items) && items.length > 0) {
+      return items.map((item, index) => ({
+        id: item.id ?? item.path ?? item.href ?? `crumb-${index}`,
+        path: item.path ?? item.href ?? null,
+        label: item.label ?? formatSegment(String(item.path ?? item.href ?? '')),
+        isCurrent: item.isCurrent ?? index === items.length - 1,
+        icon: item.icon,
+        onClick: item.onClick,
+      }))
+    }
+
+    return buildTrailFromPath(location.pathname)
+  }, [items, location.pathname])
+
+  const handleNavigate = React.useCallback(
+    (crumb) => {
+      if (crumb.isCurrent) return
+      if (typeof crumb.onClick === 'function') {
+        crumb.onClick()
+        return
+      }
+
+      if (!crumb.path) return
+
       try {
-        navigate({ to: path });
+        navigate({ to: crumb.path })
       } catch (error) {
-        console.error("Navigation error:", error);
+        console.error('Breadcrumb navigation failed', error)
       }
     },
     [navigate],
-  );
+  )
 
-  // Generate breadcrumb path from current location
-  const crumbs = React.useMemo(() => {
-    const pathSegments = location.pathname.split("/").filter(Boolean);
-    const breadcrumbs = [];
-
-    // Always include home if we're not on home page
-    if (location.pathname !== "/" && location.pathname !== "/dashboard") {
-      breadcrumbs.push({
-        path: "/dashboard",
-        label: "Dashboard", // Empty for home icon
-        isCurrent: false,
-      });
-    }
-
-    // Build breadcrumbs from path segments
-    let currentPath = "";
-    pathSegments.forEach((segment) => {
-      currentPath += `/${segment}`;
-
-      breadcrumbs.push({
-        path: currentPath,
-        label: getPageLabel(currentPath),
-        isCurrent: currentPath === location.pathname,
-      });
-    });
-
-    return breadcrumbs;
-  }, [location.pathname]);
-
-  const getVisibleCrumbs = React.useCallback(() => {
-    if (showAllCrumbs) return crumbs;
-
-    const maxVisible = 4;
-    if (crumbs.length <= maxVisible) return crumbs;
-
-    // Show first + last few items
-    return [crumbs[0], ...crumbs.slice(crumbs.length - (maxVisible - 1))];
-  }, [crumbs, showAllCrumbs]);
-
-  const getCollapsedCrumbs = React.useCallback(() => {
-    if (showAllCrumbs) return [];
-
-    const maxVisible = 4;
-    if (crumbs.length <= maxVisible) return [];
-
-    // Middle items are collapsed
-    return crumbs.slice(1, crumbs.length - (maxVisible - 1));
-  }, [crumbs, showAllCrumbs]);
-
-  const visibleCrumbs = React.useMemo(
-    () => getVisibleCrumbs(),
-    [getVisibleCrumbs],
-  );
-  const collapsedCrumbs = React.useMemo(
-    () => getCollapsedCrumbs(),
-    [getCollapsedCrumbs],
-  );
-
-  if (crumbs.length === 0) return null;
+  if (!crumbs.length) return null
 
   return (
-    <div className="w-full">
-      <div className="flex items-center gap-2">
-        <Breadcrumb className="flex-1 min-w-0">
-          <BreadcrumbList className="flex items-center gap-1 text-base flex-nowrap overflow-x-auto">
-            {visibleCrumbs.map((c, idx) => {
-              const isLast = idx === visibleCrumbs.length - 1;
-              const shouldShowEllipsis =
-                !showAllCrumbs && idx === 1 && collapsedCrumbs.length > 0;
+    <div className={cn('flex flex-col gap-3', className)}>
+      <Breadcrumb>
+        <BreadcrumbList className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-brand-mid-gray sm:text-sm">
+          {crumbs.map((crumb, index) => {
+            const isLast = index === crumbs.length - 1
+            const Icon = crumb.icon ?? (crumb.path === '/' ? Home : null)
 
-              return (
-                <React.Fragment key={c.path}>
-                  {shouldShowEllipsis && (
-                    <>
-                      <BreadcrumbItem>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <BreadcrumbEllipsis asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-auto p-1 hover:bg-muted/50"
-                                aria-label="Show hidden breadcrumbs"
-                              >
-                                <Ellipsis className="size-4 text-muted-foreground" />
-                              </Button>
-                            </BreadcrumbEllipsis>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="start"
-                            className="min-w-[200px] max-w-[280px]"
-                          >
-                            {collapsedCrumbs.map((crumb) => (
-                              <DropdownMenuItem
-                                key={crumb.path}
-                                onClick={() => handleNavigation(crumb.path)}
-                                className="cursor-pointer capitalize text-sm flex items-center gap-2"
-                              >
-                                {crumb.path === "/dashboard" && (
-                                  <Home className="size-4 flex-shrink-0" />
-                                )}
-                                <span className="truncate">
-                                  {crumb.label || "Dashboard"}
-                                </span>
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </BreadcrumbItem>
-                      <BreadcrumbSeparator>
-                        <ChevronRight className="size-4" />
-                      </BreadcrumbSeparator>
-                    </>
+            return (
+              <React.Fragment key={crumb.id}>
+                <BreadcrumbItem>
+                  {isLast ? (
+                    <BreadcrumbPage className="inline-flex items-center gap-2 rounded-full bg-brand-bg-2 px-3 py-1.5 text-sm font-semibold capitalize text-brand-black">
+                      {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
+                      <span className="truncate">{crumb.label}</span>
+                    </BreadcrumbPage>
+                  ) : (
+                    <BreadcrumbLink asChild>
+                      <button
+                        type="button"
+                        onClick={() => handleNavigate(crumb)}
+                        className="inline-flex items-center gap-2 rounded-full bg-brand-bg-2/60 px-3 py-1.5 text-xs font-semibold capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:text-brand-black focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start"
+                      >
+                        {Icon && <Icon className="h-4 w-4" aria-hidden="true" />}
+                        <span className="truncate">{crumb.label}</span>
+                      </button>
+                    </BreadcrumbLink>
                   )}
+                </BreadcrumbItem>
 
-                  <BreadcrumbItem
-                    className={
-                      c.path === "/dashboard" ? "w-auto" : "max-w-[200px]"
-                    }
-                  >
-                    {isLast ? (
-                      <BreadcrumbPage className="capitalize font-medium text-foreground truncate flex items-center gap-1">
-                        {c.path === "/dashboard" ? (
-                          <>
-                            {/* <Home className="flex-shrink-0 size-4" /> */}
-                            <span className="truncate font-medium">
-                              {c.label}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="truncate font-medium">
-                            {c.label}
-                          </span>
-                        )}
-                      </BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink asChild>
-                        <button
-                          onClick={() => handleNavigation(c.path)}
-                          className="capitalize text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-150 truncate inline-flex items-center cursor-pointer rounded-sm gap-1 py-1 px-2"
-                          title={
-                            c.path === "/dashboard"
-                              ? "Go to Dashboard"
-                              : `Go to ${c.label}`
-                          }
-                          aria-label={
-                            c.path === "/dashboard"
-                              ? "Navigate to Dashboard"
-                              : `Navigate to ${c.label}`
-                          }
-                        >
-                          {c.path === "/dashboard" ? (
-                            <Home className="flex-shrink-0 size-4" />
-                          ) : (
-                            <span className="truncate">{c.label}</span>
-                          )}
-                        </button>
-                      </BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
+                {!isLast && (
+                  <BreadcrumbSeparator className="text-brand-mid-gray">
+                    <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                  </BreadcrumbSeparator>
+                )}
+              </React.Fragment>
+            )
+          })}
+        </BreadcrumbList>
+      </Breadcrumb>
 
-                  {!isLast && (
-                    <BreadcrumbSeparator className="flex-shrink-0">
-                      <ChevronRight className="size-4" />
-                    </BreadcrumbSeparator>
-                  )}
-                </React.Fragment>
-              );
-            })}
-          </BreadcrumbList>
-        </Breadcrumb>
-      </div>
-
-      {collapsedCrumbs.length > 0 && (
-        <div className="mt-1">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowAllCrumbs(!showAllCrumbs)}
-            className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted/50 h-auto p-1 rounded transition-colors"
-          >
-            {showAllCrumbs
-              ? "Show less"
-              : `Show ${collapsedCrumbs.length} more`}
-          </Button>
+      {(title || description) && (
+        <div className="space-y-1">
+          {title && (
+            <h1 className="text-2xl font-semibold text-brand-black sm:text-3xl">
+              {title}
+            </h1>
+          )}
+          {description && (
+            <p className="text-sm text-brand-mid-gray sm:text-base">
+              {description}
+            </p>
+          )}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
