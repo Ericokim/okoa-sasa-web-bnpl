@@ -17,7 +17,7 @@ function SigninScreen() {
   const handleLogin = (e) => {
     e.preventDefault()
     login({ phoneNumber, name: 'Demo User' })
-    navigate({ to: '/products' })
+    navigate({ to: '/otp' })
   }
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">

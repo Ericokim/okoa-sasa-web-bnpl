@@ -24,7 +24,7 @@ function OTPScreen() {
     if (otp.length === 6) {
       // In a real app, you'd verify the OTP here
       login({ phoneNumber, name: 'Demo User' })
-      navigate({ to: '/products' })
+      navigate({ to: '/' })
     }
   }
 
@@ -59,12 +59,16 @@ function OTPScreen() {
             </Button>
           </div>
 
+  
+
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-48 h-32 flex items-center justify-center">
-              <div className="text-2xl font-bold text-brand-primary-start">
-                OKOA SASA
-              </div>
+            <div className="w-[202px] h-[184px] flex items-center justify-center">
+              <img
+                src="/primaryLogoVertical.png"
+                alt="Okoa Sasa"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
 
