@@ -1,6 +1,14 @@
 import { useState } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ShoppingCart, User, ChevronDown,Search, ChevronUp, LogOut, Box } from 'lucide-react'
+import {
+  ShoppingCart,
+  User,
+  ChevronDown,
+  Search,
+  ChevronUp,
+  LogOut,
+  Box,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -21,17 +29,17 @@ export function Header() {
   const cartCount = cart?.length || 0
   const isAuthenticated = !!user
   const cartItemCount = cartCount || 0
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   // Fallback initials
   const getInitials = (name) => {
     return name
-      .split(" ")
+      .split(' ')
       .map((n) => n[0])
-      .join("")
+      .join('')
       .toUpperCase()
-      .slice(0, 2);
-  };
+      .slice(0, 2)
+  }
   return (
     <header className="w-full border-b border-[#e8ecf4] bg-white">
       <div className="px-4 lg:px-20">
@@ -73,8 +81,6 @@ export function Header() {
               )}
             </Link>
 
-        
-
             {isAuthenticated ? (
               <DropdownMenu onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
@@ -85,11 +91,11 @@ export function Header() {
                         {user?.name ? getInitials(user.name) : 'U'}
                       </AvatarFallback>
                     </Avatar>
+                  
                     <div className="hidden sm:flex flex-col items-start">
                       <span className="text-sm font-semibold text-gray-900">
                         {user?.name || 'User'}
                       </span>
-                    
                     </div>
                     {isOpen ? (
                       <ChevronUp className="h-5 w-5 text-gray-700" />
@@ -124,7 +130,6 @@ export function Header() {
                   <DropdownMenuSeparator className="my-1" />
 
                   {/* Menu Items */}
-                 
 
                   <DropdownMenuItem asChild>
                     <Link
@@ -132,12 +137,11 @@ export function Header() {
                       className="flex items-center gap-2 px-2 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors"
                     >
                       <Box className="h-4 w-4" />
-                     
                       Order History
                     </Link>
                   </DropdownMenuItem>
 
-                   <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild>
                     <Link
                       to="/profile"
                       className="flex items-center gap-2 px-2 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors"
@@ -147,15 +151,12 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
 
-                
-
                   <DropdownMenuSeparator className="my-1" />
 
                   <DropdownMenuItem
                     onClick={logout}
                     className="flex items-center gap-2 px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors font-medium"
                   >
-                   
                     <LogOut className=" text-red-600 h-4 w-4" />
                     Log out
                   </DropdownMenuItem>

@@ -71,7 +71,7 @@ function OTPScreen() {
 
       // Set auth state and navigate to products
       login({ phoneNumber, name: 'Demo User' })
-      navigate({ to: '/products/$productId', params: { productId: '1' } })
+      navigate({ to: '/', params: { productId: '1' } })
     } catch (error) {
       setErrors({ otp: 'Verification failed. Please try again.' })
     } finally {
