@@ -1,54 +1,106 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
-import { useState } from 'react'
+import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
 import { useStateContext } from '@/context/state-context'
 import { Button } from '@/components/ui/button'
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from '@/components/ui/input-otp'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent } from '@/components/ui/card'
-import { X, ArrowLeft } from 'lucide-react'
+import { X } from 'lucide-react'
+import { z } from 'zod'
+
+// Route search params validation
+const otpSearchSchema = z.object({
+  phone: z.string().min(1, 'Phone number is required'),
+})
 
 function OTPScreen() {
   const [otp, setOtp] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [isResending, setIsResending] = useState(false)
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [errors, setErrors] = useState({})
+
   const navigate = useNavigate()
   const { login } = useStateContext()
+  const search = useSearch({ from: '/_auth/otp' })
 
-  const phoneNumber = '+254 700 000 000' // This would come from navigation state in a real app
+  // Extract phone number from URL params
+  let phoneNumber = ''
+  let shouldRedirect = false
+  try {
+    const validated = otpSearchSchema.parse(search)
+    phoneNumber = validated.phone
+  } catch {
+    shouldRedirect = true
+  }
 
-  const handleVerify = (e) => {
-    e.preventDefault()
-    if (otp.length === 6) {
-      // In a real app, you'd verify the OTP here
+  // Redirect if no valid phone number
+  useEffect(() => {
+    if (shouldRedirect) {
+      navigate({ to: '/signin' })
+    }
+  }, [shouldRedirect, navigate])
+
+  // Resend cooldown timer
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const timer = setTimeout(() => {
+        setResendCooldown((prev) => prev - 1)
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [resendCooldown])
+
+  // Early return after hooks
+  if (shouldRedirect) {
+    return null
+  }
+
+  const handleVerifyOtp = async (data) => {
+    try {
+      setIsSubmitting(true)
+      setErrors({})
+
+      // Simulate OTP verification API call
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+
+      // Simulate validation - accept '123456' as valid OTP for demo
+      if (data.otp !== '123456') {
+        setErrors({ otp: 'Invalid verification code. Please try again.' })
+        return
+      }
+
+      // Set auth state and navigate to products
       login({ phoneNumber, name: 'Demo User' })
-      navigate({ to: '/products' })
+      navigate({ to: '/products/$productId', params: { productId: '1' } })
+    } catch (error) {
+      setErrors({ otp: 'Verification failed. Please try again.' })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const handleResend = async () => {
-    setIsResending(true)
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsResending(false)
+  const handleResendOtp = async () => {
+    try {
+      setIsResending(true)
+
+      // Simulate resend API call
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Start 60-second cooldown
+      setResendCooldown(60)
+    } catch (error) {
+      // Handle resend error
+    } finally {
+      setIsResending(false)
+    }
   }
 
   return (
     <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4">
-      <Card className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-xl">
-        <CardContent className="p-8">
+      <div className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-xl">
+        <div className="p-8">
           {/* Close Button */}
-          <div className="flex justify-between items-center mb-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate({ to: '/signin' })}
-              className="h-6 w-6 p-0"
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+          <div className="flex justify-end mb-6">
             <Button
               variant="ghost"
               size="icon"
@@ -61,10 +113,12 @@ function OTPScreen() {
 
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-48 h-32 flex items-center justify-center">
-              <div className="text-2xl font-bold text-brand-primary-start">
-                OKOA SASA
-              </div>
+            <div className="w-[202px] h-[184px] flex items-center justify-center">
+              <img
+                src="/primaryLogoVertical.png"
+                alt="Okoa Sasa"
+                className="w-full h-full object-contain"
+              />
             </div>
           </div>
 
@@ -73,98 +127,76 @@ function OTPScreen() {
             <h1 className="text-3xl font-semibold text-brand-black mb-2">
               Enter Verification Code
             </h1>
-            <p className="text-base font-medium text-brand-gray mb-2">
-              We've sent a 6-digit code to
-            </p>
-            <p className="text-base font-semibold text-brand-black">
-              {phoneNumber}
+            <p className="text-base font-medium text-brand-gray">
+              We've sent a 6-digit code to {phoneNumber}
             </p>
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleVerify} className="space-y-6">
+          {/* OTP Form */}
+          <div className="space-y-6">
             {/* OTP Input */}
             <div className="space-y-2">
-              <Label className="text-sm font-normal text-brand-black text-center block">
+              <Label className="text-sm font-normal text-brand-black">
                 Verification Code
               </Label>
-              <div className="flex justify-center">
-                <InputOTP
-                  maxLength={6}
-                  value={otp}
-                  onChange={setOtp}
-                  className="gap-3"
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot
-                      index={0}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                    <InputOTPSlot
-                      index={1}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                    <InputOTPSlot
-                      index={4}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                    <InputOTPSlot
-                      index={5}
-                      className="w-12 h-12 text-lg border-brand-stroke bg-brand-bg-2 rounded-xl"
-                    />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
+              <Input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter 6-digit code"
+                className="bg-brand-bg-2 border-brand-stroke rounded-xl h-12 text-center text-lg tracking-widest"
+                maxLength={6}
+                autoFocus
+              />
+              {errors.otp && (
+                <p className="text-sm text-red-600">{errors.otp}</p>
+              )}
             </div>
 
             {/* Verify Button */}
             <Button
-              type="submit"
+              onClick={() => handleVerifyOtp({ otp })}
               variant="gradient"
               className="w-full h-12 rounded-3xl text-base font-medium"
-              disabled={otp.length !== 6}
+              disabled={isSubmitting || !otp || otp.length !== 6}
             >
-              Verify Code
+              {isSubmitting ? 'Verifying...' : 'Verify Code'}
             </Button>
-          </form>
 
-          {/* Resend Section */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-brand-gray mb-3">
-              Didn't receive the code?
-            </p>
-            <Button
-              variant="ghost"
-              onClick={handleResend}
-              disabled={isResending}
-              className="text-brand-primary-start hover:text-brand-primary-end font-medium p-0 h-auto"
-            >
-              {isResending ? 'Resending...' : 'Resend Code'}
-            </Button>
-          </div>
-
-          {/* Footer */}
-          <div className="mt-8 text-center">
-            <p className="text-sm text-brand-gray">
-              Need help?{' '}
-              <Link
-                to="/support"
-                className="text-brand-primary-start hover:text-brand-primary-end font-medium"
+            {/* Resend OTP */}
+            {resendCooldown === 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleResendOtp}
+                disabled={isResending}
+                className="w-full text-brand-primary-start hover:text-brand-primary-end"
               >
-                Contact Support
-              </Link>
-            </p>
+                {isResending ? 'Sending...' : 'Resend Code'}
+              </Button>
+            )}
+
+            {/* Back to Login */}
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => navigate({ to: '/signin' })}
+              className="w-full text-brand-gray hover:text-brand-black"
+            >
+              Back to Login
+            </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
+
+      {/* Resend cooldown display */}
+      {resendCooldown > 0 && (
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+          <p className="text-sm text-brand-gray bg-white px-4 py-2 rounded-lg shadow">
+            Resend available in {resendCooldown}s
+          </p>
+        </div>
+      )}
     </div>
   )
 }

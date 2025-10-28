@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useStateContext } from '@/context/state-context'
 import { AuthDialog } from '@/components/shared/AuthDialog'
+import { Button } from '@/components/ui/button'
 
 function CartPage() {
   const navigate = useNavigate()
@@ -54,12 +55,13 @@ function CartPage() {
               <span>KES 3,200</span>
             </div>
           </div>
-          <button 
+          <Button
             onClick={handleCheckout}
-            className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
+            variant="gradient"
+            className="rounded-lg w-full px-4 md:px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
           >
             Proceed to Checkout
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -67,7 +69,7 @@ function CartPage() {
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}
-        redirectTo="/checkout"
+        redirectTo="/otp"
       />
     </div>
   )

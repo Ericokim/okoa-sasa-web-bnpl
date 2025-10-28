@@ -23,7 +23,7 @@ export function ProtectedRoute({ children }) {
 
   React.useEffect(() => {
     if (!isAuthenticated) {
-      navigate({ to: '/signin' })
+      navigate({ to: '/' })
     }
   }, [navigate, isAuthenticated])
 

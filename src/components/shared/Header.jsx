@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { ShoppingCart, User, ChevronDown, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -10,12 +11,24 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useStateContext } from '@/context/state-context'
+import { AuthDialog } from '@/components/shared/AuthDialog'
 
 export function Header() {
+  const navigate = useNavigate()
   const { user, cart, logout } = useStateContext()
   const cartCount = cart?.length || 0
   const isAuthenticated = !!user
   const cartItemCount = cartCount || 0
+
+  const [showAuthDialog, setShowAuthDialog] = useState(false)
+
+  const handleCheckout = () => {
+    if (!isAuthenticated) {
+      setShowAuthDialog(true)
+    } else {
+      navigate({ to: '/checkout' })
+    }
+  }
 
   return (
     <header className="w-full border-b border-[#e8ecf4] bg-white">
