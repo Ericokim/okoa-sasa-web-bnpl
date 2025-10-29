@@ -38,7 +38,8 @@ export function DangerZoneCard() {
                 Delete My Account
               </h2>
             </div>
-            <p className="text-md text-gray-600">
+           
+            <p className="font-sans text-base   text-[#A0A4AC] flex-none order-1">
               Permanently delete the account and remove access from all
               workspaces
             </p>

@@ -32,25 +32,26 @@ export function PersonalInfoCard() {
 
   return (
     <div className="border rounded-xl p-6 bg-white">
-      <div className="flex items-center justify-between mb-4">
-        {/* <h3 className="text-xl font-semibold text-gray-900">
-          Personal Information
-        </h3> */}
+    
 
-        <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-black flex-none order-0 ">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="font-sans text-2xl font-medium leading-9 capitalize text-black">
           Personal Information
         </h2>
 
         {!editing && (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
+            className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
           >
             <EditIcon />
             Edit
           </button>
         )}
       </div>
+
+      {/* Separator goes BELOW the header row */}
+      <Separator className="mb-6" />
 
       {!editing ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">

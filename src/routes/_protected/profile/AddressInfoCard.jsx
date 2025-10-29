@@ -35,116 +35,90 @@ export function AddressInfoCard() {
 
   return (
     <div className="border rounded-xl p-6 bg-white">
-      <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-black flex-none order-0 ">
+      <h2 className="font-sans text-2xl font-medium leading-9 capitalize text-black">
         Address
       </h2>
+
       <Separator className="my-4" />
 
       {/* Office */}
       {office && (
-        <div className="mb-6 ">
+        <div className="mb-6 rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {/* <MapPin className="w-5 h-5 text-orange-600" /> */}
-              <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+              <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                 Office Address
               </p>
             </div>
+
             {editing !== 'office' && (
               <button
                 onClick={() => startEdit('office')}
-                className="
-                
-                flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
+                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
               >
-                <EditIcon />
+                <EditIcon  />
                 Edit
               </button>
             )}
           </div>
+
           {editing === 'office' ? (
-            <div className="space-y-3">
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={save}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditing(null)}
-                  className="flex-1 border rounded-full py-2 text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+            <AddressEditForm
+              value={street}
+              onChange={setStreet}
+              onSave={save}
+              onCancel={() => setEditing(null)}
+            />
           ) : (
-            <p className=" font-sans font-medium text-[18px]  capitalize text-[#252525] flex-none o">
+            <p className="font-sans font-medium text-lg capitalize text-[#252525]">
               {office.street}
             </p>
           )}
         </div>
       )}
 
-      {office && home && <hr className="my-4" />}
+   
 
       {/* Home */}
       {home && (
-        <div>
+        <div className="rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {/* <MapPin className="w-5 h-5 text-gray-500" /> */}
-              <p class="font-sans text-base font-normal  text-[#A0A4AC] flex-none order-0 ">
+              <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                 Home Address
               </p>
             </div>
+
             {editing !== 'home' && (
               <button
-                onClick={() => startEdit('office')}
-                className="
-                
-                flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
+                onClick={() => startEdit('home')} // <-- fixed
+                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
               >
-                <EditIcon />
+                <EditIcon  />
                 Edit
               </button>
             )}
           </div>
+
           {editing === 'home' ? (
-            <div className="space-y-3">
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={street}
-                onChange={(e) => setStreet(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <button
-                  onClick={save}
-                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditing(null)}
-                  className="flex-1 border rounded-full py-2 text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
+            <AddressEditForm
+              value={street}
+              onChange={setStreet}
+              onSave={save}
+              onCancel={() => setEditing(null)}
+            />
           ) : (
-            <p className=" font-sans font-medium text-[18px]  capitalize text-[#252525] flex-none o">
+            <p className="font-sans font-medium text-lg capitalize text-[#252525]">
               {home.street}
             </p>
           )}
         </div>
       )}
     </div>
+
+    
   )
+
 }
