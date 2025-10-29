@@ -492,6 +492,7 @@ function ProductDetailPage() {
         </div>
       </div>
     </div>
+   
   )
 }
 
