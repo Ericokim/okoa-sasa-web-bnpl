@@ -60,7 +60,7 @@ export function DangerZoneCard() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center">
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-4">
-              <Trash2 className="w-8 h-8 text-white" />
+              <TrashIconWhite />
             </div>
             <h2 className="text-xl font-bold mb-2">
               Are You Sure You Want To Delete This Account?
