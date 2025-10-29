@@ -1,4 +1,5 @@
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { Minus, Plus } from 'lucide-react'
+import { TrashIcon } from '@/assets/icons'
 import { formatCurrency } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 
@@ -27,29 +28,27 @@ export function CartItem({
   }
 
   return (
-    <>
+    <div className="w-full">
       {/* Desktop Layout */}
-      <div className="hidden lg:flex lg:items-center lg:justify-between lg:gap-4">
-        {/* Product Info - 401px width in design */}
-        <div className="flex items-center gap-3">
+      <div className="hidden lg:grid lg:grid-cols-12 lg:gap-4 lg:items-center">
+        {/* Product Info - spans 6 columns */}
+        <div className="col-span-6 flex items-center gap-4">
           <div className="flex h-[130px] w-[139px] shrink-0 items-center justify-center rounded-2xl bg-[#F9FAFB] p-[17px]">
             <img src={image} alt={title} className="h-24 w-24 object-contain" />
           </div>
 
-          <div className="flex w-56 flex-col gap-4">
-            <div className="flex flex-col gap-2">
-              <h3 className="text-lg font-semibold capitalize leading-[140%] text-black">
-                {title}
-              </h3>
-              <p className="text-base font-normal leading-[140%] text-[#676D75]">
-                {description}
-              </p>
-            </div>
+          <div className="flex flex-1 flex-col gap-2 min-w-0">
+            <h3 className="text-lg font-semibold capitalize leading-[140%] text-black truncate">
+              {title}
+            </h3>
+            <p className="text-base font-normal leading-[140%] text-[#676D75] line-clamp-3">
+              {description}
+            </p>
           </div>
         </div>
 
-        {/* Quantity Controls - 176px width in design */}
-        <div className="flex w-[176px] items-center justify-center gap-3">
+        {/* Quantity Controls - spans 3 columns */}
+        <div className="col-span-3 flex items-center justify-center gap-3">
           <button
             onClick={handleIncrement}
             className="flex h-[30px] w-[30px] items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
@@ -71,9 +70,9 @@ export function CartItem({
           </button>
         </div>
 
-        {/* Subtotal - flex-1 */}
-        <div className="flex flex-1 items-center justify-between">
-          <div className="text-brand-primary-gradient text-xl font-semibold capitalize leading-[140%]">
+        {/* Subtotal and Remove - spans 3 columns */}
+        <div className="col-span-3 flex items-center justify-between">
+          <div className="bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent text-xl font-semibold capitalize leading-[140%]">
             {formatCurrency(price * quantity)}
           </div>
 
@@ -82,7 +81,7 @@ export function CartItem({
             className="flex h-[30px] w-[30px] shrink-0 items-center justify-center transition-opacity hover:opacity-80"
             aria-label="Remove item"
           >
-            <Trash2
+            <TrashIcon
               className="h-[30px] w-[30px] text-[#F25E5E]"
               fill="#F25E5E"
             />
@@ -94,15 +93,11 @@ export function CartItem({
       <div className="flex flex-col gap-4 lg:hidden">
         {/* Product Info */}
         <div className="flex gap-3">
-          <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-xl bg-[#F9FAFB] p-2">
-            <img
-              src={image}
-              alt={title}
-              className="h-full w-full object-contain"
-            />
+          <div className="flex h-[130px] w-[139px] shrink-0 items-center justify-center rounded-2xl bg-[#F9FAFB] p-[17px]">
+            <img src={image} alt={title} className="h-24 w-24 object-contain" />
           </div>
 
-          <div className="flex flex-1 flex-col gap-1">
+          <div className="flex flex-1 flex-col gap-2 min-w-0">
             <h3 className="text-base font-semibold leading-[140%] text-black">
               {title}
             </h3>
@@ -113,45 +108,50 @@ export function CartItem({
         </div>
 
         {/* Quantity and Actions */}
-        <div className="flex items-center">
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleDecrement}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E8ECF4] bg-white"
-              aria-label="Decrease quantity"
-            >
-              <Minus className="h-4 w-4 text-[#252525]" strokeWidth={1.5} />
-            </button>
-
-            <span className="flex w-8 justify-center text-base font-semibold text-[#252525]">
-              {quantity}
-            </span>
-
-            <button
-              onClick={handleIncrement}
-              className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E8ECF4] bg-white"
-              aria-label="Increase quantity"
-            >
-              <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.5} />
-            </button>
-          </div>
-
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="text-brand-primary-gradient text-lg font-semibold">
-              {formatCurrency(price * quantity)}
-            </div>
+            <span className="text-xs text-[#676D75] font-medium">Quantity</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleDecrement}
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="h-4 w-4 text-[#252525]" strokeWidth={1.5} />
+              </button>
 
-            <button
-              onClick={handleRemove}
-              className="flex h-7 w-7 items-center justify-center"
-              aria-label="Remove item"
-            >
-              <Trash2 className="h-6 w-6 text-[#F25E5E]" fill="#F25E5E" />
-            </button>
+              <span className="flex w-8 justify-center text-base font-semibold text-[#252525]">
+                {quantity}
+              </span>
+
+              <button
+                onClick={handleIncrement}
+                className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                aria-label="Increase quantity"
+              >
+                <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.5} />
+              </button>
+            </div>
           </div>
+
+          <button
+            onClick={handleRemove}
+            className="flex h-8 w-8 items-center justify-center transition-opacity hover:opacity-80"
+            aria-label="Remove item"
+          >
+            <TrashIcon className="h-5 w-5 text-[#F25E5E]" fill="#F25E5E" />
+          </button>
+        </div>
+
+        {/* Subtotal */}
+        <div className="flex justify-between items-center pt-2">
+          <span className="text-sm text-[#676D75] font-medium">Subtotal</span>
+          <span className="bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent text-lg font-semibold">
+            KES {formatCurrency(price * quantity)}
+          </span>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
