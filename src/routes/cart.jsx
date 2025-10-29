@@ -1,8 +1,7 @@
 import React from 'react'
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Minus, Plus, Trash2 } from 'lucide-react'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useStateContext } from '@/context/state-context'
-import { Button } from '@/components/ui/button'
+import { Cart } from '@/components/shared'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
@@ -17,34 +16,37 @@ function CartPage() {
   const [cartItems, setCartItems] = React.useState([
     {
       id: 1,
-      name: 'iPhone 14',
+      title: 'iPhone 14',
       description:
         'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
       price: 87696,
       quantity: 1,
-      image: '/api/placeholder/80/80',
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
     },
     {
       id: 2,
-      name: 'iPhone 14',
+      title: 'iPhone 14',
       description:
         'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
       price: 87696,
       quantity: 1,
-      image: '/api/placeholder/80/80',
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
     },
     {
       id: 3,
-      name: 'iPhone 14',
+      title: 'iPhone 14',
       description:
         'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
       price: 87696,
       quantity: 1,
-      image: '/api/placeholder/80/80',
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
     },
     {
       id: 4,
-      name: 'iPhone 14',
+      title: 'iPhone 14',
       description:
         'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
       price: 87696,
