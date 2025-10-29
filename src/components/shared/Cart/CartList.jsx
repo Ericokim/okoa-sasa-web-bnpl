@@ -37,7 +37,7 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
 
       {/* Mobile Header */}
       <div className="flex items-center justify-between self-stretch lg:hidden">
-        <h3 className="text-lg font-semibold text-black">Your Items</h3>
+        <h3 className="text-lg font-semibold text-black">Items</h3>
         <span className="text-sm text-[#676D75]">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
       </div>
 
