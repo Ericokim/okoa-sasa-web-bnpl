@@ -24,13 +24,13 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
     <div className="flex flex-1 flex-col items-start gap-4 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
       {/* Table Header - Desktop Only */}
       <div className="hidden lg:flex lg:items-start lg:gap-4 lg:self-stretch">
-        <div className="w-[401px] text-xl font-semibold capitalize leading-[140%] text-black">
+        <div className="w-[401px] text-xl font-semibold capitalize  text-black">
           Item
         </div>
-        <div className="w-44 text-xl font-semibold capitalize leading-[140%] text-black">
+        <div className="w-44 text-xl font-semibold capitalize ml-18 text-black">
           Quantity
         </div>
-        <div className="flex-1 text-xl font-semibold capitalize leading-[140%] text-black">
+        <div className="flex-1 text-xl font-semibold capitalize -ml-5 text-start text-black">
           Subtotal
         </div>
       </div>

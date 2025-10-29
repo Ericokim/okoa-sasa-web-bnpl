@@ -78,8 +78,8 @@ export default function CheckoutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white p-8">
-      <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
+    <div className="min-h-screen bg-white ">
+      <BreadCrumbs items={breadcrumbItems} className="my-8" />
 
       {/* Center everything with max-width and mx-auto */}
       <div className="max-w-[1067px] mx-auto flex flex-col">
