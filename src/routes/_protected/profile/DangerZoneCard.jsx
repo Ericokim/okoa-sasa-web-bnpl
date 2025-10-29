@@ -29,34 +29,37 @@ export function DangerZoneCard() {
   return (
     <>
       {/* Danger Zone Card */}
-      <div className="border-2  rounded-xl p-6 ">
-        <div className="flex items-start justify-between">
+
+      <div className="border-2  rounded-xl p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
           {/* Left: Title + Description */}
-          <div className="flex-1 pr-8">
-            <div className="flex items-center gap-2 mb-3">
-              <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-red-400 flex-none order-0 ">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="font-sans text-xl sm:text-2xl font-medium leading-tight text-red-400">
                 Delete My Account
               </h2>
             </div>
 
-            <p className="font-sans text-base   text-[#A0A4AC] flex-none order-1">
+            <p className="font-sans text-sm sm:text-base text-[#A0A4AC] break-words">
               Permanently delete the account and remove access from all
               workspaces
             </p>
           </div>
+
+          {/* Button – full width on mobile, auto on desktop */}
           <Button
             onClick={() => setOpen(true)}
             variant="gradient"
-            className="l h-[46px] px-4 py-3 
-          bg-red-400 rounded-3xl 
-             text-white font-medium text-base shadow-sm hover:bg-red-500"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 
+                 bg-red-400 hover:bg-red-600 rounded-3xl 
+                 text-white font-medium text-sm sm:text-base shadow-sm 
+                 transition-colors"
           >
-            <TrashIconWhite />
+            <TrashIconWhite className="w-5 h-5" />
             Delete Account
           </Button>
         </div>
       </div>
-
       {/* Delete Confirmation Modal */}
       {open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
