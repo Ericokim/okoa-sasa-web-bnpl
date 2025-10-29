@@ -105,8 +105,9 @@ const CheckIcon = () => (
 const brands = ['Apple', 'Samsung', 'Tecno', 'Infinix']
 const deviceTypes = ['Phone', 'Laptop', 'Tablet']
 
-export function FilterBar({ className = '' }) {
+export function FilterBar({ className = '', onLoanCalculatorOpen }) {
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
+  const [selectedSort, setSelectedSort] = useState('price-low-high')
   const [activeFilters, setActiveFilters] = useState({
     brand: ['Brand'],
     priceRange: ['Price Range'],
@@ -323,60 +324,14 @@ export function FilterBar({ className = '' }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2">
-              <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
-                How it works
-              </span>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
-          >
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => setSelectedPaymentType('basic')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'basic'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'basic'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Basic Pay
-                </span>
-                {selectedPaymentType === 'basic' && <CheckIcon />}
-              </button>
-              <button
-                onClick={() => setSelectedPaymentType('net')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'net'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'net'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Net Pay
-                </span>
-                {selectedPaymentType === 'net' && <CheckIcon />}
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        <button
+          // onClick={onLoanCalculatorOpen}
+          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2"
+        >
+          <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
+            How it works
+          </span>
+        </button>
 
         <Popover>
           <PopoverTrigger asChild>
@@ -409,7 +364,10 @@ export function FilterBar({ className = '' }) {
           >
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => setSelectedPaymentType('basic')}
+                onClick={() => {
+                  onLoanCalculatorOpen()
+                  setSelectedPaymentType('basic')
+                }}
                 className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
                   selectedPaymentType === 'basic'
                     ? 'bg-[rgba(244,113,32,0.12)]'
@@ -428,7 +386,10 @@ export function FilterBar({ className = '' }) {
                 {selectedPaymentType === 'basic' && <CheckIcon />}
               </button>
               <button
-                onClick={() => setSelectedPaymentType('net')}
+                onClick={() => {
+                  onLoanCalculatorOpen()
+                  setSelectedPaymentType('net')
+                }}
                 className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
                   selectedPaymentType === 'net'
                     ? 'bg-[rgba(244,113,32,0.12)]'
@@ -481,42 +442,80 @@ export function FilterBar({ className = '' }) {
           >
             <div className="flex flex-col gap-2">
               <button
-                onClick={() => setSelectedPaymentType('basic')}
+                onClick={() => setSelectedSort('price-low-high')}
                 className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'basic'
+                  selectedSort === 'price-low-high'
                     ? 'bg-[rgba(244,113,32,0.12)]'
                     : ''
                 }`}
               >
                 <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'basic'
+                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
+                    selectedSort === 'price-low-high'
                       ? 'text-[#F47120]'
                       : 'text-[#252525]'
                   }`}
                 >
-                  Basic Pay
+                  Price: Low to High
                 </span>
-                {selectedPaymentType === 'basic' && <CheckIcon />}
+                {selectedSort === 'price-low-high' && <CheckIcon />}
               </button>
               <button
-                onClick={() => setSelectedPaymentType('net')}
+                onClick={() => setSelectedSort('price-high-low')}
                 className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'net'
+                  selectedSort === 'price-high-low'
                     ? 'bg-[rgba(244,113,32,0.12)]'
                     : ''
                 }`}
               >
                 <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'net'
+                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
+                    selectedSort === 'price-high-low'
                       ? 'text-[#F47120]'
                       : 'text-[#252525]'
                   }`}
                 >
-                  Net Pay
+                  Price: High to Low
                 </span>
-                {selectedPaymentType === 'net' && <CheckIcon />}
+                {selectedSort === 'price-high-low' && <CheckIcon />}
+              </button>
+              <button
+                onClick={() => setSelectedSort('name-ascending')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedSort === 'name-ascending'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
+                    selectedSort === 'name-ascending'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Name Ascending
+                </span>
+                {selectedSort === 'name-ascending' && <CheckIcon />}
+              </button>
+              <button
+                onClick={() => setSelectedSort('name-descending')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedSort === 'name-descending'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
+                    selectedSort === 'name-descending'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Name Descending
+                </span>
+                {selectedSort === 'name-descending' && <CheckIcon />}
               </button>
             </div>
           </PopoverContent>

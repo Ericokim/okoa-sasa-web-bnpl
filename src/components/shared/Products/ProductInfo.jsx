@@ -35,16 +35,16 @@ export function ProductInfo({ product }) {
         </p>
         <div className="flex items-center gap-2">
           {[
-            { Icon: LinkIcon, label: 'Copy link', size: 16 },
-            { Icon: FacebookIcon, label: 'Facebook', size: 18 },
-            { Icon: XIcon, label: 'Twitter', size: 16 },
-            { Icon: InstagramIcon, label: 'Instagram', size: 18 },
-            { Icon: WhatsAppIcon, label: 'WhatsApp', size: 18 },
-            { Icon: TikTokIcon, label: 'TikTok', size: 18 },
+            { Icon: LinkIcon, label: 'Copy link', size: 22 },
+            { Icon: FacebookIcon, label: 'Facebook', size: 24 },
+            { Icon: XIcon, label: 'Twitter', size: 20 },
+            { Icon: InstagramIcon, label: 'Instagram', size: 24 },
+            { Icon: WhatsAppIcon, label: 'WhatsApp', size: 24 },
+            { Icon: TikTokIcon, label: 'TikTok', size: 20 },
           ].map(({ Icon, label, size }, i) => (
             <button
               key={i}
-              className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-[#F9FAFB] transition-colors hover:bg-gray-200 md:h-10 md:w-10"
+              className="flex size-8 items-center justify-center rounded-full bg-[#F9FAFB] transition-colors hover:bg-gray-200 md:h-10 md:w-10"
               aria-label={label}
             >
               <Icon size={size} />
