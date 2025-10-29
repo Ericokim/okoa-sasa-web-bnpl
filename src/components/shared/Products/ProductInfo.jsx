@@ -12,6 +12,7 @@ import {
   TruckIcon,
   VerifyIcon,
 } from '@/assets/icons'
+import { Button } from '@/components/ui/button'
 
 export function ProductInfo({ product }) {
   const [quantity, setQuantity] = useState(1)
@@ -114,15 +115,12 @@ export function ProductInfo({ product }) {
       {/* Action Buttons */}
       <div className="flex flex-col gap-3">
         {/* Add to Cart Button */}
-        <button
-          className="relative flex h-12 w-full items-center justify-center gap-2 overflow-hidden rounded-3xl text-base font-medium capitalize leading-[140%] transition-colors"
-          style={{
-            background:
-              'linear-gradient(#fff, #fff) padding-box, linear-gradient(180deg, #F8971D 0%, #EE3124 100%) border-box',
-            border: '1px solid transparent',
-          }}
+        <Button
+          variant={'outlineGradient'}
+          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl  px-4 py-3 text-base font-medium capitalize leading-[140%]"
+          size="lg"
         >
-          <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none">
+          <svg className="size-6" viewBox="0 0 20 20" fill="none">
             <path
               d="M1.66699 1.66669H3.117C4.017 1.66669 4.72533 2.44169 4.65033 3.33335L3.95866 11.6334C3.84199 12.9917 4.91699 14.1584 6.28365 14.1584H15.1587C16.3587 14.1584 17.4087 13.175 17.5003 11.9834L17.9503 5.73335C18.0503 4.35002 17.0003 3.22502 15.6087 3.22502H4.85033"
               stroke="url(#cart0)"
@@ -148,56 +146,75 @@ export function ProductInfo({ product }) {
               strokeLinecap="round"
             />
             <defs>
-              <linearGradient id="cart0" x1="11.7" y1="1.67" x2="11.7" y2="14.16">
+              <linearGradient
+                id="cart0"
+                x1="11.7"
+                y1="1.67"
+                x2="11.7"
+                y2="14.16"
+              >
                 <stop stopColor="#F8971D" />
                 <stop offset="1" stopColor="#EE3124" />
               </linearGradient>
-              <linearGradient id="cart1" x1="13.78" y1="16.25" x2="13.78" y2="18.33">
+              <linearGradient
+                id="cart1"
+                x1="13.78"
+                y1="16.25"
+                x2="13.78"
+                y2="18.33"
+              >
                 <stop stopColor="#F8971D" />
                 <stop offset="1" stopColor="#EE3124" />
               </linearGradient>
-              <linearGradient id="cart2" x1="7.12" y1="16.25" x2="7.12" y2="18.33">
+              <linearGradient
+                id="cart2"
+                x1="7.12"
+                y1="16.25"
+                x2="7.12"
+                y2="18.33"
+              >
                 <stop stopColor="#F8971D" />
                 <stop offset="1" stopColor="#EE3124" />
               </linearGradient>
-              <linearGradient id="cart3" x1="13.66" y1="6.67" x2="13.66" y2="7.67">
+              <linearGradient
+                id="cart3"
+                x1="13.66"
+                y1="6.67"
+                x2="13.66"
+                y2="7.67"
+              >
                 <stop stopColor="#F8971D" />
                 <stop offset="1" stopColor="#EE3124" />
               </linearGradient>
             </defs>
           </svg>
-          <span
-            style={{
-              background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Add to Cart
-          </span>
-        </button>
+          Add to Cart
+        </Button>
 
         {/* Buy Now Button */}
-        <button
-          className="flex h-12 w-full items-center justify-center rounded-3xl text-base font-medium capitalize leading-[140%] text-white transition-opacity hover:opacity-90"
-          style={{
-            background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
-            border: '1px solid transparent',
-          }}
+        <Button
+          // onClick={onCheckout}
+          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl border border-transparent bg-brand-primary-gradient px-4 py-3 text-base font-medium capitalize leading-[140%] text-white transition-opacity hover:bg-brand-primary-gradient hover:opacity-90 md:h-12"
+          size="lg"
         >
           Buy Now
-        </button>
+        </Button>
       </div>
 
       {/* Features */}
       <div className="flex flex-col gap-2 rounded-2xl bg-[#F9FAFB] p-3 md:p-4">
         {[
-          { Icon: BoxIcon, text: '15GB + 500 Mins + Unlimited SMS at KES 1,000/Month' },
+          {
+            Icon: BoxIcon,
+            text: '15GB + 500 Mins + Unlimited SMS at KES 1,000/Month',
+          },
           { Icon: TruckIcon, text: 'Country Wide Delivery' },
           { Icon: VerifyIcon, text: 'Warranty on all mobile phone' },
         ].map(({ Icon, text }, i) => (
-          <div key={i} className="flex items-start gap-2 md:items-center md:gap-3">
+          <div
+            key={i}
+            className="flex items-start gap-2 md:items-center md:gap-3"
+          >
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[rgba(244,113,32,0.12)]">
               <Icon size={20} />
             </div>

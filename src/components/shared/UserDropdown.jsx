@@ -106,7 +106,9 @@ export function UserDropdown() {
           <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-gray-200">
             <User className="h-4 w-4" />
           </div>
-          <span className="hidden text-base leading-[140%] md:inline">Account</span>
+          <span className="hidden text-base leading-[140%] md:inline">
+            Account
+          </span>
           <ChevronDown className="hidden h-4 w-4 md:inline" />
         </button>
         <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
@@ -150,10 +152,7 @@ export function UserDropdown() {
 
           <div className="h-px w-[192px] bg-[#E8ECF4]"></div>
 
-          <Link
-            to="/protected/orders"
-            className="flex items-center gap-2 py-2"
-          >
+          <Link to="/protected/orders" className="flex items-center gap-2 py-2">
             <BoxIcon className="h-5 w-5 text-[#292D32]" />
             <span className="flex-1 text-base font-medium leading-[140%] text-black">
               Order History
@@ -172,10 +171,7 @@ export function UserDropdown() {
 
           <div className="h-px w-[192px] bg-[#E8ECF4]"></div>
 
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 py-2"
-          >
+          <button onClick={logout} className="flex items-center gap-2 py-2">
             <LogoutIcon className="h-6 w-6" />
             <span className="flex-1 text-base font-medium leading-[140%] text-[#F25E5E]">
               Log Out
