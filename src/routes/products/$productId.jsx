@@ -35,9 +35,7 @@ function ProductDetailPage() {
     { label: 'Warranty', value: '1 Year' },
   ]
 
-  const productImages = Array(4).fill(
-    'https://api.builder.io/api/v1/image/assets/TEMP/f6b8b1540f881e95c37af45c5c832d8722353d7a?width=448',
-  )
+  const productImages = Array(4).fill('/phone.png')
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
