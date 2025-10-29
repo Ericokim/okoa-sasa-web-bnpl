@@ -115,18 +115,19 @@ export function LoanLimitCalculator({ open, onOpenChange }) {
           </div>
 
           <p className="text-center text-base font-medium leading-[140%] text-[#676D75]">
-            Would you like to see devices within your loan limit range (Max.
-            KES {loanAmount.toLocaleString()})?
+            Would you like to see devices within your loan limit range (Max. KES{' '}
+            {loanAmount.toLocaleString()})?
           </p>
 
           <div className="flex items-start gap-6">
             <Button
               onClick={handleCancel}
-              variant="outline"
-              className="flex-1 rounded-3xl border border-[#F8971D] bg-transparent px-4 py-3 text-base font-medium leading-[140%] capitalize text-transparent hover:bg-transparent [background:linear-gradient(180deg,#F8971D_0%,#EE3124_100%)] [background-clip:text] [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+              variant={'outlineGradient'}
+              className="flex-1 rounded-3xl px-4 py-3 text-base font-medium leading-[140%] capitalize hover:opacity-90"
             >
               Cancel
             </Button>
+
             <Button
               onClick={handleProceed}
               className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white hover:opacity-90"
