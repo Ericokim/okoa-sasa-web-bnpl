@@ -2,6 +2,7 @@ import { ShoppingCart } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { ShoppingCartIcon } from '@/assets/icons'
 
 export function ProductCard({
   id = '1',
@@ -22,7 +23,7 @@ export function ProductCard({
                 size="icon"
                 className="absolute right-4 top-4 h-12 w-12 rounded-full bg-gradient-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 transition-opacity"
               >
-                <ShoppingCart className="w-6 h-6 text-white" />
+                <ShoppingCartIcon className="w-6 h-6 text-white" />
               </Button>
             )}
           </div>

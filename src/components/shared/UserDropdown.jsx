@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronUp, User } from 'lucide-react'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useStateContext } from '@/context/state-context'
 import { useAccountStore } from '@/data/accountStore'
 import { AuthDialog } from '@/components/shared/AuthDialog'
@@ -19,6 +19,12 @@ export function UserDropdown() {
   const { user, isAuthenticated, logout } = useStateContext()
   const { personalInfo } = useAccountStore()
   const [isOpen, setIsOpen] = useState(false) // for chevron toggle
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    logout()
+    navigate({ to: '/' })
+  }
 
   if (!isAuthenticated || !user) {
     return (
@@ -106,7 +112,7 @@ export function UserDropdown() {
         <DropdownMenuSeparator className="my-1" />
 
         <Button
-          onClick={logout}
+          onClick={handleLogout}
           variant="ghost"
           className="flex items-center gap-2 px-2 py-2 text-md text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors font-medium h-auto justify-start w-full"
         >

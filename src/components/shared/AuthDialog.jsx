@@ -239,7 +239,7 @@ function OTPStep({
                   key={index}
                   index={index}
                   className={cn(
-                    'flex-1 md:w-[60px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border ',
+                    'flex-1 md:w-[65px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border border-gray-300 bg-[#F9FAFB]',
                     'text-[#6d6d6d] text-[11px] md:text-base font-medium text-center font-["Public_Sans"]',
                     'focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20',
                   )}
@@ -273,8 +273,9 @@ function OTPStep({
             Did'nt Receive the code?
           </span>
           {countdown > 0 ? (
-            <span className="text-sm font-semibold leading-[140%] capitalize font-['Public_Sans'] bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
-              Resend In {countdown}S
+            <span className="text-sm font-medium leading-[140%] capitalize font-['Public_Sans'] bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
+              Resend In
+              <span className="font-bold"> {countdown}</span>s
             </span>
           ) : (
             <button

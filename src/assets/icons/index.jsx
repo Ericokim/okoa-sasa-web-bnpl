@@ -17,6 +17,7 @@ import editIcon from '@/assets/icons/edit.svg'
 import boxWhiteIcon from '@/assets/icons/box_white.svg'
 import profileIcon from '@/assets/icons/profile.svg'
 import logoutIcon from '@/assets/icons/logout.svg'
+import ShoppingCart  from '@/assets/icons/shoppingCart.svg';
 
 export const HomeIcon = ({ size = 24, className = '' }) => (
   <img src={homeIcon} alt="trash" width={size} height={size} className={className} />
@@ -92,4 +93,7 @@ export const ProfileIcon = ({ size = 20, className = '' }) => (
 
 export const LogoutIcon = ({ size = 24, className = '' }) => (
   <img src={logoutIcon} alt="logout" width={size} height={size} className={className} />
+);
+export const ShoppingCartIcon = ({ size = 24, className = '' }) => (
+  <img src={ShoppingCart} alt="logout" width={size} height={size} className={className} />
 );
