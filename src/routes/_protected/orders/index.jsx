@@ -16,10 +16,7 @@ import { Clock, XCircle, AlertCircle, Trash2 } from 'lucide-react'
 import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
-
-
 function OrdersPage() {
-
   const recentOrders = [
     {
       id: '1',
@@ -102,7 +99,7 @@ function OrdersPage() {
     },
   ]
 
-   const breadcrumbItems = [
+  const breadcrumbItems = [
     { label: 'Home', path: '/' },
     { label: 'My Order History', path: `/orderHistory`, isCurrent: true },
   ]
@@ -142,7 +139,7 @@ function OrdersPage() {
 
   return (
     <div className="min-h-screen">
-       <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
+      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
       <main className="mx-auto px-4 sm:px-4 lg:px-4 py-4">
         <h1 className="text-4xl font-semibold text-gray-900 mb-2">
           My Order History
@@ -151,7 +148,7 @@ function OrdersPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Recent Orders */}
-
+          {/* Left Column: Recent Orders */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="shadow-none">
               <CardHeader>
@@ -167,19 +164,21 @@ function OrdersPage() {
 
                   return (
                     <div key={order.id}>
-                      {/* Main Row */}
+                      {/* ---------- ROW ---------- */}
                       <div className="flex gap-4 py-3 items-start">
-                        {/* Product Image (gray bg like product cards) */}
-                        <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2 p-4 shrink-0">
+                        {/* Product image – fixed size */}
+                        <div className="flex-shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
                           <img
                             src={order.image}
                             alt={order.title}
-                            className="h-16 w-16 object-contain"
+                            className="h-14 w-14 object-contain"
                           />
                         </div>
 
-                        <div className="flex-1 flex items-start justify-between min-w-0">
-                          <div className="flex-1 min-w-0 pr-4">
+                        {/* Text + status/price – responsive wrapper */}
+                        <div className="flex-1 min-w-0 flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+                          {/* Title + specs */}
+                          <div className="flex-1 min-w-0">
                             <h4 className="font-medium text-lg text-gray-900 truncate">
                               {order.title}
                             </h4>
@@ -187,27 +186,29 @@ function OrdersPage() {
                             <div className="mt-1 space-y-0.5">
                               <p className="text-base text-gray-600 leading-snug">
                                 {order.specsLine1 ||
-                                  'iPhone 14 - 6.1" - 6GB RAM - 128GB ROM - Midnight +'}
+                                  'iPhone 14 - 6.1" - 6GB RAM - 128GB ROM - Midnight freeCover +'}
                               </p>
                               <p className="text-base text-gray-600 leading-snug">
                                 {order.specsLine2 ||
-                                  'freeCover + Screen Protector'}
+                                  ' Screen Protector'}
                               </p>
                             </div>
                           </div>
 
-                          <div className="flex flex-col place-items-end">
+                          {/* Status badge + price – stacked on mobile, side-by-side on lg+ */}
+                          <div className="flex flex-col items-end gap-2">
                             <Badge
                               variant="outline"
-                              className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusClasses(
+                              className={`text-xs font-medium px-2.5 py-0.5 rounded-full whitespace-nowrap ${getStatusClasses(
                                 order.statusColor,
                               )}`}
                             >
-                              <span>{order.status}</span>
+                              {getStatusIcon(order.status)}
+                              <span className="ml-1">{order.status}</span>
                             </Badge>
 
                             <p
-                              className={`font-bold text-lg bg-linear-to-r ${gradient} bg-clip-text text-transparent whitespace-nowrap mt-10`}
+                              className={`font-bold text-lg bg-linear-to-r ${gradient} bg-clip-text text-transparent whitespace-nowrap lg:mt-10`}
                             >
                               KES {order.price.toLocaleString()}
                             </p>
@@ -224,7 +225,6 @@ function OrdersPage() {
                 })}
               </CardContent>
             </Card>
-
           </div>
 
           {/* Right Column: Order History, Cart, Loan Status */}
@@ -349,83 +349,82 @@ function OrdersPage() {
           </div>
         </div>
 
-        
-            {/* Order History */}
+        {/* Order History */}
 
-            <Card className="shadow-none mt-10">
-              <CardHeader>
-                <CardTitle className="font-medium text-2xl">
-                  Order History
-                </CardTitle>
-                <Separator className="my-4" />
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Order</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Device</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {orderHistory.map((order, idx) => (
-                      <TableRow
-                        key={idx}
-                        className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''} // Even rows get gray bg
+        <Card className="shadow-none mt-10">
+          <CardHeader>
+            <CardTitle className="font-medium text-2xl">
+              Order History
+            </CardTitle>
+            <Separator className="my-4" />
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Order</TableHead>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Device</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {orderHistory.map((order, idx) => (
+                  <TableRow
+                    key={idx}
+                    className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''} // Even rows get gray bg
+                  >
+                    <TableCell className=" text-[15px] text-[#252525] font-sans">
+                      {order.orderId}
+                    </TableCell>
+                    <TableCell className="text-[15px] text-[#252525] font-sans">
+                      {order.createdDate}
+                    </TableCell>
+                    <TableCell className="text-[15px] text-[#252525] font-sans">
+                      {order.device}
+                    </TableCell>
+                    <TableCell className="text-[15px] text-[#252525] font-sans">
+                      {order.loanAmount.toLocaleString()} KES
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          order.status === 'Fulfilled'
+                            ? 'default'
+                            : order.statusVariant
+                        }
+                        className={
+                          order.status === 'Fulfilled'
+                            ? 'bg-green-100 text-green-800'
+                            : order.status === 'Approved'
+                              ? 'bg-blue-100 text-blue-800'
+                              : order.status === 'Declined'
+                                ? 'bg-red-100 text-red-800'
+                                : order.status === 'Pending'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : ''
+                        }
                       >
-                        <TableCell className=" text-[15px] text-[#252525] font-sans">
-                          {order.orderId}
-                        </TableCell>
-                        <TableCell className="text-[15px] text-[#252525] font-sans">
-                          {order.createdDate}
-                        </TableCell>
-                        <TableCell className="text-[15px] text-[#252525] font-sans">
-                          {order.device}
-                        </TableCell>
-                        <TableCell className="text-[15px] text-[#252525] font-sans">
-                          {order.loanAmount.toLocaleString()} KES
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              order.status === 'Fulfilled'
-                                ? 'default'
-                                : order.statusVariant
-                            }
-                            className={
-                              order.status === 'Fulfilled'
-                                ? 'bg-green-100 text-green-800'
-                                : order.status === 'Approved'
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : order.status === 'Declined'
-                                    ? 'bg-red-100 text-red-800'
-                                    : order.status === 'Pending'
-                                      ? 'bg-yellow-100 text-yellow-800'
-                                      : ''
-                            }
-                          >
-                            {order.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button
-                            variant="link"
-                            size="sm"
-                            className="text-orange-600 text-[15px] font-medium underline underline-offset-2 hover:text-orange-700 hover:underline cursor-pointer"
-                          >
-                            View Details
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+                        {order.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="text-orange-600 text-[15px] font-medium underline underline-offset-2 hover:text-orange-700 hover:underline cursor-pointer"
+                      >
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </main>
     </div>
   )
