@@ -31,7 +31,7 @@ export function PersonalInfoCard() {
   }
 
   return (
-    <div className="border rounded-xl p-6 bg-white">
+    <div className="border rounded-xl p-6 bg-white ">
     
 
       <div className="flex items-center justify-between mb-4">

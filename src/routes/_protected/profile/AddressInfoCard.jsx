@@ -39,14 +39,13 @@ export function AddressInfoCard() {
         Address
       </h2>
 
-      <Separator className="my-4" />
+      <hr className="my-4 border-gray-200" />
 
       {/* Office */}
       {office && (
-        <div className="mb-6 rounded-xl border p-4">
+        <div className="mb-6 rounded-xl border  p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              {/* <MapPin className="w-5 h-5 text-orange-600" /> */}
               <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                 Office Address
               </p>
@@ -55,10 +54,10 @@ export function AddressInfoCard() {
             {editing !== 'office' && (
               <button
                 onClick={() => startEdit('office')}
-                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
+                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon  />
-                Edit
+                <EditIcon className="w-4 h-4" />
+                <span>Edit</span>
               </button>
             )}
           </div>
@@ -78,14 +77,11 @@ export function AddressInfoCard() {
         </div>
       )}
 
-   
-
       {/* Home */}
       {home && (
         <div className="rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              {/* <MapPin className="w-5 h-5 text-gray-500" /> */}
               <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                 Home Address
               </p>
@@ -93,11 +89,11 @@ export function AddressInfoCard() {
 
             {editing !== 'home' && (
               <button
-                onClick={() => startEdit('home')} // <-- fixed
-                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
+                onClick={() => startEdit('home')}
+                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon  />
-                Edit
+                <EditIcon className="w-4 h-4" />
+                <span>Edit</span>
               </button>
             )}
           </div>
@@ -117,8 +113,35 @@ export function AddressInfoCard() {
         </div>
       )}
     </div>
-
-    
   )
+}
 
+// Reusable Edit Form — Pure JSX
+function AddressEditForm({ value, onChange, onSave, onCancel }) {
+  return (
+    <div className="space-y-3">
+      <input
+        type="text"
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Enter street address"
+      />
+
+      <div className="flex gap-2">
+        <button
+          onClick={onSave}
+          className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 text-sm font-medium transition-colors"
+        >
+          Save
+        </button>
+        <button
+          onClick={onCancel}
+          className="flex-1 border border-gray-300 hover:bg-gray-100 rounded-full py-2 text-sm font-medium transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  )
 }
