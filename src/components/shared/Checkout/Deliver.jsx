@@ -47,7 +47,7 @@ export default function DeliveryDetailsForm({
     deliveryType === 'door' ? 'md:h-[569px]' : 'md:h-[529px]'
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 md:p-0 gap-6">
+    <div className="flex flex-col mb-6 items-center justify-center p-4 md:p-0 gap-6">
       {/* Form Container */}
       <div
         className={`bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6 w-full max-w-[1020px] ${containerHeight}`}

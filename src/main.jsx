@@ -5,7 +5,7 @@ import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { Provider, getContext } from './config/root-provider.jsx'
 
 // Import the generated route tree
-import { routeTree } from './routeTree.gen'
+import { routeTree } from './routeTree.gen.js'
 
 import './styles.css'
 import reportWebVitals from './reportWebVitals.js'
