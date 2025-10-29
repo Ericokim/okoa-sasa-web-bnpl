@@ -371,7 +371,7 @@ function OrdersPage() {
                 <Button
                   variant="gradient"
                   className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
-             bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-[24px] 
+             bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
                 >
                   Proceed To Payment
@@ -409,8 +409,6 @@ function OrdersPage() {
                   >
                     View Application
                   </Button>
-
-                 
                 </div>
               </CardContent>
             </Card>
