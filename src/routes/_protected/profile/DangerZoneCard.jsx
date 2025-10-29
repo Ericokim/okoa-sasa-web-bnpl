@@ -51,7 +51,7 @@ export function DangerZoneCard() {
           bg-red-400 rounded-3xl 
              text-white font-medium text-base shadow-sm hover:bg-red-500"
           >
-            <TrashIconWhite/>
+            <TrashIconWhite />
             Delete Account
           </Button>
         </div>
@@ -82,10 +82,10 @@ export function DangerZoneCard() {
               </Button>
               <Button
                 onClick={() => setOpen(false)}
-                variant="gradient"
+                variant="outline"
                 className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
-             bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-             text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+             border border-[#F8971D] text-[#F8971D] rounded-[24px] 
+             font-medium text-base hover:bg-[#F8971D]/10 transition-all"
               >
                 Cancel
               </Button>
