@@ -166,6 +166,13 @@ code {
     var(--brand-primary-end) 100%
   );
 }
+ .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
 .text-brand-primary-gradient {
   background: linear-gradient(

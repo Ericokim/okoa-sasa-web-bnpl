@@ -4,25 +4,27 @@ import { Button } from '@/components/ui/button'
 
 export default function AccountOptionPage() {
   return (
-    <div className=" bg-white flex items-center justify-center p-4">
-      <div className="w-[1020px] h-[207px] bg-white rounded-4xl shadow-sm p-6">
-        <div className="w-[972px]">
+    <div className="flex items-center justify-center p-4 sm:p-0">
+      <div className="bg-white w-full max-w-[1020px] h-auto sm:h-[207px] rounded-4xl shadow-sm p-4 sm:p-6">
+        <div className="w-full">
           {/* Header */}
-          <div className="h-16">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+          <div className="h-auto sm:h-16 mb-4 sm:mb-0">
+            <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
               Account Option
             </h1>
-            <p className="text-gray-500">
+            <p className="w-full text-sm sm:text-base font-medium leading-[1.4] text-[#676D75]">
               No Account? Proceed to checkout and you can create an account
               after purchase
             </p>
           </div>
-          <div className="h-0.5 bg-gray-300 my-6"></div>
+          
+          <div className="w-full h-px bg-[#E8ECF4] my-4 sm:my-6"></div>
+          
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row mt-6 gap-6">
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
             <Button
               asChild
-              className="flex-1 py-3 px-4 w-[474px] h-[46px] bg-linear-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 rounded-full text-base font-medium shadow-md"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 rounded-3xl text-base font-medium shadow-md"
             >
               <Link to="/create-account">Create Account</Link>
             </Button>
@@ -30,7 +32,7 @@ export default function AccountOptionPage() {
             <Button
               asChild
               variant="outline"
-              className="flex-1 py-3 px-4 w-[474px] h-[46px] border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded-full text-base font-medium"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded-3xl text-base font-medium"
             >
               <Link to="/checkout">Continue As Guest</Link>
             </Button>
