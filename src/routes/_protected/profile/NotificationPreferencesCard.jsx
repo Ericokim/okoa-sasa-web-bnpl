@@ -1,24 +1,21 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react';
-import { BellIcon } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { useAccountStore } from '@/data/accountStore';
-import gsap from 'gsap';
-import { Bell } from 'lucide-react';
+import { useEffect, useRef } from 'react'
+import { BellIcon } from 'lucide-react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { useAccountStore } from '@/data/accountStore'
+import gsap from 'gsap'
+import { Bell } from 'lucide-react'
 
-
-
-export const Route = createFileRoute('/_protected/profile/NotificationPreferencesCard')({
+export const Route = createFileRoute(
+  '/_protected/profile/NotificationPreferencesCard',
+)({
   component: RouteComponent,
 })
 
-
-
-
 export function NotificationPreferencesCard() {
-  const { notifications, toggleNotification } = useAccountStore();
+  const { notifications, toggleNotification } = useAccountStore()
 
   const items = [
     {
@@ -36,15 +33,16 @@ export function NotificationPreferencesCard() {
       title: 'System Update',
       desc: 'Stay informed about new features and app improvements.',
     },
-  ];
+  ]
 
   return (
     <div className="border rounded-xl p-6 bg-white">
       <div className="flex items-center gap-2 mb-4">
         {/* <Bell className="w-5 h-5 text-orange-600" /> */}
-        <h3 className="text-xl font-semibold text-gray-900">
+
+        <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-black flex-none order-0 ">
           Notification Preferences
-        </h3>
+        </h2>
       </div>
 
       {items.map((item) => (
@@ -68,5 +66,5 @@ export function NotificationPreferencesCard() {
         </div>
       ))}
     </div>
-  );
+  )
 }

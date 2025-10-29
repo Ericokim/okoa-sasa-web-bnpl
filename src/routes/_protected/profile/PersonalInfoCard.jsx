@@ -9,6 +9,7 @@ import { useAccountStore } from '@/data/accountStore'
 import gsap from 'gsap'
 import { Edit2 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
+import { EditIcon } from '@/assets/icons'
 
 export const Route = createFileRoute('/_protected/profile/PersonalInfoCard')({
   component: RouteComponent,
@@ -32,16 +33,20 @@ export function PersonalInfoCard() {
   return (
     <div className="border rounded-xl p-6 bg-white">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-xl font-semibold text-gray-900">
+        {/* <h3 className="text-xl font-semibold text-gray-900">
           Personal Information
-        </h3>
+        </h3> */}
+
+        <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-black flex-none order-0 ">
+          Personal Information
+        </h2>
 
         {!editing && (
           <button
             onClick={() => setEditing(true)}
             className="flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
           >
-            <Pencil className="w-4 h-4" />
+            <EditIcon />
             Edit
           </button>
         )}
@@ -50,34 +55,44 @@ export function PersonalInfoCard() {
       {!editing ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="text-gray-500 capitalize text-md ">First Name</p>
-            <p className="font-medium text-md text-gray-900">
+            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+              First Name
+            </p>
+            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.firstName}
             </p>
           </div>
           <div>
-            <p className="text-gray-500 capitalize text-md ">Last Name</p>
+            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+              Last Name
+            </p>
             <p className="font-medium text-md text-gray-900">
               {personalInfo.lastName}
             </p>
           </div>
           <div>
-            <p className="text-gray-500 capitalize text-md ">Designation</p>
-            <p className="font-medium text-md text-gray-900">
+            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+              Designation
+            </p>
+            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.role}
             </p>
           </div>
           <div>
-            <p className="text-gray-500 capitalize text-md">Email Address</p>
-            <p className="font-medium text-md text-gray-900">
+            <p class=" font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+              Email Address
+            </p>
+
+            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.email}
             </p>
           </div>
           <div>
-            <p className="text-gray-500 capitalize text-md font-medium">
+            <p class="  font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               Phone Number
             </p>
-            <p className="font-medium text-md text-gray-900">
+
+            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.phone}
             </p>
           </div>

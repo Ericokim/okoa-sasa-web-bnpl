@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { useAccountStore } from '@/data/accountStore'
 import { MapPin, Edit2 } from 'lucide-react'
+import { EditIcon } from '@/assets/icons'
 
 export const Route = createFileRoute('/_protected/profile/AddressInfoCard')({
   component: RouteComponent,
@@ -34,16 +35,20 @@ export function AddressInfoCard() {
 
   return (
     <div className="border rounded-xl p-6 bg-white">
-      <h3 className="text-xl font-semibold  text-gray-900 mb-4">Address</h3>
+      <h2 class=" font-sans text-[24px] font-medium leading-[34px] capitalize text-black flex-none order-0 ">
+        Address
+      </h2>
       <Separator className="my-4" />
 
       {/* Office */}
       {office && (
-        <div className="mb-6">
+        <div className="mb-6 ">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {/* <MapPin className="w-5 h-5 text-orange-600" /> */}
-              <h4 className="text-1xl text-gray-500">Office Address</h4>
+              <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+                Office Address
+              </p>
             </div>
             {editing !== 'office' && (
               <button
@@ -52,7 +57,7 @@ export function AddressInfoCard() {
                 
                 flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
               >
-                <Pencil className="w-4 h-4" />
+                <EditIcon />
                 Edit
               </button>
             )}
@@ -80,7 +85,9 @@ export function AddressInfoCard() {
               </div>
             </div>
           ) : (
-            <p className="text-sm font-medium text-gray-700">{office.street}</p>
+            <p className=" font-sans font-medium text-[18px]  capitalize text-[#252525] flex-none o">
+              {office.street}
+            </p>
           )}
         </div>
       )}
@@ -93,7 +100,9 @@ export function AddressInfoCard() {
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               {/* <MapPin className="w-5 h-5 text-gray-500" /> */}
-              <h4 className=" text-1xl text-gray-500">Home Address</h4>
+              <p class="font-sans text-base font-normal  text-[#A0A4AC] flex-none order-0 ">
+                Home Address
+              </p>
             </div>
             {editing !== 'home' && (
               <button
@@ -102,7 +111,7 @@ export function AddressInfoCard() {
                 
                 flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
               >
-                <Pencil className="w-4 h-4" />
+                <EditIcon />
                 Edit
               </button>
             )}
@@ -130,7 +139,9 @@ export function AddressInfoCard() {
               </div>
             </div>
           ) : (
-            <p className="text-sm font-medium text-gray-700">{home.street}</p>
+            <p className=" font-sans font-medium text-[18px]  capitalize text-[#252525] flex-none o">
+              {home.street}
+            </p>
           )}
         </div>
       )}
