@@ -148,7 +148,6 @@ function OrdersPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column: Recent Orders */}
-          {/* Left Column: Recent Orders */}
           <div className="lg:col-span-2 space-y-6">
             <Card className="shadow-none">
               <CardHeader>
@@ -203,7 +202,7 @@ function OrdersPage() {
                                 order.statusColor,
                               )}`}
                             >
-                              {getStatusIcon(order.status)}
+                            
                               <span className="ml-1">{order.status}</span>
                             </Badge>
 
