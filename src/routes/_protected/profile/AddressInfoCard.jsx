@@ -56,7 +56,7 @@ export function AddressInfoCard() {
                 onClick={() => startEdit('office')}
                 className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon className="w-4 h-4" />
+                <EditIcon  />
                 <span>Edit</span>
               </button>
             )}
@@ -92,7 +92,7 @@ export function AddressInfoCard() {
                 onClick={() => startEdit('home')}
                 className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon className="w-4 h-4" />
+                <EditIcon  />
                 <span>Edit</span>
               </button>
             )}
