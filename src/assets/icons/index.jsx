@@ -11,7 +11,8 @@ import boxIcon from '@/assets/icons/box.svg';
 import truckIcon from '@/assets/icons/truck.svg';
 import verifyIcon from '@/assets/icons/verify.svg';
 import trashIcon from '@/assets/icons/trash.svg'
-
+import trashWhite from '@/assets/icons/trashwhite.svg'
+import editIcon from '@/assets/icons/edit.svg'
 
 export const TrashIcon = ({ size = 24, className = '' }) => (
   <img src={trashIcon} alt="trash" width={size} height={size} className={className} />
@@ -64,4 +65,11 @@ export const WhatsAppIcon = ({ size = 24, className = '' }) => (
 
 export const XIcon = ({ size = 24, className = '' }) => (
   <img src={xIcon} alt="X" width={size} height={size} className={className} />
+);
+
+export const TrashIconWhite = ({ size = 24, className = 'text-white' }) => (
+  <img src={trashWhite} alt="trash" width={size} height={size} className={className} />
+);
+export const EditIcon = ({ size = 24, className = '' }) => (
+  <img src={editIcon} alt="edit" width={size} height={size} className={className} />
 );
