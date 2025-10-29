@@ -11,35 +11,42 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
+import {
+  DeviceIcon,
+  FileIcon,
+  HandMoneyIcon,
+  SearchIcon,
+  TruckTickIcon,
+} from '@/assets/icons'
 
 const steps = [
   {
-    icon: <Laptop2 size={36} className="text-white mx-auto" />,
+    icon: <DeviceIcon size={36} className="text-white mx-auto" />,
     title: 'Browse And Choose Your Device.',
     step: '1 Step',
   },
   {
-    icon: <Wallet size={36} className="text-white mx-auto" />,
+    icon: <HandMoneyIcon size={36} className="text-white mx-auto" />,
     title: 'Check Your Loan Limit To Qualify.',
     step: '2 Step',
   },
   {
-    icon: <FileText size={36} className="text-white mx-auto" />,
+    icon: <FileIcon size={36} className="text-white mx-auto" />,
     title: 'Fill In Your Details And Employer Info.',
     step: '3 Step',
   },
   {
-    icon: <ClipboardCheck size={36} className="text-white mx-auto" />,
+    icon: <SearchIcon size={36} className="text-white mx-auto" />,
     title: 'We Review Your Loan Request.',
     step: '4 Step',
   },
   {
-    icon: <Truck size={36} className="text-white mx-auto" />,
+    icon: <TruckTickIcon size={36} className="text-white mx-auto" />,
     title: 'Once Approved, Your Device Is Delivered.',
     step: '5 Step',
   },
   {
-    icon: <RefreshCw size={36} className="text-white mx-auto" />,
+    icon: <TruckTickIcon size={36} className="text-white mx-auto" />,
     title: 'Loan Repaid Monthly Via Payroll Checkoff.',
     step: '6 Step',
   },
@@ -87,16 +94,18 @@ const FAQs = () => {
   }
 
   return (
-    <section className="bg-white -my-8 -ml-24 w-[1440px]">
+    <section className="bg-white -ml-20 w-[1550px]">
       <div className="h-[552px]">
         <div className="bg-linear-to-b from-orange-500 to-orange-400 text-white grid justify-center py-8 px-4 text-center h-96">
           <div className="h-[375px] flex flex-col justify-between w-full max-w-7xl mt-[60px]">
             {/* Header */}
             <div className="p-0">
               <div className="w-16 h-1 bg-white mx-auto mb-4 rounded-full"></div>
-              <h1 className="text-3xl font-bold mb-2">How It Works</h1>
-              <p className="text-sm md:text-base text-white/90">
-                Simple Steps To Get Your Device With Okoa Sasa Financing.
+              <h1 className="text-[36px]  font-semibold capitalize text-white">
+                How It Works
+              </h1>
+              <p className="text-[18px] font-semibold capitalize text-white ">
+                Simple steps to get your device with Okoa Sasa financing.
               </p>
             </div>
 

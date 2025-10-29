@@ -1,23 +1,14 @@
 import { useState } from 'react'
-import { ChevronDown, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
 import { Slider } from '@/components/ui/slider'
+import { Link } from '@tanstack/react-router'
 
 const FilterIcon = () => (
   <svg
@@ -102,8 +93,84 @@ const CheckIcon = () => (
   </svg>
 )
 
-const brands = ['Apple', 'Samsung', 'Tecno', 'Infinix']
-const deviceTypes = ['Phone', 'Laptop', 'Tablet']
+const ArrowDownIcon = ({ className = '' }) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    className={className}
+  >
+    <path
+      d="M13.2802 10.0333L8.93355 5.68667C8.42021 5.17333 7.58021 5.17333 7.06688 5.68667L2.72021 10.0333"
+      stroke="#292D32"
+      strokeWidth="1.5"
+      strokeMiterlimit="10"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+const CheckedCheckboxIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M13.4915 1.66666H6.50817C3.47484 1.66666 1.6665 3.475 1.6665 6.50833V13.4833C1.6665 16.525 3.47484 18.3333 6.50817 18.3333H13.4832C16.5165 18.3333 18.3248 16.525 18.3248 13.4917V6.50833C18.3332 3.475 16.5248 1.66666 13.4915 1.66666ZM13.9832 8.08333L9.25817 12.8083C9.1415 12.925 8.98317 12.9917 8.8165 12.9917C8.64984 12.9917 8.4915 12.925 8.37484 12.8083L6.0165 10.45C5.77484 10.2083 5.77484 9.80833 6.0165 9.56666C6.25817 9.325 6.65817 9.325 6.89984 9.56666L8.8165 11.4833L13.0998 7.2C13.3415 6.95833 13.7415 6.95833 13.9832 7.2C14.2248 7.44166 14.2248 7.83333 13.9832 8.08333Z"
+      fill="#1C8546"
+    />
+  </svg>
+)
+
+const UncheckedCheckboxIcon = () => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path
+      d="M12.4998 18.9583H7.49984C2.97484 18.9583 1.0415 17.025 1.0415 12.5V7.5C1.0415 2.975 2.97484 1.04166 7.49984 1.04166H12.4998C17.0248 1.04166 18.9582 2.975 18.9582 7.5V12.5C18.9582 17.025 17.0248 18.9583 12.4998 18.9583ZM7.49984 2.29166C3.65817 2.29166 2.2915 3.65833 2.2915 7.5V12.5C2.2915 16.3417 3.65817 17.7083 7.49984 17.7083H12.4998C16.3415 17.7083 17.7082 16.3417 17.7082 12.5V7.5C17.7082 3.65833 16.3415 2.29166 12.4998 2.29166H7.49984Z"
+      fill="#A0A4AC"
+    />
+  </svg>
+)
+
+const FilterSection = ({ title, children, isOpen, onToggle }) => (
+  <div className="flex flex-col items-start gap-3 self-stretch">
+    <button
+      onClick={onToggle}
+      className="flex items-center justify-between self-stretch"
+    >
+      <span className="font-['Public_Sans'] text-sm font-medium leading-[140%] text-black">
+        {title}
+      </span>
+      <ArrowDownIcon
+        className={`transition-transform duration-200 ${isOpen ? '' : 'rotate-180'}`}
+      />
+    </button>
+    {isOpen && children}
+  </div>
+)
+
+const FilterCheckboxItem = ({ label, checked, onChange }) => (
+  <button
+    onClick={() => onChange(!checked)}
+    className="flex items-center justify-center gap-2 self-stretch rounded-lg px-2 py-1"
+  >
+    {checked ? <CheckedCheckboxIcon /> : <UncheckedCheckboxIcon />}
+    <span className="flex-1 text-left font-['Public_Sans'] text-sm font-medium leading-[140%] text-[#252525]">
+      {label}
+    </span>
+  </button>
+)
 
 export function FilterBar({ className = '', onLoanCalculatorOpen }) {
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
@@ -113,12 +180,55 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
     priceRange: ['Price Range'],
     deviceType: ['Device Type'],
   })
+
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
-  const [tempFilters, setTempFilters] = useState({
-    brand: [],
-    priceRange: [0, 200000],
-    deviceType: [],
+  const [openSections, setOpenSections] = useState({
+    price: true,
+    color: true,
+    storage: true,
+    camera: true,
+    display: true,
+    ram: true,
+    brand: true,
   })
+
+  const [filters, setFilters] = useState({
+    priceRange: [0, 200000],
+    priceMin: '00',
+    priceMax: '00',
+    color: {
+      Green: true,
+      Black: false,
+    },
+    storage: {
+      '128 GB': true,
+      '256 GB': false,
+    },
+    camera: {
+      '50MP': true,
+      '256 GB': false,
+    },
+    display: {
+      '6.3"': true,
+      '6.6': false,
+      '6.7': false,
+    },
+    ram: {
+      '8 GB': true,
+    },
+    brand: {
+      Apple: false,
+      TECNO: false,
+      TCL: false,
+    },
+  })
+
+  const toggleSection = (section) => {
+    setOpenSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }))
+  }
 
   const removeFilter = (type, value) => {
     setActiveFilters((prev) => ({
@@ -127,34 +237,36 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
     }))
   }
 
-  const applyFilters = () => {
-    const newFilters = {
-      brand: tempFilters.brand.length > 0 ? tempFilters.brand : ['Brand'],
-      priceRange:
-        tempFilters.priceRange[0] !== 0 || tempFilters.priceRange[1] !== 200000
-          ? [
-              `KES ${tempFilters.priceRange[0].toLocaleString()} - KES ${tempFilters.priceRange[1].toLocaleString()}`,
-            ]
-          : ['Price Range'],
-      deviceType:
-        tempFilters.deviceType.length > 0
-          ? tempFilters.deviceType
-          : ['Device Type'],
-    }
-    setActiveFilters(newFilters)
-    setIsFiltersOpen(false)
-  }
-
-  const resetFilters = () => {
-    setTempFilters({
-      brand: [],
+  const clearAllFilters = () => {
+    setFilters({
       priceRange: [0, 200000],
-      deviceType: [],
-    })
-    setActiveFilters({
-      brand: ['Brand'],
-      priceRange: ['Price Range'],
-      deviceType: ['Device Type'],
+      priceMin: '00',
+      priceMax: '00',
+      color: {
+        Green: false,
+        Black: false,
+      },
+      storage: {
+        '128 GB': false,
+        '256 GB': false,
+      },
+      camera: {
+        '50MP': false,
+        '256 GB': false,
+      },
+      display: {
+        '6.3"': false,
+        '6.6': false,
+        '6.7': false,
+      },
+      ram: {
+        '8 GB': false,
+      },
+      brand: {
+        Apple: false,
+        TECNO: false,
+        TCL: false,
+      },
     })
   }
 
@@ -214,124 +326,298 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
           </div>
         ))}
 
-        <Dialog open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <DialogTrigger asChild>
+        <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+          <PopoverTrigger asChild>
             <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
               <span className="text-sm font-normal capitalize text-black md:text-base">
                 All Filters
               </span>
               <FilterIcon />
             </button>
-          </DialogTrigger>
-          <DialogContent className="max-w-xl">
-            <DialogHeader>
-              <DialogTitle>All Filters</DialogTitle>
-              <DialogDescription>
-                Refine products by brand, price, or device type.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6 py-4">
-              <div>
-                <h4 className="mb-3 text-sm font-semibold uppercase text-brand-mid-gray">
-                  Brand
-                </h4>
-                <div className="space-y-2">
-                  {brands.map((brand) => (
-                    <div key={brand} className="flex items-center gap-3">
-                      <Checkbox
-                        id={`brand-${brand}`}
-                        checked={tempFilters.brand.includes(brand)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              brand: [...prev.brand, brand],
-                            }))
-                          } else {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              brand: prev.brand.filter((b) => b !== brand),
-                            }))
-                          }
-                        }}
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-[280px] overflow-y-auto rounded-2xl border-none bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)] max-h-[90vh]"
+          >
+            <div className="flex flex-col items-start justify-center gap-4">
+              <div className="flex items-center justify-between self-stretch">
+                <span className="font-['Public_Sans'] text-base font-medium leading-[140%] text-black">
+                  Filters
+                </span>
+                <button
+                  onClick={clearAllFilters}
+                  className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-[#F25E5E]"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <FilterSection
+                title="Price"
+                isOpen={openSections.price}
+                onToggle={() => toggleSection('price')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <div className="relative h-4 self-stretch">
+                    <div className="absolute left-0 top-1 h-2 w-full rounded-lg bg-[#F9FAFB]"></div>
+                    <div
+                      className="absolute left-0 top-1 h-2 rounded-lg bg-[#F47120]"
+                      style={{
+                        width: `${((filters.priceRange[1] - filters.priceRange[0]) / 200000) * 100}%`,
+                      }}
+                    ></div>
+                    <div className="absolute left-0 top-0 h-4 w-4 rounded-full border border-[#E8ECF4] bg-white"></div>
+                    <div
+                      className="absolute top-0 h-4 w-4 rounded-full border border-[#E8ECF4] bg-white"
+                      style={{
+                        left: `${((filters.priceRange[1] - filters.priceRange[0]) / 200000) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                  <div className="flex items-start gap-2 self-stretch">
+                    <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                      <input
+                        type="text"
+                        value={filters.priceMin}
+                        onChange={(e) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            priceMin: e.target.value,
+                          }))
+                        }
+                        className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                        placeholder="00"
                       />
-                      <Label htmlFor={`brand-${brand}`}>{brand}</Label>
                     </div>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <h4 className="mb-3 text-sm font-semibold uppercase text-brand-mid-gray">
-                  Price Range
-                </h4>
-                <Slider
-                  min={0}
-                  max={200000}
-                  step={1000}
-                  value={tempFilters.priceRange}
-                  onValueChange={(value) => {
-                    setTempFilters((prev) => ({
-                      ...prev,
-                      priceRange: value,
-                    }))
-                  }}
-                />
-                <div className="mt-2 flex items-center justify-between text-sm">
-                  <span>KES {tempFilters.priceRange[0].toLocaleString()}</span>
-                  <span>KES {tempFilters.priceRange[1].toLocaleString()}</span>
-                </div>
-              </div>
-              <div>
-                <h4 className="mb-3 text-sm font-semibold uppercase text-brand-mid-gray">
-                  Device Type
-                </h4>
-                <div className="space-y-2">
-                  {deviceTypes.map((type) => (
-                    <div key={type} className="flex items-center gap-3">
-                      <Checkbox
-                        id={`type-${type}`}
-                        checked={tempFilters.deviceType.includes(type)}
-                        onCheckedChange={(checked) => {
-                          if (checked) {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              deviceType: [...prev.deviceType, type],
-                            }))
-                          } else {
-                            setTempFilters((prev) => ({
-                              ...prev,
-                              deviceType: prev.deviceType.filter(
-                                (t) => t !== type,
-                              ),
-                            }))
-                          }
-                        }}
+                    <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                      <input
+                        type="text"
+                        value={filters.priceMax}
+                        onChange={(e) =>
+                          setFilters((prev) => ({
+                            ...prev,
+                            priceMax: e.target.value,
+                          }))
+                        }
+                        className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                        placeholder="00"
                       />
-                      <Label htmlFor={`type-${type}`}>{type}</Label>
                     </div>
-                  ))}
+                  </div>
+                  <button className="flex items-center justify-center gap-2 self-stretch rounded-3xl bg-[#F47120] px-4 py-2">
+                    <span className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-white">
+                      Apply
+                    </span>
+                  </button>
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
                 </div>
-              </div>
+              </FilterSection>
+
+              <FilterSection
+                title="Color"
+                isOpen={openSections.color}
+                onToggle={() => toggleSection('color')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label="Green"
+                    checked={filters.color.Green}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        color: { ...prev.color, Green: checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="Black"
+                    checked={filters.color.Black}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        color: { ...prev.color, Black: checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
+
+              <FilterSection
+                title="Storage Capacity"
+                isOpen={openSections.storage}
+                onToggle={() => toggleSection('storage')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label="128 GB"
+                    checked={filters.storage['128 GB']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        storage: { ...prev.storage, '128 GB': checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="256 GB"
+                    checked={filters.storage['256 GB']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        storage: { ...prev.storage, '256 GB': checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
+
+              <FilterSection
+                title="Camera Megapixel"
+                isOpen={openSections.camera}
+                onToggle={() => toggleSection('camera')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label="50MP"
+                    checked={filters.camera['50MP']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        camera: { ...prev.camera, '50MP': checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="256 GB"
+                    checked={filters.camera['256 GB']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        camera: { ...prev.camera, '256 GB': checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
+
+              <FilterSection
+                title="Display Size"
+                isOpen={openSections.display}
+                onToggle={() => toggleSection('display')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label='6.3"'
+                    checked={filters.display['6.3"']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        display: { ...prev.display, '6.3"': checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="6.6"
+                    checked={filters.display['6.6']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        display: { ...prev.display, '6.6': checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="6.7"
+                    checked={filters.display['6.7']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        display: { ...prev.display, '6.7': checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
+
+              <FilterSection
+                title="RAM"
+                isOpen={openSections.ram}
+                onToggle={() => toggleSection('ram')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label="8 GB"
+                    checked={filters.ram['8 GB']}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        ram: { ...prev.ram, '8 GB': checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
+
+              <FilterSection
+                title="Brand"
+                isOpen={openSections.brand}
+                onToggle={() => toggleSection('brand')}
+              >
+                <div className="flex flex-col items-start gap-3 self-stretch">
+                  <FilterCheckboxItem
+                    label="Apple"
+                    checked={filters.brand.Apple}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        brand: { ...prev.brand, Apple: checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="TECNO"
+                    checked={filters.brand.TECNO}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        brand: { ...prev.brand, TECNO: checked },
+                      }))
+                    }
+                  />
+                  <FilterCheckboxItem
+                    label="TCL"
+                    checked={filters.brand.TCL}
+                    onChange={(checked) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        brand: { ...prev.brand, TCL: checked },
+                      }))
+                    }
+                  />
+                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                </div>
+              </FilterSection>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={resetFilters}>
-                Reset
-              </Button>
-              <Button onClick={applyFilters}>Apply Filters</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
-        <button
-          // onClick={onLoanCalculatorOpen}
-          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2"
-        >
+         <Link
+                to="/FAQs"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
+        <button className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2">
           <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
             How it works
           </span>
         </button>
+        </Link>
 
         <Popover>
           <PopoverTrigger asChild>

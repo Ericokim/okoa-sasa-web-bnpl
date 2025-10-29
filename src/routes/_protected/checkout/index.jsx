@@ -4,13 +4,16 @@ import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
 import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
 import AccountOptionPage from '@/components/shared/Checkout/AccountOption'
+import CheckoutLoanPage from '@/components/shared/Checkout/CheckoutLoan'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
+import DeliveryDetailsForm from '@/components/shared/Checkout/Deliver'
 
 const steps = [
   {
     id: 1,
     name: 'Check Loan Limit',
     label: 'Check Loan Limit',
-    component: null,
+    component: CheckoutLoanPage,
   },
   {
     id: 2,
@@ -22,13 +25,13 @@ const steps = [
     id: 3,
     name: 'Delivery Details',
     label: 'Delivery Details',
-    component: null, // Add your component here
+    component: DeliveryDetailsForm,
   },
   {
     id: 4,
     name: 'Order Summary',
     label: 'Order Summary',
-    component: null, // Add your component here
+    component: null,
   },
   {
     id: 5,
@@ -46,6 +49,7 @@ const steps = [
 
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1)
+  const { productId } = Route.useParams()
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -61,86 +65,149 @@ export default function CheckoutPage() {
 
   const handleFormSubmit = (data) => {
     console.log('Form submitted:', data)
-    // Handle form submission and move to next step
     handleNext()
   }
 
-  // Get the current step's component
   const CurrentStepComponent = steps[currentStep - 1].component
   const hasComponent = CurrentStepComponent !== null
 
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'iPhone 14', path: `/products/${productId}` },
+    { label: 'Checkout', path: `/Checkout`, isCurrent: true },
+  ]
+
   return (
     <div className="min-h-screen bg-white p-8">
-      <div className="w-[1067px] flex flex-col justify-center">
-        {/* Stepper Header */}
-        <div className="mb-12 w-[1067px]">
-          {/* Circles and Lines Row */}
-          <div className="flex items-center mb-3">
-            {steps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                {/* Circle */}
-                <div className="relative shrink-0">
-                  {step.id < currentStep ? (
-                    // Completed - filled orange with white check
-                    <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
-                      <Check className="w-6 h-6 text-white" strokeWidth={3} />
-                    </div>
-                  ) : step.id === currentStep ? (
-                    // Current - white bg with orange border and orange dot
-                    <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
-                    </div>
-                  ) : (
-                    // Upcoming - gray border with gray dot
-                    <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-                      <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                    </div>
-                  )}
-                </div>
+      <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
 
-                {/* Connector Line */}
-                {index < steps.length - 1 && (
+      {/* Center everything with max-width and mx-auto */}
+      <div className="max-w-[1067px] mx-auto flex flex-col">
+        {/* Stepper Header */}
+        <div className="mb-12 w-full">
+          {/* Desktop View */}
+          <div className="hidden md:block">
+            {/* Circles and Lines Row */}
+            <div className="flex items-center mb-3">
+              {steps.map((step, index) => (
+                <React.Fragment key={step.id}>
+                  {/* Circle */}
+                  <div className="relative shrink-0">
+                    {step.id < currentStep ? (
+                      <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                        <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                      </div>
+                    ) : step.id === currentStep ? (
+                      <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                        <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Connector Line */}
+                  {index < steps.length - 1 && (
+                    <div
+                      className={`h-[3px] flex-1 ${
+                        step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                      }`}
+                    ></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Labels Row */}
+            <div className="flex items-center">
+              {steps.map((step, index) => (
+                <React.Fragment key={step.id}>
                   <div
-                    className={`h-[3px] flex-1 ${
-                      step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
-                    }`}
-                  ></div>
-                )}
-              </React.Fragment>
-            ))}
+                    className="text-center -ml-6 shrink-0"
+                    style={{ width: '40px' }}
+                  >
+                    <p
+                      className={`text-base font-medium leading-[1.4] flex items-center justify-center -mr-10 h-[22px] whitespace-nowrap ${
+                        step.id <= currentStep
+                          ? 'text-[#0D0B26]'
+                          : 'text-gray-400'
+                      }`}
+                    >
+                      {step.label}
+                    </p>
+                  </div>
+                  {index < steps.length - 1 && <div className="flex-1"></div>}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
 
-          {/* Labels Row */}
-          <div className="flex items-center">
-            {steps.map((step, index) => (
-              <React.Fragment key={step.id}>
-                {/* Label under circle */}
+          {/* Mobile View */}
+          <div className="block md:hidden">
+            {/* Circles and Lines Row */}
+            <div className="flex items-center mb-4">
+              {steps.map((step, index) => (
+                <React.Fragment key={step.id}>
+                  {/* Circle */}
+                  <div className="relative shrink-0">
+                    {step.id < currentStep ? (
+                      <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                      </div>
+                    ) : step.id === currentStep ? (
+                      <div className="w-8 h-8 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                      </div>
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                        <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Connector Line */}
+                  {index < steps.length - 1 && (
+                    <div
+                      className={`h-[2px] flex-1 ${
+                        step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                      }`}
+                    ></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Labels Row - Stacked on Mobile */}
+            <div className="flex items-start justify-between">
+              {steps.map((step) => (
                 <div
-                  className="text-center -ml-6 shrink-0"
-                  style={{ width: '40px' }}
+                  key={step.id}
+                  className="text-center flex-1 first:text-left last:text-right"
                 >
                   <p
-                    className={`text-base font-medium leading-[1.4] flex  items-center justify-center -mr-10 h-[22px] whitespace-nowrap ${
+                    className={`text-[10px] font-medium leading-tight ${
                       step.id <= currentStep
                         ? 'text-[#0D0B26]'
                         : 'text-gray-400'
                     }`}
+                    style={{
+                      wordBreak: 'break-word',
+                      maxWidth: '60px',
+                      margin: '0 auto',
+                    }}
                   >
                     {step.label}
                   </p>
                 </div>
-
-                {/* Spacer for the line */}
-                {index < steps.length - 1 && <div className="flex-1"></div>}
-              </React.Fragment>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Step Content Area */}
-        <div>
-          <div className="bg-white w-[1020px]">
-            {/* Render the current step's component */}
+        {/* Step Content Area - Centered */}
+        <div className="flex justify-center w-full">
+          <div className="bg-white w-full max-w-[1020px]">
             {CurrentStepComponent ? (
               <CurrentStepComponent
                 onSubmit={handleFormSubmit}
@@ -151,16 +218,17 @@ export default function CheckoutPage() {
                 isLastStep={currentStep === steps.length}
               />
             ) : (
-              <div className="">
-                <p className="">Content for {steps[currentStep - 1].label}</p>
+              <div className="p-8 border border-gray-200 rounded-2xl">
+                <p className="text-gray-600">
+                  Content for {steps[currentStep - 1].label}
+                </p>
               </div>
             )}
           </div>
         </div>
-
-        {/* Navigation Buttons - Only show when there's no component */}
+        {/* Navigation Buttons */}
         {!hasComponent && (
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center mt-8 w-full max-w-[1020px] mx-auto">
             <button
               onClick={handlePrevious}
               disabled={currentStep === 1}
