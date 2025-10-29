@@ -116,8 +116,7 @@ const products = Array(12)
     name: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover+...',
     price: 87696,
     originalPrice: 87696,
-    image:
-      'https://api.builder.io/api/v1/image/assets/TEMP/f6b8b1540f881e95c37af45c5c832d8722353d7a?width=448',
+    image: '/phone.png',
     inCart: index === 1 || index === 3 || index === 5 || index === 7,
   }))
 
@@ -294,8 +293,12 @@ function IndexPage() {
                     }}
                   />
                   <div className="mt-2 flex items-center justify-between text-sm">
-                    <span>KES {tempFilters.priceRange[0].toLocaleString()}</span>
-                    <span>KES {tempFilters.priceRange[1].toLocaleString()}</span>
+                    <span>
+                      KES {tempFilters.priceRange[0].toLocaleString()}
+                    </span>
+                    <span>
+                      KES {tempFilters.priceRange[1].toLocaleString()}
+                    </span>
                   </div>
                 </div>
                 <div>
@@ -318,7 +321,7 @@ function IndexPage() {
                               setTempFilters((prev) => ({
                                 ...prev,
                                 deviceType: prev.deviceType.filter(
-                                  (t) => t !== type
+                                  (t) => t !== type,
                                 ),
                               }))
                             }
