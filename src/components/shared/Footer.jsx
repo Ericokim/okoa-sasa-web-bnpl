@@ -71,7 +71,7 @@ const TikTokIcon = ({ className }) => (
 export function Footer() {
   return (
     <footer className="bg-neutral-900 py-10 px-4 sm:px-6 md:px-20">
-      <div className="max-w-[1280px] mx-auto">
+      <div className="">
         {/* Header Section with Logo and Social Media */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6 md:gap-0">
           {/* Logo */}

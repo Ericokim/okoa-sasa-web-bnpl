@@ -6,41 +6,41 @@ import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
 import AccountOptionPage from '@/components/shared/Checkout/AccountOption'
 
 const steps = [
-  { 
-    id: 1, 
-    name: 'Check Loan Limit', 
+  {
+    id: 1,
+    name: 'Check Loan Limit',
     label: 'Check Loan Limit',
-    component: null
+    component: null,
   },
-  { 
-    id: 2, 
-    name: 'Personal Info', 
+  {
+    id: 2,
+    name: 'Personal Info',
     label: 'Personal Info',
-   component: PersonalInfoForm
+    component: PersonalInfoForm,
   },
-  { 
-    id: 3, 
-    name: 'Delivery Details', 
+  {
+    id: 3,
+    name: 'Delivery Details',
     label: 'Delivery Details',
-    component: null // Add your component here
+    component: null, // Add your component here
   },
-  { 
-    id: 4, 
-    name: 'Order Summary', 
+  {
+    id: 4,
+    name: 'Order Summary',
     label: 'Order Summary',
-    component: null // Add your component here
+    component: null, // Add your component here
   },
-  { 
-    id: 5, 
-    name: 'Terms & Conditions', 
+  {
+    id: 5,
+    name: 'Terms & Conditions',
     label: 'Terms & Conditions',
-    component: TermsConditionPage
+    component: TermsConditionPage,
   },
-  { 
-    id: 6, 
-    name: 'Account Option', 
+  {
+    id: 6,
+    name: 'Account Option',
     label: 'Account Option',
-    component: AccountOptionPage
+    component: AccountOptionPage,
   },
 ]
 
@@ -71,9 +71,9 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-white p-8">
-      <div className="max-w-6xl mx-auto">
+      <div className="w-[1067px] flex flex-col justify-center">
         {/* Stepper Header */}
-        <div className="mb-12">
+        <div className="mb-12 w-[1067px]">
           {/* Circles and Lines Row */}
           <div className="flex items-center mb-3">
             {steps.map((step, index) => (
@@ -101,7 +101,7 @@ export default function CheckoutPage() {
                 {/* Connector Line */}
                 {index < steps.length - 1 && (
                   <div
-                    className={`h-0.5 flex-1 ${
+                    className={`h-[3px] flex-1 ${
                       step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
                     }`}
                   ></div>
@@ -120,8 +120,10 @@ export default function CheckoutPage() {
                   style={{ width: '40px' }}
                 >
                   <p
-                    className={`text-xs font-medium whitespace-nowrap ${
-                      step.id <= currentStep ? 'text-gray-900' : 'text-gray-400'
+                    className={`text-base font-medium leading-[1.4] flex  items-center justify-center -mr-10 h-[22px] whitespace-nowrap ${
+                      step.id <= currentStep
+                        ? 'text-[#0D0B26]'
+                        : 'text-gray-400'
                     }`}
                   >
                     {step.label}
@@ -137,10 +139,10 @@ export default function CheckoutPage() {
 
         {/* Step Content Area */}
         <div>
-          <div className="bg-white">
+          <div className="bg-white w-[1020px]">
             {/* Render the current step's component */}
             {CurrentStepComponent ? (
-              <CurrentStepComponent 
+              <CurrentStepComponent
                 onSubmit={handleFormSubmit}
                 onNext={handleNext}
                 onPrevious={handlePrevious}
@@ -150,9 +152,7 @@ export default function CheckoutPage() {
               />
             ) : (
               <div className="">
-                <p className="">
-                  Content for {steps[currentStep - 1].label}
-                </p>
+                <p className="">Content for {steps[currentStep - 1].label}</p>
               </div>
             )}
           </div>
