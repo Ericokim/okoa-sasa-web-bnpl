@@ -522,8 +522,8 @@ export const ErrorAlertDialog = ({
   secondaryAction,
 }) => {
   return (
-    <At.AlertDialog open={isOpen} onOpenChange={onClose}>
-      <At.AlertDialogContent className="max-w-md p-0 gap-0">
+    <At.AlertDialog className={''} open={isOpen} onOpenChange={onClose}>
+      <At.AlertDialogContent className="max-w-md rounded-4xl p-0 gap-0">
         {/* Close button */}
         <button
           onClick={onClose}
