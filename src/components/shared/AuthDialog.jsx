@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogPortal } from '@/components/ui/dialog'
+import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -73,16 +74,19 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} className="h-80">
-      <DialogContent
-        className={cn(
-          'rounded-3xl p-0 gap-0 border-0',
-          'max-w-[335px] w-[335px]',
-          'md:max-w-[500px] md:w-[500px]',
-          step === 'otp' ? 'h-[657px] md:h-auto' : 'h-[569px] md:h-auto',
-        )}
-        showCloseButton={false}
-      >
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogPortal>
+        <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-[#252525]/20 backdrop-blur-[4px]" />
+        <DialogPrimitive.Content
+          className={cn(
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+            'fixed top-[50%] left-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-6 duration-200',
+            'rounded-3xl border-0 bg-white p-0 shadow-lg',
+            'max-w-[335px] w-[335px]',
+            'md:max-w-[500px] md:w-[500px]',
+            step === 'otp' ? 'h-[657px] md:h-auto' : 'h-[569px] md:h-auto',
+          )}
+        >
         <div className="relative w-full p-5 md:p-[30px] flex flex-col items-center gap-6">
           <button
             onClick={() => onOpenChange(false)}
@@ -120,7 +124,8 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
             )}
           </div>
         </div>
-      </DialogContent>
+        </DialogPrimitive.Content>
+      </DialogPortal>
     </Dialog>
   )
 }

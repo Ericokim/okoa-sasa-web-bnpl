@@ -2,6 +2,7 @@ import { createFileRoute, useSearch } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
 import { FilterBar } from '@/components/shared/Products/FilterBar'
 import { AuthDialog } from '@/components/shared/AuthDialog'
+import { LoanLimitCalculator } from '@/components/shared/LoanLimitCalculator'
 import { ProductCard } from '@/components/shared/Products/ProductCard'
 import { PaginationComponent } from '@/components/shared/PaginationComponent'
 
@@ -19,16 +20,20 @@ const products = Array(12)
 function IndexPage() {
   const search = useSearch({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [showLoanCalculator, setShowLoanCalculator] = useState(false)
 
   useEffect(() => {
     if (search?.auth === 'login') {
       setShowAuthDialog(true)
     }
+    if (search?.calculator === 'loan') {
+      setShowLoanCalculator(true)
+    }
   }, [search])
 
   return (
     <div className="mx-auto">
-      <FilterBar />
+      <FilterBar onLoanCalculatorOpen={() => setShowLoanCalculator(true)} />
 
       <div className="py-6 md:py-8 lg:py-[38px]">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-[30px]">
@@ -51,6 +56,10 @@ function IndexPage() {
       </div>
 
       <AuthDialog open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+      <LoanLimitCalculator
+        open={showLoanCalculator}
+        onOpenChange={setShowLoanCalculator}
+      />
     </div>
   )
 }
@@ -59,5 +68,6 @@ export const Route = createFileRoute('/')({
   component: IndexPage,
   validateSearch: (search) => ({
     auth: search?.auth,
+    calculator: search?.calculator,
   }),
 })
