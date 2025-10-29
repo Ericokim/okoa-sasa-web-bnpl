@@ -23,6 +23,8 @@ const DEFAULT_OPTIONS = {
   ram: [],
 }
 
+const FILTER_CATEGORIES = ['brand', 'color', 'storage', 'camera', 'display', 'ram']
+
 const FilterIcon = () => (
   <svg
     width="24"
@@ -208,6 +210,33 @@ const uniqueList = (items = []) =>
 const buildToggleState = (items) =>
   items.reduce((acc, item) => ({ ...acc, [item]: false }), {})
 
+const buildToggleStateFromSelection = (items, selected = []) =>
+  items.reduce(
+    (acc, item) => ({ ...acc, [item]: selected.includes(item) }),
+    {},
+  )
+
+const areFilterStatesEqual = (a, b, categories) => {
+  if (!a || !b) return false
+  if (a.priceRange[0] !== b.priceRange[0] || a.priceRange[1] !== b.priceRange[1]) {
+    return false
+  }
+  if (a.priceMin !== b.priceMin || a.priceMax !== b.priceMax) {
+    return false
+  }
+  return categories.every((category) => {
+    const aEntries = a[category] ?? {}
+    const bEntries = b[category] ?? {}
+    const keys = new Set([...Object.keys(aEntries), ...Object.keys(bEntries)])
+    for (const key of keys) {
+      if (!!aEntries[key] !== !!bEntries[key]) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
 const buildDefaultFilters = (options) => ({
   priceRange: [options.price.min, options.price.max],
   priceMin: `${options.price.min}`,
@@ -227,7 +256,8 @@ export function FilterBar({
   onSortChange,
   initialSort = 'price-low-high',
   options = DEFAULT_OPTIONS,
-  resetSignal = 0,
+  selectedFilters,
+  selectedSort,
 }) {
   const normalizedOptions = useMemo(() => {
     const priceMin = options?.price?.min ?? DEFAULT_OPTIONS.price.min
@@ -255,7 +285,7 @@ export function FilterBar({
   const validInitialSort = SORT_OPTIONS.some((item) => item.value === initialSort)
     ? initialSort
     : SORT_OPTIONS[0].value
-  const [selectedSort, setSelectedSort] = useState(validInitialSort)
+  const [sortSelection, setSortSelection] = useState(validInitialSort)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [openSections, setOpenSections] = useState({
     price: true,
@@ -268,13 +298,53 @@ export function FilterBar({
   })
 
   useEffect(() => {
-    setFilters(defaultFilters)
-    setSelectedPaymentType('basic')
-  }, [defaultFilters, resetSignal])
+    const priceMinValue = selectedFilters?.priceRange?.[0] ?? normalizedOptions.price.min
+    const priceMaxValue = selectedFilters?.priceRange?.[1] ?? normalizedOptions.price.max
+    const clampedMin = Math.max(normalizedOptions.price.min, Math.min(priceMinValue, normalizedOptions.price.max))
+    const clampedMax = Math.max(clampedMin, Math.min(priceMaxValue, normalizedOptions.price.max))
+
+    const nextFilters = {
+      priceRange: [clampedMin, clampedMax],
+      priceMin: `${clampedMin}`,
+      priceMax: `${clampedMax}`,
+      brand: buildToggleStateFromSelection(
+        normalizedOptions.brand,
+        selectedFilters?.brand ?? [],
+      ),
+      color: buildToggleStateFromSelection(
+        normalizedOptions.color,
+        selectedFilters?.color ?? [],
+      ),
+      storage: buildToggleStateFromSelection(
+        normalizedOptions.storage,
+        selectedFilters?.storage ?? [],
+      ),
+      camera: buildToggleStateFromSelection(
+        normalizedOptions.camera,
+        selectedFilters?.camera ?? [],
+      ),
+      display: buildToggleStateFromSelection(
+        normalizedOptions.display,
+        selectedFilters?.display ?? [],
+      ),
+      ram: buildToggleStateFromSelection(
+        normalizedOptions.ram,
+        selectedFilters?.ram ?? [],
+      ),
+    }
+
+    setFilters((prev) =>
+      areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES) ? prev : nextFilters,
+    )
+  }, [defaultFilters, selectedFilters, normalizedOptions])
 
   useEffect(() => {
-    setSelectedSort(validInitialSort)
-  }, [validInitialSort, resetSignal])
+    const nextSort =
+      selectedSort && SORT_OPTIONS.some((item) => item.value === selectedSort)
+        ? selectedSort
+        : validInitialSort
+    setSortSelection(nextSort)
+  }, [validInitialSort, selectedSort])
 
   useEffect(() => {
     if (!onFiltersChange) return
@@ -297,9 +367,9 @@ export function FilterBar({
 
   useEffect(() => {
     if (onSortChange) {
-      onSortChange(selectedSort)
+      onSortChange(sortSelection)
     }
-  }, [selectedSort, onSortChange])
+  }, [sortSelection, onSortChange])
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -731,11 +801,11 @@ export function FilterBar({
             className="w-[210px] border-none bg-white p-2 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
           >
             {SORT_OPTIONS.map((option) => {
-              const isActive = selectedSort === option.value
+              const isActive = sortSelection === option.value
               return (
                 <DropdownMenuItem
                   key={option.value}
-                  onSelect={() => setSelectedSort(option.value)}
+                  onSelect={() => setSortSelection(option.value)}
                   className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-normal leading-[140%] ${
                     isActive
                       ? 'bg-[rgba(244,113,32,0.12)] text-[#F47120]'
