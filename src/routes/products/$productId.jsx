@@ -43,7 +43,7 @@ function ProductDetailPage() {
   ]
 
   return (
-    <>
+    <div className=" mx-auto">
       <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
@@ -209,7 +209,7 @@ function ProductDetailPage() {
         </div>
       </div>
 
-      <div className="mt-8">
+      <div className="my-8 mb-4">
         <div className="flex gap-8 border-b-2 border-gray-200">
           {['specifications', 'description', 'benefits'].map((tab) => (
             <button
@@ -221,13 +221,13 @@ function ProductDetailPage() {
             >
               {tab}
               {activeTab === tab && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#F8971D] to-[#EE3124]" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2.5px] rounded-4xl bg-brand-primary-gradient" />
               )}
             </button>
           ))}
         </div>
 
-        <div className="mt-8">
+        <div className="my-8 mb-4">
           {activeTab === 'specifications' && (
             <div className="overflow-hidden rounded-lg border border-gray-200">
               <div className="flex flex-col md:flex-row">
@@ -276,7 +276,7 @@ function ProductDetailPage() {
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
