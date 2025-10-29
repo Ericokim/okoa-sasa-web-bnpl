@@ -18,16 +18,17 @@ import boxWhiteIcon from '@/assets/icons/box_white.svg'
 import profileIcon from '@/assets/icons/profile.svg'
 import logoutIcon from '@/assets/icons/logout.svg'
 import ShoppingCart  from '@/assets/icons/shoppingCart.svg';
-
-export const HomeIcon = ({ size = 24, className = '' }) => (
-  <img src={homeIcon} alt="trash" width={size} height={size} className={className} />
-);import successIcon from '@/assets/icons/success.svg'
+import successIcon from '@/assets/icons/success.svg'
 import alertIcon from '@/assets/icons/alert.svg'
 import deviceIcon from '@/assets/icons/device.svg'
 import handMoneyIcon from '@/assets/icons/handMoney.svg'
 import fileIcon from '@/assets/icons/file.svg'
 import searchIcon from '@/assets/icons/searchStatus.svg'
 import truckTickIcon from '@/assets/icons/truckTick.svg'
+
+export const HomeIcon = ({ size = 24, className = '' }) => (
+  <img src={homeIcon} alt="trash" width={size} height={size} className={className} />
+);
 
 export const TruckTickIcon = ({ size, className = '' }) => (
   <img
