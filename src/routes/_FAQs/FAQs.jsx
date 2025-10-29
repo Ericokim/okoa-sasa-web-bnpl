@@ -1,16 +1,6 @@
 import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import {
-  Laptop2,
-  Wallet,
-  FileText,
-  ClipboardCheck,
-  Truck,
-  RefreshCw,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import {
   DeviceIcon,
   FileIcon,
@@ -21,71 +11,63 @@ import {
 
 const steps = [
   {
-    icon: <DeviceIcon size={36} className="text-white mx-auto" />,
-    title: 'Browse And Choose Your Device.',
+    icon: <DeviceIcon size={50} className="text-white" />,
+    title: 'Browse and choose your device.',
     step: '1 Step',
   },
   {
-    icon: <HandMoneyIcon size={36} className="text-white mx-auto" />,
-    title: 'Check Your Loan Limit To Qualify.',
+    icon: <HandMoneyIcon size={50} className="text-white" />,
+    title: 'Check Your Loan Limit to Qualify',
     step: '2 Step',
   },
   {
-    icon: <FileIcon size={36} className="text-white mx-auto" />,
-    title: 'Fill In Your Details And Employer Info.',
+    icon: <FileIcon size={50} className="text-white" />,
+    title: 'Fill in your details and employer info.',
     step: '3 Step',
   },
   {
-    icon: <SearchIcon size={36} className="text-white mx-auto" />,
-    title: 'We Review Your Loan Request.',
+    icon: <SearchIcon size={50} className="text-white" />,
+    title: 'We review your loan request.',
     step: '4 Step',
   },
   {
-    icon: <TruckTickIcon size={36} className="text-white mx-auto" />,
-    title: 'Once Approved, Your Device Is Delivered.',
+    icon: <TruckTickIcon size={50} className="text-white" />,
+    title: 'Once approved, your device is delivered.',
     step: '5 Step',
   },
   {
-    icon: <TruckTickIcon size={36} className="text-white mx-auto" />,
-    title: 'Loan Repaid Monthly Via Payroll Checkoff.',
+    icon: <TruckTickIcon size={50} className="text-white" />,
+    title: 'Loan repaid monthly via payroll checkoff.',
     step: '6 Step',
   },
 ]
 
 const faqData = [
   {
-    question: 'What Is Okoa Sasa?',
+    question: 'What is Okao Sasa?',
     answer:
-      'Okoa Sasa Is An Online Marketplace That Connects Buyers And Sellers, Offering A Wide Range Of Unique Items That Can Be Purchased From The Comfort Of Your Home, Office, Or Even While On The Go. It Also Allows You To Sell Your Own Products To A Broad Audience. Items Can Be Delivered To Your Doorstep Or Picked Up From Designated Collection Points Nationwide.',
+      'Okao Sasa is an online marketplace that connects buyers and sellers, offering a wide range of unique items that can be purchased from the comfort of your home, office, or even while on the go. It also allows you to sell your own products to a broad audience. Items can be delivered to your doorstep or picked up from designated collection points nationwide.',
   },
   {
-    question: 'What Do I Do In Case I Have Forgotten My Password?',
+    question: 'What do I do in case I have forgotten my password?',
     answer:
-      'Please Visit The Login Page And Click On The Link Next To "Forgot Your Password?"; Enter The Details Of The Email Address That You Used When You First Registered Your Account. We Will Email You A Link To This Email Address Which You Can Click On To Reset Your Password.',
+      'Please visit the login page and click on the link next to \'Forgot your password?\'; enter the details of the email address that you used when you first registered your account. We will email you a link to this email address which you can click on to reset your password.',
   },
   {
-    question: 'When Can I Place My Order?',
+    question: 'When can I place my order?',
     answer:
-      'You Can Place Your Order At Any Time. Deliveries However Will Be Done As Per The Timelines Noted On The Check-Out Page.',
+      'You can place your order at any time. Deliveries however will be done as per the timelines noted on the check-out page.',
   },
   {
-    question: 'How Soon From The Time Of Ordering Will My Item Be Delivered?',
+    question: 'How soon from the time of ordering will my item be delivered?',
     answer:
-      'We Offer Same Day Delivery On All Orders Made Before 3pm Are Delivered Same Day Within Nairobi. If Outside Nairobi Delivery Is Made The Next Day, Orders Made After 3pm Will Be Processed The Next Day.The Transit Time Period Is Calculated Strictly Using Business Days, Which Excludes Sunday And Public Holidays( Visit Shipping And Delivery Policy For More Details)',
+      'We offer same day delivery on all orders made before 3pm are delivered same day within Nairobi. If outside nairobi delivery is made the next day. Orders made after 3pm will be processed the next day.The transit time-period is calculated strictly using business days, which excludes Sunday and Public holidays( Visit Shipping and Delivery Policy for more details)',
   },
 ]
 
 const FAQs = () => {
   const [openStates, setOpenStates] = React.useState(faqData.map(() => false))
-  const [currentIndex, setCurrentIndex] = React.useState(0)
-
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % steps.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + steps.length) % steps.length)
-  }
+  const [currentSlide, setCurrentSlide] = React.useState(0)
 
   const toggleFAQ = (index) => {
     setOpenStates((prev) =>
@@ -93,139 +75,168 @@ const FAQs = () => {
     )
   }
 
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 2 < steps.length ? prev + 2 : 0))
+  }
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 2 >= 0 ? prev - 2 : Math.max(0, steps.length - 2)))
+  }
+
   return (
-    <section className="bg-white -ml-20 w-[1550px]">
-      <div className="h-[552px]">
-        <div className="bg-linear-to-b from-orange-500 to-orange-400 text-white grid justify-center py-8 px-4 text-center h-96">
-          <div className="h-[375px] flex flex-col justify-between w-full max-w-7xl mt-[60px]">
+    <div className="bg-white overflow-hidden relative w-full">
+      {/* How It Works Section */}
+      <div className="bg-white overflow-hidden relative w-full h-[485px] lg:h-[552px]">
+        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-screen absolute left-0 top-0" />
+
+        <div className="absolute left-1/2 top-[42px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] lg:max-w-7xl px-5 lg:px-0">
+          <div className="flex flex-col gap-10 lg:gap-[60px] items-center">
             {/* Header */}
-            <div className="p-0">
-              <div className="w-16 h-1 bg-white mx-auto mb-4 rounded-full"></div>
-              <h1 className="text-[36px]  font-semibold capitalize text-white">
+            <div className="flex flex-col gap-2 items-center text-center w-full lg:max-w-[616px]">
+              <div className="w-[67px] lg:w-[77px] h-0 border-t-4 border-white rotate-180 mb-2" />
+              <h1 className="text-[24px] lg:text-[36px] font-semibold leading-[1.4] text-white capitalize">
                 How It Works
               </h1>
-              <p className="text-[18px] font-semibold capitalize text-white ">
+              <p className="text-[14px] lg:text-[18px] font-semibold leading-[1.4] text-white capitalize">
                 Simple steps to get your device with Okoa Sasa financing.
               </p>
             </div>
 
-            {/* Desktop layout */}
-            <div className="hidden lg:grid grid-cols-6 gap-3">
+            {/* Desktop Grid */}
+            <div className="hidden lg:grid grid-cols-6 gap-[12px] w-full">
               {steps.map((step, index) => (
                 <div
                   key={index}
-                  className="bg-white text-gray-700 rounded-xl py-6 px-4 shadow-md hover:shadow-lg transition-all duration-200 h-56 w-[203.33px]"
+                  className="bg-white flex flex-col gap-[16px] items-center justify-center px-[12px] py-[16px] rounded-[16px] shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] flex-1"
                 >
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="bg-orange-500 rounded-full h-20 w-20 flex items-center justify-center">
-                      {step.icon}
-                    </div>
-                    <p className="text-sm font-medium text-center w-[178px] h-[50px]">
+                  <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
+                    {step.icon}
+                  </div>
+                  <div className="flex flex-col gap-[12px] items-center justify-center w-[178px]">
+                    <p className="font-['Public_Sans'] text-base font-normal leading-[1.4] text-[#252525] text-center capitalize">
                       {step.title}
                     </p>
-                    <span className="text-orange-500 font-semibold w-[179.33px] h-[30px]">
+                  </div>
+                  <div className="relative h-[30px] w-full">
+                    <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
                       {step.step}
-                    </span>
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
 
-            {/* Mobile + Tablet Carousel */}
-            <div className="relative lg:hidden flex items-center justify-center mt-4">
-              {/* Prev button */}
+            {/* Mobile Carousel */}
+            <div className="relative lg:hidden w-full">
+              {/* Navigation Buttons */}
               <button
                 onClick={prevSlide}
-                className="absolute left-0 bg-white text-orange-500 rounded-full shadow-md p-2 hover:bg-orange-100 transition"
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+                disabled={currentSlide === 0}
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft className="w-4 h-4 text-[#f8971d]" />
               </button>
 
-              {/* Card */}
-              <div className="bg-white text-gray-700 rounded-xl py-6 px-4 shadow-md h-56 w-[250px] mx-10 flex-shrink-0 transition-all duration-500">
-                <div className="flex flex-col items-center justify-center space-y-3">
-                  <div className="bg-orange-500 rounded-full h-20 w-20 flex items-center justify-center">
-                    {steps[currentIndex].icon}
-                  </div>
-                  <p className="text-sm font-medium text-center w-[178px] h-[50px]">
-                    {steps[currentIndex].title}
-                  </p>
-                  <span className="text-orange-500 font-semibold w-[179.33px] h-[30px]">
-                    {steps[currentIndex].step}
-                  </span>
-                </div>
-              </div>
-
-              {/* Next button */}
               <button
                 onClick={nextSlide}
-                className="absolute right-0 bg-white text-orange-500 rounded-full shadow-md p-2 hover:bg-orange-100 transition"
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+                disabled={currentSlide >= steps.length - 2}
               >
-                <ChevronRight size={24} />
+                <ChevronRight className="w-4 h-4 text-[#f8971d]" />
               </button>
+
+              {/* Carousel Container */}
+              <div className="overflow-hidden mx-8">
+                <div
+                  className="flex transition-transform duration-300 ease-in-out gap-3"
+                  style={{ transform: `translateX(-${(currentSlide * 100) / 2}%)` }}
+                >
+                  {steps.map((step, index) => (
+                    <div
+                      key={index}
+                      className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] min-w-[50%] shrink-0"
+                    >
+                      <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
+                        {step.icon}
+                      </div>
+                      <div className="flex flex-col gap-3 items-center justify-center w-[178px]">
+                        <p className="font-['Public_Sans'] text-[18px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
+                          {step.title}
+                        </p>
+                      </div>
+                      <div className="relative h-[30px] w-full">
+                        <div className="absolute left-0 w-[30px] h-[30px] rounded-full">
+                          <div className="w-full h-full bg-linear-to-b from-[#f8971d] to-[#ee3124] rounded-full" />
+                        </div>
+                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                          {step.step}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* body */}
-
-      <div className="h-[928px] px-20 py-5 grid place-items-center">
-        <div className="w-7xl max-w-7xl h-[888px]  flex flex-col justify-between items-center">
-          {/* Header */}
-          <div className="h-[111px] w-full text-center flex flex-col justify-center items-center">
-            <div className=" w-20 h-1 bg-orange-500 -mt-6 mb-4 rounded-full"></div>
-            <h1 className="text-3xl font-bold mb-2 ">FAQs</h1>
-            <p className="text-sm md:text-base">
-              Have any question for us? Ask away
-            </p>
-          </div>
-
-          {/* body */}
-          <div className="h-[721px] w-full max-w-7xl overflow-y-auto p-1 space-y-10">
-            {faqData.map((faq, index) => (
-              <div
-                key={index}
-                className={`rounded-lg bg-white overflow-hidden shadow-2xs transition-all duration-300 
-                   
-                `}
-              >
-                {/* Top Row — Question + Toggle Button */}
-                <div className="w-full px-6 py-5 flex justify-between items-center text-left">
-                  <span className="font-semibold text-gray-900 text-base pr-4">
-                    {faq.question}
-                  </span>
-                  <button
-                    onClick={() => toggleFAQ(index)}
-                    className="p-2 rounded-full hover:bg-gray-100 transition"
-                  >
-                    <ChevronDown
-                      className={`transition-transform duration-300 text-gray-600 ${
-                        openStates[index] ? 'rotate-180' : ''
-                      }`}
-                      size={20}
-                    />
-                  </button>
-                </div>
-
-                {/* Collapsible Answer */}
-                <div
-                  className={`overflow-hidden transition-all duration-500 ${
-                    openStates[index]
-                      ? 'max-h-96 opacity-100'
-                      : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-6 pb-5 pt-2 text-gray-600 text-sm leading-relaxed">
-                    {faq.answer}
-                  </div>
-                </div>
+      {/* FAQs Section */}
+      <div className="w-full px-5 lg:px-20 py-6 lg:py-5">
+        <div className="max-w-[335px] lg:max-w-7xl mx-auto">
+          <div className="flex flex-col gap-4 lg:gap-14 items-center lg:items-start w-full">
+            {/* Header */}
+            <div className="flex flex-col gap-4 lg:gap-6 items-center w-full">
+              <div className="w-[77px] h-0 border-t-4 border-[#f8971d] rotate-180" />
+              <div className="flex flex-col gap-2 lg:gap-3 items-center text-center">
+                <h1 className="font-['Public_Sans'] text-[24px] lg:text-[36px] font-semibold leading-[1.4] text-[#1c1f21] capitalize">
+                  FAQs
+                </h1>
+                <p className="font-['Public_Sans'] text-[14px] lg:text-[18px] font-semibold leading-[1.4] text-[#4e555a] capitalize">
+                  Have any question for us? Ask away
+                </p>
               </div>
-            ))}
+            </div>
+
+            {/* FAQ Items */}
+            <div className="flex flex-col gap-4 lg:gap-10 w-full">
+              {faqData.map((faq, index) => (
+                <div
+                  key={index}
+                  className="bg-white flex flex-col gap-3 items-start p-3 lg:p-6 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-full"
+                >
+                  {/* Question Row */}
+                  <div className="flex items-start justify-between w-full">
+                    <h2 className="font-['Public_Sans'] text-[18px] lg:text-[24px] font-semibold leading-[1.4] text-[#1c1f21] capitalize text-left flex-1 pr-4">
+                      {faq.question}
+                    </h2>
+                    <button
+                      onClick={() => toggleFAQ(index)}
+                      className="flex items-center justify-center w-6 h-6 shrink-0"
+                    >
+                      <ChevronDown
+                        className={`w-6 h-6 text-[#4e555a] transition-transform duration-300 ${
+                          openStates[index] ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Answer */}
+                  {openStates[index] && (
+                    <div className="w-full">
+                      <p className="font-['Public_Sans'] text-[14px] lg:text-[18px] font-normal leading-[1.4] text-[#4e555a]">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   )
 }
 
