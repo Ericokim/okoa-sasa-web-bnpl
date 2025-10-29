@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from '@tanstack/react-router'
 import { ThemedSuspense, LoadingSpinner } from '@/components/shared/Loading'
 import { useStateContext } from '@/context/state-context'
 import Layout from '@/container/Layout'
+import { AuthDialog } from '@/components/shared'
 
 /**
  * Lazy load helper with suspense fallback
@@ -57,7 +58,6 @@ export function ProtectedRoute({ children }) {
 
 // Lazy load AuthDialog to avoid circular dependencies
 function AuthDialogWrapper({ open, onOpenChange }) {
-  const { AuthDialog } = React.useMemo(() => require('@/components/shared'), [])
   return <AuthDialog open={open} onOpenChange={onOpenChange} />
 }
 

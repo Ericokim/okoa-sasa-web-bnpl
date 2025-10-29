@@ -1,28 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState, useEffect, useRef } from 'react'
-import { AlertTriangle, AlertTriangleIcon, Trash2 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import gsap from 'gsap'
-import { EditIcon, TrashIcon, TrashIconWhite } from '@/assets/icons'
+import { TrashIconWhite } from '@/assets/icons'
 
-export const Route = createFileRoute('/_protected/profile/DangerZoneCard')({
-  component: RouteComponent,
-})
-
-export function DangerZoneCard() {
+export function RouteComponent() {
   const [open, setOpen] = useState(false)
 
   const confirmDelete = () => {
-    console.log('Account deleted')
     setOpen(false)
   }
 
@@ -99,3 +83,10 @@ export function DangerZoneCard() {
     </>
   )
 }
+
+export const Route = createFileRoute('/_protected/profile/DangerZoneCard')({
+  component: RouteComponent,
+})
+
+export const component = RouteComponent
+export const DangerZoneCard = RouteComponent

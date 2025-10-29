@@ -121,30 +121,39 @@ export const formatNoteContent = (content) => {
 }
 
 // Function to disable any accidental use of console logs
-export const GlobalDebug = (function () {
-  var savedConsole = console
+export const GlobalDebug = (() => {
+  const saved = {
+    log: console.log?.bind(console),
+    info: console.info?.bind(console),
+    warn: console.warn?.bind(console),
+    error: console.error?.bind(console),
+  }
+
+  const noop = () => {}
+
   /**
    * @param {boolean} debugOn
    * @param {boolean} suppressAll
    */
-  return function (debugOn, suppressAll) {
-    var suppress = suppressAll || false
+  return (debugOn, suppressAll) => {
+    const suppress = suppressAll || false
+
     if (debugOn === false) {
-      // supress the default console functionality
-      console = {}
-      console.log = function () {}
-      // supress all type of consoles
+      console.log = noop
       if (suppress) {
-        console.info = function () {}
-        console.warn = function () {}
-        console.error = function () {}
+        console.info = noop
+        console.warn = noop
+        console.error = noop
       } else {
-        console.info = savedConsole.info
-        console.warn = savedConsole.warn
-        console.error = savedConsole.error
+        console.info = saved.info || noop
+        console.warn = saved.warn || noop
+        console.error = saved.error || noop
       }
     } else {
-      console = savedConsole
+      console.log = saved.log || noop
+      console.info = saved.info || noop
+      console.warn = saved.warn || noop
+      console.error = saved.error || noop
     }
   }
 })()

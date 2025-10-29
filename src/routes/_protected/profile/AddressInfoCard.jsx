@@ -1,20 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react'
-import { Edit2Icon, MapPinIcon, Pencil } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
+import { useState } from 'react'
 import { useAccountStore } from '@/data/accountStore'
-import { MapPin, Edit2 } from 'lucide-react'
 import { EditIcon } from '@/assets/icons'
 
-export const Route = createFileRoute('/_protected/profile/AddressInfoCard')({
-  component: RouteComponent,
-})
-
-export function AddressInfoCard() {
+export function RouteComponent() {
   const { addresses, updateAddress } = useAccountStore()
   const [editing, setEditing] = useState(null)
   const [street, setStreet] = useState('')
@@ -56,7 +45,7 @@ export function AddressInfoCard() {
                 onClick={() => startEdit('office')}
                 className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon  />
+                <EditIcon />
                 <span>Edit</span>
               </button>
             )}
@@ -92,7 +81,7 @@ export function AddressInfoCard() {
                 onClick={() => startEdit('home')}
                 className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
-                <EditIcon  />
+                <EditIcon />
                 <span>Edit</span>
               </button>
             )}
@@ -115,6 +104,13 @@ export function AddressInfoCard() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_protected/profile/AddressInfoCard')({
+  component: RouteComponent,
+})
+
+export const component = RouteComponent
+export const AddressInfoCard = RouteComponent
 
 // Reusable Edit Form — Pure JSX
 function AddressEditForm({ value, onChange, onSave, onCancel }) {
