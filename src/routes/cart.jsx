@@ -12,6 +12,8 @@ function CartPage() {
   const { isAuthenticated } = useStateContext()
   const [showAuthDialog, setShowAuthDialog] = React.useState(false)
 
+  const productImages = Array(4).fill('/phone.png')
+
   const [cartItems, setCartItems] = React.useState([
     {
       id: 1,
@@ -71,14 +73,13 @@ function CartPage() {
   )
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
-   const breadcrumbItems = [
+  const breadcrumbItems = [
     { label: 'Home', path: '/' },
     { label: 'My Cart', path: `/cart`, isCurrent: true },
   ]
 
   return (
     <div className="min-h-screen w-full  lg:w-7xl space-y-4 lg:space-y-[30px] px-4 lg:px-0">
-
       <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
       {/* Header */}
       <div className="lg:h-20">
@@ -155,7 +156,7 @@ function CartPage() {
                         onClick={() => removeItem(item.id)}
                         className="text-red-400 hover:text-red-600 w-8 h-8 flex items-center justify-center"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <TrashIcon className="w-5 h-5" />
                       </button>
                     </div>
 
@@ -175,7 +176,12 @@ function CartPage() {
                     {/* Product Info */}
                     <div className="col-span-6 flex gap-4 items-start w-[375px] h-[130px]">
                       <div className="bg-brand-bg-2 rounded-lg flex items-center justify-center shrink-0 w-[139px] h-[130px]">
-                        <div className="w-24 h-24 bg-linear-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div>
+                        {/* <div className="w-24 h-24 bg-linear-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div> */}
+                        <img
+                          src={productImages}
+                          alt="Product main view"
+                          className="w-24 h-24 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 object-contain rounded-2xl"
+                        />
                       </div>
                       <div className="flex-1 w-56 h-[99px]">
                         <h3 className="font-semibold text-lg leading-[1.4] capitalize text-black w-56 h-[25px]">

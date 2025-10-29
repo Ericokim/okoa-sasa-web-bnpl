@@ -83,22 +83,23 @@ export default function CheckLoanLimitPage({
   const maxPercentage = ((maxMonths - 1) / (24 - 1)) * 100
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="bg-white w-[1020px] h-[429px] rounded-4xl shadow-sm border border-gray-200 p-6">
+    <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
+      {/* Form Container */}
+      <div className="bg-white w-full max-w-[1020px] h-auto rounded-4xl shadow-sm border border-gray-200 p-4 sm:p-6">
         <div className="">
-          <h1 className="w-full max-w-[972px] text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
+          <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
             Check Your Loan Limit
           </h1>
-          <p className="w-full max-w-[972px] text-base font-medium leading-[1.4] text-[#676D75]">
+          <p className="w-full text-sm sm:text-base font-medium leading-[1.4] text-[#676D75]">
             Enter your details to check your loan eligibility.
           </p>
         </div>
 
-        <div className="h-0.5 bg-gray-300 my-6"></div>
+        <div className="h-0.5 bg-gray-300 my-4 sm:my-6"></div>
 
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Basic Pay and Net Pay */}
-          <div className="grid grid-cols-2 h-[75px] gap-[50px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[50px] h-auto sm:h-[75px]">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Basic Pay
@@ -127,9 +128,9 @@ export default function CheckLoanLimitPage({
           </div>
 
           {/* Repayment Period Slider */}
-          <div className="h-[70px]">
+          <div className="h-auto sm:h-[70px]">
             {/* Fixed month badge at top center */}
-            <div className="flex justify-center h-[38px]">
+            <div className="flex justify-center h-[38px] mb-4 sm:mb-0">
               <div className="flex flex-row justify-center items-center px-3.5 py-2.5 gap-2.5 mx-auto w-[104px] h-[38px] border border-[#F47120] rounded-full">
                 <p className="text-sm font-normal text-center text-[#333333]">
                   {maxMonths} Months
@@ -138,12 +139,14 @@ export default function CheckLoanLimitPage({
             </div>
 
             {/* Slider section */}
-            <div className="flex items-center justify-center gap-4 mt-4">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-4">
               {/* Min label */}
-              <span className="text-sm font-normal text-[#333333]">Min 06</span>
+              <span className="text-sm font-normal text-[#333333] order-2 sm:order-1">
+                Min 06
+              </span>
 
               {/* Slider container */}
-              <div className="relative w-[307px] h-5 flex items-center">
+              <div className="relative w-full sm:w-[307px] h-5 flex items-center order-1 sm:order-2">
                 {/* Background track */}
                 <div className="absolute w-full h-2 bg-gray-200 rounded-full"></div>
 
@@ -192,12 +195,14 @@ export default function CheckLoanLimitPage({
               </div>
 
               {/* Max label */}
-              <span className="text-sm font-normal text-[#333333]">Max 24</span>
+              <span className="text-sm font-normal text-[#333333] order-3">
+                Max 24
+              </span>
             </div>
           </div>
 
           {/* Upload Payslip */}
-          <div className="h-[75px]">
+          <div className="h-auto sm:h-[75px]">
             <label className="block text-sm font-medium text-gray-900 mb-2">
               Upload Latest Payslip
             </label>
@@ -224,7 +229,7 @@ export default function CheckLoanLimitPage({
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M7.50003 14.7917C7.15837 14.7917 6.87503 14.5084 6.87503 14.1667V10.6751L6.27503 11.2751C6.03337 11.5167 5.63337 11.5167 5.3917 11.2751C5.15003 11.0334 5.15003 10.6334 5.3917 10.3917L7.05837 8.72507C7.23337 8.55007 7.50837 8.49174 7.7417 8.59174C7.97503 8.68341 8.12503 8.91674 8.12503 9.16674V14.1667C8.12503 14.5084 7.8417 14.7917 7.50003 14.7917Z"
+                    d="M7.50003 14.7917C7.15837 14.7917 6.87503 14.5084 6.87503 14.1667V10.6751L6.27503 11.2751C6.03337 11.5167 5.63337 11.5167 5.3917 11.2751C5.15003 11.0334 5.15003 10.6334 5.3917 10.3917L7.05837 8.72507C7.23337 8.55007 7.50837 8.49174 7.7417 8.59174C7.97503 8.68341 7.97503 8.68341 8.12503 9.16674V14.1667C8.12503 14.5084 7.8417 14.7917 7.50003 14.7917Z"
                     fill="#A0A4AC"
                   />
                   <path
@@ -243,67 +248,51 @@ export default function CheckLoanLimitPage({
               </label>
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Buttons */}
-          <div className="flex justify-end gap-4 pt-6">
-            <Button
-              onClick={onPrevious}
-              disabled={isFirstStep}
-              type="button"
-              className="px-8 py-3 h-12 rounded-full border-2 border-orange-500 bg-white text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50 transition-colors"
-            >
-              Return To Back
-            </Button>
-            <Button
-              //   onClick={form.handleSubmit(onSubmit)}
-              onClick={() => setOpen(true)}
-              type="button"
-              className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity"
-              style={{
-                background: 'linear-gradient(to right, #F97316, #EF4444)',
-              }}
-            >
-              Check Loan Limit
-            </Button>
-          </div>
-          {/* <AlertDialogCustom
-        open={open}
-        onOpenChange={setOpen}
-        variant="success"
-                      title="Congratulations!"
-                      icon={<SuccessIcon/>}
-        amount={50000}
-        currency="KES"
-        period="24 months"
-        additionalMessage="Would you like to see devices within your loan limit range (Max. KES 50,000)?"
-        cancelLabel="Cancel"
-        actionLabel="Proceed"
-        onCancel={() => setOpen(false)}
-        onAction={() => {
-          console.log('Success action');
-          setOpen(false);
+      {/* Buttons Container - Completely Outside */}
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-[1020px]">
+        <Button
+          onClick={onPrevious}
+          disabled={isFirstStep}
+          type="button"
+          className="px-8 py-3 h-12 rounded-full border-2 border-orange-500 bg-white text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50 transition-colors w-full sm:w-auto"
+        >
+          Return To Back
+        </Button>
+        <Button
+          onClick={() => setOpen(true)}
+          type="button"
+          className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity w-full sm:w-auto"
+          style={{
+            background: 'linear-gradient(to right, #F97316, #EF4444)',
+          }}
+        >
+          Check Loan Limit
+        </Button>
+      </div>
+
+      <SuccessAlertDialog
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        loanAmount="KES 50,000"
+        paybackPeriod="24 months"
+        maxAmount="KES 50,000"
+        secondaryAction={{
+          label: 'Cancel',
+          onClick: () => {
+            console.log('Cancelled')
+            setOpen(false)
+          },
         }}
-                  /> */}
-          <SuccessAlertDialog
-            isOpen={open}
-            onClose={() => setOpen(false)}
-            loanAmount="KES 50,000"
-            paybackPeriod="24 months"
-            maxAmount="KES 50,000"
-            secondaryAction={{
-              label: 'Cancel',
-              onClick: () => {
-                console.log('Cancelled')
-                setOpen(false)
-              },
-            }}
-            primaryAction={{
-              label: 'Proceed',
-              onClick: onNext,
-            }}
-            decorativeIcons={<SuccessIcon />}
-                  />
-          {/* <ErrorAlertDialog
+        primaryAction={{
+          label: 'Proceed',
+          onClick: onNext,
+        }}
+        decorativeIcons={<SuccessIcon />}
+      />
+      {/* <ErrorAlertDialog
             isOpen={open}
             onClose={() => setOpen(false)}
             message="The selected device exceeds your loan limit. Please choose another device within your approved range."
@@ -322,8 +311,6 @@ export default function CheckLoanLimitPage({
               },
             }}
           /> */}
-        </div>
-      </div>
     </div>
   )
 }

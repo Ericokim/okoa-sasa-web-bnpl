@@ -449,17 +449,17 @@ export const SuccessAlertDialog = ({
 }) => {
   return (
     <At.AlertDialog open={isOpen} onOpenChange={onClose}>
-      <At.AlertDialogContent className="max-w-md p-0 gap-0">
+      <At.AlertDialogContent className="max-w-md w-[90vw] sm:w-full p-0 gap-0 mx-auto">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+          className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
         >
           <X className="h-4 w-4" />
         </button>
 
         {/* Icon Section */}
-        <div className="flex items-center justify-center pt-8 pb-6">
+        <div className="flex items-center justify-center pt-6 sm:pt-8 pb-4 sm:pb-6">
           <div className="relative">
             {/* Decorative icons */}
             {decorativeIcons}
@@ -467,28 +467,27 @@ export const SuccessAlertDialog = ({
         </div>
 
         {/* Content Section */}
-        <div className="text-center px-8 pb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
+        <div className="text-center px-4 sm:px-8 pb-4 sm:pb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{title}</h2>
 
-          <p className="text-gray-600 text-sm mb-4">
+          <p className="text-gray-600 text-sm mb-3 sm:mb-4 leading-relaxed">
             You qualify for a loan of{' '}
             <span className="text-green-600 font-semibold">{loanAmount}</span>,
             payable within {paybackPeriod}.
           </p>
 
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-600 text-sm leading-relaxed">
             Would you like to see devices within your loan limit range (Max.{' '}
             {maxAmount})?
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 px-8 pb-8">
+        <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors flex-none flex-grow order-0"
-              style={{ width: '208px', height: '46px' }}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
             >
               {secondaryAction.label}
             </button>
@@ -497,10 +496,8 @@ export const SuccessAlertDialog = ({
           {primaryAction && (
             <button
               onClick={primaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all flex-none flex-grow order-1"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
               style={{
-                width: '208px',
-                height: '46px',
                 background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
               }}
             >
@@ -523,36 +520,35 @@ export const ErrorAlertDialog = ({
 }) => {
   return (
     <At.AlertDialog className={''} open={isOpen} onOpenChange={onClose}>
-      <At.AlertDialogContent className="max-w-md rounded-4xl p-0 gap-0">
+      <At.AlertDialogContent className="max-w-md w-[90vw] sm:w-full rounded-4xl p-0 gap-0 mx-auto">
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+          className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
         >
           <X className="h-4 w-4" />
         </button>
 
         {/* Icon Section */}
-        <div className="flex items-center justify-center pt-10 pb-6">
-          <div className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center">
-            <AlertCircle className="w-14 h-14 text-white" strokeWidth={3} />
+        <div className="flex items-center justify-center pt-6 sm:pt-10 pb-4 sm:pb-6">
+          <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-red-500 flex items-center justify-center">
+            <AlertCircle className="w-8 h-8 sm:w-14 sm:h-14 text-white" strokeWidth={3} />
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="text-center px-8 pb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
+        <div className="text-center px-4 sm:px-8 pb-4 sm:pb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{title}</h2>
 
           <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3 px-8 pb-8">
+        <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors flex-none flex-grow order-0"
-              style={{ width: '208px', height: '46px' }}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
             >
               {secondaryAction.label}
             </button>
@@ -561,10 +557,8 @@ export const ErrorAlertDialog = ({
           {primaryAction && (
             <button
               onClick={primaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all flex-none flex-grow order-1"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
               style={{
-                width: '208px',
-                height: '46px',
                 background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
               }}
             >
