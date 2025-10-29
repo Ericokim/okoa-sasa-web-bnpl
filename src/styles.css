@@ -6,8 +6,9 @@
 body {
   @apply m-0;
   font-family:
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
+    'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -146,6 +147,7 @@ code {
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-brand: 24%;
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -164,6 +166,13 @@ code {
     var(--brand-primary-end) 100%
   );
 }
+ .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 
 .text-brand-primary-gradient {
   background: linear-gradient(
@@ -174,6 +183,29 @@ code {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.border-brand-primary-gradient {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(
+        180deg,
+        var(--brand-primary-start) 0%,
+        var(--brand-primary-end) 100%
+      )
+      border-box;
+}
+
+.border-brand-primary-gradient.dark {
+  background:
+    linear-gradient(var(--brand-black), var(--brand-black)) padding-box,
+    linear-gradient(
+        180deg,
+        var(--brand-primary-start) 0%,
+        var(--brand-primary-end) 100%
+      )
+      border-box;
 }
 
 @layer base {

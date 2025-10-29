@@ -4,9 +4,9 @@ import { Footer } from '@/components/shared/Footer'
 
 export default function Layout() {
   return (
-    <div className="flex min-h-screen flex-col bg-background w-full">
+    <div className="relative flex min-h-screen flex-col bg-background w-full">
       <Header />
-      <main className="container mx-auto flex-1 px-4 py-8">
+      <main className="px-5 md:px-20 w-full">
         <Outlet />
       </main>
       <Footer />

@@ -1,71 +1,140 @@
+import React from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
 import { useStateContext } from '@/context/state-context'
+import { Cart } from '@/components/shared'
 import { AuthDialog } from '@/components/shared/AuthDialog'
+import { TrashIcon } from '@/assets/icons'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
+import { Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router'
 
 function CartPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useStateContext()
-  const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [showAuthDialog, setShowAuthDialog] = React.useState(false)
 
+  const productImages = Array(4).fill('/phone.png')
+
+  const initialCartItems = [
+    {
+      id: 1,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
+    },
+    {
+      id: 2,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
+    },
+    {
+      id: 3,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
+    },
+    {
+      id: 4,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
+    },
+  ]
   const handleCheckout = () => {
     if (!isAuthenticated) {
       setShowAuthDialog(true)
-    } else {
-      navigate({ to: '/checkout' })
+      return
     }
+    navigate({ to: '/checkout' })
   }
+
+  const [cartItems, setCartItems] = React.useState([
+    {
+      id: 1,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image:
+        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
+    },
+    {
+      id: 2,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image: '/phone.png',
+    },
+    {
+      id: 3,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image: '/phone.png',
+    },
+    {
+      id: 4,
+      title: 'iPhone 14',
+      description:
+        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
+      price: 87696,
+      quantity: 1,
+      image: '/phone.png',
+    },
+  ])
+
+  const updateQuantity = (id, change) => {
+    setCartItems((items) =>
+      items.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, item.quantity + change) }
+          : item,
+      ),
+    )
+  }
+
+  const removeItem = (id) => {
+    setCartItems((items) => items.filter((item) => item.id !== id))
+  }
+
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  )
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'My Cart', path: `/cart`, isCurrent: true },
+  ]
+
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Shopping Cart</h1>
+    <div className="mx-auto w-full py-6 md:py-8">
+      <Cart initialItems={initialCartItems} onCheckout={handleCheckout} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          {[1, 2].map((i) => (
-            <div key={i} className="border rounded-lg p-4 flex gap-4">
-              <div className="w-24 h-24 bg-muted rounded-lg"></div>
-              <div className="flex-1 space-y-2">
-                <h3 className="font-semibold">Product {i}</h3>
-                <p className="text-sm text-muted-foreground">KES {i * 1000}</p>
-                <div className="flex items-center gap-2">
-                  <button className="px-2 py-1 border rounded">-</button>
-                  <span>1</span>
-                  <button className="px-2 py-1 border rounded">+</button>
-                </div>
-              </div>
-              <button className="text-destructive">Remove</button>
-            </div>
-          ))}
-        </div>
-
-        <div className="border rounded-lg p-6 space-y-4 h-fit">
-          <h2 className="text-xl font-semibold">Order Summary</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>KES 3,000</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>KES 200</span>
-            </div>
-            <div className="border-t pt-2 flex justify-between font-bold">
-              <span>Total</span>
-              <span>KES 3,200</span>
-            </div>
-          </div>
-          <Button
-            onClick={handleCheckout}
-            variant="gradient"
-            className="rounded-lg w-full px-4 md:px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
-          >
-            Proceed to Checkout
-          </Button>
-        </div>
-      </div>
-
-      {/* Auth Dialog */}
       <AuthDialog
         open={showAuthDialog}
         onOpenChange={setShowAuthDialog}

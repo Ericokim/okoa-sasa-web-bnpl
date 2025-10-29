@@ -1,48 +1,48 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useStateContext } from '@/context/state-context'
+import { useEffect } from 'react'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
+import { AccountProfileCard } from './AccountProfileCard'
+import { PersonalInfoCard } from './PersonalInfoCard'
+import { AddressInfoCard } from './AddressInfoCard'
+import { NotificationPreferencesCard } from './NotificationPreferencesCard'
+import { DangerZoneCard } from './DangerZoneCard'
 
-function ProfilePage() {
-  const { user, logout } = useStateContext()
+export default function ProfilePage() {
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'My Account', path: '/my-account', isCurrent: true },
+  ]
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">My Profile</h1>
+    <div className="min-h-screen">
+      {/* Breadcrumbs – exact same classes */}
+      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
 
-      <div className="border rounded-lg p-6 space-y-4">
-        <div>
-          <label className="text-sm text-muted-foreground">Name</label>
-          <p className="font-semibold">
-            {user && user.name ? user.name : 'Demo User'}
+      {/* Main content – exact same responsive padding */}
+      <main className="mx-auto px-4 sm:px-4 lg:px-4 py-4">
+        {/* Header */}
+        <div className="space-y-1 mb-6">
+          <h1 className="text-4xl font-semibold text-gray-900">
+            My Account
+          </h1>
+          <p className="text-gray-600">
+            Almost there! Ready to place your order?
           </p>
         </div>
-        <div>
-          <label className="text-sm text-muted-foreground">Email</label>
-          <p className="font-semibold">
-            {user && user.email ? user.email : 'demo@example.com'}
-          </p>
-        </div>
-        <div>
-          <label className="text-sm text-muted-foreground">Phone</label>
-          <p className="font-semibold">+254 700 000 000</p>
-        </div>
-      </div>
 
-      <div className="border rounded-lg p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Payment Methods</h2>
-        <p className="text-sm text-muted-foreground">
-          Manage your payment methods
-        </p>
-        <button className="px-4 py-2 border rounded-lg hover:bg-muted">
-          Add Payment Method
-        </button>
-      </div>
-
-      <button
-        onClick={logout}
-        className="w-full px-6 py-3 bg-destructive text-destructive-foreground rounded-lg hover:bg-destructive/90"
-      >
-        Logout
-      </button>
+        {/* All cards – stacked vertically, no layout changes */}
+        <div className="space-y-6">
+          <AccountProfileCard />
+          <PersonalInfoCard />
+          <AddressInfoCard />
+          <NotificationPreferencesCard />
+          <DangerZoneCard />
+        </div>
+      </main>
     </div>
   )
 }

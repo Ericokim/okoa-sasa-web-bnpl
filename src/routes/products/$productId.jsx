@@ -1,64 +1,60 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { ProductGallery } from '@/components/shared/Products/ProductGallery'
+import { ProductInfo } from '@/components/shared/Products/ProductInfo'
+import { SpecificationsTable } from '@/components/shared/Products/SpecificationsTable'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
 function ProductDetailPage() {
   const { productId } = Route.useParams()
 
+  const product = {
+    id: productId,
+    name: 'iPhone 14',
+    description:
+      "6.1''-6GB RAM - 128GB ROM - Midnight +Free (Cover + Screen Protector)",
+    price: 'kES 87,696',
+    stock: '20 in stock',
+    images: ['/phone.png', '/phone.png', '/phone.png', '/phone.png'],
+  }
+
+  const specifications = {
+    Display: '6.1"',
+    Camera: 'Front Camera: 12 MP, Rear Camera : 12MP +12MP',
+    Memory: 'RAM: 6GB, ROM : 128GB',
+    network: 'Sim Type: Dual Sim',
+    OS: 'IOS 16',
+    Battery: '3279mAh',
+    Warranty: '1 year',
+  }
+
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'iPhone 14', path: `/products/${productId}`, isCurrent: true },
+  ]
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <div className="h-96 bg-muted rounded-lg"></div>
-          <div className="grid grid-cols-4 gap-2">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-20 bg-muted rounded-lg"></div>
-            ))}
+    <div className="w-full">
+      {/* Breadcrumbs - Desktop & Mobile */}
+      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
+
+      {/* Product Section - Desktop & Mobile */}
+      <div className="px-0 py-4 md:py-8">
+        <div className="flex w-full flex-col gap-5 lg:flex-row lg:gap-8">
+          {/* Gallery */}
+          <div className="w-full lg:w-[calc(58.33%-16px)]">
+            <ProductGallery images={product.images} name={product.name} />
+          </div>
+
+          {/* Product Info */}
+          <div className="w-full lg:w-[calc(41.67%-16px)]">
+            <ProductInfo product={product} />
           </div>
         </div>
+      </div>
 
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold">Product {productId}</h1>
-            <p className="text-muted-foreground mt-2">SKU: PROD-{productId}</p>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-3xl font-bold">KES 5,000</p>
-            <p className="text-lg text-primary">
-              Or pay KES 1,250/month for 4 months
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Description</h3>
-            <p className="text-muted-foreground">
-              High-quality product with flexible payment options. Buy now and
-              pay in installments with zero interest.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h3 className="font-semibold">Payment Plans</h3>
-            <div className="space-y-2">
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">4 Payments of KES 1,250</p>
-                <p className="text-sm text-muted-foreground">Interest-free</p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <p className="font-medium">6 Payments of KES 833</p>
-                <p className="text-sm text-muted-foreground">Interest-free</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex gap-4">
-            <button className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-              Add to Cart
-            </button>
-            <button className="px-6 py-3 border rounded-lg hover:bg-muted">
-              Buy Now
-            </button>
-          </div>
-        </div>
+      {/* Specifications Section - Desktop & Mobile */}
+      <div className="px-0 pb-8 md:pb-12">
+        <SpecificationsTable specifications={specifications} />
       </div>
     </div>
   )
