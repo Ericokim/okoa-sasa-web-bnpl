@@ -5,6 +5,7 @@ import { useStateContext } from '@/context/state-context'
 import { Button } from '@/components/ui/button'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { TrashIcon } from '@/assets/icons'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
 function CartPage() {
   const navigate = useNavigate()
@@ -70,8 +71,15 @@ function CartPage() {
   )
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
+   const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'My Cart', path: `/cart`, isCurrent: true },
+  ]
+
   return (
     <div className="min-h-screen w-full  lg:w-7xl space-y-4 lg:space-y-[30px] px-4 lg:px-0">
+
+      <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
       {/* Header */}
       <div className="lg:h-20">
         <p className="text-2xl lg:text-[36px] font-bold">My Cart</p>

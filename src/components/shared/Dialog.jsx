@@ -8,10 +8,13 @@ import {
   XCircle,
   Info,
   HelpCircle,
+  X,
+  AlertCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useStateContext } from '@/context/state-context'
 import { Input } from '@/components/ui/input'
+import { SuccessIcon } from '@/assets/icons'
 
 export const Dialog = React.forwardRef(
   (
@@ -253,5 +256,323 @@ export const CreateDialog = ({ align = 'left', title, icon, children }) => {
       </legend>
       {children}
     </fieldset>
+  )
+}
+
+export const AlertDialogCustom = ({
+  open = false,
+  onOpenChange,
+  variant = 'error',
+  title,
+  message,
+  amount,
+  currency = 'KES',
+  period,
+  additionalMessage,
+  cancelLabel = 'Cancel',
+  actionLabel = 'Proceed',
+  onCancel,
+  onAction,
+  icon,
+  showDecorations = true,
+  showCloseButton = true,
+}) => {
+  // Get icon and colors based on variant
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'success':
+        return {
+          icon: SuccessIcon,
+        }
+      case 'error':
+        return {
+          icon: AlertCircle,
+          bgGradient: 'from-red-500 to-red-600',
+          textColor: 'text-red-600',
+          buttonGradient: 'from-orange-500 to-orange-600',
+          buttonHover: 'hover:from-orange-600 hover:to-orange-700',
+          borderColor: 'border-orange-500',
+          textButtonColor: 'text-orange-500',
+          hoverBg: 'hover:bg-orange-50',
+          ringColor: 'focus:ring-orange-500',
+        }
+      case 'warning':
+        return {
+          icon: AlertTriangle,
+          bgGradient: 'from-yellow-400 to-yellow-500',
+          textColor: 'text-yellow-600',
+          buttonGradient: 'from-orange-500 to-orange-600',
+          buttonHover: 'hover:from-orange-600 hover:to-orange-700',
+          borderColor: 'border-orange-500',
+          textButtonColor: 'text-orange-500',
+          hoverBg: 'hover:bg-orange-50',
+          ringColor: 'focus:ring-orange-500',
+        }
+      case 'info':
+        return {
+          icon: Info,
+          bgGradient: 'from-blue-400 to-blue-500',
+          textColor: 'text-blue-600',
+          buttonGradient: 'from-orange-500 to-orange-600',
+          buttonHover: 'hover:from-orange-600 hover:to-orange-700',
+          borderColor: 'border-orange-500',
+          textButtonColor: 'text-orange-500',
+          hoverBg: 'hover:bg-orange-50',
+          ringColor: 'focus:ring-orange-500',
+        }
+      default:
+        return {
+          icon: Info,
+          bgGradient: 'from-gray-400 to-gray-500',
+          textColor: 'text-gray-600',
+          buttonGradient: 'from-orange-500 to-orange-600',
+          buttonHover: 'hover:from-orange-600 hover:to-orange-700',
+          borderColor: 'border-orange-500',
+          textButtonColor: 'text-orange-500',
+          hoverBg: 'hover:bg-orange-50',
+          ringColor: 'focus:ring-orange-500',
+        }
+    }
+  }
+
+  const styles = getVariantStyles()
+  const Icon = styles.icon
+
+  return (
+    <At.AlertDialog className={'p-6'} open={open} onOpenChange={onOpenChange}>
+      <At.AlertDialogContent className="flex flex-col justify-center items-center p-[30px] gap-6 w-[500px] h-[537.11px] bg-white rounded-3xl sm:max-w-md overflow-hidden">
+        {' '}
+        {/* Close button */}
+        <div className="flex flex-row justify-end items-center gap-2.5 w-[440px] h-6 order-0 self-stretch flex-none">
+          {showCloseButton && (
+            <button
+              onClick={() => onOpenChange?.(false)}
+              className="cursor-pointer absolute right-4 top-4 rounded-sm opacity-70 ring-offset-white transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 disabled:pointer-events-none z-10"
+            >
+              <X className="h-6 w-6" />
+              <span className="sr-only">Close</span>
+            </button>
+          )}
+        </div>
+        <div className="bg-white dark:bg-gray-950">
+          {/* Icon Section with decorative elements */}
+          <div className="flex flex-col justify-center items-center pl-4 pr-[41px] gap-2.5 w-[440px] h-[176.11px] order-1 self-stretch flex-none">
+            {/* Icon */}
+            <div className="">{icon}</div>
+          </div>
+
+          {/* Content Section */}
+          <div className="mt-6">
+            <At.AlertDialogHeader>
+              <At.AlertDialogTitle className="w-[440px] h-[39px] font-semibold text-[28px] leading-[140%] text-center capitalize text-[#252525] order-0 self-stretch flex-none">
+                {title}
+              </At.AlertDialogTitle>
+
+              <At.AlertDialogDescription className="text-sm text-gray-600 dark:text-gray-400 space-y-2">
+                {message && <div>{message}</div>}
+
+                {amount && (
+                  <div className="w-[440px] mt-2 h-11 font-medium text-base leading-[140%] text-center text-[#676D75] order-1 self-stretch flex-none">
+                    You qualify for a loan of{' '}
+                    <span className={cn('font-semibold', styles.textColor)}>
+                      {currency} {amount.toLocaleString()}
+                    </span>
+                    {period && `, payable within ${period}`}.
+                  </div>
+                )}
+
+                {additionalMessage && (
+                  <div className="w-[440px] h-11 font-medium text-base leading-[140%] text-center text-[#676D75] order-0 self-stretch flex-none">
+                    {additionalMessage}
+                  </div>
+                )}
+              </At.AlertDialogDescription>
+            </At.AlertDialogHeader>
+          </div>
+
+          {/* Button Section */}
+          <div className=" mt-6  flex gap-6 w-[440px] h-6">
+            <button
+              onClick={onCancel}
+              className={cn(
+                'flex-1 px-6 py-3 rounded-full',
+                'text-sm font-semibold',
+                'border-2',
+                styles.borderColor,
+                styles.textButtonColor,
+                'bg-white',
+                styles.hoverBg,
+                'transition-colors duration-150',
+                'focus:outline-none focus:ring-2',
+                styles.ringColor,
+                'focus:ring-offset-2',
+              )}
+            >
+              {cancelLabel}
+            </button>
+
+            <button
+              onClick={onAction}
+              className={cn(
+                'flex-1 px-6 py-3 rounded-full',
+                'text-sm font-semibold',
+                'bg-gradient-to-r',
+                styles.buttonGradient,
+                'text-white',
+                styles.buttonHover,
+                'shadow-lg hover:shadow-xl',
+                'transition-all duration-150',
+                'focus:outline-none focus:ring-2',
+                styles.ringColor,
+                'focus:ring-offset-2',
+              )}
+            >
+              {actionLabel}
+            </button>
+          </div>
+        </div>
+      </At.AlertDialogContent>
+    </At.AlertDialog>
+  )
+}
+
+export const SuccessAlertDialog = ({
+  isOpen,
+  onClose,
+  title = 'Congratulations!',
+  loanAmount,
+  paybackPeriod,
+  maxAmount,
+  primaryAction,
+  secondaryAction,
+  decorativeIcons,
+}) => {
+  return (
+    <At.AlertDialog open={isOpen} onOpenChange={onClose}>
+      <At.AlertDialogContent className="max-w-md p-0 gap-0">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Icon Section */}
+        <div className="flex items-center justify-center pt-8 pb-6">
+          <div className="relative">
+            {/* Decorative icons */}
+            {decorativeIcons}
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="text-center px-8 pb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
+
+          <p className="text-gray-600 text-sm mb-4">
+            You qualify for a loan of{' '}
+            <span className="text-green-600 font-semibold">{loanAmount}</span>,
+            payable within {paybackPeriod}.
+          </p>
+
+          <p className="text-gray-600 text-sm">
+            Would you like to see devices within your loan limit range (Max.{' '}
+            {maxAmount})?
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 px-8 pb-8">
+          {secondaryAction && (
+            <button
+              onClick={secondaryAction.onClick}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors flex-none flex-grow order-0"
+              style={{ width: '208px', height: '46px' }}
+            >
+              {secondaryAction.label}
+            </button>
+          )}
+
+          {primaryAction && (
+            <button
+              onClick={primaryAction.onClick}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all flex-none flex-grow order-1"
+              style={{
+                width: '208px',
+                height: '46px',
+                background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
+              }}
+            >
+              {primaryAction.label}
+            </button>
+          )}
+        </div>
+      </At.AlertDialogContent>
+    </At.AlertDialog>
+  )
+}
+
+export const ErrorAlertDialog = ({
+  isOpen,
+  onClose,
+  title = 'Alert!',
+  message,
+  primaryAction,
+  secondaryAction,
+}) => {
+  return (
+    <At.AlertDialog open={isOpen} onOpenChange={onClose}>
+      <At.AlertDialogContent className="max-w-md p-0 gap-0">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        {/* Icon Section */}
+        <div className="flex items-center justify-center pt-10 pb-6">
+          <div className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center">
+            <AlertCircle className="w-14 h-14 text-white" strokeWidth={3} />
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="text-center px-8 pb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{title}</h2>
+
+          <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-3 px-8 pb-8">
+          {secondaryAction && (
+            <button
+              onClick={secondaryAction.onClick}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors flex-none flex-grow order-0"
+              style={{ width: '208px', height: '46px' }}
+            >
+              {secondaryAction.label}
+            </button>
+          )}
+
+          {primaryAction && (
+            <button
+              onClick={primaryAction.onClick}
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all flex-none flex-grow order-1"
+              style={{
+                width: '208px',
+                height: '46px',
+                background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
+              }}
+            >
+              {primaryAction.label}
+            </button>
+          )}
+        </div>
+      </At.AlertDialogContent>
+    </At.AlertDialog>
   )
 }

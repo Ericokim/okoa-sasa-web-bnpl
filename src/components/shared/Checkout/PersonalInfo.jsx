@@ -36,7 +36,7 @@ export default function PersonalInfoForm({
   isLastStep,
 }) {
   const form = useForm({
-    resolver: zodResolver(personalInfoSchema),
+    // resolver: zodResolver(personalInfoSchema),
     defaultValues: {
       fullName: '',
       nationalId: '',

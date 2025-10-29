@@ -9,20 +9,20 @@ export default function AccountOptionPage() {
         <div className="w-[972px]">
           {/* Header */}
           <div className="h-16">
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="w-full max-w-[972px] text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
               Account Option
             </h1>
-            <p className="text-gray-500">
+            <p className="w-full max-w-[972px] text-base font-medium leading-[1.4] text-[#676D75]">
               No Account? Proceed to checkout and you can create an account
               after purchase
             </p>
           </div>
-          <div className="h-0.5 bg-gray-300 my-6"></div>
+          <div className="w-full max-w-[972px] h-px bg-[#E8ECF4] my-6"></div>
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row mt-6 gap-6">
             <Button
               asChild
-              className="flex-1 py-3 px-4 w-[474px] h-[46px] bg-linear-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 rounded-full text-base font-medium shadow-md"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 rounded-3xl text-base font-medium shadow-md"
             >
               <Link to="/create-account">Create Account</Link>
             </Button>
@@ -30,7 +30,7 @@ export default function AccountOptionPage() {
             <Button
               asChild
               variant="outline"
-              className="flex-1 py-3 px-4 w-[474px] h-[46px] border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded-full text-base font-medium"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded-3xl text-base font-medium"
             >
               <Link to="/checkout">Continue As Guest</Link>
             </Button>
