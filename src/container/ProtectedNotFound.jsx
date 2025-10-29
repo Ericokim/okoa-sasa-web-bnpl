@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 
 export default function ProtectedNotFound() {
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center px-5 py-8 text-foreground">
+    <div className="flex min-h-[65vh] flex-col items-center justify-center px-5 py-8 text-foreground">
       {/* 404 Illustration */}
       <div className="mb-8 flex w-full max-w-[650px] items-center justify-center">
         <img
@@ -23,12 +23,12 @@ export default function ProtectedNotFound() {
         </p>
 
         {/* Back to Dashboard Button */}
-        <Link to="/profile" className="w-full lg:w-auto">
+        <Link to="/" className="w-full lg:w-auto">
           <Button
             variant="gradient"
             className="w-full rounded-3xl border border-[#F8971D] px-4 py-3 text-base font-medium capitalize leading-[140%] text-white lg:w-[344px]"
           >
-            Go to Dashboard
+            Go to home
           </Button>
         </Link>
       </div>
