@@ -176,6 +176,29 @@ code {
   background-clip: text;
 }
 
+.border-brand-primary-gradient {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(
+        180deg,
+        var(--brand-primary-start) 0%,
+        var(--brand-primary-end) 100%
+      )
+      border-box;
+}
+
+.border-brand-primary-gradient.dark {
+  background:
+    linear-gradient(var(--brand-black), var(--brand-black)) padding-box,
+    linear-gradient(
+        180deg,
+        var(--brand-primary-start) 0%,
+        var(--brand-primary-end) 100%
+      )
+      border-box;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
