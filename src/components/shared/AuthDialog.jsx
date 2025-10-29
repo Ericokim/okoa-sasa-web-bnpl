@@ -1,268 +1,280 @@
-import { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { useStateContext } from '@/context/state-context'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
 } from '@/components/ui/dialog'
-import { Phone, User, Mail, X } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
+import { useStateContext } from '@/context/state-context'
+import { cn } from '@/lib/utils'
+import { PhoneIcon, XIcon } from 'lucide-react'
 
-export function AuthDialog({ open, onOpenChange, redirectTo = '/' }) {
-  const [mode, setMode] = useState('signin')
-  const [formData, setFormData] = useState({
-    phoneNumber: '',
-    rememberMe: false,
-    firstName: '',
-    lastName: '',
-    email: '',
-    agreeToTerms: false,
-  })
-
-  const navigate = useNavigate()
+export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
+  const [step, setStep] = useState(initialStep)
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [rememberMe, setRememberMe] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [countdown, setCountdown] = useState(41)
+  const [isResending, setIsResending] = useState(false)
   const { login } = useStateContext()
+  const navigate = useNavigate()
 
-  const handleChange = (field) => (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: e.target?.value ?? e,
-    }))
-  }
+  const maskedPhone = phoneNumber ? `0712****` : '0712****'
 
-  const handleSignin = (e) => {
+  useEffect(() => {
+    if (step === 'otp' && countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [step, countdown])
+
+  useEffect(() => {
+    if (!open) {
+      setTimeout(() => {
+        setStep('login')
+        setPhoneNumber('')
+        setOtp('')
+        setRememberMe(false)
+        setCountdown(41)
+      }, 200)
+    }
+  }, [open])
+
+  const handleLogin = (e) => {
     e.preventDefault()
-    login({ phoneNumber: formData.phoneNumber, name: 'Demo User' })
-    onOpenChange(false)
-    navigate({ to: redirectTo })
+    if (phoneNumber) {
+      setStep('otp')
+      setCountdown(41)
+    }
   }
 
-  const handleSignup = (e) => {
+  const handleVerifyOTP = (e) => {
     e.preventDefault()
-    login({
-      phoneNumber: formData.phoneNumber,
-      name: `${formData.firstName} ${formData.lastName}`,
-      email: formData.email,
-    })
-    onOpenChange(false)
-    navigate({ to: redirectTo })
+    if (otp.length === 6) {
+      login({
+        phoneNumber,
+        name: 'User',
+      })
+      onOpenChange(false)
+      navigate({ to: '/' })
+    }
   }
 
-  const resetForm = () => {
-    setFormData({
-      phoneNumber: '',
-      rememberMe: false,
-      firstName: '',
-      lastName: '',
-      email: '',
-      agreeToTerms: false,
-    })
-  }
-
-  const switchMode = (newMode) => {
-    setMode(newMode)
-    resetForm()
+  const handleResendOTP = () => {
+    setIsResending(true)
+    setCountdown(41)
+    setOtp('')
+    setTimeout(() => setIsResending(false), 1000)
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-md mx-auto bg-white rounded-3xl shadow-xl p-8 border border-white/20">
-        {/* Logo */}
-        <div className="flex justify-center mb-8">
-          <div className="w-[180px] h-[160px] flex items-center justify-center">
+      <DialogContent
+        className={cn(
+          'rounded-3xl p-0 gap-0 border-0',
+          'max-w-[335px] w-[335px]',
+          'md:max-w-[500px] md:w-[500px]',
+          step === 'otp' 
+            ? 'h-[657px] md:h-auto' 
+            : 'h-[569px] md:h-auto'
+        )}
+        showCloseButton={false}
+      >
+        <div className="relative w-full p-5 md:p-[30px] flex flex-col items-center gap-6">
+          <button
+            onClick={() => onOpenChange(false)}
+            className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
+          >
+            <XIcon className="h-6 w-6 text-[#09244B]" />
+            <span className="sr-only">Close</span>
+          </button>
+
+          <div className="flex flex-col items-center gap-4 md:gap-6 w-full">
             <img
-              src="/primaryLogoVertical.png"
-              alt="Okoa Sasa"
-              className="w-full h-full object-contain"
+              src="https://api.builder.io/api/v1/image/assets/TEMP/39a66955168d541edf4a09720ea52bb31a5ef9a7?width=404"
+              alt="Okoa Sasa Logo"
+              className="w-[202px] h-[184px] object-contain"
+            />
+
+            {step === 'login' ? (
+              <LoginStep
+                phoneNumber={phoneNumber}
+                setPhoneNumber={setPhoneNumber}
+                rememberMe={rememberMe}
+                setRememberMe={setRememberMe}
+                handleLogin={handleLogin}
+              />
+            ) : (
+              <OTPStep
+                otp={otp}
+                setOtp={setOtp}
+                maskedPhone={maskedPhone}
+                countdown={countdown}
+                isResending={isResending}
+                handleVerifyOTP={handleVerifyOTP}
+                handleResendOTP={handleResendOTP}
+              />
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+function LoginStep({ phoneNumber, setPhoneNumber, rememberMe, setRememberMe, handleLogin }) {
+  return (
+    <>
+      <div className="flex flex-col gap-2 w-full text-left">
+        <h2 className="text-[#252525] text-2xl md:text-[28px] font-semibold leading-[140%] capitalize font-['Public_Sans']">
+          Login
+        </h2>
+        <p className="text-[#676D75] text-sm md:text-base font-normal md:font-normal leading-[140%] font-['Public_Sans']">
+          Login now to access the dashboard
+        </p>
+      </div>
+
+      <form onSubmit={handleLogin} className="flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-[9px] w-full">
+          <Label
+            htmlFor="phone"
+            className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']"
+          >
+            Phone Number
+          </Label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center gap-2.5">
+              <PhoneIcon className="w-5 h-5 text-[#676D75]" />
+            </div>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+12 0"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#A0A4AC] text-sm font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC]"
             />
           </div>
         </div>
 
-        {/* Header */}
-        <DialogHeader className="text-center mb-8">
-          <DialogTitle className="text-3xl font-semibold text-brand-black mb-2">
-            {mode === 'signin' ? 'Login' : 'Sign Up'}
-          </DialogTitle>
-          <DialogDescription className="text-base font-medium text-brand-gray">
-            {mode === 'signin'
-              ? 'Login now to access the dashboard'
-              : 'Create your account to get started'}
-          </DialogDescription>
-        </DialogHeader>
+        <div className="flex items-center gap-2">
+          <Checkbox
+            id="remember"
+            checked={rememberMe}
+            onCheckedChange={setRememberMe}
+            className="w-5 h-5 rounded border-[#A0A4AC]"
+          />
+          <Label
+            htmlFor="remember"
+            className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans'] cursor-pointer"
+          >
+            Remember Me
+          </Label>
+        </div>
 
-        {/* --- SIGN IN --- */}
-        {mode === 'signin' ? (
-          <form onSubmit={handleSignin} className="space-y-6">
-            <div className="space-y-2">
-              <Label
-                htmlFor="phone"
-                className="text-sm font-normal text-brand-black"
-              >
-                Phone Number
-              </Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-mid-gray" />
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={handleChange('phoneNumber')}
-                  placeholder="+254 700 000 000"
-                  className="pl-10 bg-brand-bg-2 border-brand-stroke rounded-xl h-12 text-base"
-                  required
+        <Button
+          type="submit"
+          className={cn(
+            'w-full h-auto py-3 px-4 rounded-3xl',
+            'bg-gradient-to-b from-[#F8971D] to-[#EE3124]',
+            'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
+            'hover:opacity-90 transition-opacity',
+            'border border-transparent'
+          )}
+        >
+          Login
+        </Button>
+      </form>
+    </>
+  )
+}
+
+function OTPStep({ otp, setOtp, maskedPhone, countdown, isResending, handleVerifyOTP, handleResendOTP }) {
+  return (
+    <>
+      <div className="flex flex-col gap-2 w-full text-left">
+        <h2 className="text-[#252525] text-2xl md:text-[28px] font-semibold leading-[140%] capitalize font-['Public_Sans']">
+          OTP Verification
+        </h2>
+      </div>
+
+      <div className="w-full py-4 px-3 rounded-2xl bg-[rgba(244,113,32,0.12)] flex items-center justify-center">
+        <p className="text-[#F47120] text-sm font-medium leading-[140%] font-['Public_Sans'] text-center">
+          We've sent a 6-digit code to {maskedPhone} and xx@gmail.com
+        </p>
+      </div>
+
+      <form onSubmit={handleVerifyOTP} className="flex flex-col gap-6 w-full">
+        <div className="flex flex-col gap-3 w-full">
+          <Label className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']">
+            Verification Code
+          </Label>
+          
+          <InputOTP
+            maxLength={6}
+            value={otp}
+            onChange={(value) => setOtp(value)}
+            className="w-full"
+          >
+            <InputOTPGroup className="w-full gap-1.5 md:gap-[9px]">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <InputOTPSlot
+                  key={index}
+                  index={index}
+                  className={cn(
+                    'flex-1 md:w-[65px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border border-[#E8ECF4] bg-[#F9FAFB]',
+                    'text-[#A0A4AC] text-[11px] md:text-base font-medium text-center font-["Public_Sans"]',
+                    'focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20'
+                  )}
                 />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <Checkbox
-                id="remember"
-                checked={formData.rememberMe}
-                onCheckedChange={handleChange('rememberMe')}
-                className="h-5 w-5"
-              />
-              <Label
-                htmlFor="remember"
-                className="text-sm font-normal text-brand-black cursor-pointer"
-              >
-                Remember Me
-              </Label>
-            </div>
-
-            <Button
-              type="submit"
-              variant="gradient"
-              className="w-full h-12 rounded-3xl text-base font-medium"
-            >
-              Login
-            </Button>
-          </form>
-        ) : (
-          /* --- SIGN UP --- */
-          <form onSubmit={handleSignup} className="space-y-6">
-            {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              {['firstName', 'lastName'].map((field) => (
-                <div key={field} className="space-y-2">
-                  <Label
-                    htmlFor={field}
-                    className="text-sm font-normal text-brand-black capitalize"
-                  >
-                    {field.replace(/([A-Z])/g, ' $1')}
-                  </Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-mid-gray" />
-                    <Input
-                      id={field}
-                      type="text"
-                      value={formData[field]}
-                      onChange={handleChange(field)}
-                      placeholder={
-                        field === 'firstName' ? 'First name' : 'Last name'
-                      }
-                      className="pl-10 bg-brand-bg-2 border-brand-stroke rounded-xl h-12 text-base"
-                      required
-                    />
-                  </div>
-                </div>
               ))}
-            </div>
+            </InputOTPGroup>
+          </InputOTP>
 
-            {/* Email */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-sm font-normal text-brand-black"
-              >
-                Email Address
-              </Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-mid-gray" />
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange('email')}
-                  placeholder="your@email.com"
-                  className="pl-10 bg-brand-bg-2 border-brand-stroke rounded-xl h-12 text-base"
-                  required
-                />
-              </div>
-            </div>
+          <p className="text-[#676D75] text-sm font-normal leading-[140%] text-center font-['Public_Sans']">
+            Enter the 6-digit code we sent to your email
+          </p>
+        </div>
 
-            {/* Phone */}
-            <div className="space-y-2">
-              <Label
-                htmlFor="phone-signup"
-                className="text-sm font-normal text-brand-black"
-              >
-                Phone Number
-              </Label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-brand-mid-gray" />
-                <Input
-                  id="phone-signup"
-                  type="tel"
-                  value={formData.phoneNumber}
-                  onChange={handleChange('phoneNumber')}
-                  placeholder="+254 700 000 000"
-                  className="pl-10 bg-brand-bg-2 border-brand-stroke rounded-xl h-12 text-base"
-                  required
-                />
-              </div>
-            </div>
+        <Button
+          type="submit"
+          disabled={otp.length !== 6}
+          className={cn(
+            'w-full h-auto py-3 px-4 rounded-3xl',
+            'bg-gradient-to-b from-[#F8971D] to-[#EE3124]',
+            'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
+            'hover:opacity-90 transition-opacity',
+            'border border-transparent',
+            'disabled:opacity-50'
+          )}
+        >
+          Login
+        </Button>
 
-            {/* Terms */}
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="terms"
-                checked={formData.agreeToTerms}
-                onCheckedChange={handleChange('agreeToTerms')}
-                className="h-5 w-5 mt-1"
-                required
-              />
-              <Label
-                htmlFor="terms"
-                className="text-sm font-normal text-brand-black leading-relaxed cursor-pointer"
-              >
-                I agree to the{' '}
-                <span className="font-medium text-brand-primary-start">
-                  Terms & Conditions
-                </span>{' '}
-                and{' '}
-                <span className="font-medium text-brand-primary-end">
-                  Privacy Policy
-                </span>
-              </Label>
-            </div>
-
-            <Button
-              type="submit"
-              variant="gradient"
-              className="w-full h-12 rounded-3xl text-base font-medium"
-              disabled={!formData.agreeToTerms}
+        <div className="flex items-center justify-center gap-3 w-full flex-wrap">
+          <span className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']">
+            Did'nt Receive the code?
+          </span>
+          {countdown > 0 ? (
+            <span className="text-sm font-semibold leading-[140%] capitalize font-['Public_Sans'] bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
+              Resend In {countdown}S
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleResendOTP}
+              disabled={isResending}
+              className="text-sm font-semibold leading-[140%] capitalize font-['Public_Sans'] bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent hover:opacity-80 transition-opacity disabled:opacity-50"
             >
-              Create Account
-            </Button>
-
-            <p className="text-center text-sm text-brand-gray">
-              Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => switchMode('signin')}
-                className="text-brand-primary-start hover:text-brand-primary-end font-medium"
-              >
-                Sign In
-              </button>
-            </p>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
+              Resend Code
+            </button>
+          )}
+        </div>
+      </form>
+    </>
   )
 }

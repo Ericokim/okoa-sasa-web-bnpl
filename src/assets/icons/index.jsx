@@ -11,7 +11,12 @@ import boxIcon from '@/assets/icons/box.svg';
 import truckIcon from '@/assets/icons/truck.svg';
 import verifyIcon from '@/assets/icons/verify.svg';
 import trashIcon from '@/assets/icons/trash.svg'
+import homeIcon from '@/assets/icons/home.svg'
 
+
+export const HomeIcon = ({ size = 24, className = '' }) => (
+  <img src={homeIcon} alt="trash" width={size} height={size} className={className} />
+);
 
 export const TrashIcon = ({ size = 24, className = '' }) => (
   <img src={trashIcon} alt="trash" width={size} height={size} className={className} />

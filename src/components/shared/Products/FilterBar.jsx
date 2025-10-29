@@ -105,7 +105,7 @@ const CheckIcon = () => (
 const brands = ['Apple', 'Samsung', 'Tecno', 'Infinix']
 const deviceTypes = ['Phone', 'Laptop', 'Tablet']
 
-export function FilterBar({ className = "" }) {
+export function FilterBar({ className = '' }) {
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
   const [activeFilters, setActiveFilters] = useState({
     brand: ['Brand'],
@@ -158,7 +158,9 @@ export function FilterBar({ className = "" }) {
   }
 
   return (
-    <div className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}>
+    <div
+      className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}
+    >
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
         {activeFilters.brand.map((brand) => (
           <div
@@ -274,12 +276,8 @@ export function FilterBar({ className = "" }) {
                   }}
                 />
                 <div className="mt-2 flex items-center justify-between text-sm">
-                  <span>
-                    KES {tempFilters.priceRange[0].toLocaleString()}
-                  </span>
-                  <span>
-                    KES {tempFilters.priceRange[1].toLocaleString()}
-                  </span>
+                  <span>KES {tempFilters.priceRange[0].toLocaleString()}</span>
+                  <span>KES {tempFilters.priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
               <div>
@@ -380,19 +378,149 @@ export function FilterBar({ className = "" }) {
           </PopoverContent>
         </Popover>
 
-        <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
-          <span className="text-sm font-normal capitalize text-black md:text-base">
-            My Loan Limit
-          </span>
-          <ChevronDown className="h-5 w-5 md:h-6 md:w-6" />
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
+              <span className="text-sm font-normal capitalize text-black md:text-base">
+                My Loan Limit
+              </span>
+              <svg
+                className="h-5 w-5 md:h-6 md:w-6"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.9201 8.95L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95"
+                  stroke="#292D32"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
+          >
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setSelectedPaymentType('basic')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedPaymentType === 'basic'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
+                    selectedPaymentType === 'basic'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Basic Pay
+                </span>
+                {selectedPaymentType === 'basic' && <CheckIcon />}
+              </button>
+              <button
+                onClick={() => setSelectedPaymentType('net')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedPaymentType === 'net'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
+                    selectedPaymentType === 'net'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Net Pay
+                </span>
+                {selectedPaymentType === 'net' && <CheckIcon />}
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
 
-        <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
-          <span className="text-sm font-normal capitalize text-black md:text-base">
-            Sort By
-          </span>
-          <ChevronDown className="h-5 w-5 md:h-6 md:w-6" />
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
+              <span className="text-sm font-normal capitalize text-black md:text-base">
+                Sort By
+              </span>
+              <svg
+                className="h-5 w-5 md:h-6 md:w-6"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M19.9201 8.95L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95"
+                  stroke="#292D32"
+                  strokeWidth="1.5"
+                  strokeMiterlimit="10"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
+          >
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setSelectedPaymentType('basic')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedPaymentType === 'basic'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
+                    selectedPaymentType === 'basic'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Basic Pay
+                </span>
+                {selectedPaymentType === 'basic' && <CheckIcon />}
+              </button>
+              <button
+                onClick={() => setSelectedPaymentType('net')}
+                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                  selectedPaymentType === 'net'
+                    ? 'bg-[rgba(244,113,32,0.12)]'
+                    : ''
+                }`}
+              >
+                <span
+                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
+                    selectedPaymentType === 'net'
+                      ? 'text-[#F47120]'
+                      : 'text-[#252525]'
+                  }`}
+                >
+                  Net Pay
+                </span>
+                {selectedPaymentType === 'net' && <CheckIcon />}
+              </button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   )
