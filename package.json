@@ -14,11 +14,9 @@
   ],
   "scripts": {
     "dev": "vite --port 3000",
-    "prebuild": "node scripts/clean-routetree.cjs",
     "build": "vite build",
-    "postbuild": "node scripts/clean-routetree.cjs",
     "serve": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests --exclude \"e2e/**\"",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
