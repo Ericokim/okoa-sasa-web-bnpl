@@ -25,7 +25,7 @@ const products = [
     deviceType: 'Phone',
     price: 184999,
     originalPrice: 199999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
   {
@@ -35,7 +35,7 @@ const products = [
     deviceType: 'Phone',
     price: 169999,
     originalPrice: 179999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: true,
   },
   {
@@ -45,7 +45,7 @@ const products = [
     deviceType: 'Phone',
     price: 23999,
     originalPrice: 25999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
   {
@@ -55,7 +55,7 @@ const products = [
     deviceType: 'Phone',
     price: 42999,
     originalPrice: 45999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: true,
   },
   {
@@ -65,7 +65,7 @@ const products = [
     deviceType: 'Laptop',
     price: 148999,
     originalPrice: 159999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
   {
@@ -75,7 +75,7 @@ const products = [
     deviceType: 'Laptop',
     price: 109999,
     originalPrice: 119999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
   {
@@ -85,7 +85,7 @@ const products = [
     deviceType: 'Tablet',
     price: 98999,
     originalPrice: 104999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
   {
@@ -95,7 +95,7 @@ const products = [
     deviceType: 'Tablet',
     price: 44999,
     originalPrice: 47999,
-    image: '/placeholder-phone.jpg',
+    image: '/phone.png',
     inCart: false,
   },
 ]
@@ -460,21 +460,29 @@ function IndexPage() {
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
         {noResults ? (
           <div className="col-span-full flex flex-col items-center justify-center rounded-2xl border border-dashed border-brand-stroke/50 bg-brand-bg-2/30 px-6 py-16 text-center">
-            <p className="text-base font-medium text-brand-black">
-              No products match your filters yet.
-            </p>
-            <p className="mt-2 text-sm text-brand-mid-gray">
-              Try adjusting the filters or reset them to explore more devices.
+            <div className="w-full md:w-[48rem] h-auto md:h-[48rem]">
+              <img
+                src="/404.png"
+                alt="Okoa Sasa"
+                className="h-full w-full object-contain"
+              />
+            </div>
+
+            <h1 className="font-medium text-3xl text-brand-black">
+              Ooops! Product not found.
+            </h1>
+            <p className="mt-2 text-sm text-brand-mid-gray mb-4">
+              The Product you are looking for doesn't exist
             </p>
             <Button
-              variant="outline"
-              className="mt-6 rounded-3xl border-brand-primary-start text-brand-primary-start"
+              variant="gradient"
+              className="rounded-full w-48 px-4 md:px-6 py-6 text-base font-medium text-primary-foreground hover:bg-primary/90"
               onClick={() => {
                 handleResetFilters()
                 setIsDialogOpen(false)
               }}
             >
-              Reset Filters
+              Back to Home
             </Button>
           </div>
         ) : (
@@ -486,13 +494,12 @@ function IndexPage() {
             >
               <Card className="border-none shadow-none">
                 <CardContent className="space-y-4 p-0">
-                  <div className="relative flex h-70 items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2">
-                    <div className="flex h-56 w-56 items-center justify-center rounded-xl bg-gray-200">
-                      <span className="text-sm text-gray-400">
-                        Product Image
-                      </span>
-                    </div>
-
+                  <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2 p-5">
+                    <img
+                      src={product.image}
+                      alt="Okoa Sasa"
+                      className="h-70 w-60 object-contain"
+                    />
                     {product.inCart && (
                       <div className="absolute right-4 top-4">
                         <Button
