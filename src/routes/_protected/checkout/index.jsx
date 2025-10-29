@@ -7,6 +7,7 @@ import AccountOptionPage from '@/components/shared/Checkout/AccountOption'
 import CheckoutLoanPage from '@/components/shared/Checkout/CheckoutLoan'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import DeliveryDetailsForm from '@/components/shared/Checkout/Deliver'
+import OrderSummaryPage from '@/components/shared/Checkout/OrderSummary'
 
 const steps = [
   {
@@ -31,7 +32,7 @@ const steps = [
     id: 4,
     name: 'Order Summary',
     label: 'Order Summary',
-    component: null,
+    component: OrderSummaryPage,
   },
   {
     id: 5,
