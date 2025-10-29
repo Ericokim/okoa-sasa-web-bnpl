@@ -76,18 +76,18 @@ const FAQs = () => {
   }
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 2 < steps.length ? prev + 2 : 0))
+    setCurrentSlide((prev) => (prev + 1) % steps.length)
   }
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 2 >= 0 ? prev - 2 : Math.max(0, steps.length - 2)))
+    setCurrentSlide((prev) => (prev - 1 + steps.length) % steps.length)
   }
 
   return (
     <div className="bg-white overflow-hidden relative w-full">
       {/* How It Works Section */}
-      <div className="bg-white overflow-hidden relative w-full h-[485px] lg:h-[552px]">
-        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-screen absolute left-0 top-0" />
+      <div className="bg-white overflow-hidden relative w-full min-h-[485px] lg:h-[552px]">
+        <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-full absolute left-0 top-0" />
 
         <div className="absolute left-1/2 top-[42px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] lg:max-w-7xl px-5 lg:px-0">
           <div className="flex flex-col gap-10 lg:gap-[60px] items-center">
@@ -109,7 +109,7 @@ const FAQs = () => {
                   key={index}
                   className="bg-white flex flex-col gap-[16px] items-center justify-center px-[12px] py-[16px] rounded-[16px] shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] flex-1"
                 >
-                  <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
+                  <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
                     {step.icon}
                   </div>
                   <div className="flex flex-col gap-[12px] items-center justify-center w-[178px]">
@@ -118,7 +118,7 @@ const FAQs = () => {
                     </p>
                   </div>
                   <div className="relative h-[30px] w-full">
-                    <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                    <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-gradient-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
                       {step.step}
                     </p>
                   </div>
@@ -126,55 +126,66 @@ const FAQs = () => {
               ))}
             </div>
 
-            {/* Mobile Carousel */}
-            <div className="relative lg:hidden w-full">
-              {/* Navigation Buttons */}
+            {/* Mobile Carousel - Fixed with edge buttons and border */}
+            <div className="relative lg:hidden w-full max-w-[300px] mx-auto">
+              {/* Navigation Buttons - Positioned on card edges */}
               <button
                 onClick={prevSlide}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
+                className="absolute left-0 top-[40%] -translate-y-1/2 z-20 bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:border-orange-500 transition-all -ml-4"
                 disabled={currentSlide === 0}
               >
-                <ChevronLeft className="w-4 h-4 text-[#f8971d]" />
+                <ChevronLeft className="w-5 h-5 text-[#f8971d]" />
               </button>
 
               <button
                 onClick={nextSlide}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md"
-                disabled={currentSlide >= steps.length - 2}
+                className="absolute right-0 top-[40%] -translate-y-1/2 z-20 bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:border-orange-500 transition-all -mr-4"
+                disabled={currentSlide === steps.length - 1}
               >
-                <ChevronRight className="w-4 h-4 text-[#f8971d]" />
+                <ChevronRight className="w-5 h-5 text-[#f8971d]" />
               </button>
 
-              {/* Carousel Container */}
-              <div className="overflow-hidden mx-8">
+              {/* Carousel Container with Border */}
+              <div className="overflow-hidden w-full border rounded-2xl shadow-lg">
                 <div
-                  className="flex transition-transform duration-300 ease-in-out gap-3"
-                  style={{ transform: `translateX(-${(currentSlide * 100) / 2}%)` }}
+                  className="flex transition-transform duration-300 ease-in-out"
+                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   {steps.map((step, index) => (
                     <div
                       key={index}
-                      className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] min-w-[50%] shrink-0"
+                      className="bg-white flex flex-col gap-4 items-center justify-center px-4 py-6 rounded-xl w-full shrink-0"
                     >
-                      <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
+                      <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
                         {step.icon}
                       </div>
-                      <div className="flex flex-col gap-3 items-center justify-center w-[178px]">
-                        <p className="font-['Public_Sans'] text-[18px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
+                      <div className="flex flex-col gap-3 items-center justify-center w-full px-2">
+                        <p className="font-['Public_Sans'] text-[16px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
                           {step.title}
                         </p>
                       </div>
                       <div className="relative h-[30px] w-full">
-                        <div className="absolute left-0 w-[30px] h-[30px] rounded-full">
-                          <div className="w-full h-full bg-linear-to-b from-[#f8971d] to-[#ee3124] rounded-full" />
-                        </div>
-                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-gradient-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
                           {step.step}
                         </p>
                       </div>
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Scroll Indicators */}
+              <div className="flex justify-center items-center gap-2 mt-4">
+                {steps.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === currentSlide 
+                        ? 'bg-orange-500 w-4' 
+                        : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
               </div>
             </div>
           </div>
