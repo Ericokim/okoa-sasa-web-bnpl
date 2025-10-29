@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Slider } from '@/components/ui/slider'
+import { Link } from '@tanstack/react-router'
 
 const FilterIcon = () => (
   <svg
@@ -607,11 +608,16 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
+         <Link
+                to="/FAQs"
+                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+              >
         <button className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2">
           <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
             How it works
           </span>
         </button>
+        </Link>
 
         <Popover>
           <PopoverTrigger asChild>
