@@ -54,7 +54,7 @@ export function NotificationPreferencesCard() {
         >
           <div className="flex-1">
             <p className="font-medium">{item.title}</p>
-            <p className="text-sm text-gray-500">{item.desc}</p>
+            <p className="text-md text-gray-500">{item.desc}</p>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
             <input

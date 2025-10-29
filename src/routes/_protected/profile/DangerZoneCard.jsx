@@ -33,18 +33,18 @@ export function DangerZoneCard() {
           {/* Left: Title + Description */}
           <div className="flex-1 pr-8">
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="text-xl  text-red-400">
+              <h3 className="text-xl  font-medium text-red-400">
                 Delete My Account
               </h3>
             </div>
-            <p className="text-sm text-gray-600">
+            <p className="text-md text-gray-600">
               Permanently delete the account and remove access from all workspaces
             </p>
           </div>
 
           <button
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 border border-orange-500 bg-red-400 text-white hover:bg-red-500 rounded-full px-4 py-2 text-sm font-medium transition-all"
+            className="flex items-center gap-2 border bg-red-400 text-white hover:bg-red-500 rounded-full px-4 py-2 text-sm font-medium transition-all"
           >
             <Trash2 className="w-4 h-4" />
             Delete Account

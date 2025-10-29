@@ -85,18 +85,20 @@ export function Header() {
               <DropdownMenu onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200">
-                    <Avatar className="h-8 w-8 ring-2 ring-white shadow-sm">
-                      <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="bg-linear-to-br from-orange-400 to-orange-600 text-white text-sm font-medium">
-                        {user?.name ? getInitials(user.name) : 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  
+                    <div className="h-8 w-8 rounded-full ring-2 ring-white shadow-sm overflow-hidden">
+                      <img
+                        src="/avator.png"
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
                     <div className="hidden sm:flex flex-col items-start">
                       <span className="text-sm font-semibold text-gray-900">
                         {user?.name || 'User'}
                       </span>
                     </div>
+
                     {isOpen ? (
                       <ChevronUp className="h-5 w-5 text-gray-700" />
                     ) : (
@@ -111,12 +113,14 @@ export function Header() {
                 >
                   {/* User Info Header */}
                   <div className="flex items-center gap-3 px-2 py-3">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user?.avatar} alt={user?.name} />
-                      <AvatarFallback className="bg-linear-to-br from-orange-400 to-orange-600 text-white font-medium">
-                        {user?.name ? getInitials(user.name) : 'U'}
-                      </AvatarFallback>
-                    </Avatar>
+                      <div className="h-8 w-8 rounded-full ring-2 ring-white shadow-sm overflow-hidden">
+                      <img
+                        src="/avator.png"
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  
                     <div className="flex flex-col">
                       <p className="text-sm font-semibold text-gray-900">
                         {user?.name || 'User'}

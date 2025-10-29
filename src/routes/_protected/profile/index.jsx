@@ -20,7 +20,7 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="space-y-1">
         <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
-        <p className="text-gray-600">Almost there! Ready to place your order?</p>
+        <p className="text-gray-600">Almost there! Ready to place your order ?</p>
       </div>
 
       {/* Cards */}

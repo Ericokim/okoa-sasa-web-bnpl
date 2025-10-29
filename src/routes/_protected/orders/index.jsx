@@ -311,9 +311,9 @@ function OrdersPage() {
               <CardContent>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Pending</span>
-                  <span className="text-sm text-gray-600">70% Complete</span>
+                  <span className="text-sm text-green-500">70%</span>
                 </div>
-                <Progress value={70} className="h-3 rounded-full" />
+                <Progress value={70} className="h-3 rounded-full" /> 
                 <div className="flex justify-center mt-4">
                   <Button
                     variant="outline"

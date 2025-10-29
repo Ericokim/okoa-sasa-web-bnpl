@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import React, { useState } from 'react'
-import { Edit2Icon, MapPinIcon } from 'lucide-react'
+import { Edit2Icon, MapPinIcon, Pencil } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -34,7 +34,8 @@ export function AddressInfoCard() {
 
   return (
     <div className="border rounded-xl p-6 bg-white">
-      <h3 className="text-xl font-semibold text-gray-900 mb-4">Address</h3>
+      <h3 className="text-xl font-semibold  text-gray-900 mb-4">Address</h3>
+      <Separator className="my-4" />
 
       {/* Office */}
       {office && (
@@ -51,7 +52,7 @@ export function AddressInfoCard() {
                 
                 flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
               >
-                <Edit2 className="w-4 h-4" />
+                <Pencil className="w-4 h-4" />
                 Edit
               </button>
             )}
@@ -101,7 +102,7 @@ export function AddressInfoCard() {
                 
                 flex items-center gap-1 border border-orange-500 text-orange-600 hover:bg-orange-50 rounded-full px-3 py-1 text-sm"
               >
-                <Edit2 className="w-4 h-4" />
+                <Pencil className="w-4 h-4" />
                 Edit
               </button>
             )}
