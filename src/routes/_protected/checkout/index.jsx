@@ -1,144 +1,197 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
+import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
+import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
+import AccountOptionPage from '@/components/shared/Checkout/AccountOption'
 
-function CheckoutPage() {
-  const [step, setStep] = useState(1)
+const steps = [
+  { 
+    id: 1, 
+    name: 'Check Loan Limit', 
+    label: 'Check Loan Limit',
+    component: null
+  },
+  { 
+    id: 2, 
+    name: 'Personal Info', 
+    label: 'Personal Info',
+   component: PersonalInfoForm
+  },
+  { 
+    id: 3, 
+    name: 'Delivery Details', 
+    label: 'Delivery Details',
+    component: null // Add your component here
+  },
+  { 
+    id: 4, 
+    name: 'Order Summary', 
+    label: 'Order Summary',
+    component: null // Add your component here
+  },
+  { 
+    id: 5, 
+    name: 'Terms & Conditions', 
+    label: 'Terms & Conditions',
+    component: TermsConditionPage
+  },
+  { 
+    id: 6, 
+    name: 'Account Option', 
+    label: 'Account Option',
+    component: AccountOptionPage
+  },
+]
+
+export default function CheckoutPage() {
+  const [currentStep, setCurrentStep] = useState(1)
+
+  const handleNext = () => {
+    if (currentStep < steps.length) {
+      setCurrentStep(currentStep + 1)
+    }
+  }
+
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const handleFormSubmit = (data) => {
+    console.log('Form submitted:', data)
+    // Handle form submission and move to next step
+    handleNext()
+  }
+
+  // Get the current step's component
+  const CurrentStepComponent = steps[currentStep - 1].component
+  const hasComponent = CurrentStepComponent !== null
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Checkout</h1>
-
-      <div className="flex items-center justify-between mb-8">
-        <div
-          className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}
-        >
-          <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center">
-            1
-          </div>
-          <span className="ml-2">Shipping</span>
-        </div>
-        <div className="flex-1 h-0.5 bg-border mx-4"></div>
-        <div
-          className={`flex items-center ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}
-        >
-          <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center">
-            2
-          </div>
-          <span className="ml-2">Payment Plan</span>
-        </div>
-        <div className="flex-1 h-0.5 bg-border mx-4"></div>
-        <div
-          className={`flex items-center ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}
-        >
-          <div className="w-8 h-8 rounded-full border-2 flex items-center justify-center">
-            3
-          </div>
-          <span className="ml-2">Confirmation</span>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          {step === 1 && (
-            <div className="border rounded-lg p-6 space-y-4">
-              <h2 className="text-xl font-semibold">Shipping Information</h2>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-                <input
-                  type="email"
-                  placeholder="Email"
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone Number"
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-                <input
-                  type="text"
-                  placeholder="Address"
-                  className="w-full px-4 py-2 border rounded-lg"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="text"
-                    placeholder="City"
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Postal Code"
-                    className="w-full px-4 py-2 border rounded-lg"
-                  />
+    <div className="min-h-screen bg-white p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Stepper Header */}
+        <div className="mb-12">
+          {/* Circles and Lines Row */}
+          <div className="flex items-center mb-3">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                {/* Circle */}
+                <div className="relative shrink-0">
+                  {step.id < currentStep ? (
+                    // Completed - filled orange with white check
+                    <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                      <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                    </div>
+                  ) : step.id === currentStep ? (
+                    // Current - white bg with orange border and orange dot
+                    <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                    </div>
+                  ) : (
+                    // Upcoming - gray border with gray dot
+                    <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                      <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Connector Line */}
+                {index < steps.length - 1 && (
+                  <div
+                    className={`h-0.5 flex-1 ${
+                      step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                    }`}
+                  ></div>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+
+          {/* Labels Row */}
+          <div className="flex items-center">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                {/* Label under circle */}
+                <div
+                  className="text-center -ml-6 shrink-0"
+                  style={{ width: '40px' }}
+                >
+                  <p
+                    className={`text-xs font-medium whitespace-nowrap ${
+                      step.id <= currentStep ? 'text-gray-900' : 'text-gray-400'
+                    }`}
+                  >
+                    {step.label}
+                  </p>
+                </div>
+
+                {/* Spacer for the line */}
+                {index < steps.length - 1 && <div className="flex-1"></div>}
+              </React.Fragment>
+            ))}
+          </div>
+        </div>
+
+        {/* Step Content Area */}
+        <div>
+          <div className="bg-white">
+            {/* Render the current step's component */}
+            {CurrentStepComponent ? (
+              <CurrentStepComponent 
+                onSubmit={handleFormSubmit}
+                onNext={handleNext}
+                onPrevious={handlePrevious}
+                currentStep={currentStep}
+                isFirstStep={currentStep === 1}
+                isLastStep={currentStep === steps.length}
+              />
+            ) : (
+              <div className="">
+                <p className="">
+                  Content for {steps[currentStep - 1].label}
+                </p>
               </div>
-              <button
-                onClick={() => setStep(2)}
-                className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-              >
-                Continue to Payment Plan
-              </button>
-            </div>
-          )}
-
-          {step === 2 && (
-            <div className="border rounded-lg p-6 space-y-4">
-              <h2 className="text-xl font-semibold">Choose Payment Plan</h2>
-              <div className="space-y-3">
-                <div className="border-2 border-primary rounded-lg p-4 cursor-pointer">
-                  <p className="font-semibold">4 Monthly Payments</p>
-                  <p className="text-2xl font-bold">KES 800/month</p>
-                  <p className="text-sm text-muted-foreground">Interest-free</p>
-                </div>
-                <div className="border rounded-lg p-4 cursor-pointer hover:border-primary">
-                  <p className="font-semibold">6 Monthly Payments</p>
-                  <p className="text-2xl font-bold">KES 533/month</p>
-                  <p className="text-sm text-muted-foreground">Interest-free</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setStep(3)}
-                className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
-              >
-                Continue to Confirmation
-              </button>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="border rounded-lg p-6 space-y-4">
-              <h2 className="text-xl font-semibold">Confirm Your Order</h2>
-              <p className="text-muted-foreground">
-                Review your order details before completing your purchase
-              </p>
-              <button className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-                Complete Purchase
-              </button>
-            </div>
-          )}
-        </div>
-
-        <div className="border rounded-lg p-6 space-y-4 h-fit">
-          <h2 className="text-xl font-semibold">Order Summary</h2>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Subtotal</span>
-              <span>KES 3,000</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>KES 200</span>
-            </div>
-            <div className="border-t pt-2 flex justify-between font-bold">
-              <span>Total</span>
-              <span>KES 3,200</span>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Navigation Buttons - Only show when there's no component */}
+        {!hasComponent && (
+          <div className="flex justify-between items-center">
+            <button
+              onClick={handlePrevious}
+              disabled={currentStep === 1}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                currentStep === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-orange-500 hover:text-orange-500'
+              }`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Previous
+            </button>
+
+            <div className="text-sm text-gray-500 font-medium">
+              Step {currentStep} of {steps.length}
+            </div>
+
+            <button
+              onClick={handleNext}
+              disabled={currentStep === steps.length}
+              className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all ${
+                currentStep === steps.length
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-orange-500 text-white hover:bg-orange-600'
+              }`}
+            >
+              Next
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

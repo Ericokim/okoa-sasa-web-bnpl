@@ -302,12 +302,14 @@ function IndexPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button
-              variant="outline"
-              className="border-brand-primary-start text-brand-primary-start rounded-3xl px-4 py-2 bg-gradient-to-b from-transparent to-transparent hover:from-brand-primary-start/10 hover:to-brand-primary-end/10"
-            >
-              How it works
-            </Button>
+            <Link to={`/FAQs`}>
+              <Button
+                variant="outline"
+                className="border-brand-primary-start text-brand-primary-start rounded-3xl px-4 py-2 bg-gradient-to-b from-transparent to-transparent hover:from-brand-primary-start/10 hover:to-brand-primary-end/10"
+              >
+                How it works
+              </Button>
+            </Link>
             <Button
               variant="outline"
               className="border-brand-stroke text-brand-black rounded-3xl px-4 py-2"
@@ -463,7 +465,7 @@ function IndexPage() {
                 src="/404.png"
                 alt="Okoa Sasa"
                 className="h-full w-full object-contain"
-              />{' '}
+              />
             </div>
 
             <h1 className="font-medium text-3xl text-brand-black">
@@ -484,58 +486,50 @@ function IndexPage() {
             </Button>
           </div>
         ) : (
-          <>
-            {' '}
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.id}
-                to={`/products/${product.id}`}
-                className="hover:brand-primary-end"
-              >
-                <Card className="border-none shadow-none">
-                  <CardContent className="space-y-4 p-0">
-                    <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2 p-5">
-                      {/* <div className="flex h-56 w-56 items-center justify-center rounded-xl bg-gray-200">
-                        <span className="text-sm text-gray-400">
-                          Product Image
-                        </span>
-                      </div> */}
-                      <img
-                        src={product.image}
-                        alt="Okoa Sasa"
-                        className="h-70 w-60 object-contain"
-                      />{' '}
-                      {product.inCart && (
-                        <div className="absolute right-4 top-4">
-                          <Button
-                            size="icon"
-                            variant="gradient"
-                            className="h-12 w-12 rounded-full shadow-lg"
-                          >
-                            <ShoppingCart className="h-6 w-6" />
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="space-y-2">
-                      <h3 className="text-base font-medium leading-relaxed text-brand-black line-clamp-2">
-                        {product.name}
-                      </h3>
-                      <div className="flex items-center gap-3">
-                        <span className="text-base font-semibold text-brand-black">
-                          {formatKes(product.price)}
-                        </span>
-                        <span className="text-sm font-medium text-brand-mid-gray line-through">
-                          {formatKes(product.originalPrice)}
-                        </span>
+          filteredProducts.map((product) => (
+            <Link
+              key={product.id}
+              to={`/products/${product.id}`}
+              className="hover:brand-primary-end"
+            >
+              <Card className="border-none shadow-none">
+                <CardContent className="space-y-4 p-0">
+                  <div className="relative flex items-center justify-center overflow-hidden rounded-2xl bg-brand-bg-2 p-5">
+                    <img
+                      src={product.image}
+                      alt="Okoa Sasa"
+                      className="h-70 w-60 object-contain"
+                    />
+                    {product.inCart && (
+                      <div className="absolute right-4 top-4">
+                        <Button
+                          size="icon"
+                          variant="gradient"
+                          className="h-12 w-12 rounded-full shadow-lg"
+                        >
+                          <ShoppingCart className="h-6 w-6" />
+                        </Button>
                       </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <h3 className="text-base font-medium leading-relaxed text-brand-black line-clamp-2">
+                      {product.name}
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <span className="text-base font-semibold text-brand-black">
+                        {formatKes(product.price)}
+                      </span>
+                      <span className="text-sm font-medium text-brand-mid-gray line-through">
+                        {formatKes(product.originalPrice)}
+                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))
         )}
       </div>
 

@@ -63,7 +63,7 @@ export function Footer() {
             </h3>
             <div className="space-y-2 md:space-y-3">
               <Link
-                to="/how-it-works"
+                to="/FAQs"
                 className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
               >
                 How it Works
