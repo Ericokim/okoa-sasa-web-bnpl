@@ -5,6 +5,9 @@ import { Cart } from '@/components/shared'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
+import { Minus,Plus } from "lucide-react";
+import { Button } from '@/components/ui/button'
+import { Link } from '@tanstack/react-router'
 
 function CartPage() {
   const navigate = useNavigate()
