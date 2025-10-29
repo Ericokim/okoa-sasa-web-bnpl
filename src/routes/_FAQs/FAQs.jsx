@@ -161,8 +161,8 @@ const FAQs = () => {
 
       {/* body */}
 
-      <div className="h-[928px]  grid place-items-center">
-        <div className="w-full max-w-7xl h-[888px]  flex flex-col justify-between items-center">
+      <div className="h-[928px] px-20 py-5 grid place-items-center">
+        <div className="w-7xl max-w-7xl h-[888px]  flex flex-col justify-between items-center">
           {/* Header */}
           <div className="h-[111px] w-full text-center flex flex-col justify-center items-center">
             <div className=" w-20 h-1 bg-orange-500 -mt-6 mb-4 rounded-full"></div>

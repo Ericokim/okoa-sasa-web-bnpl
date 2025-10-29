@@ -1,12 +1,13 @@
 import React from 'react'
-import { Link, createFileRoute,useNavigate } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Minus, Plus, Trash2 } from 'lucide-react'
 import { useStateContext } from '@/context/state-context'
 import { Button } from '@/components/ui/button'
 import { AuthDialog } from '@/components/shared/AuthDialog'
+import { TrashIcon } from '@/assets/icons'
 
 function CartPage() {
-    const navigate = useNavigate()
+  const navigate = useNavigate()
   const { isAuthenticated } = useStateContext()
   const [showAuthDialog, setShowAuthDialog] = React.useState(false)
 
@@ -70,14 +71,11 @@ function CartPage() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   return (
-    <div className="min-h-screen w-full lg:h-[892px] lg:w-7xl space-y-4 lg:space-y-[30px] px-4 lg:px-0">
-      {/* Breadcrumb */}
-      <div className="h-6 text-sm text-gray-600">home cart</div>
-
+    <div className="min-h-screen w-full  lg:w-7xl space-y-4 lg:space-y-[30px] px-4 lg:px-0">
       {/* Header */}
       <div className="lg:h-20">
         <p className="text-2xl lg:text-[36px] font-bold">My Cart</p>
-        <p className="text-xs lg:text-[10px] font-semibold text-gray-600">
+        <p className="w-[536px] h-[22px] text-base font-medium leading-[140%] text-[#676D75] self-stretch">
           Almost there! Ready to place your order?
         </p>
       </div>
@@ -89,11 +87,13 @@ function CartPage() {
           <div className="flex-1 bg-white">
             {/* Desktop Table Header */}
             <div className="hidden lg:grid grid-cols-12 gap-4 border-b-2 mb-4 pb-4 border-gray-200 w-[800px]">
-              <div className="col-span-6 text-lg font-semibold">Item</div>
-              <div className="col-span-3 text-lg font-semibold text-center">
+              <div className="col-span-6 w-[401px] h-7 text-xl font-semibold leading-[140%] capitalize text-black">
+                Item
+              </div>
+              <div className="col-span-3 w-44 h-7 text-xl font-semibold leading-[140%] capitalize text-black text-start">
                 Quantity
               </div>
-              <div className="col-span-3 text-lg font-semibold text-right">
+              <div className="col-span-3 text-xl font-semibold leading-[1.4] capitalize text-black text-start">
                 Subtotal
               </div>
             </div>
@@ -107,7 +107,7 @@ function CartPage() {
                     {/* Product Info */}
                     <div className="flex gap-3">
                       <div className="bg-gray-50 rounded-lg flex items-center justify-center shrink-0 w-20 h-20">
-                        <div className="w-16 h-16 bg-gradient-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div>
+                        <div className="w-16 h-16 bg-linear-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div>
                       </div>
                       <div className="flex-1">
                         <h3 className="font-semibold text-gray-900 text-base mb-1">
@@ -166,14 +166,14 @@ function CartPage() {
                   <div className="hidden lg:grid grid-cols-12 gap-4 items-center">
                     {/* Product Info */}
                     <div className="col-span-6 flex gap-4 items-start w-[375px] h-[130px]">
-                      <div className="bg-gray-50 rounded-lg flex items-center justify-center shrink-0 w-[139px] h-[130px]">
-                        <div className="w-24 h-24 bg-gradient-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div>
+                      <div className="bg-brand-bg-2 rounded-lg flex items-center justify-center shrink-0 w-[139px] h-[130px]">
+                        <div className="w-24 h-24 bg-linear-to-b from-gray-300 via-gray-200 to-gray-300 rounded-lg"></div>
                       </div>
                       <div className="flex-1 w-56 h-[99px]">
-                        <h3 className="font-semibold text-gray-900 text-lg mb-2">
+                        <h3 className="font-semibold text-lg leading-[1.4] capitalize text-black w-56 h-[25px]">
                           {item.name}
                         </h3>
-                        <p className="text-sm text-gray-500 leading-relaxed">
+                        <p className="text-base font-normal leading-[1.4] text-[#676D75] w-56 h-[66px]">
                           {item.description}
                         </p>
                       </div>
@@ -200,14 +200,14 @@ function CartPage() {
 
                     {/* Price and Delete */}
                     <div className="col-span-3 flex items-center justify-end gap-4">
-                      <span className="text-xl font-semibold text-orange-600 h-7 w-28">
+                      <span className="text-xl font-semibold leading-[1.4] capitalize h-7 w-28 bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
                         KES {(item.price * item.quantity).toLocaleString()}
                       </span>
                       <button
                         onClick={() => removeItem(item.id)}
                         className="text-red-400 hover:text-red-600 cursor-pointer w-[30px] h-[30px]"
                       >
-                        <Trash2 className="w-5 h-5" />
+                        <TrashIcon />
                       </button>
                     </div>
                   </div>
@@ -221,41 +221,55 @@ function CartPage() {
         <div className="border w-full lg:w-[412px] lg:h-[382px] rounded-xl py-6 px-4">
           <div className="lg:sticky lg:top-8">
             <div className="w-full lg:w-[380px]">
-              <h2 className="text-xl lg:text-2xl font-semibold mb-6 lg:mb-8">
+              <h2 className="text-2xl font-semibold leading-[1.4] capitalize text-black lg:mb-8">
                 Order Summary
               </h2>
             </div>
 
-            <div className="w-full lg:w-[380px] h-0.5 bg-gray-200 mb-6"></div>
+            <div className="w-[380px] h-px bg-[#E8ECF4] self-stretch my-5"></div>
 
-            <div className="w-full lg:w-[380px] space-y-4 mb-6">
+            <div className="w-full lg:w-[380px]  space-y-4">
               <div className="flex justify-between text-gray-700">
-                <span className="text-sm lg:text-base">Total Items</span>
-                <span className="font-semibold">{totalItems}</span>
+                <span className="capitalize text-[#676D75] lg:text-base text-lg font-medium">
+                  Total Items
+                </span>
+                <span className="text-lg font-medium  capitalize text-black">
+                  {totalItems}
+                </span>
               </div>
               <div className="flex justify-between text-gray-700">
-                <span className="text-sm lg:text-base">Shipping Cost</span>
-                <span className="font-semibold">KES 0</span>
+                <span className="capitalize text-[#676D75] lg:text-base text-lg font-medium">
+                  Shipping Cost
+                </span>
+                <span className="text-lg font-medium  capitalize text-black">
+                  KES 0
+                </span>
               </div>
               <div className="flex justify-between text-gray-700">
-                <span className="text-sm lg:text-base">Subtotal</span>
-                <span className="font-semibold">
+                <span className="capitalize text-[#676D75] lg:text-base text-lg font-medium">
+                  Subtotal
+                </span>
+                <span className="text-lg font-medium  capitalize text-black">
                   KES {subtotal.toLocaleString()}
                 </span>
               </div>
             </div>
 
-            <div className="w-full lg:w-[380px] h-0.5 bg-gray-200 mb-6"></div>
+            <div className="w-[380px] h-px bg-[#E8ECF4] self-stretch my-5"></div>
 
             <div className="w-full lg:w-[380px] mb-6">
               <div className="flex justify-between text-base lg:text-md text-gray-900 font-semibold">
-                <span>Grand Total</span>
-                <span>KES {subtotal.toLocaleString()}</span>
+                <span className="capitalize text-[#676D75] lg:text-base text-lg font-medium">
+                  Grand Total
+                </span>
+                <span className="text-lg font-medium  capitalize text-black">
+                  KES {subtotal.toLocaleString()}
+                </span>
               </div>
             </div>
             <Link to="/checkout">
               <Button
-                className="w-full h-12 lg:h-[46px] bg-linear-to-r from-orange-500 to-orange-600 text-white py-4 rounded-full font-semibold hover:from-orange-600 hover:to-orange-700 transition-all shadow-md"
+                className="w-full lg:w-[380px] h-12 lg:h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white rounded-[24px] font-semibold hover:opacity-90 transition-all shadow-md flex flex-row justify-center items-center px-4 py-3 gap-2.5"
                 variant={'default'}
                 size={'sm'}
               >

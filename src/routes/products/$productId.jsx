@@ -18,6 +18,18 @@ import {
   ChevronRight,
   Package,
 } from 'lucide-react'
+import {
+  BoxIcon,
+  CartIcon,
+  FacebookIcon,
+  InstagramIcon,
+  LinkIcon,
+  TikTokIcon,
+  TruckIcon,
+  VerifyIcon,
+  WhatsAppIcon,
+  XIcon,
+} from '@/assets/icons'
 
 function ProductDetailPage() {
   const [activeTab, setActiveTab] = React.useState('specifications')
@@ -39,55 +51,76 @@ function ProductDetailPage() {
       <div className="hidden lg:block">
         <div className="w-7xl h-[617px] flex justify-between">
           <div className=" h-[617px] w-[168px] space-y-2 bg-white">
-            <div className="w-[168px] h-[148.25px] rounded-2xl flex justify-center bg-gray-50">
-              <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+            <div className="w-[168px] h-[148.25px] ">
+              <div className="h-[139px] rounded-2xl flex justify-center bg-brand-bg-2">
+                <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+              </div>
             </div>
-            <div className="w-[168px] h-[148.25px] rounded-2xl flex justify-center bg-gray-50">
-              <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
-            </div>
-            <div className="w-[168px] h-[148.25px] rounded-2xl flex justify-center bg-gray-50">
-              <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
-            </div>
-            <div className="w-[168px] h-[148.25px] rounded-2xl flex justify-center bg-gray-50">
-              <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+            <div className="w-[168px] h-[148.25px] ">
+              <div className="h-[139px] rounded-2xl flex justify-center bg-brand-bg-2">
+                <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+              </div>
+            </div>{' '}
+            <div className="w-[168px] h-[148.25px] ">
+              <div className="h-[139px] rounded-2xl flex justify-center bg-brand-bg-2">
+                <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+              </div>
+            </div>{' '}
+            <div className="w-[168px] h-[148.25px] ">
+              <div className="h-[139px] rounded-2xl flex justify-center bg-brand-bg-2">
+                <div className="bg-black w-[49px] h-[97px] rounded-md m-[25.625px]"></div>
+              </div>
             </div>
           </div>
           <div className=" m-5 w-[536px] h-[580px] rounded-2xl bg-gray-50">
             <div className="w-[479px] h-[479px] my-[50.5px] mx-[28.5px] relative">
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-lg flex items-center justify-center transition-all z-10"
+                className="absolute left-4 top-1/2 -translate-y-1/2 cursor-pointer w-[34px] h-[34px] rounded-full bg-white/80 hover:bg-white shadow-lg flex items-center justify-center transition-all z-10"
                 onClick={() => {}}
               >
                 <svg
-                  className="w-6 h-6 text-gray-800"
-                  fill="none"
-                  stroke="currentColor"
+                  width="24"
+                  height="24"
                   viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
+                    d="M15.0898 19.92L8.56984 13.4C7.79984 12.63 7.79984 11.37 8.56984 10.6L15.0898 4.08"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
                 </svg>
               </button>
               <div className="w-[300px] h-[479px] mx-[89.5px] bg-black rounded-2xl "></div>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer w-10 h-10 rounded-full bg-white/80 hover:bg-white shadow-lg flex items-center justify-center transition-all z-10"
+                className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer w-[34px] h-[34px] rounded-full bg-white/80 hover:bg-white shadow-lg flex items-center justify-center transition-all z-10"
                 onClick={() => {}}
               >
                 <svg
-                  className="w-6 h-6 text-gray-800"
+                  width="34"
+                  height="34"
+                  viewBox="0 0 34 34"
                   fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
                 >
+                  <circle
+                    cx="17"
+                    cy="17"
+                    r="16.5"
+                    fill="white"
+                    stroke="#E8ECF4"
+                  />
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
+                    d="M13.9102 24.92L20.4302 18.4C21.2002 17.63 21.2002 16.37 20.4302 15.6L13.9102 9.08"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   />
                 </svg>
               </button>
@@ -96,49 +129,55 @@ function ProductDetailPage() {
           <div className="h-[617px] w-[536px] ">
             <div className="w-[536px] h-[142px] space-y-2 mb-5 ">
               <div className=" h-[65px] grid justify-end">
-                <div className="h-[17px] text-xs justify-end font-semibold mb-2">
+                <div className="w-[104px] h-[17px] text-xs font-medium leading-[140%] text-black mb-2 ml-46">
                   Share With Others
                 </div>
                 <div className="h-10 flex px-2.5 w-[300px] space-x-2">
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <Link2 className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <LinkIcon />
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <Facebook className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <FacebookIcon />
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <Twitter className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <XIcon />
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <Instagram className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <InstagramIcon />
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <MessageCircle className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <WhatsAppIcon />
                   </div>
-                  <div className="h-10 w-10 rounded-full bg-gray-100 p-2">
-                    <Music2 className="text-primary" />
+                  <div className="h-10 w-10 rounded-full bg-brand-bg-2 p-2">
+                    <TikTokIcon />
                   </div>
                 </div>
               </div>
-              <div className="text-[26px] font-semibold">Iphone 14</div>
-              <div className="font-semibold text-gray-400 -mt-2">
+              <div className="w-[536px] h-[39px] text-[28px] font-semibold leading-[140%] capitalize text-black self-stretch">
+                iPhone 14
+              </div>
+              <div className="w-[533px] h-[22px] text-base font-medium leading-[140%] text-brand-gray -mt-2">
                 6.1''-6GB RAM - 128GB ROM - Midnight +Free (Cover + Screen
                 Protector)
               </div>
             </div>
-            <div className="my-5 h-0.5 bg-gray-200"></div>
+            <div className="w-[536px] h-px bg-[#E8ECF4] self-stretch my-5"></div>
             <div className="flex justify-between h-9 mb-5 ">
-              <p>KES 87,969</p>
-              <div className="bg-primary w-[107px] text-center rounded-full h-9 p-[4.5px] ">
-                20 in stock
+              <p className="w-[134px] h-[34px] text-2xl font-semibold leading-[140%] capitalize bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
+                KES 87,696
+              </p>
+              <div className="flex flex-row justify-center items-center px-4 py-2 gap-2.5 w-[107px] h-9 bg-[rgba(244,113,32,0.12)] rounded-3xl">
+                <p className="w-[75px] h-5 text-sm font-semibold leading-[140%] capitalize text-[#F47120]">
+                  20 in stock
+                </p>
               </div>
             </div>
             <div className=" h-[74px] mb-5 ">
-              <div className="h-[46px] w-[250px] rounded-full bg-gray-100">
+              <div className="h-[46px] w-[250px] rounded-full bg-brand-bg-2">
                 <div className="flex py-2 px-4 justify-between">
                   <Button
                     className={
-                      'rounded-full cursor-pointer w-[30px] h-[30px] bg-white text-primary'
+                      'rounded-full cursor-pointer w-[30px] h-[30px] bg-white text-primary '
                     }
                     variant={'default'}
                     size={'sm'}
@@ -156,39 +195,46 @@ function ProductDetailPage() {
                     <Minus size={16} className=" hover:bg-white" />
                   </Button>
                 </div>
-                <p className="text-gray-400">Maximum purchase 5</p>
+                <p className="w-[142px] mt-2 h-5 text-sm font-medium leading-[140%] capitalize text-[#A0A4AC]">
+                  Maximum purchase 5
+                </p>
               </div>
             </div>
             <div className="mb-5 h-[104px] space-y-3 ">
               <Button className="w-[536px] h-[46px] bg-white border border-primary text-primary rounded-full">
-                <ShoppingCart /> Add To Cart
+                <CartIcon />{' '}
+                <p className="w-[88px] h-[22px] text-base font-medium leading-[140%] capitalize bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent">
+                  Add To Cart
+                </p>
               </Button>
-              <Button className="w-[536px] h-[46px] bg-primary text-white rounded-full">
-                Buy now
+              <Button className="flex flex-row justify-center items-center px-4 py-3 gap-[10px] w-[536px] h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl self-stretch text-white">
+                <p className="w-[67px] h-[22px] text-base font-medium leading-[140%] capitalize text-white">
+                  Buy Now
+                </p>
               </Button>
             </div>
             <div className="bg-gray-50 rounded-2xl h-40 p-3 space-y-2">
               <div className="h-10 flex">
                 <div className="h-10 w-10 rounded-full p-2 bg-orange-100">
-                  <Box className="text-primary" />
+                  <BoxIcon />
                 </div>
-                <p className=" my-[9px] font-semibold ml-2">
+                <p className="w-[407px] h-[22px] text-base font-medium leading-[140%] text-center text-black my-[9px] ml-2">
                   15GB + 500 Mins + Unlimited SMS at KES 1,000/Month
                 </p>
               </div>
               <div className="h-10 flex">
                 <div className="h-10 w-10 rounded-full p-2 bg-orange-100">
-                  <Truck className="text-primary" />
+                  <TruckIcon />
                 </div>
-                <p className=" my-[9px] font-semibold ml-2">
+                <p className="w-[171px] h-[22px] text-base font-medium leading-[140%] text-center text-black my-[9px] ml-2">
                   Country Wide Delivery
                 </p>
               </div>
               <div className="h-10 flex">
                 <div className="h-10 w-10 rounded-full p-2 bg-orange-100">
-                  <Settings className="text-primary" />
+                  <VerifyIcon />
                 </div>
-                <p className=" my-[9px] font-semibold ml-2">
+                <p className="w-[218px] h-[22px] text-base font-medium leading-[140%] text-center text-black my-[9px] ml-2">
                   Warranty on all mobile phone
                 </p>
               </div>
@@ -236,7 +282,7 @@ function ProductDetailPage() {
                   {specifications.map((spec, index) => (
                     <div
                       key={index}
-                      className="px-6 py-5 text-gray-700 border-b last:border-b-0 border-gray-200 h-[60px]"
+                      className="px-6 py-5 border-b text-lg font-medium capitalize text-[#252525] last:border-b-0 border-gray-200 h-[60px]"
                     >
                       {spec.value}
                     </div>
