@@ -19,7 +19,7 @@ export default function TermsConditionPage({
   }
 
   return (
-    <div className=" bg-white flex items-center justify-center p-4">
+    <div className=" bg-white flex items-center justify-center p-4 w-[1020px]">
       <div className="w-[1020px] h-[195px] bg-white rounded-4xl shadow-sm p-6">
         <div className="w-[972px] h-16">
           {/* Header */}

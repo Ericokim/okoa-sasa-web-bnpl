@@ -228,13 +228,13 @@ export default function PersonalInfoForm({
               </div>
 
               {/* Buttons */}
-              <div className="flex justify-end gap-4 pt-6">
+              <div className="flex justify-end gap-4 -mr-6 mt-[50px] pt-6">
                 <Button
                   onClick={onPrevious}
                   disabled={isFirstStep}
                   type="button"
                   variant="outline"
-                  className="px-6 py-2.5 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 rounded-full font-medium"
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
                 >
                   Return To Back
                 </Button>
@@ -242,7 +242,7 @@ export default function PersonalInfoForm({
                   type="submit"
                   onClick={onNext}
                   disabled={isLastStep}
-                  className="px-6 py-2.5 bg-orange-500 hover:bg-orange-600 text-white rounded-full font-medium"
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
                 >
                   Next: Delivery Details
                 </Button>
