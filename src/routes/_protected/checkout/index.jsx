@@ -5,6 +5,7 @@ import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
 import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
 import AccountOptionPage from '@/components/shared/Checkout/AccountOption'
 import CheckoutLoanPage from '@/components/shared/Checkout/CheckoutLoan'
+import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
 const steps = [
   {
@@ -47,6 +48,7 @@ const steps = [
 
 export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1)
+  const { productId } = Route.useParams()
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -68,11 +70,18 @@ export default function CheckoutPage() {
   const CurrentStepComponent = steps[currentStep - 1].component
   const hasComponent = CurrentStepComponent !== null
 
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'iPhone 14', path: `/products/${productId}` },
+    { label: 'Checkout', path: `/Checkout`, isCurrent: true },
+  ]
+
   return (
     <div className="min-h-screen bg-white p-8">
+      <BreadCrumbs items={breadcrumbItems} className="my-6 mb-10" />
+
       {/* Center everything with max-width and mx-auto */}
       <div className="max-w-[1067px] mx-auto flex flex-col">
-        
         {/* Stepper Header */}
         <div className="mb-12 w-full">
           {/* Circles and Lines Row */}
@@ -146,7 +155,9 @@ export default function CheckoutPage() {
               />
             ) : (
               <div className="p-8 border border-gray-200 rounded-2xl">
-                <p className="text-gray-600">Content for {steps[currentStep - 1].label}</p>
+                <p className="text-gray-600">
+                  Content for {steps[currentStep - 1].label}
+                </p>
               </div>
             )}
           </div>
