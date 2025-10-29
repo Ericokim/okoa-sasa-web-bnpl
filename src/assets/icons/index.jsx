@@ -2,7 +2,7 @@ import facebookIcon from '@/assets/icons/facebook.svg';
 import instagramIcon from '@/assets/icons/instagram.svg';
 import tiktokIcon from '@/assets/icons/tiktok.svg';
 import whatsappIcon from '@/assets/icons/whatsApp.svg';
-import xIcon from '@/assets/icons/x.svg';
+import xIcon from '@/assets/icons/X.svg';
 import linkIcon from '@/assets/icons/link.svg';
 import addIcon from '@/assets/icons/add.svg';
 import minusIcon from '@/assets/icons/minus.svg';

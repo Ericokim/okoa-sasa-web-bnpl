@@ -26,6 +26,7 @@ export function Header() {
   const navigate = useNavigate()
   const { user, cart, logout } = useStateContext()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
   const cartCount = cart?.length || 0
   const isAuthenticated = !!user
   const cartItemCount = cartCount || 0
