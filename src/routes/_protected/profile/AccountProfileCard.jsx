@@ -1,15 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useAccountStore } from '@/data/accountStore'
-import { Edit2, Pencil } from 'lucide-react'
 import { EditIcon } from '@/assets/icons'
 
-export const Route = createFileRoute('/_protected/profile/AccountProfileCard')({
-  component: RouteComponent,
-})
-
-export function AccountProfileCard() {
+export function RouteComponent() {
   const { personalInfo } = useAccountStore()
 
   return (
@@ -30,14 +23,14 @@ export function AccountProfileCard() {
           />
         </div>
         <div>
-          <h1 class=" font-sans text-[28px] font-semibold leading-[39px] capitalize text-[#252525] flex-none order-0 flex-grow-0">
+          <h1 className="font-sans text-[28px] font-semibold leading-[39px] capitalize text-[#252525] flex-none order-0 flex-grow-0">
             {personalInfo.firstName}
           </h1>
           <h3 className="text-2xl font-bold text-gray-900"></h3>
-          <p class=" font-sans text-base font-normal leading-[22px] text-[#252525] flex-none order-1 flex-grow-0">
+          <p className="font-sans text-base font-normal leading-[22px] text-[#252525] flex-none order-1 flex-grow-0">
             {personalInfo.role}
           </p>
-          <p class=" font-sans text-base font-normal leading-[22px] text-[#252525] flex-none order-2 flex-grow-0">
+          <p className="font-sans text-base font-normal leading-[22px] text-[#252525] flex-none order-2 flex-grow-0">
             {personalInfo.location}
           </p>
         </div>
@@ -45,3 +38,10 @@ export function AccountProfileCard() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_protected/profile/AccountProfileCard')({
+  component: RouteComponent,
+})
+
+export const component = RouteComponent
+export const AccountProfileCard = RouteComponent

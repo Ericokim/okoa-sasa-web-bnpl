@@ -5,7 +5,32 @@ import { useNavigate } from '@tanstack/react-router'
 import { useSnackbar } from 'notistack'
 import { useStateContext } from '@/context/state-context'
 import { queryKeys } from '../queryKeys'
-import { setStorageData, getStorageData, clearStorageData } from '@/lib/utils'
+import { setStorageData, clearStorageData } from '@/lib/utils'
+
+const AUTH_STORAGE_KEYS = {
+  user: 'userInfo',
+  token: 'token',
+  name: 'name',
+}
+
+const setStoredAuthData = (authPayload) => {
+  if (!authPayload) return
+
+  const userPayload = authPayload.user ?? authPayload.userInfo ?? authPayload
+  if (userPayload) {
+    setStorageData(AUTH_STORAGE_KEYS.user, userPayload)
+  }
+
+  if (authPayload.token) {
+    setStorageData(AUTH_STORAGE_KEYS.token, authPayload.token)
+  }
+
+  const derivedName =
+    authPayload.name ?? userPayload?.name ?? userPayload?.fullName
+  if (derivedName) {
+    setStorageData(AUTH_STORAGE_KEYS.name, derivedName)
+  }
+}
 
 // Login mutation (matching reference Auth.jsx pattern)
 export const useLogin = () => {
@@ -253,15 +278,11 @@ export const useAuthResetPassword = () => {
   return useMutation({
     mutationKey: queryKeys.auth.resetPassword(),
     mutationFn: async (formData) => {
-      try {
-        const { data } = await api.post(
-          '/api/v1.0/auth/resetPassword',
-          formData,
-        )
-        return data
-      } catch (error) {
-        throw error
-      }
+      const { data } = await api.post(
+        '/api/v1.0/auth/resetPassword',
+        formData,
+      )
+      return data
     },
     onMutate: () => {
       // RESET_PASSWORD_REQUEST equivalent
@@ -351,15 +372,11 @@ export const useAuthChangePassword = () => {
   return useMutation({
     mutationKey: queryKeys.auth.changePassword(),
     mutationFn: async (formData) => {
-      try {
-        const { data } = await api.post(
-          '/api/v1.0/auth/changePassword',
-          formData,
-        )
-        return data
-      } catch (error) {
-        throw error
-      }
+      const { data } = await api.post(
+        '/api/v1.0/auth/changePassword',
+        formData,
+      )
+      return data
     },
     onMutate: () => {
       // CHANGE_PASSWORD_REQUEST equivalent

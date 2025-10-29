@@ -1,21 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useRef } from 'react'
-import { BellIcon } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { useAccountStore } from '@/data/accountStore'
-import gsap from 'gsap'
-import { Bell } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 
-export const Route = createFileRoute(
-  '/_protected/profile/NotificationPreferencesCard',
-)({
-  component: RouteComponent,
-})
-
-export function NotificationPreferencesCard() {
+export function RouteComponent() {
   const { notifications, toggleNotification } = useAccountStore()
 
   const items = [
@@ -79,3 +66,12 @@ export function NotificationPreferencesCard() {
     </div>
   )
 }
+
+export const Route = createFileRoute(
+  '/_protected/profile/NotificationPreferencesCard',
+)({
+  component: RouteComponent,
+})
+
+export const component = RouteComponent
+export const NotificationPreferencesCard = RouteComponent

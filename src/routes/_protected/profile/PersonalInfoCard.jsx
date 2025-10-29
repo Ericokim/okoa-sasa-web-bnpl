@@ -1,21 +1,10 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Edit2Icon, Pencil } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { useAccountStore } from '@/data/accountStore'
-import gsap from 'gsap'
-import { Edit2 } from 'lucide-react'
 import { Separator } from '@/components/ui/separator'
 import { EditIcon } from '@/assets/icons'
 
-export const Route = createFileRoute('/_protected/profile/PersonalInfoCard')({
-  component: RouteComponent,
-})
-
-export function PersonalInfoCard() {
+export function RouteComponent() {
   const { personalInfo, updatePersonalInfo } = useAccountStore()
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState(personalInfo)
@@ -32,7 +21,6 @@ export function PersonalInfoCard() {
 
   return (
     <div className="border rounded-xl p-6 bg-white ">
-    
 
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-sans text-2xl font-medium leading-9 capitalize text-black">
@@ -56,15 +44,15 @@ export function PersonalInfoCard() {
       {!editing ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
-            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               First Name
             </p>
-            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.firstName}
             </p>
           </div>
           <div>
-            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               Last Name
             </p>
             <p className="font-medium text-md text-gray-900">
@@ -72,28 +60,28 @@ export function PersonalInfoCard() {
             </p>
           </div>
           <div>
-            <p class="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               Designation
             </p>
-            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.role}
             </p>
           </div>
           <div>
-            <p class=" font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               Email Address
             </p>
 
-            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.email}
             </p>
           </div>
           <div>
-            <p class="  font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
               Phone Number
             </p>
 
-            <p class="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
               {personalInfo.phone}
             </p>
           </div>
@@ -160,3 +148,10 @@ export function PersonalInfoCard() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_protected/profile/PersonalInfoCard')({
+  component: RouteComponent,
+})
+
+export const component = RouteComponent
+export const PersonalInfoCard = RouteComponent
