@@ -15,24 +15,50 @@ export const lazyLoad = (fn) => (props) => (
 )
 
 /**
- * Protected Route Wrapper - Redirects to signin if not authenticated
+ * Protected Route Wrapper - Shows auth dialog if not authenticated
  */
 export function ProtectedRoute({ children }) {
   const navigate = useNavigate()
   const { isAuthenticated } = useStateContext()
+  const [showAuthDialog, setShowAuthDialog] = React.useState(false)
+  const [isChecking, setIsChecking] = React.useState(true)
 
   React.useEffect(() => {
+    setIsChecking(true)
     if (!isAuthenticated) {
+      setShowAuthDialog(true)
+    }
+    setIsChecking(false)
+  }, [isAuthenticated])
+
+  const handleAuthDialogClose = (open) => {
+    setShowAuthDialog(open)
+    if (!open && !isAuthenticated) {
       navigate({ to: '/' })
     }
-  }, [navigate, isAuthenticated])
+  }
 
-  // Show loading spinner while redirecting
-  if (!isAuthenticated) {
+  // Show loading spinner while checking auth status
+  if (isChecking) {
     return <LoadingSpinner />
   }
 
+  // If not authenticated, show auth dialog with backdrop over home page
+  if (!isAuthenticated) {
+    return (
+      <>
+        <AuthDialogWrapper open={showAuthDialog} onOpenChange={handleAuthDialogClose} />
+      </>
+    )
+  }
+
   return children
+}
+
+// Lazy load AuthDialog to avoid circular dependencies
+function AuthDialogWrapper({ open, onOpenChange }) {
+  const { AuthDialog } = React.useMemo(() => require('@/components/shared'), [])
+  return <AuthDialog open={open} onOpenChange={onOpenChange} />
 }
 
 /**
