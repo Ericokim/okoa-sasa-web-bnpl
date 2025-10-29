@@ -84,7 +84,7 @@ export function Footer() {
           </div>
 
           {/* Social Media Icons */}
-          <div className="flex items-center gap-[20px]">
+          <div className="flex items-center gap-5">
             <a
               href="#"
               className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"

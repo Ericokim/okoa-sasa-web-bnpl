@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp'
 import { useStateContext } from '@/context/state-context'
 import { cn } from '@/lib/utils'
 import { PhoneIcon, XIcon } from 'lucide-react'
@@ -72,15 +73,13 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} className="h-80">
       <DialogContent
         className={cn(
           'rounded-3xl p-0 gap-0 border-0',
           'max-w-[335px] w-[335px]',
           'md:max-w-[500px] md:w-[500px]',
-          step === 'otp' 
-            ? 'h-[657px] md:h-auto' 
-            : 'h-[569px] md:h-auto'
+          step === 'otp' ? 'h-[657px] md:h-auto' : 'h-[569px] md:h-auto',
         )}
         showCloseButton={false}
       >
@@ -126,7 +125,13 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
   )
 }
 
-function LoginStep({ phoneNumber, setPhoneNumber, rememberMe, setRememberMe, handleLogin }) {
+function LoginStep({
+  phoneNumber,
+  setPhoneNumber,
+  rememberMe,
+  setRememberMe,
+  handleLogin,
+}) {
   return (
     <>
       <div className="flex flex-col gap-2 w-full text-left">
@@ -153,10 +158,10 @@ function LoginStep({ phoneNumber, setPhoneNumber, rememberMe, setRememberMe, han
             <Input
               id="phone"
               type="tel"
-              placeholder="+12 0"
+              placeholder="+254"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#A0A4AC] text-sm font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC]"
+              className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#4d4d4e] text-sm font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC]"
             />
           </div>
         </div>
@@ -183,7 +188,7 @@ function LoginStep({ phoneNumber, setPhoneNumber, rememberMe, setRememberMe, han
             'bg-gradient-to-b from-[#F8971D] to-[#EE3124]',
             'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
             'hover:opacity-90 transition-opacity',
-            'border border-transparent'
+            'border border-transparent',
           )}
         >
           Login
@@ -193,7 +198,15 @@ function LoginStep({ phoneNumber, setPhoneNumber, rememberMe, setRememberMe, han
   )
 }
 
-function OTPStep({ otp, setOtp, maskedPhone, countdown, isResending, handleVerifyOTP, handleResendOTP }) {
+function OTPStep({
+  otp,
+  setOtp,
+  maskedPhone,
+  countdown,
+  isResending,
+  handleVerifyOTP,
+  handleResendOTP,
+}) {
   return (
     <>
       <div className="flex flex-col gap-2 w-full text-left">
@@ -213,7 +226,7 @@ function OTPStep({ otp, setOtp, maskedPhone, countdown, isResending, handleVerif
           <Label className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']">
             Verification Code
           </Label>
-          
+
           <InputOTP
             maxLength={6}
             value={otp}
@@ -226,9 +239,9 @@ function OTPStep({ otp, setOtp, maskedPhone, countdown, isResending, handleVerif
                   key={index}
                   index={index}
                   className={cn(
-                    'flex-1 md:w-[65px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border border-[#E8ECF4] bg-[#F9FAFB]',
-                    'text-[#A0A4AC] text-[11px] md:text-base font-medium text-center font-["Public_Sans"]',
-                    'focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20'
+                    'flex-1 md:w-[60px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border ',
+                    'text-[#6d6d6d] text-[11px] md:text-base font-medium text-center font-["Public_Sans"]',
+                    'focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20',
                   )}
                 />
               ))}
@@ -249,7 +262,7 @@ function OTPStep({ otp, setOtp, maskedPhone, countdown, isResending, handleVerif
             'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
             'hover:opacity-90 transition-opacity',
             'border border-transparent',
-            'disabled:opacity-50'
+            'disabled:opacity-50',
           )}
         >
           Login

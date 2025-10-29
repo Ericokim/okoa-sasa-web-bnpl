@@ -2,7 +2,7 @@ import facebookIcon from '@/assets/icons/facebook.svg';
 import instagramIcon from '@/assets/icons/instagram.svg';
 import tiktokIcon from '@/assets/icons/tiktok.svg';
 import whatsappIcon from '@/assets/icons/whatsApp.svg';
-import xIcon from '@/assets/icons/x.svg';
+import xIcon from '@/assets/icons/X.svg';
 import linkIcon from '@/assets/icons/link.svg';
 import addIcon from '@/assets/icons/add.svg';
 import minusIcon from '@/assets/icons/minus.svg';
@@ -12,7 +12,11 @@ import truckIcon from '@/assets/icons/truck.svg';
 import verifyIcon from '@/assets/icons/verify.svg';
 import trashIcon from '@/assets/icons/trash.svg'
 import homeIcon from '@/assets/icons/home.svg'
-
+import trashWhite from '@/assets/icons/trashwhite.svg'
+import editIcon from '@/assets/icons/edit.svg'
+import boxWhiteIcon from '@/assets/icons/box_white.svg'
+import profileIcon from '@/assets/icons/profile.svg'
+import logoutIcon from '@/assets/icons/logout.svg'
 
 export const HomeIcon = ({ size = 24, className = '' }) => (
   <img src={homeIcon} alt="trash" width={size} height={size} className={className} />
@@ -69,4 +73,23 @@ export const WhatsAppIcon = ({ size = 24, className = '' }) => (
 
 export const XIcon = ({ size = 24, className = '' }) => (
   <img src={xIcon} alt="X" width={size} height={size} className={className} />
+);
+
+export const TrashIconWhite = ({ size = 24, className = 'text-white' }) => (
+  <img src={trashWhite} alt="trash" width={size} height={size} className={className} />
+);
+export const EditIcon = ({ size = 24, className = '' }) => (
+  <img src={editIcon} alt="edit" width={size} height={size} className={className} />
+);
+
+export const BoxWhiteIcon = ({ size = 20, className = '' }) => (
+  <img src={boxWhiteIcon} alt="box" width={size} height={size} className={className} />
+);
+
+export const ProfileIcon = ({ size = 20, className = '' }) => (
+  <img src={profileIcon} alt="profile" width={size} height={size} className={className} />
+);
+
+export const LogoutIcon = ({ size = 24, className = '' }) => (
+  <img src={logoutIcon} alt="logout" width={size} height={size} className={className} />
 );

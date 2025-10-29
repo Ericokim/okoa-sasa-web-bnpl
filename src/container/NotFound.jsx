@@ -118,14 +118,8 @@ const NotFoundFilterBar = () => {
 export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      {/* Header */}
-      <Header />
-
-      {/* Filter Bar */}
-      <NotFoundFilterBar />
-
       {/* Main Content */}
-      <main className="flex flex-1 flex-col items-center justify-center px-5 py-8 md:px-20 lg:px-20 lg:py-16">
+      <main className="flex flex-1 flex-col items-center justify-center px-5  md:px-20 lg:px-20 ">
         {/* 404 Illustration */}
         <div className="mb-8 flex w-full max-w-[650px] items-center justify-center">
           <img
@@ -155,9 +149,6 @@ export default function NotFound() {
           </Link>
         </div>
       </main>
-
-      {/* Footer */}
-      <Footer />
     </div>
   )
 }

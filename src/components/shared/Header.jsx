@@ -1,8 +1,6 @@
-import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { ShoppingCart, Search, ChevronDown } from 'lucide-react'
+import { ShoppingCart, Search } from 'lucide-react'
 import { useStateContext } from '@/context/state-context'
-import { AuthButton } from '@/components/shared/AuthButton'
 import { UserDropdown } from '@/components/shared/UserDropdown'
 
 export function Header() {
@@ -12,7 +10,10 @@ export function Header() {
   return (
     <header className="w-full border-b border-[#E8ECF4] bg-white">
       <div className="flex items-center justify-between px-4 py-4 md:px-8 md:py-5 lg:px-20 lg:py-6">
-        <Link to="/" className="flex h-[35px] w-[130px] shrink-0 md:h-[43px] md:w-[158px]">
+        <Link
+          to="/"
+          className="flex h-[35px] w-[130px] shrink-0 md:h-[43px] md:w-[158px]"
+        >
           <img
             src="/primaryLogoHorizontal.png"
             alt="OKOA SASA"

@@ -39,17 +39,17 @@ export function AuthButton() {
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link to="/protected/profile" className="cursor-pointer">
+            <Link to="/profile" className="cursor-pointer">
               Profile
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to="/protected/orders" className="cursor-pointer">
+            <Link to="/orders" className="cursor-pointer">
               My Orders
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link to="/protected/change-password" className="cursor-pointer">
+            <Link to="/change-password" className="cursor-pointer">
               Change Password
             </Link>
           </DropdownMenuItem>
