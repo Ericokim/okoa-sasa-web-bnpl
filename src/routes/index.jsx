@@ -17,7 +17,14 @@ const SORT_OPTIONS = new Set([
   'name-ascending',
   'name-descending',
 ])
-const FILTER_CATEGORIES = ['brand', 'color', 'storage', 'camera', 'display', 'ram']
+const FILTER_CATEGORIES = [
+  'brand',
+  'color',
+  'storage',
+  'camera',
+  'display',
+  'ram',
+]
 
 const parseNumber = (value) => {
   if (value === null || value === undefined) return undefined
@@ -39,10 +46,18 @@ const parseListParam = (value, allowedValues = []) => {
 }
 
 const buildFiltersFromSearch = (searchParams, filterOptions) => {
-  const minPrice = parseNumber(searchParams?.priceMin) ?? filterOptions.price.min
-  const maxPrice = parseNumber(searchParams?.priceMax) ?? filterOptions.price.max
-  const clampedMin = Math.max(filterOptions.price.min, Math.min(minPrice, filterOptions.price.max))
-  const clampedMax = Math.max(clampedMin, Math.min(maxPrice, filterOptions.price.max))
+  const minPrice =
+    parseNumber(searchParams?.priceMin) ?? filterOptions.price.min
+  const maxPrice =
+    parseNumber(searchParams?.priceMax) ?? filterOptions.price.max
+  const clampedMin = Math.max(
+    filterOptions.price.min,
+    Math.min(minPrice, filterOptions.price.max),
+  )
+  const clampedMax = Math.max(
+    clampedMin,
+    Math.min(maxPrice, filterOptions.price.max),
+  )
 
   return {
     priceRange: [clampedMin, clampedMax],
@@ -55,11 +70,15 @@ const buildFiltersFromSearch = (searchParams, filterOptions) => {
   }
 }
 
-const formatListParam = (values = []) => (values.length ? values.join(',') : undefined)
+const formatListParam = (values = []) =>
+  values.length ? values.join(',') : undefined
 
 const areFiltersEqual = (a, b) => {
   if (!a || !b) return false
-  if (a.priceRange[0] !== b.priceRange[0] || a.priceRange[1] !== b.priceRange[1]) {
+  if (
+    a.priceRange[0] !== b.priceRange[0] ||
+    a.priceRange[1] !== b.priceRange[1]
+  ) {
     return false
   }
   return FILTER_CATEGORIES.every((category) => {
@@ -199,7 +218,12 @@ function IndexPage() {
     })
 
     return sorted
-  }, [activeFilters, sortOption, filterOptions.price.max, filterOptions.price.min])
+  }, [
+    activeFilters,
+    sortOption,
+    filterOptions.price.max,
+    filterOptions.price.min,
+  ])
 
   const totalProducts = filteredProducts.length
   const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCTS_PER_PAGE))
@@ -383,12 +407,7 @@ function IndexPage() {
           </>
         ) : (
           <div className="py-10">
-            <NotFound
-              title="No products match your filters"
-              description="Try adjusting or clearing your filters to explore more devices."
-              actionLabel="Reset filters"
-              onAction={handleResetFilters}
-            />
+            <NotFound onAction={handleResetFilters} />
           </div>
         )}
       </div>
