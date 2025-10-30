@@ -207,6 +207,38 @@ export default function DeliveryDetailsForm({
                       )}
                     />
 
+                    <FormField
+                      control={form.control}
+                      name="region"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
+                            Region
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <div className="relative">
+                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
+                                <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
+                                  <SelectValue placeholder="Enter your region" />
+                                </SelectTrigger>
+                              </div>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="nairobi">Nairobi</SelectItem>
+                              <SelectItem value="kisumu">Kisumu</SelectItem>
+                              <SelectItem value="coast">Coast</SelectItem>
+                              <SelectItem value="eastern">Eastern</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <div className="hidden md:block"></div>
                   </div>
 
@@ -222,7 +254,7 @@ export default function DeliveryDetailsForm({
                           <FormControl>
                             <Textarea
                               placeholder="Enter delivery address"
-                              className="min-h-[44px] md:h-11 border-gray-300 bg-gray-50 resize-none"
+                              className=" md:h-11 border-gray-300 bg-gray-50 resize-none"
                               {...field}
                             />
                           </FormControl>

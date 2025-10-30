@@ -266,6 +266,6 @@ export default function CheckoutPage() {
   )
 }
 
-export const Route = createFileRoute('/_protected/checkout/')({
+export const Route = createFileRoute('/checkout/')({
   component: CheckoutPage,
 })

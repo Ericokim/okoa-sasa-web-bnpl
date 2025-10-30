@@ -7,8 +7,11 @@ import { ProductCard } from '@/components/shared/Products/ProductCard'
 import { PaginationComponent } from '@/components/shared/PaginationComponent'
 import NotFound from '@/container/NotFound'
 import { productCatalog } from '@/data/products'
+import { useStateContext } from '@/context/state-context'
+
 
 const PRODUCT_CATALOG = productCatalog
+
 const PRODUCTS_PER_PAGE = 8
 const DEFAULT_SORT = 'price-low-high'
 const SORT_OPTIONS = new Set([
@@ -27,6 +30,7 @@ const FILTER_CATEGORIES = [
 ]
 
 const parseNumber = (value) => {
+  
   if (value === null || value === undefined) return undefined
   const num = Number(value)
   return Number.isFinite(num) ? num : undefined
@@ -34,7 +38,7 @@ const parseNumber = (value) => {
 
 const parseListParam = (value, allowedValues = []) => {
   if (typeof value !== 'string' || value.length === 0) return []
-  const parts = value
+  const parts = value 
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean)
@@ -91,12 +95,14 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
+  const { products } = useStateContext()
+  
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showLoanCalculator, setShowLoanCalculator] = useState(false)
   const filterOptions = useMemo(() => {
-    if (PRODUCT_CATALOG.length === 0) {
+    if (products.length === 0) {
       return {
         price: { min: 0, max: 0 },
         brand: [],
@@ -108,13 +114,13 @@ function IndexPage() {
       }
     }
 
-    const priceValues = PRODUCT_CATALOG.map((product) => product.price)
+    const priceValues = products.map((product) => product.price)
     const minPrice = Math.min(...priceValues)
     const maxPrice = Math.max(...priceValues)
 
     const uniqueForKey = (key) =>
       Array.from(
-        new Set(PRODUCT_CATALOG.map((product) => product[key]).filter(Boolean)),
+        new Set(products.map((product) => product[key]).filter(Boolean)),
       )
 
     return {
@@ -189,7 +195,7 @@ function IndexPage() {
       return !selections?.length || selections.includes(value)
     }
 
-    const filtered = PRODUCT_CATALOG.filter((product) => {
+    const filtered = products.filter((product) => {
       const withinPrice = product.price >= minPrice && product.price <= maxPrice
 
       return (
