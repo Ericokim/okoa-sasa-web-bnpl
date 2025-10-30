@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
 
 export const useAccountStore = create((set) => ({
   personalInfo: {
@@ -7,12 +7,17 @@ export const useAccountStore = create((set) => ({
     email: 'JamesTaylor@gmail.com',
     phone: '+023 456 789',
     role: 'Employer',
+    ID: 'JT987654321',
     location: 'London, United Kingdom',
+    company: 'Okoa Sasa Ltd',
+    employeeId: 'OS12345',
+    avatar: null, // <-- NEW: profile photo URL
   },
   addresses: [
     {
       type: 'office',
-      street: 'Okoa Sasa Headquarters Jubilee House, 4th Floor Waiyaki Way, West Lands, Nairobi, Kenya',
+      street:
+        'Okoa Sasa Headquarters Jubilee House, 4th Floor Waiyaki Way, West Lands, Nairobi, Kenya',
       city: 'Nairobi',
       state: 'Nairobi',
       zip: '00100',
@@ -32,16 +37,27 @@ export const useAccountStore = create((set) => ({
     promotions: false,
     systemUpdates: true,
   },
+
   updatePersonalInfo: (info) =>
     set((state) => ({
       personalInfo: { ...state.personalInfo, ...info },
     })),
+
+  updateAvatar: (url) =>
+    set((state) => ({
+      personalInfo: {
+        ...state.personalInfo,
+        avatar: url,
+      },
+    })),
+
   updateAddress: (type, address) =>
     set((state) => ({
       addresses: state.addresses.map((addr) =>
-        addr.type === type ? { ...addr, ...address } : addr
+        addr.type === type ? { ...addr, ...address } : addr,
       ),
     })),
+
   toggleNotification: (key) =>
     set((state) => ({
       notifications: {
@@ -49,4 +65,4 @@ export const useAccountStore = create((set) => ({
         [key]: !state.notifications[key],
       },
     })),
-}));
+}))

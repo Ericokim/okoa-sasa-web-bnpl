@@ -23,6 +23,8 @@ const PATH_LABELS = {
   '/loans/faq': 'Loan FAQ',
   '/account': 'My Account',
   '/account/orders': 'Orders',
+  '/account/order_table': 'All Orders',
+
   '/account/settings': 'Settings',
   '/support': 'Support',
 }
@@ -145,9 +147,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
                         onClick={() => handleNavigate(crumb)}
                         className="inline-flex items-center gap-2 px-3 py-1.5 text-base font-normal capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:rounded-2xl hover:text-brand-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start"
                       >
-                        {Icon && (
-                          <Icon className="size-6" aria-hidden="true" />
-                        )}
+                        {Icon && <Icon className="size-6" aria-hidden="true" />}
                         <span className="truncate">{crumb.label}</span>
                       </button>
                     </BreadcrumbLink>

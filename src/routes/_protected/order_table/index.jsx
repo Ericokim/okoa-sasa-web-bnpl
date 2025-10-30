@@ -1,5 +1,3 @@
-import { createFileRoute } from '@tanstack/react-router'
-
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,56 +10,11 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
-import { Clock, XCircle, AlertCircle, Trash2 } from 'lucide-react'
-import { TrashIcon } from '@/assets/icons'
+import { Clock, XCircle, AlertCircle, Calendar, Package, DollarSign } from 'lucide-react'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
 function OrdersTableHistory() {
-  const recentOrders = [
-    {
-      id: '1',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'In Progress',
-      statusColor: 'blue',
-      image: '/phone.png',
-    },
-    {
-      id: '2',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Rejected',
-      statusColor: 'red',
-      image: '/phone.png',
-    },
-    {
-      id: '3',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Pending Request',
-      statusColor: 'yellow',
-      image: '/phone.png',
-    },
-    {
-      id: '4',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Pending Request',
-      statusColor: 'yellow',
-      image: '/phone.png',
-    },
-  ]
-
   const orderHistory = [
     {
       orderId: '#REQ-20458',
@@ -106,37 +59,19 @@ function OrdersTableHistory() {
     { label: 'My Order History', path: `/orderHistory`, isCurrent: true },
   ]
 
-  const getStatusIcon = (status) => {
+  const getStatusBadgeClasses = (status) => {
     switch (status) {
-      case 'In Progress':
-        return <Clock className="w-3 h-3" />
-      case 'Rejected':
-        return <XCircle className="w-3 h-3" />
-      case 'Pending Request':
-        return <AlertCircle className="w-3 h-3" />
-      default:
-        return null
-    }
-  }
-
-  const getStatusClasses = (color) => {
-    switch (color) {
-      case 'blue':
-        return 'bg-blue-100 text-blue-700 border border-blue-200'
-      case 'red':
-        return 'bg-red-100 text-red-700 border border-red-200'
-      case 'yellow':
-        return 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+      case 'Fulfilled':
+        return 'bg-green-100 text-green-800'
+      case 'Approved':
+        return 'bg-blue-100 text-blue-800'
+      case 'Declined':
+        return 'bg-red-100 text-red-800'
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800'
       default:
         return ''
     }
-  }
-
-  const getGradient = (color) => {
-    const map = {
-      orange: 'from-orange-500 to-amber-500',
-    }
-    return map[color] || map.orange
   }
 
   return (
@@ -148,7 +83,8 @@ function OrdersTableHistory() {
         </h1>
         <p className="text-gray-600 mb-8">Overview of all of your activities</p>
 
-        <Card className="shadow-none mt-10">
+        {/* Desktop Table View - Hidden on mobile */}
+        <Card className="shadow-none mt-10 hidden md:block">
           <CardHeader>
             <CardTitle className="font-medium text-2xl">
               Order History
@@ -171,9 +107,9 @@ function OrdersTableHistory() {
                 {orderHistory.map((order, idx) => (
                   <TableRow
                     key={idx}
-                    className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''} // Even rows get gray bg
+                    className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
                   >
-                    <TableCell className=" text-[15px] text-[#252525] font-sans">
+                    <TableCell className="text-[15px] text-[#252525] font-sans">
                       {order.orderId}
                     </TableCell>
                     <TableCell className="text-[15px] text-[#252525] font-sans">
@@ -187,22 +123,8 @@ function OrdersTableHistory() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={
-                          order.status === 'Fulfilled'
-                            ? 'default'
-                            : order.statusVariant
-                        }
-                        className={
-                          order.status === 'Fulfilled'
-                            ? 'bg-green-100 text-green-800'
-                            : order.status === 'Approved'
-                              ? 'bg-blue-100 text-blue-800'
-                              : order.status === 'Declined'
-                                ? 'bg-red-100 text-red-800'
-                                : order.status === 'Pending'
-                                  ? 'bg-yellow-100 text-yellow-800'
-                                  : ''
-                        }
+                        variant={order.statusVariant}
+                        className={getStatusBadgeClasses(order.status)}
                       >
                         {order.status}
                       </Badge>
@@ -222,6 +144,66 @@ function OrdersTableHistory() {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Mobile Card View - Visible only on small screens */}
+        <div className="md:hidden space-y-4 mt-6">
+          <h2 className="font-medium text-xl text-gray-900 mb-4">Order History</h2>
+          {orderHistory.map((order, idx) => (
+            <Card key={idx} className="shadow-none">
+              <CardContent className="p-4">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="font-semibold text-lg text-gray-900">
+                      {order.orderId}
+                    </p>
+                    <div className="flex items-center text-sm text-gray-600 mt-1">
+                      <Calendar className="w-4 h-4 mr-1" />
+                      {order.createdDate}
+                    </div>
+                  </div>
+                  <Badge
+                    variant={order.statusVariant}
+                    className={getStatusBadgeClasses(order.status)}
+                  >
+                    {order.status}
+                  </Badge>
+                </div>
+
+                <Separator className="my-3" />
+
+                <div className="space-y-2">
+                  <div className="flex items-start">
+                    <Package className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
+                    <div>
+                      <p className="text-xs text-gray-500">Device</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {order.device}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
+                    <div>
+                      <p className="text-xs text-gray-500">Loan Amount</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {order.loanAmount.toLocaleString()} KES
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="text-orange-600 text-sm font-medium underline underline-offset-2 hover:text-orange-700 hover:underline cursor-pointer p-0 mt-3 h-auto"
+                >
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </main>
     </div>
   )
@@ -230,3 +212,7 @@ function OrdersTableHistory() {
 export const Route = createFileRoute('/_protected/order_table/')({
   component: OrdersTableHistory,
 })
+
+
+
+
