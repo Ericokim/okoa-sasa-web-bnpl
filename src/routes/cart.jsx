@@ -11,58 +11,20 @@ import { Link } from '@tanstack/react-router'
 
 function CartPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useStateContext()
+  const { isAuthenticated, products } = useStateContext()
   const [showAuthDialog, setShowAuthDialog] = React.useState(false)
 
-  const productImages = Array(4).fill('/phone.png')
+  // console.log("dataaa",products.filter(p => p.inCart === true))
 
-  const initialCartItems = [
-    {
-      id: 1,
-      title: 'iPhone 14',
-      description:
-        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
-      price: 87696,
-      quantity: 1,
-      image:
-        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
-    },
-    {
-      id: 2,
-      title: 'iPhone 14',
-      description:
-        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
-      price: 87696,
-      quantity: 1,
-      image:
-        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
-    },
-    {
-      id: 3,
-      title: 'iPhone 14',
-      description:
-        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
-      price: 87696,
-      quantity: 1,
-      image:
-        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
-    },
-    {
-      id: 4,
-      title: 'iPhone 14',
-      description:
-        'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM-Midnight + free(Cover + Screen Protector',
-      price: 87696,
-      quantity: 1,
-      image:
-        'https://api.builder.io/api/v1/image/assets/TEMP/ba62717ea27b54a9f3d68b5571d4ff38ea4aaaa6?width=192',
-    },
-  ]
+  const productData = products.filter((p) => p.inCart === true)
+
+  const initialCartItems = productData
+
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      setShowAuthDialog(true)
-      return
-    }
+    // if (!isAuthenticated) {
+    //   setShowAuthDialog(true)
+    //   return
+    // }
     navigate({ to: '/checkout' })
   }
 
@@ -105,6 +67,7 @@ function CartPage() {
       image: '/phone.png',
     },
   ])
+
 
   const updateQuantity = (id, change) => {
     setCartItems((items) =>

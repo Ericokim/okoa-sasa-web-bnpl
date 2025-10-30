@@ -19,6 +19,7 @@ import {
   SuccessAlertDialog,
 } from '../Dialog'
 import { AlertIcon, SuccessIcon } from '@/assets/icons'
+import { Slider } from '@/components/ui/slider'
 
 const loanLimitSchema = z.object({
   basicPay: z.string().min(1, 'Basic pay is required'),
@@ -36,6 +37,7 @@ export default function CheckLoanLimitPage({
   const [fileName, setFileName] = useState('')
   const [minMonths, setMinMonths] = useState(6)
   const [maxMonths, setMaxMonths] = useState(13)
+    const [months, setMonths] = useState([13])
 
   const [open, setOpen] = useState(false)
   const [errorDialogOpen, setErrorDialogOpen] = useState(false)
@@ -133,69 +135,27 @@ export default function CheckLoanLimitPage({
             <div className="flex justify-center h-[38px] mb-4 sm:mb-0">
               <div className="flex flex-row justify-center items-center px-3.5 py-2.5 gap-2.5 mx-auto w-[104px] h-[38px] border border-[#F47120] rounded-full">
                 <p className="text-sm font-normal text-center text-[#333333]">
-                  {maxMonths} Months
+                  {months} Months
                 </p>
               </div>
             </div>
 
             {/* Slider section */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-4">
-              {/* Min label */}
-              <span className="text-sm font-normal text-[#333333] order-2 sm:order-1">
-                Min 06
+           <div className="flex items-center justify-center mt-2 gap-2.5">
+              <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
+                Min 6
               </span>
-
-              {/* Slider container */}
-              <div className="relative w-full sm:w-[307px] h-5 flex items-center order-1 sm:order-2">
-                {/* Background track */}
-                <div className="absolute w-full h-2 bg-gray-200 rounded-full"></div>
-
-                {/* Filled track with gradient between two thumbs */}
-                <div
-                  className="absolute h-2 rounded-full transition-all duration-200"
-                  style={{
-                    left: `${minPercentage}%`,
-                    width: `${maxPercentage - minPercentage}%`,
-                    background:
-                      'linear-gradient(90deg, #F8971D 0%, #EE3124 100%)',
-                  }}
-                ></div>
-
-                {/* Min slider input */}
-                <input
-                  type="range"
-                  min="1"
-                  max="24"
-                  value={minMonths}
-                  onChange={handleMinChange}
-                  className="absolute w-full h-2 opacity-0 cursor-pointer z-10"
+              <div className="relative mt-0.5 w-full max-w-[307px]">
+                <Slider
+                  value={months}
+                  onValueChange={setMonths}
+                  min={6}
+                  max={24}
+                  step={1}
+                  className="w-full **:data-[slot=slider-track]:h-3.5 **:data-[slot=slider-track]:rounded-full **:data-[slot=slider-track]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
                 />
-
-                {/* Max slider input */}
-                <input
-                  type="range"
-                  min="1"
-                  max="24"
-                  value={maxMonths}
-                  onChange={handleMaxChange}
-                  className="absolute w-full h-2 opacity-0 cursor-pointer z-20"
-                />
-
-                {/* Min thumb (left) */}
-                <div
-                  className="absolute w-5 h-5 bg-white border-2 border-[#F47120] rounded-full shadow-lg -mt-1.5 transition-all duration-200 pointer-events-none z-30"
-                  style={{ left: `calc(${minPercentage}% - 10px)` }}
-                ></div>
-
-                {/* Max thumb (right) */}
-                <div
-                  className="absolute w-5 h-5 bg-white border-2 border-[#F47120] rounded-full shadow-lg -mt-1.5 transition-all duration-200 pointer-events-none z-30"
-                  style={{ left: `calc(${maxPercentage}% - 10px)` }}
-                ></div>
               </div>
-
-              {/* Max label */}
-              <span className="text-sm font-normal text-[#333333] order-3">
+              <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
                 Max 24
               </span>
             </div>
