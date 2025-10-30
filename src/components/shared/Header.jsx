@@ -2,10 +2,12 @@ import { Link } from '@tanstack/react-router'
 import { ShoppingCart, Search } from 'lucide-react'
 import { useStateContext } from '@/context/state-context'
 import { UserDropdown } from '@/components/shared/UserDropdown'
+import { HomeCartIcon } from '@/assets/icons'
 
 export function Header() {
-  const { cart } = useStateContext()
+  const { cart,products } = useStateContext()
   const cartItemCount = cart?.length || 0
+  const cartItems = products.filter(p => p.inCart === true).length
 
   return (
     <header className="w-full border-b border-[#E8ECF4] bg-white">
@@ -33,9 +35,19 @@ export function Header() {
         <div className="flex items-center gap-2 md:gap-3 lg:gap-5">
           <Link
             to="/cart"
-            className="flex items-center gap-1 md:gap-1.5"
+            className="flex items-center gap-1 md:gap-1.5 relative"
           >
-            <ShoppingCart className="h-5 w-5 md:h-6 md:w-6" strokeWidth={1.5} />
+            <div className="relative">
+              <HomeCartIcon
+                className="h-6 w-6 md:h-6 md:w-6"
+                strokeWidth={1.5}
+              />
+              {cartItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center">
+                  {cartItems}
+                </span>
+              )}
+            </div>
             <span className="text-sm md:text-base leading-[140%]">Cart</span>
           </Link>
 
