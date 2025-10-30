@@ -24,9 +24,9 @@ export function Header() {
         <div className="hidden flex-1 items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 md:mx-6 lg:mx-8 lg:flex lg:max-w-[690px] lg:px-4 lg:py-3">
           <Search className="h-6 w-6 text-[#A0A4AC]" />
           <input
-            type="text"
+            type="search"
             placeholder="Search for Devices"
-            className="flex-1 bg-transparent text-sm text-[#A0A4AC] placeholder:text-[#A0A4AC] outline-none"
+            className="flex-1 bg-transparent text-sm text-[#111111] placeholder:text-[#95979b] outline-none"
           />
         </div>
 

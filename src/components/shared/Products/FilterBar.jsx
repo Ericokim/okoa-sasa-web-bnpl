@@ -1,14 +1,29 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Slider } from '@/components/ui/slider'
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link } from '@tanstack/react-router'
+
+const SORT_OPTIONS = [
+  { value: 'price-low-high', label: 'Price: Low to High' },
+  { value: 'price-high-low', label: 'Price: High to Low' },
+  { value: 'name-ascending', label: 'Name Ascending' },
+  { value: 'name-descending', label: 'Name Descending' },
+]
+
+const DEFAULT_OPTIONS = {
+  price: { min: 0, max: 200000 },
+  brand: [],
+  color: [],
+  storage: [],
+  camera: [],
+  display: [],
+  ram: [],
+}
+
+const FILTER_CATEGORIES = ['brand', 'color', 'storage', 'camera', 'display', 'ram']
 
 const FilterIcon = () => (
   <svg
@@ -77,7 +92,7 @@ const CheckIcon = () => (
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <g clipPath="url(#clip0_450_10792)">
+    <g clipPath="url(#clip0_filterbar_check)">
       <path
         fillRule="evenodd"
         clipRule="evenodd"
@@ -86,7 +101,7 @@ const CheckIcon = () => (
       />
     </g>
     <defs>
-      <clipPath id="clip0_450_10792">
+      <clipPath id="clip0_filterbar_check">
         <rect width="20" height="20" fill="white" />
       </clipPath>
     </defs>
@@ -172,15 +187,105 @@ const FilterCheckboxItem = ({ label, checked, onChange }) => (
   </button>
 )
 
-export function FilterBar({ className = '', onLoanCalculatorOpen }) {
-  const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
-  const [selectedSort, setSelectedSort] = useState('price-low-high')
-  const [activeFilters, setActiveFilters] = useState({
-    brand: ['Brand'],
-    priceRange: ['Price Range'],
-    deviceType: ['Device Type'],
-  })
+const SelectedFilterChip = ({ label, onRemove }) => (
+  <div className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
+    <span className="text-sm font-normal capitalize text-black md:text-base">
+      {label}
+    </span>
+    <button
+      onClick={onRemove}
+      className="flex items-center justify-center"
+      aria-label={`Remove ${label}`}
+    >
+      <X className="h-5 w-5 text-[#09244B] md:h-6 md:w-6" />
+    </button>
+  </div>
+)
 
+const uniqueList = (items = []) =>
+  Array.from(new Set(items.filter(Boolean))).sort((a, b) =>
+    a.localeCompare(b, undefined, { sensitivity: 'base' }),
+  )
+
+const buildToggleState = (items) =>
+  items.reduce((acc, item) => ({ ...acc, [item]: false }), {})
+
+const buildToggleStateFromSelection = (items, selected = []) =>
+  items.reduce(
+    (acc, item) => ({ ...acc, [item]: selected.includes(item) }),
+    {},
+  )
+
+const areFilterStatesEqual = (a, b, categories) => {
+  if (!a || !b) return false
+  if (a.priceRange[0] !== b.priceRange[0] || a.priceRange[1] !== b.priceRange[1]) {
+    return false
+  }
+  if (a.priceMin !== b.priceMin || a.priceMax !== b.priceMax) {
+    return false
+  }
+  return categories.every((category) => {
+    const aEntries = a[category] ?? {}
+    const bEntries = b[category] ?? {}
+    const keys = new Set([...Object.keys(aEntries), ...Object.keys(bEntries)])
+    for (const key of keys) {
+      if (!!aEntries[key] !== !!bEntries[key]) {
+        return false
+      }
+    }
+    return true
+  })
+}
+
+const buildDefaultFilters = (options) => ({
+  priceRange: [options.price.min, options.price.max],
+  priceMin: `${options.price.min}`,
+  priceMax: `${options.price.max}`,
+  brand: buildToggleState(options.brand),
+  color: buildToggleState(options.color),
+  storage: buildToggleState(options.storage),
+  camera: buildToggleState(options.camera),
+  display: buildToggleState(options.display),
+  ram: buildToggleState(options.ram),
+})
+
+export function FilterBar({
+  className = '',
+  onLoanCalculatorOpen,
+  onFiltersChange,
+  onSortChange,
+  initialSort = 'price-low-high',
+  options = DEFAULT_OPTIONS,
+  selectedFilters,
+  selectedSort,
+}) {
+  const normalizedOptions = useMemo(() => {
+    const priceMin = options?.price?.min ?? DEFAULT_OPTIONS.price.min
+    const priceMaxRaw = options?.price?.max ?? DEFAULT_OPTIONS.price.max
+    const priceMax = priceMaxRaw < priceMin ? priceMin : priceMaxRaw
+
+    return {
+      price: { min: priceMin, max: priceMax },
+      brand: uniqueList(options?.brand ?? DEFAULT_OPTIONS.brand),
+      color: uniqueList(options?.color ?? DEFAULT_OPTIONS.color),
+      storage: uniqueList(options?.storage ?? DEFAULT_OPTIONS.storage),
+      camera: uniqueList(options?.camera ?? DEFAULT_OPTIONS.camera),
+      display: uniqueList(options?.display ?? DEFAULT_OPTIONS.display),
+      ram: uniqueList(options?.ram ?? DEFAULT_OPTIONS.ram),
+    }
+  }, [options])
+
+  const defaultFilters = useMemo(
+    () => buildDefaultFilters(normalizedOptions),
+    [normalizedOptions],
+  )
+
+  const [filters, setFilters] = useState(defaultFilters)
+  const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
+  const validInitialSort = SORT_OPTIONS.some((item) => item.value === initialSort)
+    ? initialSort
+    : SORT_OPTIONS[0].value
+  const [sortSelection, setSortSelection] = useState(validInitialSort)
   const [isFiltersOpen, setIsFiltersOpen] = useState(false)
   const [openSections, setOpenSections] = useState({
     price: true,
@@ -192,36 +297,79 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
     brand: true,
   })
 
-  const [filters, setFilters] = useState({
-    priceRange: [0, 200000],
-    priceMin: '00',
-    priceMax: '00',
-    color: {
-      Green: true,
-      Black: false,
-    },
-    storage: {
-      '128 GB': true,
-      '256 GB': false,
-    },
-    camera: {
-      '50MP': true,
-      '256 GB': false,
-    },
-    display: {
-      '6.3"': true,
-      '6.6': false,
-      '6.7': false,
-    },
-    ram: {
-      '8 GB': true,
-    },
-    brand: {
-      Apple: false,
-      TECNO: false,
-      TCL: false,
-    },
-  })
+  useEffect(() => {
+    const priceMinValue = selectedFilters?.priceRange?.[0] ?? normalizedOptions.price.min
+    const priceMaxValue = selectedFilters?.priceRange?.[1] ?? normalizedOptions.price.max
+    const clampedMin = Math.max(normalizedOptions.price.min, Math.min(priceMinValue, normalizedOptions.price.max))
+    const clampedMax = Math.max(clampedMin, Math.min(priceMaxValue, normalizedOptions.price.max))
+
+    const nextFilters = {
+      priceRange: [clampedMin, clampedMax],
+      priceMin: `${clampedMin}`,
+      priceMax: `${clampedMax}`,
+      brand: buildToggleStateFromSelection(
+        normalizedOptions.brand,
+        selectedFilters?.brand ?? [],
+      ),
+      color: buildToggleStateFromSelection(
+        normalizedOptions.color,
+        selectedFilters?.color ?? [],
+      ),
+      storage: buildToggleStateFromSelection(
+        normalizedOptions.storage,
+        selectedFilters?.storage ?? [],
+      ),
+      camera: buildToggleStateFromSelection(
+        normalizedOptions.camera,
+        selectedFilters?.camera ?? [],
+      ),
+      display: buildToggleStateFromSelection(
+        normalizedOptions.display,
+        selectedFilters?.display ?? [],
+      ),
+      ram: buildToggleStateFromSelection(
+        normalizedOptions.ram,
+        selectedFilters?.ram ?? [],
+      ),
+    }
+
+    setFilters((prev) =>
+      areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES) ? prev : nextFilters,
+    )
+  }, [defaultFilters, selectedFilters, normalizedOptions])
+
+  useEffect(() => {
+    const nextSort =
+      selectedSort && SORT_OPTIONS.some((item) => item.value === selectedSort)
+        ? selectedSort
+        : validInitialSort
+    setSortSelection(nextSort)
+  }, [validInitialSort, selectedSort])
+
+  useEffect(() => {
+    if (!onFiltersChange) return
+
+    const toSelected = (category) =>
+      Object.entries(filters[category] ?? {})
+        .filter(([, isSelected]) => isSelected)
+        .map(([value]) => value)
+
+    onFiltersChange({
+      priceRange: filters.priceRange,
+      brand: toSelected('brand'),
+      color: toSelected('color'),
+      storage: toSelected('storage'),
+      camera: toSelected('camera'),
+      display: toSelected('display'),
+      ram: toSelected('ram'),
+    })
+  }, [filters, onFiltersChange])
+
+  useEffect(() => {
+    if (onSortChange) {
+      onSortChange(sortSelection)
+    }
+  }, [sortSelection, onSortChange])
 
   const toggleSection = (section) => {
     setOpenSections((prev) => ({
@@ -230,44 +378,106 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
     }))
   }
 
-  const removeFilter = (type, value) => {
-    setActiveFilters((prev) => ({
+  const handlePriceRangeChange = (value) => {
+    const [minValue, maxValue] = value
+    setFilters((prev) => ({
       ...prev,
-      [type]: prev[type].filter((item) => item !== value),
+      priceRange: [minValue, maxValue],
+      priceMin: `${minValue}`,
+      priceMax: `${maxValue}`,
     }))
   }
 
-  const clearAllFilters = () => {
-    setFilters({
-      priceRange: [0, 200000],
-      priceMin: '00',
-      priceMax: '00',
-      color: {
-        Green: false,
-        Black: false,
+  const handlePriceInputChange = (field, value) => {
+    const numericValue = value.replace(/[^\d]/g, '')
+    setFilters((prev) => ({
+      ...prev,
+      [field]: numericValue,
+    }))
+  }
+
+  const handleApplyPrice = () => {
+    const minBound = normalizedOptions.price.min
+    const maxBound = normalizedOptions.price.max
+
+    let minValue = parseInt(filters.priceMin || '', 10)
+    let maxValue = parseInt(filters.priceMax || '', 10)
+
+    if (Number.isNaN(minValue)) minValue = filters.priceRange[0]
+    if (Number.isNaN(maxValue)) maxValue = filters.priceRange[1]
+
+    minValue = Math.max(minBound, Math.min(minValue, maxBound))
+    maxValue = Math.max(minBound, Math.min(maxValue, maxBound))
+
+    if (minValue > maxValue) {
+      ;[minValue, maxValue] = [maxValue, minValue]
+    }
+
+    setFilters((prev) => ({
+      ...prev,
+      priceRange: [minValue, maxValue],
+      priceMin: `${minValue}`,
+      priceMax: `${maxValue}`,
+    }))
+  }
+
+  const handleCheckboxToggle = (category, value, checked) => {
+    setFilters((prev) => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [value]: checked,
       },
-      storage: {
-        '128 GB': false,
-        '256 GB': false,
+    }))
+  }
+
+  const handleClearAll = () => {
+    setFilters(defaultFilters)
+  }
+
+  const activeFilterChips = useMemo(() => {
+    const chips = []
+    const [minPrice, maxPrice] = filters.priceRange
+
+    if (
+      minPrice > normalizedOptions.price.min ||
+      maxPrice < normalizedOptions.price.max
+    ) {
+      chips.push({
+        category: 'price',
+        label: `KES ${minPrice.toLocaleString()} - KES ${maxPrice.toLocaleString()}`,
+      })
+    }
+
+    ;['brand', 'color', 'storage', 'camera', 'display', 'ram'].forEach(
+      (category) => {
+        Object.entries(filters[category] ?? {}).forEach(([value, isSelected]) => {
+          if (isSelected) {
+            chips.push({
+              category,
+              value,
+              label: value,
+            })
+          }
+        })
       },
-      camera: {
-        '50MP': false,
-        '256 GB': false,
-      },
-      display: {
-        '6.3"': false,
-        '6.6': false,
-        '6.7': false,
-      },
-      ram: {
-        '8 GB': false,
-      },
-      brand: {
-        Apple: false,
-        TECNO: false,
-        TCL: false,
-      },
-    })
+    )
+
+    return chips
+  }, [filters, normalizedOptions.price.max, normalizedOptions.price.min])
+
+  const handleRemoveChip = (chip) => {
+    if (chip.category === 'price') {
+      setFilters((prev) => ({
+        ...prev,
+        priceRange: [normalizedOptions.price.min, normalizedOptions.price.max],
+        priceMin: `${normalizedOptions.price.min}`,
+        priceMax: `${normalizedOptions.price.max}`,
+      }))
+      return
+    }
+
+    handleCheckboxToggle(chip.category, chip.value, false)
   }
 
   return (
@@ -275,55 +485,12 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
       className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}
     >
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
-        {activeFilters.brand.map((brand) => (
-          <div
-            key={brand}
-            className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2"
-          >
-            <span className="text-sm font-normal capitalize text-black md:text-base">
-              {brand}
-            </span>
-            <button
-              onClick={() => removeFilter('brand', brand)}
-              className="flex items-center justify-center"
-            >
-              <X className="h-5 w-5 text-[#09244B] md:h-6 md:w-6" />
-            </button>
-          </div>
-        ))}
-
-        {activeFilters.priceRange.map((range) => (
-          <div
-            key={range}
-            className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2"
-          >
-            <span className="text-sm font-normal capitalize text-black md:text-base">
-              {range}
-            </span>
-            <button
-              onClick={() => removeFilter('priceRange', range)}
-              className="flex items-center justify-center"
-            >
-              <X className="h-5 w-5 text-[#09244B] md:h-6 md:w-6" />
-            </button>
-          </div>
-        ))}
-
-        {activeFilters.deviceType.map((device) => (
-          <div
-            key={device}
-            className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2"
-          >
-            <span className="text-sm font-normal capitalize text-black md:text-base">
-              {device}
-            </span>
-            <button
-              onClick={() => removeFilter('deviceType', device)}
-              className="flex items-center justify-center"
-            >
-              <X className="h-5 w-5 text-[#09244B] md:h-6 md:w-6" />
-            </button>
-          </div>
+        {activeFilterChips.map((chip) => (
+          <SelectedFilterChip
+            key={`${chip.category}-${chip.label}`}
+            label={chip.label}
+            onRemove={() => handleRemoveChip(chip)}
+          />
         ))}
 
         <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
@@ -337,286 +504,209 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
           </PopoverTrigger>
           <PopoverContent
             align="start"
-            className="w-[280px] overflow-y-auto rounded-2xl border-none bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)] max-h-[90vh]"
+            className="w-[300px] rounded-2xl border-none bg-white p-0 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
           >
-            <div className="flex flex-col items-start justify-center gap-4">
-              <div className="flex items-center justify-between self-stretch">
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between px-4 pt-4 pb-3">
                 <span className="font-['Public_Sans'] text-base font-medium leading-[140%] text-black">
                   Filters
                 </span>
                 <button
-                  onClick={clearAllFilters}
+                  onClick={handleClearAll}
                   className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-[#F25E5E]"
                 >
                   Clear
                 </button>
               </div>
-
-              <FilterSection
-                title="Price"
-                isOpen={openSections.price}
-                onToggle={() => toggleSection('price')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <div className="relative h-4 self-stretch">
-                    <div className="absolute left-0 top-1 h-2 w-full rounded-lg bg-[#F9FAFB]"></div>
-                    <div
-                      className="absolute left-0 top-1 h-2 rounded-lg bg-[#F47120]"
-                      style={{
-                        width: `${((filters.priceRange[1] - filters.priceRange[0]) / 200000) * 100}%`,
-                      }}
-                    ></div>
-                    <div className="absolute left-0 top-0 h-4 w-4 rounded-full border border-[#E8ECF4] bg-white"></div>
-                    <div
-                      className="absolute top-0 h-4 w-4 rounded-full border border-[#E8ECF4] bg-white"
-                      style={{
-                        left: `${((filters.priceRange[1] - filters.priceRange[0]) / 200000) * 100}%`,
-                      }}
-                    ></div>
-                  </div>
-                  <div className="flex items-start gap-2 self-stretch">
-                    <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
-                      <input
-                        type="text"
-                        value={filters.priceMin}
-                        onChange={(e) =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            priceMin: e.target.value,
-                          }))
-                        }
-                        className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
-                        placeholder="00"
+              <ScrollArea className="h-[60vh] w-full">
+                <div className="flex flex-col gap-4 px-4 pb-4">
+                  <FilterSection
+                    title="Price"
+                    isOpen={openSections.price}
+                    onToggle={() => toggleSection('price')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      <Slider
+                        value={filters.priceRange}
+                        min={normalizedOptions.price.min}
+                        max={normalizedOptions.price.max}
+                        step={1000}
+                        onValueChange={handlePriceRangeChange}
+                        className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
                       />
+
+                      <div className="flex items-start gap-2 self-stretch">
+                        <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                          <input
+                            type="text"
+                            value={filters.priceMin}
+                            onChange={(event) =>
+                              handlePriceInputChange('priceMin', event.target.value)
+                            }
+                            className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                            placeholder="Min"
+                          />
+                        </div>
+                        <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                          <input
+                            type="text"
+                            value={filters.priceMax}
+                            onChange={(event) =>
+                              handlePriceInputChange('priceMax', event.target.value)
+                            }
+                            className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                            placeholder="Max"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={handleApplyPrice}
+                        className="flex items-center justify-center gap-2 self-stretch rounded-3xl bg-[#F47120] px-4 py-2"
+                      >
+                        <span className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-white">
+                          Apply
+                        </span>
+                      </button>
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                    <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
-                      <input
-                        type="text"
-                        value={filters.priceMax}
-                        onChange={(e) =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            priceMax: e.target.value,
-                          }))
-                        }
-                        className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
-                        placeholder="00"
-                      />
+                  </FilterSection>
+
+                  <FilterSection
+                    title="Color"
+                    isOpen={openSections.color}
+                    onToggle={() => toggleSection('color')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.color.map((color) => (
+                        <FilterCheckboxItem
+                          key={color}
+                          label={color}
+                          checked={filters.color[color]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('color', color, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </div>
-                  <button className="flex items-center justify-center gap-2 self-stretch rounded-3xl bg-[#F47120] px-4 py-2">
-                    <span className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-white">
-                      Apply
-                    </span>
-                  </button>
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                  </FilterSection>
 
-              <FilterSection
-                title="Color"
-                isOpen={openSections.color}
-                onToggle={() => toggleSection('color')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label="Green"
-                    checked={filters.color.Green}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        color: { ...prev.color, Green: checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="Black"
-                    checked={filters.color.Black}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        color: { ...prev.color, Black: checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                  <FilterSection
+                    title="Storage Capacity"
+                    isOpen={openSections.storage}
+                    onToggle={() => toggleSection('storage')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.storage.map((storage) => (
+                        <FilterCheckboxItem
+                          key={storage}
+                          label={storage}
+                          checked={filters.storage[storage]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('storage', storage, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-              <FilterSection
-                title="Storage Capacity"
-                isOpen={openSections.storage}
-                onToggle={() => toggleSection('storage')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label="128 GB"
-                    checked={filters.storage['128 GB']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        storage: { ...prev.storage, '128 GB': checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="256 GB"
-                    checked={filters.storage['256 GB']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        storage: { ...prev.storage, '256 GB': checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                  <FilterSection
+                    title="Camera Megapixel"
+                    isOpen={openSections.camera}
+                    onToggle={() => toggleSection('camera')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.camera.map((camera) => (
+                        <FilterCheckboxItem
+                          key={camera}
+                          label={camera}
+                          checked={filters.camera[camera]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('camera', camera, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-              <FilterSection
-                title="Camera Megapixel"
-                isOpen={openSections.camera}
-                onToggle={() => toggleSection('camera')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label="50MP"
-                    checked={filters.camera['50MP']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        camera: { ...prev.camera, '50MP': checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="256 GB"
-                    checked={filters.camera['256 GB']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        camera: { ...prev.camera, '256 GB': checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                  <FilterSection
+                    title="Display Size"
+                    isOpen={openSections.display}
+                    onToggle={() => toggleSection('display')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.display.map((display) => (
+                        <FilterCheckboxItem
+                          key={display}
+                          label={display}
+                          checked={filters.display[display]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('display', display, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-              <FilterSection
-                title="Display Size"
-                isOpen={openSections.display}
-                onToggle={() => toggleSection('display')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label='6.3"'
-                    checked={filters.display['6.3"']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        display: { ...prev.display, '6.3"': checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="6.6"
-                    checked={filters.display['6.6']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        display: { ...prev.display, '6.6': checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="6.7"
-                    checked={filters.display['6.7']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        display: { ...prev.display, '6.7': checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                  <FilterSection
+                    title="RAM"
+                    isOpen={openSections.ram}
+                    onToggle={() => toggleSection('ram')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.ram.map((ram) => (
+                        <FilterCheckboxItem
+                          key={ram}
+                          label={ram}
+                          checked={filters.ram[ram]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('ram', ram, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-              <FilterSection
-                title="RAM"
-                isOpen={openSections.ram}
-                onToggle={() => toggleSection('ram')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label="8 GB"
-                    checked={filters.ram['8 GB']}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        ram: { ...prev.ram, '8 GB': checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
+                  <FilterSection
+                    title="Brand"
+                    isOpen={openSections.brand}
+                    onToggle={() => toggleSection('brand')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      {normalizedOptions.brand.map((brand) => (
+                        <FilterCheckboxItem
+                          key={brand}
+                          label={brand}
+                          checked={filters.brand[brand]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('brand', brand, checked)
+                          }
+                        />
+                      ))}
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
                 </div>
-              </FilterSection>
-
-              <FilterSection
-                title="Brand"
-                isOpen={openSections.brand}
-                onToggle={() => toggleSection('brand')}
-              >
-                <div className="flex flex-col items-start gap-3 self-stretch">
-                  <FilterCheckboxItem
-                    label="Apple"
-                    checked={filters.brand.Apple}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        brand: { ...prev.brand, Apple: checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="TECNO"
-                    checked={filters.brand.TECNO}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        brand: { ...prev.brand, TECNO: checked },
-                      }))
-                    }
-                  />
-                  <FilterCheckboxItem
-                    label="TCL"
-                    checked={filters.brand.TCL}
-                    onChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        brand: { ...prev.brand, TCL: checked },
-                      }))
-                    }
-                  />
-                  <div className="h-px self-stretch bg-[#E8ECF4]"></div>
-                </div>
-              </FilterSection>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
             </div>
           </PopoverContent>
         </Popover>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
-         <Link
-                to="/FAQs"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
-              >
-        <button className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 md:px-4 md:py-2">
+        <Link
+          to="/FAQs"
+          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 transition-opacity hover:opacity-90 md:px-4 md:py-2"
+        >
           <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
             How it works
           </span>
-        </button>
         </Link>
 
         <Popover>
@@ -649,56 +739,40 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
             className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
           >
             <div className="flex flex-col gap-2">
-              <button
-                onClick={() => {
-                  onLoanCalculatorOpen()
-                  setSelectedPaymentType('basic')
-                }}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'basic'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'basic'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
+              {[
+                { value: 'basic', label: 'Basic Pay' },
+                { value: 'net', label: 'Net Pay' },
+              ].map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    onLoanCalculatorOpen?.()
+                    setSelectedPaymentType(option.value)
+                  }}
+                  className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
+                    selectedPaymentType === option.value
+                      ? 'bg-[rgba(244,113,32,0.12)]'
+                      : ''
                   }`}
                 >
-                  Basic Pay
-                </span>
-                {selectedPaymentType === 'basic' && <CheckIcon />}
-              </button>
-              <button
-                onClick={() => {
-                  onLoanCalculatorOpen()
-                  setSelectedPaymentType('net')
-                }}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedPaymentType === 'net'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                    selectedPaymentType === 'net'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Net Pay
-                </span>
-                {selectedPaymentType === 'net' && <CheckIcon />}
-              </button>
+                  <span
+                    className={`flex-1 text-left text-sm font-medium leading-[140%] ${
+                      selectedPaymentType === option.value
+                        ? 'text-[#F47120]'
+                        : 'text-[#252525]'
+                    }`}
+                  >
+                    {option.label}
+                  </span>
+                  {selectedPaymentType === option.value && <CheckIcon />}
+                </button>
+              ))}
             </div>
           </PopoverContent>
         </Popover>
 
-        <Popover>
-          <PopoverTrigger asChild>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
               <span className="text-sm font-normal capitalize text-black md:text-base">
                 Sort By
@@ -721,91 +795,30 @@ export function FilterBar({ className = '', onLoanCalculatorOpen }) {
                 />
               </svg>
             </button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-[210px] border-none bg-white p-2 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
           >
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => setSelectedSort('price-low-high')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedSort === 'price-low-high'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
-                    selectedSort === 'price-low-high'
-                      ? 'text-[#F47120]'
+            {SORT_OPTIONS.map((option) => {
+              const isActive = sortSelection === option.value
+              return (
+                <DropdownMenuItem
+                  key={option.value}
+                  onSelect={() => setSortSelection(option.value)}
+                  className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 text-sm font-normal leading-[140%] ${
+                    isActive
+                      ? 'bg-[rgba(244,113,32,0.12)] text-[#F47120]'
                       : 'text-[#252525]'
                   }`}
                 >
-                  Price: Low to High
-                </span>
-                {selectedSort === 'price-low-high' && <CheckIcon />}
-              </button>
-              <button
-                onClick={() => setSelectedSort('price-high-low')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedSort === 'price-high-low'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
-                    selectedSort === 'price-high-low'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Price: High to Low
-                </span>
-                {selectedSort === 'price-high-low' && <CheckIcon />}
-              </button>
-              <button
-                onClick={() => setSelectedSort('name-ascending')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedSort === 'name-ascending'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
-                    selectedSort === 'name-ascending'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Name Ascending
-                </span>
-                {selectedSort === 'name-ascending' && <CheckIcon />}
-              </button>
-              <button
-                onClick={() => setSelectedSort('name-descending')}
-                className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                  selectedSort === 'name-descending'
-                    ? 'bg-[rgba(244,113,32,0.12)]'
-                    : ''
-                }`}
-              >
-                <span
-                  className={`flex-1 text-left text-sm font-normal leading-[140%] ${
-                    selectedSort === 'name-descending'
-                      ? 'text-[#F47120]'
-                      : 'text-[#252525]'
-                  }`}
-                >
-                  Name Descending
-                </span>
-                {selectedSort === 'name-descending' && <CheckIcon />}
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
+                  <span>{option.label}</span>
+                  {isActive && <CheckIcon />}
+                </DropdownMenuItem>
+              )
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </div>
   )
