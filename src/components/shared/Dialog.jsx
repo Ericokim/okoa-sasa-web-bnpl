@@ -475,11 +475,6 @@ export const SuccessAlertDialog = ({
             <span className="text-green-600 font-semibold">{loanAmount}</span>,
             payable within {paybackPeriod}.
           </p>
-
-          <p className="text-gray-600 text-sm leading-relaxed">
-            Would you like to see devices within your loan limit range (Max.{' '}
-            {maxAmount})?
-          </p>
         </div>
 
         {/* Action Buttons */}
