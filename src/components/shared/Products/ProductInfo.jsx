@@ -13,8 +13,10 @@ import {
   VerifyIcon,
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
+import { useStateContext } from '@/context/state-context'
 
 export function ProductInfo({ product }) {
+  const { addToCart } = useStateContext()
   const [quantity, setQuantity] = useState(1)
   const maxQuantity = 5
 
@@ -24,6 +26,10 @@ export function ProductInfo({ product }) {
 
   const handleIncrease = () => {
     if (quantity < maxQuantity) setQuantity(quantity + 1)
+  }
+
+  const handleAddToCart = () => {
+    addToCart(product?.id)
   }
 
   return (
@@ -116,6 +122,7 @@ export function ProductInfo({ product }) {
       <div className="flex flex-col gap-3">
         {/* Add to Cart Button */}
         <Button
+          onClick={handleAddToCart}
           variant={'outlineGradient'}
           className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl  px-4 py-3 text-base font-medium capitalize leading-[140%]"
           size="lg"

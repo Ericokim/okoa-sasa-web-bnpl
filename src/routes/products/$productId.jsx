@@ -4,12 +4,18 @@ import { ProductInfo } from '@/components/shared/Products/ProductInfo'
 import { SpecificationsTable } from '@/components/shared/Products/SpecificationsTable'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import NotFound from '@/container/NotFound'
-import { findProductById } from '@/data/products'
+// import { findProductById } from '@/data/products'
+import { useStateContext } from '@/context/state-context'
 
 function ProductDetailPage() {
   const { productId } = Route.useParams()
 
+  console.log("prodId",productId)
+
+   const { findProductById  } = useStateContext()
+
   const catalogProduct = findProductById(productId)
+  console.log("data",catalogProduct)
 
   if (!catalogProduct) {
     return (
