@@ -1,4 +1,6 @@
 import { Link } from '@tanstack/react-router'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 export default function NotFound({
   title = 'Ooops! Product not found',
@@ -13,17 +15,22 @@ export default function NotFound({
 
     if (onAction) {
       return (
-        <button
+        <Button
           type="button"
+          variant="gradient"
           onClick={onAction}
-          className={`${buttonClass} ${className}`}
+          className={cn(
+            `${buttonClass} ${className}`,
+            `flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3`,
+            `bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl`,
+            `text-white font-medium text-base leading-[140%] capitalize shadow-sm hover:opacity-90 transition-all font-["Public_Sans"]`,
+          )}
           style={{
             width: isMobile ? '100%' : '344px',
-            background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
           }}
         >
           {actionLabel}
-        </button>
+        </Button>
       )
     }
 

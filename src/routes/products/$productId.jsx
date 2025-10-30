@@ -10,12 +10,9 @@ import { useStateContext } from '@/context/state-context'
 function ProductDetailPage() {
   const { productId } = Route.useParams()
 
-  console.log("prodId",productId)
-
-   const { findProductById  } = useStateContext()
+  const { findProductById } = useStateContext()
 
   const catalogProduct = findProductById(productId)
-  console.log("data",catalogProduct)
 
   if (!catalogProduct) {
     return (
@@ -57,12 +54,15 @@ function ProductDetailPage() {
   ]
 
   return (
-    <div className="w-full">
+    <div className="mx-auto w-full">
       {/* Breadcrumbs - Desktop & Mobile */}
-      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
+      <BreadCrumbs
+        items={breadcrumbItems}
+        className="px-4 pt-4 md:px-0 md:pt-8"
+      />
 
       {/* Product Section - Desktop & Mobile */}
-      <div className="px-0 py-4 md:py-8">
+      <div className="px-4 py-4 md:px-0 md:py-8">
         <div className="flex w-full flex-col gap-5 lg:flex-row lg:gap-8">
           {/* Gallery */}
           <div className="w-full lg:w-[calc(58.33%-16px)]">
@@ -77,7 +77,7 @@ function ProductDetailPage() {
       </div>
 
       {/* Specifications Section - Desktop & Mobile */}
-      <div className="px-0 pb-8 md:pb-12">
+      <div className="px-4 pb-8 md:px-0 md:pb-12">
         <SpecificationsTable specifications={specifications} />
       </div>
     </div>

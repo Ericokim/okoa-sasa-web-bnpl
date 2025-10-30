@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 export default function AccountOptionPage() {
   return (
     <div className="flex items-center justify-center p-4 sm:p-0">
-      <div className="bg-white w-full max-w-[1020px] h-auto sm:h-[207px] rounded-4xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white w-full max-w-[1020px] border h-auto sm:h-[207px] rounded-4xl  p-4 sm:p-6">
         <div className="w-full">
           {/* Header */}
           <div className="h-auto sm:h-16 mb-4 sm:mb-0">
@@ -17,16 +17,16 @@ export default function AccountOptionPage() {
               after purchase
             </p>
           </div>
-          
+
           <div className="w-full h-px bg-[#E8ECF4] my-4 sm:my-6"></div>
-          
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
             <Button
               asChild
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 rounded-3xl text-base font-medium shadow-md"
+              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 rounded-3xl text-base font-medium shadow-md"
             >
-              <Link to="/create-account">Create Account</Link>
+              <Link to="/signin">Create Account / Sign In</Link>
             </Button>
 
             <Button

@@ -87,43 +87,43 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
             step === 'otp' ? 'h-[657px] md:h-auto' : 'h-[569px] md:h-auto',
           )}
         >
-        <div className="relative w-full p-5 md:p-[30px] flex flex-col items-center gap-6">
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
-          >
-            <XIcon className="h-6 w-6 text-[#09244B]" />
-            <span className="sr-only">Close</span>
-          </button>
+          <div className="relative w-full p-5 md:p-[30px] flex flex-col items-center gap-6">
+            <button
+              onClick={() => onOpenChange(false)}
+              className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
+            >
+              <XIcon className="h-6 w-6 text-[#09244B]" />
+              <span className="sr-only">Close</span>
+            </button>
 
-          <div className="flex flex-col items-center gap-4 md:gap-6 w-full">
-            <img
-              src="https://api.builder.io/api/v1/image/assets/TEMP/39a66955168d541edf4a09720ea52bb31a5ef9a7?width=404"
-              alt="Okoa Sasa Logo"
-              className="w-[202px] h-[184px] object-contain"
-            />
+            <div className="flex flex-col items-center gap-4 md:gap-6 w-full">
+              <img
+                src="https://api.builder.io/api/v1/image/assets/TEMP/39a66955168d541edf4a09720ea52bb31a5ef9a7?width=404"
+                alt="Okoa Sasa Logo"
+                className="w-[202px] h-[184px] object-contain"
+              />
 
-            {step === 'login' ? (
-              <LoginStep
-                phoneNumber={phoneNumber}
-                setPhoneNumber={setPhoneNumber}
-                rememberMe={rememberMe}
-                setRememberMe={setRememberMe}
-                handleLogin={handleLogin}
-              />
-            ) : (
-              <OTPStep
-                otp={otp}
-                setOtp={setOtp}
-                maskedPhone={maskedPhone}
-                countdown={countdown}
-                isResending={isResending}
-                handleVerifyOTP={handleVerifyOTP}
-                handleResendOTP={handleResendOTP}
-              />
-            )}
+              {step === 'login' ? (
+                <LoginStep
+                  phoneNumber={phoneNumber}
+                  setPhoneNumber={setPhoneNumber}
+                  rememberMe={rememberMe}
+                  setRememberMe={setRememberMe}
+                  handleLogin={handleLogin}
+                />
+              ) : (
+                <OTPStep
+                  otp={otp}
+                  setOtp={setOtp}
+                  maskedPhone={maskedPhone}
+                  countdown={countdown}
+                  isResending={isResending}
+                  handleVerifyOTP={handleVerifyOTP}
+                  handleResendOTP={handleResendOTP}
+                />
+              )}
+            </div>
           </div>
-        </div>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
@@ -186,16 +186,7 @@ function LoginStep({
           </Label>
         </div>
 
-        <Button
-          type="submit"
-          className={cn(
-            'w-full h-auto py-3 px-4 rounded-3xl',
-            'bg-gradient-to-b from-[#F8971D] to-[#EE3124]',
-            'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
-            'hover:opacity-90 transition-opacity',
-            'border border-transparent',
-          )}
-        >
+        <Button size="lg" type="submit" variant="gradient">
           Login
         </Button>
       </form>
@@ -238,15 +229,16 @@ function OTPStep({
             onChange={(value) => setOtp(value)}
             className="w-full"
           >
-            <InputOTPGroup className="w-full gap-1.5 md:gap-[9px]">
+            <InputOTPGroup className="w-full justify-center gap-[9px]">
               {[0, 1, 2, 3, 4, 5].map((index) => (
                 <InputOTPSlot
                   key={index}
                   index={index}
                   className={cn(
-                    'flex-1 md:w-[65px] h-[35px] md:h-[50px] rounded-lg md:rounded-xl border border-gray-300 bg-[#F9FAFB]',
-                    'text-[#6d6d6d] text-[11px] md:text-base font-medium text-center font-["Public_Sans"]',
-                    'focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20',
+                    'flex h-[50px] w-[65px] items-center justify-center rounded-[12px]',
+                    'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                    'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#A0A4AC]',
+                    'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
                   )}
                 />
               ))}
@@ -259,16 +251,10 @@ function OTPStep({
         </div>
 
         <Button
+          size="lg"
           type="submit"
+          variant="gradient"
           disabled={otp.length !== 6}
-          className={cn(
-            'w-full h-auto py-3 px-4 rounded-3xl',
-            'bg-gradient-to-b from-[#F8971D] to-[#EE3124]',
-            'text-white text-base font-medium leading-[140%] capitalize font-["Public_Sans"]',
-            'hover:opacity-90 transition-opacity',
-            'border border-transparent',
-            'disabled:opacity-50',
-          )}
         >
           Login
         </Button>

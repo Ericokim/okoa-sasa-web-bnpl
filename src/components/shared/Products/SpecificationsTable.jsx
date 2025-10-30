@@ -5,7 +5,7 @@ export function SpecificationsTable({ specifications }) {
   return (
     <Tabs
       defaultValue="specifications"
-      className="flex w-full flex-col items-start gap-6 md:max-w-[830px] md:gap-10"
+      className="flex w-full flex-col items-start gap-6 md:max-w-[730px] md:gap-10"
     >
       {/* Tabs Navigation */}
       <TabsList className="flex h-auto w-full items-center gap-0 rounded-none bg-transparent p-0 md:max-w-[630px]">

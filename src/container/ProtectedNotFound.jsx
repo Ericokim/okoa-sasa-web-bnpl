@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export default function ProtectedNotFound() {
   return (
@@ -26,9 +27,13 @@ export default function ProtectedNotFound() {
         <Link to="/" className="w-full lg:w-auto">
           <Button
             variant="gradient"
-            className="w-full rounded-3xl border border-[#F8971D] px-4 py-3 text-base font-medium capitalize leading-[140%] text-white lg:w-[344px]"
+            className={cn(
+              `flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3`,
+              `bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl`,
+              `text-white font-medium text-base leading-[140%] capitalize shadow-sm hover:opacity-90 transition-all font-["Public_Sans"]`,
+            )}
           >
-            Go to home
+            Back to home
           </Button>
         </Link>
       </div>

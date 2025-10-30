@@ -21,7 +21,7 @@ export default function TermsConditionPage({
   return (
     <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
       {/* Main Content Container */}
-      <div className="bg-white w-full max-w-[1020px] h-auto rounded-4xl shadow-sm p-4 sm:p-6">
+      <div className="bg-white w-full border max-w-[1020px] h-auto rounded-4xl p-4 sm:p-6">
         <div className="w-full h-auto">
           {/* Header */}
           <div className="space-y-2 mb-4 sm:mb-0">
@@ -33,7 +33,7 @@ export default function TermsConditionPage({
             </p>
           </div>
 
-          <div className="h-0.5 bg-gray-300 my-4 sm:my-6"></div>
+          <div className="h-px bg-gray-300 my-4 sm:my-6"></div>
 
           {/* Checkbox Section */}
           <div className="mb-6 sm:mb-0">
@@ -87,7 +87,7 @@ export default function TermsConditionPage({
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50"
         >
           <p className="text-base font-medium leading-[1.4] capitalize">
-            Return To Back
+            Back{' '}
           </p>
         </Button>
         <Button

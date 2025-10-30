@@ -21,18 +21,19 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-start gap-4 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
+    <div className="flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
       {/* Table Header - Desktop Only */}
-      <div className="hidden lg:flex lg:items-start lg:gap-4 lg:self-stretch">
-        <div className="w-[401px] text-xl font-semibold capitalize  text-black">
-          Item
-        </div>
-        <div className="w-44 text-xl font-semibold capitalize ml-18 text-black">
+      <div className="hidden w-full lg:grid lg:grid-cols-[401px_176px_1fr_auto] lg:items-start lg:gap-4">
+        <div className="text-[20px] font-semibold leading-[1.4] text-black">Item</div>
+        <div className="text-center text-[20px] font-semibold leading-[1.4] text-black">
           Quantity
         </div>
-        <div className="flex-1 text-xl font-semibold capitalize -ml-5 text-start text-black">
+        <div className="text-right text-[20px] font-semibold leading-[1.4] text-black">
           Subtotal
         </div>
+        <span className="text-right text-[20px] font-semibold leading-[1.4] text-black opacity-0">
+          Remove
+        </span>
       </div>
 
       {/* Mobile Header */}

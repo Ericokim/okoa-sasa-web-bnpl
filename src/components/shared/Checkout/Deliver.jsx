@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { User, MapPin, Home, Package } from 'lucide-react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Package, MapPin } from 'lucide-react'
 import {
   Form,
   FormControl,
@@ -11,14 +13,31 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { ListIcon, PinIcon, SingleUserIcon, WorldIcon } from '@/assets/icons'
+import { CustomSelect } from '../Inputs/CustomSelect'
+
+// Base schema for common fields
+const baseSchema = {
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  recipientNumber: z.string().min(1, 'Recipient number is required'),
+  region: z.string().min(1, 'Please select a region'),
+}
+
+// Schema for door delivery
+const doorDeliverySchema = z.object({
+  ...baseSchema,
+  deliveryAddress: z.string().min(1, 'Delivery address is required'),
+  pickupStore: z.string().optional(),
+})
+
+// Schema for pickup station
+const pickupStationSchema = z.object({
+  ...baseSchema,
+  pickupStore: z.string().min(1, 'Please select a pickup store'),
+  deliveryAddress: z.string().optional(),
+})
 
 export default function DeliveryDetailsForm({
   onNext,
@@ -28,7 +47,11 @@ export default function DeliveryDetailsForm({
 }) {
   const [deliveryType, setDeliveryType] = useState('door')
 
+  // Choose schema based on delivery type
+  const currentSchema = deliveryType === 'door' ? doorDeliverySchema : pickupStationSchema
+
   const form = useForm({
+    resolver: zodResolver(currentSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
@@ -39,19 +62,44 @@ export default function DeliveryDetailsForm({
     },
   })
 
+  // Reset validation when delivery type changes
+  useEffect(() => {
+    form.clearErrors()
+  }, [deliveryType, form])
+
   const onSubmit = (data) => {
     console.log({ ...data, deliveryType })
+    onNext()
   }
 
-  const containerHeight =
-    deliveryType === 'door' ? 'md:h-[569px]' : 'md:h-[529px]'
+  const handleDeliveryTypeChange = (type) => {
+    setDeliveryType(type)
+    // Clear the field that's not needed for the selected type
+    if (type === 'door') {
+      form.setValue('pickupStore', '')
+    } else {
+      form.setValue('deliveryAddress', '')
+    }
+  }
+
+  // Options arrays
+  const regionOptions = [
+    { value: 'nairobi', label: 'Nairobi' },
+    { value: 'kisumu', label: 'Kisumu' },
+    { value: 'coast', label: 'Coast' },
+    { value: 'eastern', label: 'Eastern' },
+  ]
+
+  const pickupStoreOptions = [
+    { value: 'store1', label: 'Main Street Store' },
+    { value: 'store2', label: 'City Center Post' },
+    { value: 'store3', label: 'Westlands Station' },
+  ]
 
   return (
-    <div className="flex flex-col mb-6 items-center justify-center p-4 md:p-0 gap-6">
-      {/* Form Container */}
-      <div
-        className={`bg-white rounded-2xl shadow-sm border border-gray-200 p-4 md:p-6 w-full max-w-[1020px] ${containerHeight}`}
-      >
+    <div className="flex flex-col items-center justify-center mb-[50px] p-4 md:p-0 gap-6">
+      {/* Form Container - Height now adjusts automatically */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 w-full max-w-[1020px]">
         <div className="w-full">
           <div className="mb-4 md:mb-0 md:h-16">
             <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-1">
@@ -64,13 +112,13 @@ export default function DeliveryDetailsForm({
             </p>
           </div>
 
-          <div className="h-0.5 bg-gray-300 my-4 md:my-6"></div>
+          <div className="h-px bg-gray-300 my-4 md:my-6"></div>
 
           {/* Delivery Type Toggle */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
             <button
               type="button"
-              onClick={() => setDeliveryType('door')}
+              onClick={() => handleDeliveryTypeChange('door')}
               className={`flex items-center gap-2 p-3 md:p-4 rounded-lg border-2 transition-all ${
                 deliveryType === 'door'
                   ? 'border-orange-500 bg-orange-50'
@@ -100,7 +148,7 @@ export default function DeliveryDetailsForm({
 
             <button
               type="button"
-              onClick={() => setDeliveryType('pickup')}
+              onClick={() => handleDeliveryTypeChange('pickup')}
               className={`flex items-center gap-2 p-3 md:p-4 rounded-lg border-2 transition-all ${
                 deliveryType === 'pickup'
                   ? 'border-orange-500 bg-orange-50'
@@ -130,9 +178,9 @@ export default function DeliveryDetailsForm({
           </div>
 
           <Form {...form}>
-            <div className="space-y-4 md:space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
               {/* Row 1: First Name and Last Name */}
-              <div className="grid grid-cols-1 md:grid-cols-2 md:h-[75px] gap-4 md:gap-[50px]">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
                 <FormField
                   control={form.control}
                   name="firstName"
@@ -143,7 +191,7 @@ export default function DeliveryDetailsForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="Enter your First Name"
                             className="pl-10 h-11 border-gray-300 bg-gray-50"
@@ -166,7 +214,7 @@ export default function DeliveryDetailsForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="Enter your Last Name"
                             className="pl-10 h-11 border-gray-300 bg-gray-50"
@@ -183,7 +231,7 @@ export default function DeliveryDetailsForm({
               {/* Row 2: Conditional - Door Delivery or Pickup Station */}
               {deliveryType === 'door' ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 md:h-[75px] gap-4 md:gap-[50px]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
                     <FormField
                       control={form.control}
                       name="recipientNumber"
@@ -194,7 +242,7 @@ export default function DeliveryDetailsForm({
                           </FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <ListIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                               <Input
                                 placeholder="Enter Recipient Number"
                                 className="pl-10 h-11 border-gray-300 bg-gray-50"
@@ -215,34 +263,22 @@ export default function DeliveryDetailsForm({
                           <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
                             Region
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
-                                <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
-                                  <SelectValue placeholder="Enter your region" />
-                                </SelectTrigger>
-                              </div>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="nairobi">Nairobi</SelectItem>
-                              <SelectItem value="kisumu">Kisumu</SelectItem>
-                              <SelectItem value="coast">Coast</SelectItem>
-                              <SelectItem value="eastern">Eastern</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <CustomSelect
+                              icon={WorldIcon}
+                              placeholder="Enter your region"
+                              options={regionOptions}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-
-                    <div className="hidden md:block"></div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:h-[75px]">
+                  <div className="grid grid-cols-1">
                     <FormField
                       control={form.control}
                       name="deliveryAddress"
@@ -254,7 +290,7 @@ export default function DeliveryDetailsForm({
                           <FormControl>
                             <Textarea
                               placeholder="Enter delivery address"
-                              className=" md:h-11 border-gray-300 bg-gray-50 resize-none"
+                              className="h-[82px] border-gray-300 bg-gray-50 resize-none"
                               {...field}
                             />
                           </FormControl>
@@ -266,7 +302,7 @@ export default function DeliveryDetailsForm({
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 md:h-[75px] gap-4 md:gap-[50px]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
                     <FormField
                       control={form.control}
                       name="recipientNumber"
@@ -277,7 +313,7 @@ export default function DeliveryDetailsForm({
                           </FormLabel>
                           <FormControl>
                             <div className="relative">
-                              <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                              <ListIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                               <Input
                                 placeholder="Enter Recipient Number"
                                 className="pl-10 h-11 border-gray-300 bg-gray-50"
@@ -298,32 +334,22 @@ export default function DeliveryDetailsForm({
                           <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
                             Region
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
-                                <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
-                                  <SelectValue placeholder="Enter your region" />
-                                </SelectTrigger>
-                              </div>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="nairobi">Nairobi</SelectItem>
-                              <SelectItem value="kisumu">Kisumu</SelectItem>
-                              <SelectItem value="coast">Coast</SelectItem>
-                              <SelectItem value="eastern">Eastern</SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <CustomSelect
+                              icon={WorldIcon}
+                              placeholder="Enter your region"
+                              options={regionOptions}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 md:h-[75px] gap-4 md:gap-[50px]">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
                     <FormField
                       control={form.control}
                       name="pickupStore"
@@ -332,30 +358,15 @@ export default function DeliveryDetailsForm({
                           <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
                             Pick Up Store / Post
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <div className="relative">
-                                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
-                                <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
-                                  <SelectValue placeholder="Location" />
-                                </SelectTrigger>
-                              </div>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="store1">
-                                Main Street Store
-                              </SelectItem>
-                              <SelectItem value="store2">
-                                City Center Post
-                              </SelectItem>
-                              <SelectItem value="store3">
-                                Westlands Station
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
+                          <FormControl>
+                            <CustomSelect
+                              icon={PinIcon}
+                              placeholder="Location"
+                              options={pickupStoreOptions}
+                              value={field.value}
+                              onValueChange={field.onChange}
+                            />
+                          </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -364,7 +375,7 @@ export default function DeliveryDetailsForm({
                   </div>
                 </>
               )}
-            </div>
+            </form>
           </Form>
         </div>
       </div>
@@ -378,16 +389,13 @@ export default function DeliveryDetailsForm({
           variant="outline"
           className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
-          Return To Back
+          Back{' '}
         </Button>
         <Button
           type="button"
-          onClick={() => {
-            form.handleSubmit(onSubmit)()
-            onNext()
-          }}
+          onClick={form.handleSubmit(onSubmit)}
           disabled={isLastStep}
-          className="flex justify-center items-center px-4 py-3 w-full md:w-[193px] h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
+          className="flex justify-center items-center px-4 py-3 w-full md:w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
           Next: Delivery Details
         </Button>
