@@ -64,10 +64,20 @@ export function CartSummary({
 
       {/* Checkout Button */}
       <div className="flex flex-col items-start gap-3 self-stretch">
-        <Button
+        {/* <Button
           onClick={onCheckout}
           className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl border border-transparent bg-brand-primary-gradient px-4 py-3 text-base font-medium capitalize leading-[140%] text-white transition-opacity hover:bg-brand-primary-gradient hover:opacity-90 md:h-12"
           size="lg"
+        >
+          Proceed to Checkout
+        </Button> */}
+
+        <Button
+          onClick={onCheckout}
+          variant="gradient"
+          className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
+             bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+             text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
         >
           Proceed to Checkout
         </Button>

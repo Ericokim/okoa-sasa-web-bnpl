@@ -8,6 +8,7 @@ export function ContextProvider({ children }) {
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState([])
   const [products, setProducts] = useState(productCatalog)
+  const [searchTerm, setSearchTerm] = useState('')
 
 
 
@@ -140,6 +141,8 @@ const removeFromCart = (productId) => {
     getCartProducts,
     clearProductCart,
     findProductById,
+    searchTerm,
+    setSearchTerm,
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>
