@@ -33,11 +33,9 @@ export function RouteComponent() {
           {/* Button – full width on mobile, auto on desktop */}
           <Button
             onClick={() => setOpen(true)}
-            variant="gradient"
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 
                  bg-red-400 hover:bg-red-600 rounded-3xl 
-                 text-white font-medium text-sm sm:text-base shadow-sm 
-                 transition-colors"
+                 text-white font-medium text-sm sm:text-base"
           >
             <TrashIconWhite className="w-5 h-5" />
             Delete Account
