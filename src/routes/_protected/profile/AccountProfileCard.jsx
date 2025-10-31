@@ -1,3 +1,4 @@
+import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Camera, IdCard, MapPin, UserCheck } from 'lucide-react'
@@ -102,6 +103,10 @@ export function RouteComponent() {
     </div>
   )
 }
+
+export const Route = createFileRoute('/_protected/profile/AccountProfileCard')({
+  component: RouteComponent,
+})
 
 export const component = RouteComponent
 export const AccountProfileCard = RouteComponent

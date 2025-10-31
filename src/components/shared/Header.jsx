@@ -30,6 +30,9 @@ import { BoxWhiteIcon, ProfileIcon, LogoutIcon } from '@/assets/icons'
 export function Header() {
   const { cartCount, getCartCount, searchTerm, setSearchTerm } =
     useStateContext()
+
+  const { personalInfo } = useAccountStore()
+
   const cartItems = typeof cartCount === 'number' ? cartCount : getCartCount()
 
   const clearSearch = () => {
@@ -145,7 +148,6 @@ export function Header() {
                     alt="OKOA SASA"
                     className="h-7 w-auto"
                   />
-                
                 </div>
               </SheetHeader>
 
