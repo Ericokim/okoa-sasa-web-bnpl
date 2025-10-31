@@ -1,7 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { X } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link } from '@tanstack/react-router'
@@ -23,7 +32,14 @@ const DEFAULT_OPTIONS = {
   ram: [],
 }
 
-const FILTER_CATEGORIES = ['brand', 'color', 'storage', 'camera', 'display', 'ram']
+const FILTER_CATEGORIES = [
+  'brand',
+  'color',
+  'storage',
+  'camera',
+  'display',
+  'ram',
+]
 
 const FilterIcon = () => (
   <svg
@@ -211,14 +227,14 @@ const buildToggleState = (items) =>
   items.reduce((acc, item) => ({ ...acc, [item]: false }), {})
 
 const buildToggleStateFromSelection = (items, selected = []) =>
-  items.reduce(
-    (acc, item) => ({ ...acc, [item]: selected.includes(item) }),
-    {},
-  )
+  items.reduce((acc, item) => ({ ...acc, [item]: selected.includes(item) }), {})
 
 const areFilterStatesEqual = (a, b, categories) => {
   if (!a || !b) return false
-  if (a.priceRange[0] !== b.priceRange[0] || a.priceRange[1] !== b.priceRange[1]) {
+  if (
+    a.priceRange[0] !== b.priceRange[0] ||
+    a.priceRange[1] !== b.priceRange[1]
+  ) {
     return false
   }
   if (a.priceMin !== b.priceMin || a.priceMax !== b.priceMax) {
@@ -282,7 +298,9 @@ export function FilterBar({
 
   const [filters, setFilters] = useState(defaultFilters)
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
-  const validInitialSort = SORT_OPTIONS.some((item) => item.value === initialSort)
+  const validInitialSort = SORT_OPTIONS.some(
+    (item) => item.value === initialSort,
+  )
     ? initialSort
     : SORT_OPTIONS[0].value
   const [sortSelection, setSortSelection] = useState(validInitialSort)
@@ -298,10 +316,18 @@ export function FilterBar({
   })
 
   useEffect(() => {
-    const priceMinValue = selectedFilters?.priceRange?.[0] ?? normalizedOptions.price.min
-    const priceMaxValue = selectedFilters?.priceRange?.[1] ?? normalizedOptions.price.max
-    const clampedMin = Math.max(normalizedOptions.price.min, Math.min(priceMinValue, normalizedOptions.price.max))
-    const clampedMax = Math.max(clampedMin, Math.min(priceMaxValue, normalizedOptions.price.max))
+    const priceMinValue =
+      selectedFilters?.priceRange?.[0] ?? normalizedOptions.price.min
+    const priceMaxValue =
+      selectedFilters?.priceRange?.[1] ?? normalizedOptions.price.max
+    const clampedMin = Math.max(
+      normalizedOptions.price.min,
+      Math.min(priceMinValue, normalizedOptions.price.max),
+    )
+    const clampedMax = Math.max(
+      clampedMin,
+      Math.min(priceMaxValue, normalizedOptions.price.max),
+    )
 
     const nextFilters = {
       priceRange: [clampedMin, clampedMax],
@@ -334,7 +360,9 @@ export function FilterBar({
     }
 
     setFilters((prev) =>
-      areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES) ? prev : nextFilters,
+      areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES)
+        ? prev
+        : nextFilters,
     )
   }, [defaultFilters, selectedFilters, normalizedOptions])
 
@@ -451,15 +479,17 @@ export function FilterBar({
 
     ;['brand', 'color', 'storage', 'camera', 'display', 'ram'].forEach(
       (category) => {
-        Object.entries(filters[category] ?? {}).forEach(([value, isSelected]) => {
-          if (isSelected) {
-            chips.push({
-              category,
-              value,
-              label: value,
-            })
-          }
-        })
+        Object.entries(filters[category] ?? {}).forEach(
+          ([value, isSelected]) => {
+            if (isSelected) {
+              chips.push({
+                category,
+                value,
+                label: value,
+              })
+            }
+          },
+        )
       },
     )
 
@@ -541,7 +571,10 @@ export function FilterBar({
                             type="text"
                             value={filters.priceMin}
                             onChange={(event) =>
-                              handlePriceInputChange('priceMin', event.target.value)
+                              handlePriceInputChange(
+                                'priceMin',
+                                event.target.value,
+                              )
                             }
                             className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
                             placeholder="Min"
@@ -552,7 +585,10 @@ export function FilterBar({
                             type="text"
                             value={filters.priceMax}
                             onChange={(event) =>
-                              handlePriceInputChange('priceMax', event.target.value)
+                              handlePriceInputChange(
+                                'priceMax',
+                                event.target.value,
+                              )
                             }
                             className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
                             placeholder="Max"
@@ -709,7 +745,18 @@ export function FilterBar({
           </span>
         </Link>
 
-        <Popover>
+        <button
+          onClick={() => {
+            onLoanCalculatorOpen?.()
+          }}
+          className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2"
+        >
+          <span className="text-sm font-normal capitalize text-black md:text-base">
+            My Loan Limit
+          </span>
+        </button>
+
+        {/* <Popover>
           <PopoverTrigger asChild>
             <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
               <span className="text-sm font-normal capitalize text-black md:text-base">
@@ -769,7 +816,7 @@ export function FilterBar({
               ))}
             </div>
           </PopoverContent>
-        </Popover>
+        </Popover> */}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

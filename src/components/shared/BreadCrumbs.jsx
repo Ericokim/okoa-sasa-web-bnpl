@@ -127,7 +127,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
   return (
     <div className={cn('flex flex-col gap-3', className)}>
       <Breadcrumb>
-        <BreadcrumbList className="flex flex-wrap items-center gap-2 text-xs uppercase tracking-wide text-brand-mid-gray sm:text-sm">
+        <BreadcrumbList className="flex flex-wrap items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide text-brand-mid-gray sm:gap-2 sm:text-xs md:text-sm">
           {crumbs.map((crumb, index) => {
             const isLast = index === crumbs.length - 1
             const Icon = crumb.icon ?? (crumb.path === '/' ? HomeIcon : null)
@@ -136,8 +136,8 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
               <React.Fragment key={crumb.id}>
                 <BreadcrumbItem>
                   {isLast ? (
-                    <BreadcrumbPage className="inline-flex items-center gap-2 px-3 py-1.5 text-base font-normal capitalize text-brand-black">
-                      {Icon && <Icon className="size-6" aria-hidden="true" />}
+                    <BreadcrumbPage className="inline-flex max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-black sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base">
+                      {Icon && <Icon className="size-5 sm:size-6" aria-hidden="true" />}
                       <span className="truncate">{crumb.label}</span>
                     </BreadcrumbPage>
                   ) : (
@@ -145,9 +145,11 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
                       <button
                         type="button"
                         onClick={() => handleNavigate(crumb)}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 text-base font-normal capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:rounded-2xl hover:text-brand-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start"
+                        className="inline-flex max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:text-brand-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base"
                       >
-                        {Icon && <Icon className="size-6" aria-hidden="true" />}
+                        {Icon && (
+                          <Icon className="size-5 md:size-6" aria-hidden="true" />
+                        )}
                         <span className="truncate">{crumb.label}</span>
                       </button>
                     </BreadcrumbLink>
@@ -156,7 +158,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
 
                 {!isLast && (
                   <BreadcrumbSeparator className="text-brand-mid-gray">
-                    <ChevronRight className="size-8" aria-hidden="true" />
+                    <ChevronRight className="size-4 sm:size-5 md:size-6" aria-hidden="true" />
                   </BreadcrumbSeparator>
                 )}
               </React.Fragment>

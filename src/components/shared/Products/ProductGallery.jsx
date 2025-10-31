@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { cn } from '@/lib/utils'
 
 export function ProductGallery({ images, name }) {
   const [selectedImage, setSelectedImage] = useState(0)
@@ -12,7 +13,7 @@ export function ProductGallery({ images, name }) {
   }
 
   return (
-    <div className="flex w-full flex-col gap-3 md:flex-row md:gap-4">
+    <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
       {/* Main Image - Order 1 on mobile, 2 on desktop */}
       <div className="relative order-1 flex h-[274px] flex-1 items-center justify-center rounded-3xl bg-[#F9FAFB] md:order-2 md:h-[580px]">
         <img
@@ -57,20 +58,32 @@ export function ProductGallery({ images, name }) {
       </div>
 
       {/* Thumbnails - Horizontal on mobile, Vertical on desktop - Order 2 on mobile, 1 on desktop */}
-      <div className="order-2 flex flex-row gap-3 md:order-1 md:w-[168px] md:flex-col md:gap-2">
+      <div
+        className="order-2 flex w-full snap-x snap-mandatory flex-row gap-3 overflow-x-auto px-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:order-1 md:w-[168px] md:flex-col md:gap-3 md:overflow-visible md:snap-none md:p-0"
+        aria-label="Product image thumbnails"
+      >
         {images.slice(0, 4).map((image, index) => (
           <button
             key={index}
+            type="button"
             onClick={() => setSelectedImage(index)}
-            className={`flex h-[95px] w-[102px] flex-shrink-0 items-center justify-center rounded-2xl bg-[#F9FAFB] transition-all hover:bg-gray-100 md:h-[139px] md:w-[168px] md:rounded-3xl ${
-              selectedImage === index ? 'ring-2 ring-[#F8971D]' : ''
-            }`}
+            className={cn(
+              'group relative flex h-[95px] w-[102px] flex-shrink-0 snap-center items-center justify-center rounded-2xl border border-[#E8ECF4] bg-[#F9FAFB] transition-all hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#F8971D] md:h-[139px] md:w-[168px] md:rounded-3xl',
+              selectedImage === index && 'border-[#F8971D] bg-white'
+            )}
           >
-            <img
-              src={image}
-              alt={`${name} ${index + 1}`}
-              className="h-[73px] w-[37px] object-contain md:h-[97px] md:w-[49px]"
-            />
+            <div
+              className={cn(
+                'flex h-full w-full items-center justify-center rounded-[inherit] bg-[#F9FAFB] transition-colors group-hover:bg-white',
+                selectedImage === index && 'bg-white'
+              )}
+            >
+              <img
+                src={image}
+                alt={`${name} ${index + 1}`}
+                className="h-[73px] w-[50px] object-contain md:h-[97px] md:w-[65px]"
+              />
+            </div>
           </button>
         ))}
       </div>

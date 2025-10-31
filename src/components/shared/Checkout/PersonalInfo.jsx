@@ -19,6 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { EmailIcon, PhoneIcon, SingleUserIcon, UserCardIcon, UserFileIcon, UserMsgIcon } from '@/assets/icons'
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -36,25 +37,27 @@ export default function PersonalInfoForm({
   isLastStep,
 }) {
   const form = useForm({
-    // resolver: zodResolver(personalInfoSchema),
+    resolver: zodResolver(personalInfoSchema),
     defaultValues: {
       fullName: '',
       nationalId: '',
       employer: '',
-      employeeNumber: 'OKOA085',
+      employeeNumber: '',
       email: '',
-      phoneNumber: '004583',
+      phoneNumber: '',
     },
   })
 
   const onSubmit = (data) => {
     console.log(data)
+    // Only proceed to next step if validation passes
+    onNext()
   }
 
   return (
     <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
       {/* Form Container */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6 w-full max-w-[1020px]">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full max-w-[1020px]">
         <div className="w-full">
           <div className="h-auto sm:h-16 mb-4 sm:mb-0">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
@@ -65,10 +68,13 @@ export default function PersonalInfoForm({
             </p>
           </div>
 
-          <div className="h-0.5 bg-gray-300 my-4 sm:my-6"></div>
+          <div className="h-px bg-gray-300 my-4 sm:my-6"></div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 sm:space-y-6"
+            >
               {/* Row 1: Full Name and National ID */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px] h-auto sm:h-[75px]">
                 <FormField
@@ -81,7 +87,7 @@ export default function PersonalInfoForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="Enter your Full Name"
                             className="pl-10 h-11 border-gray-300 bg-gray-50"
@@ -104,7 +110,7 @@ export default function PersonalInfoForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <UserFileIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="Enter ID Number"
                             type={'number'}
@@ -135,7 +141,7 @@ export default function PersonalInfoForm({
                       >
                         <FormControl>
                           <div className="relative">
-                            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
+                            <UserCardIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
                             <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
                               <SelectValue placeholder="Employer Name" />
                             </SelectTrigger>
@@ -164,7 +170,7 @@ export default function PersonalInfoForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <UserMsgIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="OKOA085"
                             className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500"
@@ -190,7 +196,7 @@ export default function PersonalInfoForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <EmailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             type="email"
                             placeholder="Enter your email"
@@ -214,7 +220,7 @@ export default function PersonalInfoForm({
                       </FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="004583"
                             className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500"
@@ -241,14 +247,12 @@ export default function PersonalInfoForm({
           variant="outline"
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
-          Return To Back
+          Back{' '}
         </Button>
         <Button
-          onClick={() => {
-            form.handleSubmit(onSubmit)()
-            onNext()
-          }}
+          onClick={form.handleSubmit(onSubmit)}
           disabled={isLastStep}
+          type="button"
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[193px] h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
           Next: Delivery Details

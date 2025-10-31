@@ -6,9 +6,18 @@
 body {
   @apply m-0;
   font-family:
-    'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
-    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
-    'Helvetica Neue', sans-serif;
+    'Public Sans',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -166,13 +175,13 @@ code {
     var(--brand-primary-end) 100%
   );
 }
- .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
 
 .text-brand-primary-gradient {
   background: linear-gradient(
@@ -206,6 +215,10 @@ code {
         var(--brand-primary-end) 100%
       )
       border-box;
+}
+
+.quantity-btn {
+  @apply flex h-10 w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:border-[#F8971D];
 }
 
 @layer base {

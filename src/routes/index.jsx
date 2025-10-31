@@ -6,11 +6,7 @@ import { LoanLimitCalculator } from '@/components/shared/LoanLimitCalculator'
 import { ProductCard } from '@/components/shared/Products/ProductCard'
 import { PaginationComponent } from '@/components/shared/PaginationComponent'
 import NotFound from '@/container/NotFound'
-import { productCatalog } from '@/data/products'
 import { useStateContext } from '@/context/state-context'
-
-
-const PRODUCT_CATALOG = productCatalog
 
 const PRODUCTS_PER_PAGE = 8
 const DEFAULT_SORT = 'price-low-high'
@@ -95,8 +91,8 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
-  const { products } = useStateContext()
-  
+  const { products, searchTerm } = useStateContext()
+
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
@@ -132,7 +128,7 @@ function IndexPage() {
       display: uniqueForKey('display'),
       ram: uniqueForKey('ram'),
     }
-  }, [])
+  }, [products])
 
   const parsedSearch = useMemo(() => {
     const sortValue =
@@ -195,8 +191,17 @@ function IndexPage() {
       return !selections?.length || selections.includes(value)
     }
 
+    const normalizedSearch = searchTerm.trim().toLowerCase()
+
     const filtered = products.filter((product) => {
       const withinPrice = product.price >= minPrice && product.price <= maxPrice
+      const matchesSearch =
+        !normalizedSearch ||
+        [product.name, product.brand, product.category, product.description]
+          .filter(Boolean)
+          .some((field) =>
+            String(field).toLowerCase().includes(normalizedSearch),
+          )
 
       return (
         withinPrice &&
@@ -205,7 +210,8 @@ function IndexPage() {
         matchesSelection('storage', product.storage) &&
         matchesSelection('camera', product.camera) &&
         matchesSelection('display', product.display) &&
-        matchesSelection('ram', product.ram)
+        matchesSelection('ram', product.ram) &&
+        matchesSearch
       )
     })
 
@@ -229,6 +235,8 @@ function IndexPage() {
     sortOption,
     filterOptions.price.max,
     filterOptions.price.min,
+    products,
+    searchTerm,
   ])
 
   const totalProducts = filteredProducts.length

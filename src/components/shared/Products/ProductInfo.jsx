@@ -95,23 +95,38 @@ export function ProductInfo({ product }) {
       {/* Quantity Selector */}
       <div className="flex flex-col gap-2">
         <div className="flex w-[250px] items-center justify-between rounded-3xl bg-[#F9FAFB] px-4 py-2">
-          <button
+          {/* <Button
+            // variant={}
+            size={'icon'}
             onClick={handleIncrease}
             disabled={quantity >= maxQuantity}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-white transition-colors hover:bg-gray-50 disabled:opacity-50 md:h-[30px] md:w-[30px]"
+            className="flex h-6 w-6 border border-[#E8ECF4] items-center justify-center rounded-full bg-white transition-colors hover:bg-white disabled:opacity-50 md:h-[30px] md:w-[30px]"
           >
             <AddIcon size={18} />
-          </button>
+          </Button> */}
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
+            onClick={handleIncrease}
+            disabled={quantity >= maxQuantity}
+          >
+            <AddIcon size={18} />
+          </Button>
+
           <span className="min-w-[30px] text-center text-sm font-bold capitalize leading-[140%] text-[#252525] md:text-lg">
             {quantity}
           </span>
-          <button
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
             onClick={handleDecrease}
-            disabled={quantity <= 1}
-            className="flex h-6 w-6 items-center justify-center rounded-full bg-white transition-colors hover:bg-gray-50 disabled:opacity-50 md:h-[30px] md:w-[30px]"
           >
             <MinusIcon size={18} />
-          </button>
+          </Button>
         </div>
         <p className="text-xs font-normal leading-[140%] text-[#A0A4AC] md:text-sm md:font-medium">
           Maximum purchase {maxQuantity}
@@ -201,8 +216,8 @@ export function ProductInfo({ product }) {
         {/* Buy Now Button */}
         <Button
           // onClick={onCheckout}
-          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl border border-transparent bg-brand-primary-gradient px-4 py-3 text-base font-medium capitalize leading-[140%] text-white transition-opacity hover:bg-brand-primary-gradient hover:opacity-90 md:h-12"
-          size="lg"
+          variant="gradient"
+          className="rounded-3xl px-4 md:px-6 py-3 h-auto text-base font-medium"
         >
           Buy Now
         </Button>

@@ -26,6 +26,116 @@ import fileIcon from '@/assets/icons/file.svg'
 import searchIcon from '@/assets/icons/searchStatus.svg'
 import truckTickIcon from '@/assets/icons/truckTick.svg'
 import homeCartIcon from '@/assets/icons/homeCart.svg'
+import cheoutDoneIcon from '@/assets/icons/checkoutDone.svg'
+import userSingleIcon from '@/assets/icons/singleUser.svg'
+import userFileIcon from '@/assets/icons/useFile.svg'
+import userCardIcon from '@/assets/icons/userCard.svg'
+import userMsgIcon from '@/assets/icons/userMsg.svg'
+import emailIcon from '@/assets/icons/email.svg'
+import phoneIcon from '@/assets/icons/phone.svg'
+import listIcon from '@/assets/icons/list.svg'
+import worldIcon from '@/assets/icons/world.svg'
+import pinIcon from '@/assets/icons/pin.svg'
+
+export const PinIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={pinIcon}
+    alt="pinIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const WorldIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={worldIcon}
+    alt="worldIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const ListIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={listIcon}
+    alt="listIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const PhoneIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={phoneIcon}
+    alt="phoneIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const EmailIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={emailIcon}
+    alt="emailIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const UserMsgIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={userMsgIcon}
+    alt="userMsgIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const UserCardIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={userCardIcon}
+    alt="userCardIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const UserFileIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={userFileIcon}
+    alt="userFileIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const SingleUserIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={userSingleIcon}
+    alt="userSingleIcon"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
+
+export const CheckoutDoneIcon = ({ size, className = '' }) => (
+  <img
+    src={cheoutDoneIcon}
+    alt="checkoutDone"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
 
 export const HomeCartIcon = ({ size = 24, className = '' }) => (
   <img
