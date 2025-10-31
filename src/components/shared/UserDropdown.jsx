@@ -32,7 +32,9 @@ export function UserDropdown() {
           onClick={() => setShowAuthDialog(true)}
           className="flex items-center gap-1 md:gap-2"
         >
-          <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-gray-200">
+          <div
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-brand-bg-2"
+          >
             <User className="h-4 w-4" />
           </div>
           <span className="hidden text-base leading-[140%] md:inline">
