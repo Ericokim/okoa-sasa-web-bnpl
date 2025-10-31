@@ -1,6 +1,15 @@
 // src/components/Header.jsx
 import { Link, useNavigate } from '@tanstack/react-router'
-import { ShoppingCart, Search, X, Package, User, LogOut, ChevronDown, ChevronUp } from 'lucide-react'
+import {
+  ShoppingCart,
+  Search,
+  X,
+  Package,
+  User,
+  LogOut,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react'
 import { useStateContext } from '@/context/state-context'
 import { useAccountStore } from '@/data/accountStore'
 import { cn } from '@/lib/utils'
@@ -16,10 +25,11 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
-import { BoxWhiteIcon, ProfileIcon, LogoutIcon } from '@/assets/icons' 
+import { BoxWhiteIcon, ProfileIcon, LogoutIcon } from '@/assets/icons'
 
 export function Header() {
-  const { products, searchTerm, setSearchTerm, user, isAuthenticated, logout } = useStateContext()
+  const { products, searchTerm, setSearchTerm, user, isAuthenticated, logout } =
+    useStateContext()
   const { personalInfo } = useAccountStore()
   const navigate = useNavigate()
   const cartItems = products.filter((p) => p.inCart === true).length
@@ -65,7 +75,7 @@ export function Header() {
                 'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-white',
                 searchTerm
                   ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
-                  : 'pointer-events-none opacity-0'
+                  : 'pointer-events-none opacity-0',
               )}
             >
               <X className="h-3.5 w-3.5" />
@@ -101,7 +111,6 @@ export function Header() {
               className="h-full w-full object-contain"
             />
           </Link>
-       
         </div>
 
         {/* Right Icons: Cart + Avatar */}
@@ -123,7 +132,8 @@ export function Header() {
                 <Avatar className="h-9 w-9 ring-2 ring-orange-100">
                   <AvatarImage src={personalInfo.avatar || '/avator.png'} />
                   <AvatarFallback className="bg-linear-to-br from-orange-100 to-orange-200 text-orange-700 text-sm font-medium">
-                    {personalInfo.firstName?.[0]}{personalInfo.lastName?.[0]}
+                    {personalInfo.firstName?.[0]}
+                    {personalInfo.lastName?.[0]}
                   </AvatarFallback>
                 </Avatar>
               </Button>
@@ -139,7 +149,6 @@ export function Header() {
                   />
                 
                 </div>
-              
               </SheetHeader>
 
               <Separator />
@@ -237,7 +246,7 @@ export function Header() {
               'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-[#EE3124]',
               searchTerm
                 ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
-                : 'pointer-events-none opacity-0'
+                : 'pointer-events-none opacity-0',
             )}
           >
             <X className="h-3.5 w-3.5" />

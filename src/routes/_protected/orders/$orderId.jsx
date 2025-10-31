@@ -178,7 +178,7 @@ function OrderDetailPage() {
   // const { recentOrders } = Route.useLoaderData()
 
   if (!recentOrders) return <div className="p-8 text-center">Loading...</div>
-  const order = recentOrders.find(o => o.orderId === orderId)
+  const order = recentOrders.find((o) => o.orderId === orderId)
   if (!order) return <div className="p-8 text-center">Order not found</div>
 
   const steps = [
@@ -197,9 +197,8 @@ function OrderDetailPage() {
     <div className="min-h-screen bg-white">
       <BreadCrumbs items={breadcrumbItems} className="my-8" />
 
-      <div className="max-w-[1067px] mx-auto px-4 py-8 space-y-10">
-
-        {/* STATUS CARD */}
+      <div className="mx-auto px-4 py-8 space-y-10">
+        {/* STATUS CARD — CENTERED */}
         <Card className="shadow-none">
           <CardHeader>
             <CardTitle className="font-medium text-2xl text-[#0D0B26]">
@@ -207,68 +206,87 @@ function OrderDetailPage() {
             </CardTitle>
             <Separator className="my-4" />
           </CardHeader>
-          <CardContent>
-            {/* Desktop Stepper */}
-            <div className="hidden md:flex items-center">
-              {steps.map((step, idx) => (
-                <div key={idx} className="flex items-center flex-1 relative">
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all ${
-                        step.active
-                          ? 'bg-orange-500 border-orange-500'
-                          : 'bg-white border-gray-300'
-                      }`}
-                    >
-                      {step.active ? (
-                        <Check className="w-7 h-7 text-white" strokeWidth={3} />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full bg-gray-300"></div>
-                      )}
-                    </div>
-                    <p className={`mt-3 text-sm font-medium ${step.active ? 'text-[#0D0B26]' : 'text-gray-400'}`}>
-                      {step.label}
-                    </p>
-                  </div>
-                  {idx < steps.length - 1 && (
-                    <div
-                      className={`flex-1 h-1 mx-2 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
 
-            {/* Mobile Stepper */}
-            <div className="md:hidden space-y-4">
-              <div className="flex items-center">
+          <CardContent className="flex justify-center">
+            <div className="w-full max-w-4xl">
+              {/* Desktop: Horizontal Stepper */}
+              <div className="hidden md:flex justify-center items-center gap-8">
                 {steps.map((step, idx) => (
-                  <div key={idx} className="flex items-center flex-1">
-                    <div
-                      className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
-                        step.active ? 'bg-orange-500 border-orange-500' : 'bg-white border-gray-300'
-                      }`}
-                    >
-                      {step.active ? (
-                        <Check className="w-5 h-5 text-white" strokeWidth={3} />
-                      ) : (
-                        <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                      )}
+                  <div key={idx} className="flex items-center flex-1 relative">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
+                          step.active
+                            ? 'bg-orange-500 border-orange-500'
+                            : 'bg-white border-gray-300'
+                        }`}
+                      >
+                        {step.active ? (
+                          <Check
+                            className="w- h-7 text-white"
+                            strokeWidth={3}
+                          />
+                        ) : (
+                          <div className="w-4 h-4 rounded-full bg-gray-300"></div>
+                        )}
+                      </div>
+                      <p
+                        className={`mt-3 text-sm font-medium ${step.active ? 'text-[#0D0B26]' : 'text-gray-400'}`}
+                      >
+                        {step.label}
+                      </p>
                     </div>
+
                     {idx < steps.length - 1 && (
                       <div
-                        className={`flex-1 h-[2px] mx-1 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
+                        className={`flex-1 h-1 mx-1 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
                       />
                     )}
                   </div>
                 ))}
               </div>
-              <div className="grid grid-cols-3 text-center text-xs font-medium">
-                {steps.map((step, idx) => (
-                  <p key={idx} className={step.active ? 'text-[#0D0B26]' : 'text-gray-400'}>
-                    {step.label}
-                  </p>
-                ))}
+
+              {/* Mobile: Vertical Stepper */}
+              <div className="md:hidden space-y-4">
+                <div className="flex items-center">
+                  {steps.map((step, idx) => (
+                    <div key={idx} className="flex items-center flex-1">
+                      <div
+                        className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
+                          step.active
+                            ? 'bg-orange-500 border-orange-500'
+                            : 'bg-white border-gray-300'
+                        }`}
+                      >
+                        {step.active ? (
+                          <Check
+                            className="w-5 h-5 text-white"
+                            strokeWidth={3}
+                          />
+                        ) : (
+                          <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                        )}
+                      </div>
+                      {idx < steps.length - 1 && (
+                        <div
+                          className={`flex-1 h-[2px] mx-1 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
+                        />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-3 text-center text-xs font-medium">
+                  {steps.map((step, idx) => (
+                    <p
+                      key={idx}
+                      className={
+                        step.active ? 'text-[#0D0B26]' : 'text-gray-400'
+                      }
+                    >
+                      {step.label}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -294,7 +312,9 @@ function OrderDetailPage() {
               </div>
               <div>
                 <span className="text-gray-500">Amount</span>
-                <p className="font-medium">{order.amount.toLocaleString()} KES</p>
+                <p className="font-medium">
+                  {order.amount.toLocaleString()} KES
+                </p>
               </div>
               <div>
                 <span className="text-gray-500">Dispatch to</span>
@@ -322,10 +342,18 @@ function OrderDetailPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#252525] font-sans">Name</TableHead>
-                  <TableHead className="text-center text-[#252525] font-sans">Qty</TableHead>
-                  <TableHead className="text-right text-[#252525] font-sans">Price</TableHead>
-                  <TableHead className="text-right text-[#252525] font-sans">Total</TableHead>
+                  <TableHead className="text-[#252525] font-sans">
+                    Name
+                  </TableHead>
+                  <TableHead className="text-center text-[#252525] font-sans">
+                    Qty
+                  </TableHead>
+                  <TableHead className="text-right text-[#252525] font-sans">
+                    Price
+                  </TableHead>
+                  <TableHead className="text-right text-[#252525] font-sans">
+                    Total
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -365,15 +393,19 @@ function OrderDetailPage() {
             Back to Orders
           </Button>
 
-          <Button className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
+          <Button
+            className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
                               bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all">
+                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+          >
             Re-Order
           </Button>
 
-          <Button className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
+          <Button
+            className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
                               bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all">
+                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+          >
             <MapPin className="h-5 w-5" />
             Track Order
           </Button>

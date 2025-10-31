@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 import { enqueueSnackbar } from 'notistack'
 import { TrashIcon } from '@/assets/icons'
 
-export function ProfilePhotoDialog({
+export function RouteComponent({
   isOpen,
   onClose,
   currentPhoto,
@@ -222,5 +222,8 @@ async function uploadAvatarToServer(file) {
 }
 
 export const Route = createFileRoute('/_protected/profile/ProfileDialog')({
-  component: ProfilePhotoDialog,
+  component: RouteComponent,
 })
+
+export const component = RouteComponent
+export const ProfilePhotoDialog = RouteComponent
