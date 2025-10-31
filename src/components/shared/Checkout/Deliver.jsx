@@ -99,7 +99,7 @@ export default function DeliveryDetailsForm({
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-4 md:p-0 gap-6">
       {/* Form Container - Height now adjusts automatically */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 w-full max-w-[1020px]">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 w-full ">
         <div className="w-full">
           <div className="mb-4 md:mb-0 md:h-16">
             <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-1">
@@ -381,7 +381,7 @@ export default function DeliveryDetailsForm({
       </div>
 
       {/* Buttons Container - Completely Outside */}
-      <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4 w-full max-w-[1020px]">
+      <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4 w-full max-w-full">
         <Button
           onClick={onPrevious}
           disabled={isFirstStep}

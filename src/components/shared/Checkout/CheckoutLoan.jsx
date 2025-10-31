@@ -72,9 +72,9 @@ export default function CheckLoanLimitPage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
+    <div className="flex flex-col mb-[50px] items-center justify-center p-4 sm:p-0 gap-6">
       {/* Form Container */}
-      <div className="bg-white w-full max-w-[1020px] h-full rounded-4xl border border-gray-200 p-4 sm:p-6">
+      <div className="bg-white w-full h-full rounded-4xl border border-gray-200 p-4 sm:p-6">
         <div className="">
           <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
             Check Your Loan Limit
@@ -238,7 +238,7 @@ export default function CheckLoanLimitPage({
       </div>
 
       {/* Buttons Container - Completely Outside */}
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-[1020px]">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
         <Button
           onClick={onPrevious}
           disabled={isFirstStep}
