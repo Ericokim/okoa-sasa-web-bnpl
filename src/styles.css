@@ -56,7 +56,7 @@ code {
   --muted-foreground: rgb(103 109 117); /* #676d75 */
   --accent: rgb(247 248 249); /* #f7f8f9 */
   --accent-foreground: rgb(37 37 37); /* #252525 */
-  --destructive: rgb(242 94 94); /* #f25e5e */
+  --destructive: rgb(248 151 29); /* #f8971d - Changed to orange */
   --destructive-foreground: rgb(255 255 255); /* white */
   --border: rgb(232 236 244); /* #e8ecf4 */
   --input: rgb(232 236 244); /* #e8ecf4 */
@@ -93,7 +93,7 @@ code {
   --muted-foreground: rgb(154 158 166); /* #9a9ea6 - mid gray */
   --accent: rgb(103 109 117); /* #676d75 - brand gray */
   --accent-foreground: rgb(255 255 255); /* white */
-  --destructive: rgb(242 94 94); /* #f25e5e */
+  --destructive: rgb(248 151 29); /* #f8971d - Changed to orange */
   --destructive-foreground: rgb(255 255 255); /* white */
   --border: rgb(103 109 117); /* #676d75 - brand gray */
   --input: rgb(103 109 117); /* #676d75 - brand gray */
