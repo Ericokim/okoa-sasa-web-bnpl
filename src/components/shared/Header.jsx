@@ -7,8 +7,9 @@ import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 
 export function Header() {
-  const { products, searchTerm, setSearchTerm } = useStateContext()
-  const cartItems = products.filter((p) => p.inCart === true).length
+  const { cartCount, getCartCount, searchTerm, setSearchTerm } =
+    useStateContext()
+  const cartItems = typeof cartCount === 'number' ? cartCount : getCartCount()
 
   const clearSearch = () => {
     if (!searchTerm) return

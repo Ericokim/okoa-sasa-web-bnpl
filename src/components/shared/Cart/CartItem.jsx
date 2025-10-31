@@ -4,8 +4,6 @@ import { formatCurrency } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { useStateContext } from '@/context/state-context'
-import clsx from 'clsx'
 
 export function CartItem({
   id,
@@ -19,7 +17,6 @@ export function CartItem({
 }) {
   const navigate = useNavigate()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const { removeFromCart } = useStateContext()
 
   const handleIncrement = () => onQuantityChange?.(id, quantity + 1)
   const handleDecrement = () =>
@@ -27,7 +24,6 @@ export function CartItem({
   const handleRemoveClick = () => setShowDeleteDialog(true)
   const confirmRemove = () => {
     onRemove?.(id)
-    removeFromCart(id)
     setShowDeleteDialog(false)
   }
   const handleImageClick = () => navigate({ to: `/products/${id}` })

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, useLayoutEffect } from 'react'
 import { FilterBar } from '@/components/shared/Products/FilterBar'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { LoanLimitCalculator } from '@/components/shared/LoanLimitCalculator'
@@ -242,7 +242,7 @@ function IndexPage() {
   const totalProducts = filteredProducts.length
   const totalPages = Math.max(1, Math.ceil(totalProducts / PRODUCTS_PER_PAGE))
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (currentPage > totalPages) {
       setCurrentPage(totalPages)
     }
