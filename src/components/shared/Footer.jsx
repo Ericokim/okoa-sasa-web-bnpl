@@ -160,11 +160,11 @@ const TikTokIcon = ({ className }) => (
 export function Footer() {
   return (
     <footer className="bg-[#161719] py-10 px-4 sm:px-6 md:px-20">
-      <div className="">
+      <div className="mx-auto w-full space-y-10">
         {/* Header Section with Logo and Social Media */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6 md:gap-0">
+        <div className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-[107px]">
           {/* Logo */}
-          <div className="w-full md:w-[395px] h-auto md:h-[109px]">
+          <div className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[335px] xl:w-[395px] h-auto md:h-[109px] lg:mr-auto">
             <img
               src="/primaryLogoHorizontal.png"
               alt="Okoa Sasa"
@@ -173,63 +173,63 @@ export function Footer() {
           </div>
 
           {/* Social Media Icons */}
-          <div className="flex items-center gap-5">
+          <div className="flex w-full flex-wrap items-center justify-center gap-4 sm:gap-5 xl:w-[400px] xl:flex-none xl:justify-end xl:self-stretch">
             <a
               href="#"
-              className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <FacebookIcon className="w-[36px] h-[36px]" />
+              <FacebookIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
             </a>
             <a
               href="#"
-              className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <XIcon className="w-[35px] h-[29px]" />
+              <XIcon className="w-6 sm:w-[26px] md:w-[35px] h-auto" />
             </a>
             <a
               href="#"
-              className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <InstagramIcon className="w-[36px] h-[36px]" />
+              <InstagramIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
             </a>
             <a
               href="#"
-              className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <WhatsAppIcon className="w-[40px] h-[40px]" />
+              <WhatsAppIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
             </a>
             <a
               href="#"
-              className="w-[63px] h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <TikTokIcon className="w-[40px] h-[40px]" />
+              <TikTokIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
             </a>
           </div>
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-0">
+        <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 lg:grid-cols-[repeat(3,minmax(220px,1fr))] lg:gap-10 lg:items-start xl:grid-cols-[repeat(3,240px)_400px] xl:gap-[48px] xl:justify-between">
           {/* Useful Links */}
-          <div className="flex-1">
-            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
               Useful Links
             </h3>
-            <div className="space-y-2 md:space-y-3">
+            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
               <Link
                 to="/FAQs"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+                className="block hover:text-brand-primary-start transition-colors"
               >
                 How it Works
               </Link>
               <Link
                 to="/faqs"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+                className="block hover:text-brand-primary-start transition-colors"
               >
                 FAQs
               </Link>
               <Link
                 to="/terms"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+                className="block hover:text-brand-primary-start transition-colors"
               >
                 Terms & Conditions
               </Link>
@@ -237,23 +237,21 @@ export function Footer() {
           </div>
 
           {/* Other Links */}
-          <div className="flex-1">
-            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
               Other Links
             </h3>
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-white text-base font-medium">
-                USSD code *884#
-              </div>
+            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
+              <div>USSD code *884#</div>
               <Link
                 to="/privacy"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+                className="block hover:text-brand-primary-start transition-colors"
               >
                 Privacy Policy
               </Link>
               <Link
                 to="/insurance"
-                className="block text-white text-base font-medium hover:text-brand-primary-start transition-colors"
+                className="block hover:text-brand-primary-start transition-colors"
               >
                 Insurance Policy
               </Link>
@@ -261,37 +259,32 @@ export function Footer() {
           </div>
 
           {/* Contact Us */}
-          <div className="flex-1">
-            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize">
+          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
               Contact Us
             </h3>
-            <div className="space-y-2 md:space-y-3">
-              <div className="text-white text-base font-medium">
-                +09 456 789
-              </div>
-              <div className="text-white text-base font-medium">
-                OkoaSASA@gmail.com
-              </div>
-              <div className="text-white text-base font-medium">
-                1234 Building, Kenya
-              </div>
+            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
+              <div>+09 456 789</div>
+              <div>OkoaSASA@gmail.com</div>
+              <div>1234 Building, Kenya</div>
             </div>
           </div>
 
           {/* Newsletter Section */}
-          <div className="w-full md:w-[400px]">
-            <h3 className="text-xl md:text-2xl font-semibold text-white mb-4 md:mb-6 capitalize text-center md:text-left">
+          <div className="flex flex-col gap-6 text-left w-full sm:col-span-2 lg:col-span-3 xl:col-span-1 xl:w-[400px] xl:ml-auto">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
               You Can Find Us On!
             </h3>
-            <div className="flex flex-col sm:flex-row gap-2.5">
+            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:gap-[10px] xl:flex-row xl:items-center xl:gap-[10px]">
               <Input
                 type="email"
                 placeholder="Enter Your Email"
-                className="bg-[#2c2d2f] border-none text-brand-mid-gray placeholder:text-brand-mid-gray rounded-2xl px-4 md:px-6 py-3 h-auto flex-1"
+                className="bg-[#2c2d2f] border-none text-base text-brand-mid-gray placeholder:text-brand-mid-gray rounded-[16px] px-6 py-[13px] h-auto flex-1 xl:min-w-[240px]"
               />
               <Button
                 variant="gradient"
-                className="rounded-3xl px-4 md:px-6 py-3 h-auto text-base font-medium"
+                className="w-full rounded-[24px] px-6 py-3 text-base font-medium whitespace-nowrap xl:w-auto xl:flex-shrink-0 sm:max-w-[160px]"
+                size="lg"
               >
                 Contact Us
               </Button>

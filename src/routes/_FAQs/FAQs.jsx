@@ -1,6 +1,6 @@
 import React from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import {
   DeviceIcon,
   FileIcon,
@@ -67,7 +67,6 @@ const faqData = [
 
 const FAQs = () => {
   const [openStates, setOpenStates] = React.useState(faqData.map(() => false))
-  const [currentSlide, setCurrentSlide] = React.useState(0)
 
   const toggleFAQ = (index) => {
     setOpenStates((prev) =>
@@ -75,21 +74,13 @@ const FAQs = () => {
     )
   }
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % steps.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + steps.length) % steps.length)
-  }
-
   return (
-    <div className="bg-white overflow-hidden relative w-full">
+    <div className="bg-white mb-[100px] overflow-hidden relative w-full">
       {/* How It Works Section */}
       <div className="bg-white overflow-hidden relative w-full min-h-[485px] lg:h-[552px]">
-        <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-full absolute left-0 top-0" />
+        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-full absolute left-0 top-0" />
 
-        <div className="absolute left-1/2 top-[42px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] lg:max-w-7xl px-5 lg:px-0">
+        <div className="absolute left-1/2 top-[42px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] md:max-w-[680px] lg:max-w-7xl px-4  lg:px-0">
           <div className="flex flex-col gap-10 lg:gap-[60px] items-center">
             {/* Header */}
             <div className="flex flex-col gap-2 items-center text-center w-full lg:max-w-[616px]">
@@ -102,70 +93,50 @@ const FAQs = () => {
               </p>
             </div>
 
-            {/* Desktop Grid */}
-            <div className="hidden lg:grid grid-cols-6 gap-[12px] w-full">
-              {steps.map((step, index) => (
-                <div
-                  key={index}
-                  className="bg-white flex flex-col gap-[16px] items-center justify-center px-[12px] py-[16px] rounded-[16px] shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] flex-1"
-                >
-                  <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
-                    {step.icon}
+            {/* Steps Grid - Scrollable on mobile and tablet */}
+            <div className="w-full">
+              {/* Desktop Grid */}
+              <div className="hidden lg:grid grid-cols-6 gap-3 w-full">
+                {steps.map((step, index) => (
+                  <div
+                    key={index}
+                    className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] flex-1"
+                  >
+                    <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-20 h-20 flex items-center justify-center">
+                      {step.icon}
+                    </div>
+                    <div className="flex flex-col gap-3 items-center justify-center w-[178px]">
+                      <p className="font-['Public_Sans'] text-base font-normal leading-[1.4] text-[#252525] text-center capitalize">
+                        {step.title}
+                      </p>
+                    </div>
+                    <div className="relative h-[30px] w-full">
+                      <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                        {step.step}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-[12px] items-center justify-center w-[178px]">
-                    <p className="font-['Public_Sans'] text-base font-normal leading-[1.4] text-[#252525] text-center capitalize">
-                      {step.title}
-                    </p>
-                  </div>
-                  <div className="relative h-[30px] w-full">
-                    <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-gradient-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
-                      {step.step}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Mobile Carousel - Fixed with edge buttons and border */}
-            <div className="relative lg:hidden w-full max-w-[300px] mx-auto">
-              {/* Navigation Buttons - Positioned on card edges */}
-              <button
-                onClick={prevSlide}
-                className="absolute left-0 top-[40%] -translate-y-1/2 z-20 bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:border-orange-500 transition-all -ml-4"
-                disabled={currentSlide === 0}
-              >
-                <ChevronLeft className="w-5 h-5 text-[#f8971d]" />
-              </button>
-
-              <button
-                onClick={nextSlide}
-                className="absolute right-0 top-[40%] -translate-y-1/2 z-20 bg-white rounded-full p-3 shadow-lg border border-gray-200 hover:border-orange-500 transition-all -mr-4"
-                disabled={currentSlide === steps.length - 1}
-              >
-                <ChevronRight className="w-5 h-5 text-[#f8971d]" />
-              </button>
-
-              {/* Carousel Container with Border */}
-              <div className="overflow-hidden w-full border rounded-2xl shadow-lg">
-                <div
-                  className="flex transition-transform duration-300 ease-in-out"
-                  style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-                >
+              {/* Mobile & Tablet - Horizontal Scroll Grid */}
+              <div className="lg:hidden w-full overflow-x-auto">
+                <div className="flex gap-4 pb-4 min-w-max">
                   {steps.map((step, index) => (
                     <div
                       key={index}
-                      className="bg-white flex flex-col gap-4 items-center justify-center px-4 py-6 rounded-xl w-full shrink-0"
+                      className="bg-white flex flex-col gap-4 items-center justify-center px-6 py-8 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-[300px] md:w-[320px] shrink-0"
                     >
-                      <div className="bg-gradient-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-[80px] h-[80px] flex items-center justify-center">
+                      <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-20 h-20 flex items-center justify-center">
                         {step.icon}
                       </div>
                       <div className="flex flex-col gap-3 items-center justify-center w-full px-2">
-                        <p className="font-['Public_Sans'] text-[16px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
+                        <p className="font-['Public_Sans'] text-[18px] md:text-[20px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
                           {step.title}
                         </p>
                       </div>
                       <div className="relative h-[30px] w-full">
-                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-gradient-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] md:text-[28px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
                           {step.step}
                         </p>
                       </div>
@@ -173,28 +144,14 @@ const FAQs = () => {
                   ))}
                 </div>
               </div>
-
-              {/* Scroll Indicators */}
-              <div className="flex justify-center items-center gap-2 mt-4">
-                {steps.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                      index === currentSlide 
-                        ? 'bg-orange-500 w-4' 
-                        : 'bg-gray-300'
-                    }`}
-                  />
-                ))}
-              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* FAQs Section */}
-      <div className="w-full px-5 lg:px-20 py-6 lg:py-5">
-        <div className="max-w-[335px] lg:max-w-7xl mx-auto">
+      <div className="w-full px-4  lg:px-20 py-6 lg:py-5">
+        <div className="max-w-[335px] md:max-w-[680px] lg:max-w-7xl mx-auto">
           <div className="flex flex-col gap-4 lg:gap-14 items-center lg:items-start w-full">
             {/* Header */}
             <div className="flex flex-col gap-4 lg:gap-6 items-center w-full">
@@ -214,19 +171,19 @@ const FAQs = () => {
               {faqData.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-white flex flex-col gap-3 items-start p-3 lg:p-6 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-full"
+                  className="bg-white flex flex-col gap-3 items-start p-4 md:p-6 lg:p-6 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-full"
                 >
                   {/* Question Row */}
                   <div className="flex items-start justify-between w-full">
-                    <h2 className="font-['Public_Sans'] text-[18px] lg:text-[24px] font-semibold leading-[1.4] text-[#1c1f21] capitalize text-left flex-1 pr-4">
+                    <h2 className="font-['Public_Sans'] text-[18px] md:text-[20px] lg:text-[24px] font-semibold leading-[1.4] text-[#1c1f21] capitalize text-left flex-1 pr-4">
                       {faq.question}
                     </h2>
                     <button
                       onClick={() => toggleFAQ(index)}
-                      className="flex items-center justify-center w-6 h-6 shrink-0"
+                      className="flex items-center justify-center w-6 h-6 md:w-7 md:h-7 shrink-0"
                     >
                       <ChevronDown
-                        className={`w-6 h-6 text-[#4e555a] transition-transform duration-300 ${
+                        className={`w-6 h-6 md:w-7 md:h-7 text-[#4e555a] transition-transform duration-300 ${
                           openStates[index] ? 'rotate-180' : ''
                         }`}
                       />
@@ -236,7 +193,7 @@ const FAQs = () => {
                   {/* Answer */}
                   {openStates[index] && (
                     <div className="w-full">
-                      <p className="font-['Public_Sans'] text-[14px] lg:text-[18px] font-normal leading-[1.4] text-[#4e555a]">
+                      <p className="font-['Public_Sans'] text-[14px] md:text-[16px] lg:text-[18px] font-normal leading-[1.4] text-[#4e555a]">
                         {faq.answer}
                       </p>
                     </div>
