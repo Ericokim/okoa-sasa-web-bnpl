@@ -1,13 +1,43 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from 'react'
 import { productCatalog } from '@/data/products'
 
 const StateContext = createContext(null)
 
+const buildInitialCart = () =>
+  productCatalog
+    .filter((product) => product.inCart)
+    .map((product) => ({
+      productId: product.id,
+      quantity: Math.max(1, product.cartQuantity ?? 1),
+    }))
+
+const buildInitialProducts = (initialCart) =>
+  productCatalog.map((product) => {
+    const cartItem = initialCart.find((item) => item.productId === product.id)
+    return {
+      ...product,
+      inCart: Boolean(cartItem),
+      cartQuantity: cartItem?.quantity ?? 0,
+    }
+  })
+
 export function ContextProvider({ children }) {
+  const initialCart = useMemo(() => buildInitialCart(), [])
+  const initialProducts = useMemo(
+    () => buildInitialProducts(initialCart),
+    [initialCart],
+  )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
-  const [cart, setCart] = useState([])
-  const [products, setProducts] = useState(productCatalog)
+  const [cart, setCart] = useState(initialCart)
+  const [products, setProducts] = useState(initialProducts)
   const [searchTerm, setSearchTerm] = useState('')
 
 
@@ -39,98 +69,189 @@ export function ContextProvider({ children }) {
     localStorage.removeItem('user')
   }
 
-  const clearCart = () => {
+  const syncProductCartState = useCallback((productId, changes) => {
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === productId
+          ? {
+              ...product,
+              ...(changes.inCart !== undefined ? { inCart: changes.inCart } : {}),
+              ...(changes.cartQuantity !== undefined
+                ? { cartQuantity: changes.cartQuantity }
+                : {}),
+            }
+          : product,
+      ),
+    )
+  }, [])
+
+  const addToCart = useCallback(
+    (productId, quantity = 1) => {
+      if (quantity <= 0) return
+      setCart((prevCart) => {
+        const existing = prevCart.find((item) => item.productId === productId)
+        if (existing) {
+          const updatedQuantity = existing.quantity + quantity
+          const nextCart = prevCart.map((item) =>
+            item.productId === productId
+              ? { ...item, quantity: updatedQuantity }
+              : item,
+          )
+          syncProductCartState(productId, {
+            inCart: true,
+            cartQuantity: updatedQuantity,
+          })
+          return nextCart
+        }
+
+        syncProductCartState(productId, {
+          inCart: true,
+          cartQuantity: quantity,
+        })
+
+        return [...prevCart, { productId, quantity }]
+      })
+    },
+    [syncProductCartState],
+  )
+
+  const updateCartQuantity = useCallback(
+    (productId, quantity) => {
+      setCart((prevCart) => {
+        const sanitizedQuantity = Math.max(0, Number(quantity) || 0)
+        const exists = prevCart.find((item) => item.productId === productId)
+
+        if (!exists && sanitizedQuantity <= 0) {
+          syncProductCartState(productId, {
+            inCart: false,
+            cartQuantity: 0,
+          })
+          return prevCart
+        }
+
+        if (sanitizedQuantity <= 0) {
+          syncProductCartState(productId, {
+            inCart: false,
+            cartQuantity: 0,
+          })
+          return prevCart.filter((item) => item.productId !== productId)
+        }
+
+        const nextCart = exists
+          ? prevCart.map((item) =>
+              item.productId === productId
+                ? { ...item, quantity: sanitizedQuantity }
+                : item,
+            )
+          : [...prevCart, { productId, quantity: sanitizedQuantity }]
+
+        syncProductCartState(productId, {
+          inCart: true,
+          cartQuantity: sanitizedQuantity,
+        })
+
+        return nextCart
+      })
+    },
+    [syncProductCartState],
+  )
+
+  const removeFromCart = useCallback(
+    (productId) => {
+      setCart((prevCart) =>
+        prevCart.filter((item) => item.productId !== productId),
+      )
+      syncProductCartState(productId, { inCart: false, cartQuantity: 0 })
+    },
+    [syncProductCartState],
+  )
+
+  const clearCart = useCallback(() => {
     setCart([])
-  }
+    setProducts((prevProducts) =>
+      prevProducts.map((product) => ({
+        ...product,
+        inCart: false,
+        cartQuantity: 0,
+      })),
+    )
+  }, [])
 
-  // Toggle product's inCart property
-  const toggleProductInCart = (productId) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === productId
-          ? { ...product, inCart: !product.inCart }
-          : product
-      )
-    )
-  }
-const addToCart = (productId) => {
-  setProducts(prevProducts =>
-    prevProducts.map(product =>
-      product.id === productId
-        ? { ...product, inCart: true }
-        : product
-    )
+  const toggleProductInCart = useCallback(
+    (productId) => {
+      if (cart.some((item) => item.productId === productId)) {
+        removeFromCart(productId)
+      } else {
+        addToCart(productId, 1)
+      }
+    },
+    [cart, addToCart, removeFromCart],
   )
-}
 
-const removeFromCart = (productId) => {
-  setProducts(prevProducts =>
-    prevProducts.map(product =>
-      product.id === productId
-        ? { ...product, inCart: false }
-        : product
-    )
+  const addProductToCart = useCallback(
+    (productId, quantity = 1) => {
+      addToCart(productId, quantity)
+    },
+    [addToCart],
   )
-}
-  // Add product to cart (set inCart to true)
-  const addProductToCart = (productId) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === productId
-          ? { ...product, inCart: true }
-          : product
-      )
-    )
-  }
 
-  // Remove product from cart (set inCart to false)
-  const removeProductFromCart = (productId) => {
-    setProducts(prevProducts =>
-      prevProducts.map(product =>
-        product.id === productId
-          ? { ...product, inCart: false }
-          : product
-      )
-    )
-  }
+  const removeProductFromCart = useCallback(
+    (productId) => {
+      removeFromCart(productId)
+    },
+    [removeFromCart],
+  )
 
-  // Check if product is in cart
-  const isProductInCart = (productId) => {
-    const product = products.find(p => p.id === productId)
-    return product ? product.inCart : false
-  }
+  const isProductInCart = useCallback(
+    (productId) => cart.some((item) => item.productId === productId),
+    [cart],
+  )
 
-  // Get cart count
-  const getCartCount = () => {
-    return products.filter(p => p.inCart).length
-  }
+  const cartCount = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart],
+  )
 
-  // Get all products in cart
-  const getCartProducts = () => {
-    return products.filter(p => p.inCart)
-  }
+  const cartProducts = useMemo(
+    () =>
+      cart
+        .map((item) => {
+          const product = products.find((p) => p.id === item.productId)
+          if (!product) return null
+          return {
+            ...product,
+            quantity: item.quantity,
+          }
+        })
+        .filter(Boolean),
+    [cart, products],
+  )
 
-  // Clear all products from cart
-  const clearProductCart = () => {
-    setProducts(prevProducts =>
-      prevProducts.map(product => ({ ...product, inCart: false }))
-    )
-  }
+  const getCartCount = useCallback(() => cartCount, [cartCount])
 
-  // Find product by ID
-  const findProductById = (productId) => {
-    return products.find(p => p.id === Number(productId))
-  }
+  const getCartProducts = useCallback(() => cartProducts, [cartProducts])
+
+  const clearProductCart = useCallback(() => {
+    clearCart()
+  }, [clearCart])
+
+  const findProductById = useCallback(
+    (productId) => products.find((p) => p.id === Number(productId)),
+    [products],
+  )
 
   const value = {
     isAuthenticated,
     user,
     cart,
+    cartCount,
+    cartProducts,
     login,
     logout,
     addToCart,
     removeFromCart,
     clearCart,
+    updateCartQuantity,
     products,
     setProducts,
     toggleProductInCart,

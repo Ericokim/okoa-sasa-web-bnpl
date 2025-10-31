@@ -29,7 +29,7 @@ export function ProductInfo({ product }) {
   }
 
   const handleAddToCart = () => {
-    addToCart(product?.id)
+    addToCart(product?.id, quantity)
   }
 
   return (

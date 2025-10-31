@@ -8,7 +8,6 @@ Pixel-perfect, fully responsive cart components for the Okoa Sasa BNPL applicati
 Main container component that manages cart state and orchestrates child components.
 
 **Props:**
-- `initialItems` (array): Initial cart items
 - `onCheckout` (function): Callback function when checkout button is clicked
 
 **Usage:**
@@ -20,18 +19,7 @@ function CartPage() {
     navigate('/checkout')
   }
 
-  const items = [
-    {
-      id: 1,
-      title: 'iPhone 14',
-      description: 'iPhone 14 - 6.1" - 6GB RAM-128 GB ROM',
-      price: 87696,
-      quantity: 1,
-      image: '/images/iphone.png',
-    },
-  ]
-
-  return <Cart initialItems={items} onCheckout={handleCheckout} />
+  return <Cart onCheckout={handleCheckout} />
 }
 ```
 
@@ -242,10 +230,7 @@ function CartPage() {
 
   return (
     <div className="mx-auto w-full py-6 md:py-8">
-      <Cart 
-        initialItems={cartItems} 
-        onCheckout={handleCheckout} 
-      />
+      <Cart onCheckout={handleCheckout} />
       <AuthDialog 
         open={showAuth} 
         onOpenChange={setShowAuth} 
@@ -256,21 +241,7 @@ function CartPage() {
 ```
 
 ## State Management
-
-The Cart component uses local state with `useState`. For production:
-
-```jsx
-// Option 1: Context API
-const { cart, updateQuantity, removeItem } = useCart()
-
-// Option 2: Backend integration
-const { data: cart, mutate } = useQuery('cart', fetchCart)
-
-// Option 3: Local storage persistence
-useEffect(() => {
-  localStorage.setItem('cart', JSON.stringify(cartItems))
-}, [cartItems])
-```
+Cart state is sourced from the shared `StateContext`, which exposes helpers like `cartProducts`, `addToCart`, `updateCartQuantity`, and `removeFromCart`. Integrate your own backend or persistence layer by extending the context implementation.
 
 ## Testing Checklist
 

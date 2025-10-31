@@ -11,8 +11,8 @@ export default function OrderSummaryPage({
   isLastStep,
 }) {
   const navigate = useNavigate()
-  const { products, removeFromCart, updateCartQuantity } = useStateContext()
-  const cartItems = products.filter(p => p.inCart === true)
+  const { cartProducts, removeFromCart, updateCartQuantity } = useStateContext()
+  const cartItems = cartProducts ?? []
   
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
@@ -50,7 +50,8 @@ export default function OrderSummaryPage({
   }
 
   const subtotal = cartItems.reduce((total, item) => {
-    return total + (item.price * (item.quantity || 1))
+    const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
+    return total + item.price * quantity
   }, 0)
   
   const grandTotal = subtotal
@@ -76,10 +77,16 @@ export default function OrderSummaryPage({
 
           {/* Map through cart items */}
           {cartItems.length > 0 ? (
-            cartItems.map((product) => (
-              <div key={product.id}>
-                {/* Product Item */}
-                <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+            cartItems.map((product) => {
+              const quantity = Math.max(
+                1,
+                product.quantity || product.cartQuantity || 1,
+              )
+
+              return (
+                <div key={product.id}>
+                  {/* Product Item */}
+                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
                   {/* Product Image */}
                   <div 
                     onClick={() => handleImageClick(product.id)}
@@ -106,7 +113,7 @@ export default function OrderSummaryPage({
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
                           <button
-                            onClick={() => handleDecrement(product.id, product.quantity || 1)}
+                            onClick={() => handleDecrement(product.id, quantity)}
                             className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                             aria-label="Decrease quantity"
                             type="button"
@@ -118,11 +125,11 @@ export default function OrderSummaryPage({
                           </button>
 
                           <span className="flex w-8 justify-center text-base font-semibold text-[#252525]">
-                            {product.quantity || 1}
+                            {quantity}
                           </span>
 
                           <button
-                            onClick={() => handleIncrement(product.id, product.quantity || 1)}
+                            onClick={() => handleIncrement(product.id, quantity)}
                             className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                             aria-label="Increase quantity"
                             type="button"
@@ -152,7 +159,8 @@ export default function OrderSummaryPage({
                   <div className="h-px bg-gray-200 my-6"></div>
                 )}
               </div>
-            ))
+              )
+            })
           ) : (
             <p className="text-center text-[#676D75] py-8">No items in cart</p>
           )}
