@@ -5,7 +5,7 @@ import { Link } from '@tanstack/react-router'
 
 const DoneScreen = () => {
   return (
-    <div className="bg-white grid grid-cols-1 place-items-center w-full max-w-[1020px] h-auto rounded-4xl border border-gray-200 p-6">
+    <div className="bg-white grid grid-cols-1 place-items-center w-full max-w-full h-auto rounded-4xl border border-gray-200 p-6">
       <div className="w-[200px] h-[200px] mb-6">
         <CheckoutDoneIcon />
       </div>

@@ -23,6 +23,8 @@ const PATH_LABELS = {
   '/loans/faq': 'Loan FAQ',
   '/account': 'My Account',
   '/account/orders': 'Orders',
+  '/account/order_table': 'All Orders',
+
   '/account/settings': 'Settings',
   '/support': 'Support',
 }

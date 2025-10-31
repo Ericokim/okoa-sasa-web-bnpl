@@ -59,7 +59,7 @@ export default function OrderSummaryPage({
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-4 sm:p-0 gap-6">
       {/* Form Container */}
-      <div className="bg-white w-full max-w-[1020px] h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
+      <div className="bg-white w-full  h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
         <div className="mb-6">
           <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
             Order Summary
@@ -196,7 +196,7 @@ export default function OrderSummaryPage({
       </div>
 
       {/* Buttons Container */}
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-[1020px]">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
         <button
           onClick={onPrevious}
           disabled={isFirstStep}

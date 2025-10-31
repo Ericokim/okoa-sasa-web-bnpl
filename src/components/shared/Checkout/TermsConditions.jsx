@@ -21,7 +21,7 @@ export default function TermsConditionPage({
   return (
     <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
       {/* Main Content Container */}
-      <div className="bg-white w-full border max-w-[1020px] h-auto rounded-4xl p-4 sm:p-6">
+      <div className="bg-white w-full border h-auto rounded-4xl p-4 sm:p-6">
         <div className="w-full h-auto">
           {/* Header */}
           <div className="space-y-2 mb-4 sm:mb-0">
@@ -79,7 +79,7 @@ export default function TermsConditionPage({
       </div>
 
       {/* Buttons Container - Completely Outside */}
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-[1020px]">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
         <Button
           variant="outline"
           onClick={onPrevious}
