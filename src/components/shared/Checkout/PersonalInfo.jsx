@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { EmailIcon, PhoneIcon, SingleUserIcon, UserCardIcon, UserFileIcon, UserMsgIcon } from '@/assets/icons'
+import { CustomSelect } from '../Inputs/CustomSelect'
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -48,6 +49,13 @@ export default function PersonalInfoForm({
     },
   })
 
+    const companyOptions = [
+    { value: 'company1', label: 'Company One' },
+    { value: 'company2', label: 'Company Two' },
+    { value: 'company3', label: 'Company Three' },
+    { value: 'company4', label: 'Company Four' },
+  ]
+
   const onSubmit = (data) => {
     console.log(data)
     // Only proceed to next step if validation passes
@@ -57,7 +65,7 @@ export default function PersonalInfoForm({
   return (
     <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
       {/* Form Container */}
-      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full max-w-[1020px]">
+      <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full">
         <div className="w-full">
           <div className="h-auto sm:h-16 mb-4 sm:mb-0">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
@@ -135,26 +143,17 @@ export default function PersonalInfoForm({
                       <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
                         Employer
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      
                         <FormControl>
-                          <div className="relative">
-                            <UserCardIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
-                            <SelectTrigger className="pl-10 h-11 w-full border-gray-300 bg-gray-50">
-                              <SelectValue placeholder="Employer Name" />
-                            </SelectTrigger>
-                          </div>
+                          
+                          <CustomSelect
+                                                        icon={UserCardIcon}
+                                                        placeholder="Employer Name"
+                                                        options={companyOptions}
+                                                        value={field.value}
+                                                        onValueChange={field.onChange}
+                                                      />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="company1">Company One</SelectItem>
-                          <SelectItem value="company2">Company Two</SelectItem>
-                          <SelectItem value="company3">
-                            Company Three
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -239,7 +238,7 @@ export default function PersonalInfoForm({
       </div>
 
       {/* Buttons Container - Completely Outside */}
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-[1020px]">
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
         <Button
           onClick={onPrevious}
           disabled={isFirstStep}

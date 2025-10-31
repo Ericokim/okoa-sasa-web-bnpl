@@ -87,7 +87,7 @@ export default function CheckoutPage() {
       <BreadCrumbs items={breadcrumbItems} className="my-8" />
 
       {/* Center everything with max-width and mx-auto */}
-      <div className="max-w-[1067px] mx-auto flex flex-col">
+      <div className="max-w-[1230px] mx-auto flex flex-col">
         {!isCompleted ? (
           <>
             {/* Stepper Header */}
@@ -214,7 +214,7 @@ export default function CheckoutPage() {
             </div>
             {/* Step Content Area - Centered */}
             <div className="flex justify-center w-full">
-              <div className="bg-white w-full max-w-[1020px]">
+              <div className="bg-white w-full max-w-full">
                 {CurrentStepComponent ? (
                   <CurrentStepComponent
                     onSubmit={handleFormSubmit}

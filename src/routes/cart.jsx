@@ -10,10 +10,10 @@ function CartPage() {
   const [showAuthDialog, setShowAuthDialog] = React.useState(false)
 
   const handleCheckout = () => {
-    if (!isAuthenticated) {
-      setShowAuthDialog(true)
-      return
-    }
+    // if (!isAuthenticated) {
+    //   setShowAuthDialog(true)
+    //   return
+    // }
     navigate({ to: '/checkout' })
   }
 
