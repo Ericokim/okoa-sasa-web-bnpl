@@ -1,4 +1,4 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -24,49 +24,168 @@ import {
 import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
+export const recentOrders = [
+  {
+    id: '1',
+    orderId: 'REQ-20458',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'In Progress',
+    statusColor: 'blue',
+    image: '/phone.png',
+    date: '28/10/2025 14:30:00',
+    invoice: 'S-INV+0942801',
+    amount: 87696,
+    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
+    statusText: 'PROCESSING',
+    items: [
+      {
+        name: 'iPhone 14 - Midnight',
+        qty: 1,
+        price: 87696,
+        total: 87696,
+      },
+    ],
+    shippingAddress: {
+      name: 'John Doe',
+      street: 'Westlands Road',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 87696,
+      shipping: 0,
+      total: 87696,
+    },
+    statusStep: 0, // 0 = Processing, 1 = On the way, 2 = Delivered
+  },
+
+  {
+    id: '2',
+    orderId: 'REQ-20459',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'Rejected',
+    statusColor: 'red',
+    image: '/phone.png',
+    date: '27/10/2025 09:15:00',
+    invoice: 'S-INV+0942802',
+    amount: 87696,
+    dispatchTo: 'Jane Mwangi, Kilimani, Nairobi',
+    statusText: 'REJECTED',
+    items: [
+      {
+        name: 'iPhone 14 - Midnight',
+        qty: 1,
+        price: 87696,
+        total: 87696,
+      },
+    ],
+    shippingAddress: {
+      name: 'Jane Mwangi',
+      street: 'Argwings Kodhek Rd',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 87696,
+      shipping: 0,
+      total: 87696,
+    },
+    statusStep: -1, // Rejected → no progress
+  },
+
+  {
+    id: '3',
+    orderId: 'REQ-20460',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'Pending Request',
+    statusColor: 'yellow',
+    image: '/phone.png',
+    date: '26/10/2025 11:45:00',
+    invoice: 'S-INV+0942803',
+    amount: 87696,
+    dispatchTo: 'Peter Kimani, Lavington, Nairobi',
+    statusText: 'PENDING',
+    items: [
+      {
+        name: 'iPhone 14 - Midnight',
+        qty: 1,
+        price: 87696,
+        total: 87696,
+      },
+    ],
+    shippingAddress: {
+      name: 'Peter Kimani',
+      street: 'James Gichuru Rd',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 87696,
+      shipping: 0,
+      total: 87696,
+    },
+    statusStep: 0,
+  },
+
+  {
+    id: '4',
+    orderId: 'GSO32912984',
+    title: "Mara Moja Tablets 20's",
+    specs: "Mara Moja Tablets 20's",
+    price: 4000,
+    status: 'In Transit',
+    statusColor: 'blue',
+    image: '/tablet.png',
+    date: '29/10/2025 00:00:00',
+    invoice: 'S-INV+0942812',
+    amount: 4000,
+    dispatchTo: 'Festus Sila Kenna House (Hse No. 14) Kilifi Close',
+    statusText: 'COMPLETE',
+    items: [
+      { name: "Mara Moja Tablets 20's", qty: 1, price: 185.0, total: 185.0 },
+      {
+        name: "Visionace Plus Caps & Tablets 56's",
+        qty: 1,
+        price: 2220.0,
+        total: 2220.0,
+      },
+      {
+        name: 'St Ives Soothing Chamomile Facial Cleanser 200ml',
+        qty: 1,
+        price: 1595.0,
+        total: 1595.0,
+      },
+    ],
+    shippingAddress: {
+      name: 'Festus Sila',
+      street: 'Kilifi Close, Hse No. 14',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 4000,
+      shipping: 0,
+      total: 4000,
+    },
+    statusStep: 1,
+  },
+]
+
 function OrdersPage() {
-  const recentOrders = [
-    {
-      id: '1',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'In Progress',
-      statusColor: 'blue',
-      image: '/phone.png',
-    },
-    {
-      id: '2',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Rejected',
-      statusColor: 'red',
-      image: '/phone.png',
-    },
-    {
-      id: '3',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Pending Request',
-      statusColor: 'yellow',
-      image: '/phone.png',
-    },
-    {
-      id: '4',
-      title: 'iPhone 14',
-      specs:
-        'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-      price: 87696,
-      status: 'Pending Request',
-      statusColor: 'yellow',
-      image: '/phone.png',
-    },
-  ]
+  const navigate = useNavigate()
 
   const orderHistory = [
     {
@@ -160,6 +279,10 @@ function OrdersPage() {
     return map[color] || map.orange
   }
 
+  const handleImageClick = (orderId) => {
+    navigate({ to: `/orders/${orderId}` })
+  }
+
   return (
     <div className="min-h-screen">
       <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
@@ -187,7 +310,10 @@ function OrdersPage() {
                   return (
                     <div key={order.id}>
                       {/* Desktop & Tablet View */}
-                      <div className="hidden sm:flex gap-4 py-3 items-start">
+                      <div
+                        className="hidden sm:flex gap-4 py-3 items-start cursor-pointer"
+                        onClick={() => handleImageClick(order.orderId)}
+                      >
                         <div className="flex-shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
                           <img
                             src={order.image}
@@ -229,8 +355,11 @@ function OrdersPage() {
                         </div>
                       </div>
 
-                      {/* Mobile View - Better Aligned */}
-                      <div className="sm:hidden py-3">
+                      {/* Mobile View */}
+                      <div
+                        className="sm:hidden py-3 cursor-pointer"
+                        onClick={() => handleImageClick(order.orderId)}
+                      >
                         <div className="flex gap-3">
                           <div className="flex-shrink-0 rounded-xl bg-brand-bg-2 p-2 overflow-hidden h-fit">
                             <img
@@ -255,11 +384,7 @@ function OrdersPage() {
                               </Badge>
                             </div>
 
-                            <p
-                              className="
-                            font-sans text-base font-normal leading-relaxed text-[#676D75] flex-none order-1 self-stretch flex-grow-0
-"
-                            >
+                            <p className="font-sans text-base font-normal leading-relaxed text-[#676D75] flex-none order-1 self-stretch flex-grow-0">
                               {order.specs}
                             </p>
 
@@ -526,7 +651,11 @@ function OrdersPage() {
     </div>
   )
 }
-
+// In parent route (orders/index.jsx)
 export const Route = createFileRoute('/_protected/orders/')({
   component: OrdersPage,
+  loader: () => ({ recentOrders }),
+
 })
+
+
