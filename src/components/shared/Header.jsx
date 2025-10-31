@@ -89,7 +89,6 @@ export function Header() {
             )}
           </Link>
 
-          {/* Mobile – same component, just tell it it’s mobile */}
           <UserDropdown isMobile />
         </div>
       </div>
