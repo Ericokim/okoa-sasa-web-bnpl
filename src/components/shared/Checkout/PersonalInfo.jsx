@@ -67,7 +67,7 @@ export default function PersonalInfoForm({
       {/* Form Container */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full">
         <div className="w-full">
-          <div className="h-auto sm:h-16 mb-4 sm:mb-0">
+          <div className="mb-4 sm:mb-0">
             <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-1">
               Personal Info
             </h2>
@@ -84,7 +84,7 @@ export default function PersonalInfoForm({
               className="space-y-4 sm:space-y-6"
             >
               {/* Row 1: Full Name and National ID */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px] h-auto sm:h-[75px]">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
                 <FormField
                   control={form.control}
                   name="fullName"
@@ -98,7 +98,7 @@ export default function PersonalInfoForm({
                           <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="Enter your Full Name"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50"
+                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
                             {...field}
                           />
                         </div>
@@ -122,7 +122,7 @@ export default function PersonalInfoForm({
                           <Input
                             placeholder="Enter ID Number"
                             type={'number'}
-                            className="pl-10 h-11 border-gray-300 bg-gray-50"
+                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
                             {...field}
                           />
                         </div>
@@ -134,7 +134,7 @@ export default function PersonalInfoForm({
               </div>
 
               {/* Row 2: Employer and Employee Number */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px] h-auto sm:h-[75px]">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
                 <FormField
                   control={form.control}
                   name="employer"
@@ -172,7 +172,7 @@ export default function PersonalInfoForm({
                           <UserMsgIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="OKOA085"
-                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500"
+                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500 focus-visible:ring-orange-500 invalid:border-orange-300"
                             {...field}
                           />
                         </div>
@@ -184,7 +184,7 @@ export default function PersonalInfoForm({
               </div>
 
               {/* Row 3: Email and Phone Number */}
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px] h-auto sm:h-[75px]">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
                 <FormField
                   control={form.control}
                   name="email"
@@ -199,7 +199,7 @@ export default function PersonalInfoForm({
                           <Input
                             type="email"
                             placeholder="Enter your email"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50"
+                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
                             {...field}
                           />
                         </div>
@@ -222,7 +222,7 @@ export default function PersonalInfoForm({
                           <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <Input
                             placeholder="004583"
-                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500"
+                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500 focus-visible:ring-orange-500 invalid:border-orange-300"
                             {...field}
                           />
                         </div>
