@@ -74,7 +74,8 @@ export default function CheckoutPage() {
   }
 
   const CurrentStepComponent = steps[currentStep - 1]?.component
-  const hasComponent = CurrentStepComponent !== null && CurrentStepComponent !== undefined
+  const hasComponent =
+    CurrentStepComponent !== null && CurrentStepComponent !== undefined
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
@@ -83,11 +84,11 @@ export default function CheckoutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white ">
-      <BreadCrumbs items={breadcrumbItems} className="my-8" />
+    <div className="min-h-screen max-w-full bg-white ">
+      <BreadCrumbs items={breadcrumbItems} className="my-8 -ml-2" />
 
       {/* Center everything with max-width and mx-auto */}
-      <div className="max-w-[1230px] mx-auto flex flex-col">
+      <div className="max-w-full mx-auto flex flex-col">
         {!isCompleted ? (
           <>
             {/* Stepper Header */}
@@ -102,7 +103,10 @@ export default function CheckoutPage() {
                       <div className="relative shrink-0">
                         {step.id < currentStep ? (
                           <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
-                            <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                            <Check
+                              className="w-6 h-6 text-white"
+                              strokeWidth={3}
+                            />
                           </div>
                         ) : step.id === currentStep ? (
                           <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
@@ -119,7 +123,9 @@ export default function CheckoutPage() {
                       {index < steps.length - 1 && (
                         <div
                           className={`h-[3px] flex-1 ${
-                            step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                            step.id < currentStep
+                              ? 'bg-orange-500'
+                              : 'bg-gray-300'
                           }`}
                         ></div>
                       )}
@@ -128,18 +134,24 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Labels Row */}
-                <div className="flex items-center">
+                <div className="flex items-center relative">
                   {steps.map((step, index) => (
                     <React.Fragment key={step.id}>
                       <div
-                        className="text-center -ml-6 shrink-0"
+                        className="shrink-0 relative"
                         style={{ width: '40px' }}
                       >
                         <p
-                          className={`text-base font-medium leading-[1.4] flex items-center justify-center -mr-10 h-[22px] whitespace-nowrap ${
+                          className={`text-base font-medium leading-[1.4] whitespace-nowrap ${
                             step.id <= currentStep
                               ? 'text-[#0D0B26]'
                               : 'text-gray-400'
+                          } ${
+                            index === 0 
+                              ? 'text-left' 
+                              : index === steps.length - 1 
+                              ? 'text-right absolute -mt-2.5 right-0' 
+                              : 'text-center -translate-x-1/2'
                           }`}
                         >
                           {step.label}
@@ -161,7 +173,10 @@ export default function CheckoutPage() {
                       <div className="relative shrink-0">
                         {step.id < currentStep ? (
                           <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                            <Check
+                              className="w-4 h-4 text-white"
+                              strokeWidth={3}
+                            />
                           </div>
                         ) : step.id === currentStep ? (
                           <div className="w-8 h-8 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
@@ -178,7 +193,9 @@ export default function CheckoutPage() {
                       {index < steps.length - 1 && (
                         <div
                           className={`h-[2px] flex-1 ${
-                            step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
+                            step.id < currentStep
+                              ? 'bg-orange-500'
+                              : 'bg-gray-300'
                           }`}
                         ></div>
                       )}
