@@ -28,11 +28,9 @@ import { DropdownMenuSeparator } from '@/components/ui/dropdown-menu'
 import { BoxWhiteIcon, ProfileIcon, LogoutIcon } from '@/assets/icons'
 
 export function Header() {
-  const { products, searchTerm, setSearchTerm, user, isAuthenticated, logout } =
+  const { cartCount, getCartCount, searchTerm, setSearchTerm } =
     useStateContext()
-  const { personalInfo } = useAccountStore()
-  const navigate = useNavigate()
-  const cartItems = products.filter((p) => p.inCart === true).length
+  const cartItems = typeof cartCount === 'number' ? cartCount : getCartCount()
 
   const clearSearch = () => {
     if (!searchTerm) return

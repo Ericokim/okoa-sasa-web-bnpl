@@ -1,36 +1,37 @@
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { BreadCrumbs } from '../BreadCrumbs'
 import { CartList } from './CartList'
 import { CartSummary } from './CartSummary'
+import { useStateContext } from '@/context/state-context'
 
-export function Cart({ initialItems = [], onCheckout }) {
-  const [cartItems, setCartItems] = useState(initialItems)
+export function Cart({ onCheckout }) {
+  const { cartProducts, updateCartQuantity, removeFromCart } =
+    useStateContext()
+
+  const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
 
   const handleQuantityChange = (id, newQuantity) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id ? { ...item, quantity: newQuantity } : item,
-      ),
-    )
+    updateCartQuantity?.(id, Math.max(1, newQuantity))
   }
 
   const handleRemove = (id) => {
-    setCartItems((items) => items.filter((item) => item.id !== id))
+    removeFromCart?.(id)
   }
 
-  const calculateTotals = () => {
-    const totalItems = cartItems.reduce(
-      (sum, item) => sum + (item.quantity || 1),
-      0,
+  const { totalItems, subtotal } = useMemo(() => {
+    const totals = cartItems.reduce(
+      (acc, item) => {
+        const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
+        return {
+          totalItems: acc.totalItems + quantity,
+          subtotal: acc.subtotal + item.price * quantity,
+        }
+      },
+      { totalItems: 0, subtotal: 0 },
     )
-    const subtotal = cartItems.reduce(
-      (sum, item) => sum + item.price * (item.quantity || 1),
-      0,
-    )
-    return { totalItems, subtotal }
-  }
 
-  const { totalItems, subtotal } = calculateTotals()
+    return totals
+  }, [cartItems])
 
   return (
     <div className="flex w-full flex-col items-start gap-6 md:gap-[30px]">
