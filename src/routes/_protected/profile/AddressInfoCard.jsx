@@ -59,7 +59,7 @@ export function RouteComponent() {
               onCancel={() => setEditing(null)}
             />
           ) : (
-            <p className="font-sans font-medium text-lg capitalize text-[#252525]">
+            <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
               {office.street}
             </p>
           )}
@@ -95,7 +95,7 @@ export function RouteComponent() {
               onCancel={() => setEditing(null)}
             />
           ) : (
-            <p className="font-sans font-medium text-lg capitalize text-[#252525]">
+            <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
               {home.street}
             </p>
           )}
@@ -112,13 +112,13 @@ export const Route = createFileRoute('/_protected/profile/AddressInfoCard')({
 export const component = RouteComponent
 export const AddressInfoCard = RouteComponent
 
-// Reusable Edit Form — Pure JSX
+// Reusable Edit Form — Updated with Textarea
 function AddressEditForm({ value, onChange, onSave, onCancel }) {
   return (
     <div className="space-y-3">
-      <input
-        type="text"
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+      <textarea
+        rows={3}
+        className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-y min-h-[80px]"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Enter street address"

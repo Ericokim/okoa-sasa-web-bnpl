@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp, User } from 'lucide-react'
+import { ChevronDown, ChevronUp, List, User } from 'lucide-react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useStateContext } from '@/context/state-context'
 import { useAccountStore } from '@/data/accountStore'
@@ -12,7 +12,6 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
-
 
 export function UserDropdown() {
   const [showAuthDialog, setShowAuthDialog] = useState(false)
@@ -33,7 +32,9 @@ export function UserDropdown() {
           onClick={() => setShowAuthDialog(true)}
           className="flex items-center gap-1 md:gap-2"
         >
-          <div className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-gray-200">
+          <div
+            className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-brand-bg-2"
+          >
             <User className="h-4 w-4" />
           </div>
           <span className="hidden text-base leading-[140%] md:inline">
@@ -95,17 +96,36 @@ export function UserDropdown() {
         <DropdownMenuSeparator className="my-1" />
 
         {/* Menu Items */}
-        <Button asChild variant="ghost" className="flex items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start">
+        <Button
+          asChild
+          variant="ghost"
+          className="flex items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
+        >
           <Link to="/orders">
             <BoxWhiteIcon className="h-5 w-5 text-black" />
             Order History
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" className="flex items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start">
+        <Button
+          asChild
+          variant="ghost"
+          className="flex items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
+        >
           <Link to="/profile">
             <ProfileIcon className="h-5 w-5 text-black" />
             My Account
+          </Link>
+        </Button>
+
+        <Button
+          asChild
+          variant="ghost"
+          className="flex items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
+        >
+          <Link to="/order_table">
+            <List className="h-5 w-5 text-black" />
+            All Orders
           </Link>
         </Button>
 

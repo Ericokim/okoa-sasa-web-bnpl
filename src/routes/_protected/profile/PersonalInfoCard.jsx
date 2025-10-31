@@ -21,7 +21,6 @@ export function RouteComponent() {
 
   return (
     <div className="border rounded-xl p-6 bg-white ">
-
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-sans text-2xl font-medium leading-9 capitalize text-black">
           Personal Information
@@ -44,44 +43,45 @@ export function RouteComponent() {
       {!editing ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
           <div>
-            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 grow-0">
               First Name
             </p>
-            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch grow-0">
               {personalInfo.firstName}
             </p>
           </div>
           <div>
-            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 grow-0">
               Last Name
             </p>
-            <p className="font-medium text-md text-gray-900">
+              <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch grow-0">
               {personalInfo.lastName}
             </p>
+         
           </div>
           <div>
-            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
-              Designation
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 grow-0">
+              Company
             </p>
-            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
-              {personalInfo.role}
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch grow-0">
+              {personalInfo.company}
             </p>
           </div>
           <div>
-            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 grow-0">
               Email Address
             </p>
 
-            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch grow-0">
               {personalInfo.email}
             </p>
           </div>
           <div>
-            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 flex-grow-0">
+            <p className="font-sans text-base font-normal leading-[22px] text-[#A0A4AC] flex-none order-0 grow-0">
               Phone Number
             </p>
 
-            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch flex-grow-0">
+            <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525] flex-none order-1 self-stretch grow-0">
               {personalInfo.phone}
             </p>
           </div>
