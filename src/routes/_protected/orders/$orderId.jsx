@@ -13,169 +13,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Check, Package, Truck, MapPin } from 'lucide-react'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
-const recentOrders = [
-  {
-    id: '1',
-    orderId: 'REQ-20458',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'In Progress',
-    statusColor: 'blue',
-    image: '/phone.png',
-    date: '28/10/2025 14:30:00',
-    invoice: 'S-INV+0942801',
-    amount: 87696,
-    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
-    statusText: 'PROCESSING',
-    items: [
-      {
-        name: 'iPhone 14 - Midnight',
-        qty: 1,
-        price: 87696,
-        total: 87696,
-      },
-    ],
-    shippingAddress: {
-      name: 'John Doe',
-      street: 'Westlands Road',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 87696,
-      shipping: 0,
-      total: 87696,
-    },
-    statusStep: 0, // 0 = Processing, 1 = On the way, 2 = Delivered
-  },
+import { recentOrders } from './index'
 
-  {
-    id: '2',
-    orderId: 'REQ-20459',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'Rejected',
-    statusColor: 'red',
-    image: '/phone.png',
-    date: '27/10/2025 09:15:00',
-    invoice: 'S-INV+0942802',
-    amount: 87696,
-    dispatchTo: 'Jane Mwangi, Kilimani, Nairobi',
-    statusText: 'REJECTED',
-    items: [
-      {
-        name: 'iPhone 14 - Midnight',
-        qty: 1,
-        price: 87696,
-        total: 87696,
-      },
-    ],
-    shippingAddress: {
-      name: 'Jane Mwangi',
-      street: 'Argwings Kodhek Rd',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 87696,
-      shipping: 0,
-      total: 87696,
-    },
-    statusStep: -1, // Rejected → no progress
-  },
 
-  {
-    id: '3',
-    orderId: 'REQ-20460',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'Pending Request',
-    statusColor: 'yellow',
-    image: '/phone.png',
-    date: '26/10/2025 11:45:00',
-    invoice: 'S-INV+0942803',
-    amount: 87696,
-    dispatchTo: 'Peter Kimani, Lavington, Nairobi',
-    statusText: 'PENDING',
-    items: [
-      {
-        name: 'iPhone 14 - Midnight',
-        qty: 1,
-        price: 87696,
-        total: 87696,
-      },
-    ],
-    shippingAddress: {
-      name: 'Peter Kimani',
-      street: 'James Gichuru Rd',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 87696,
-      shipping: 0,
-      total: 87696,
-    },
-    statusStep: 0,
-  },
-
-  {
-    id: '4',
-    orderId: 'GSO32912984',
-    title: "Mara Moja Tablets 20's",
-    specs: "Mara Moja Tablets 20's",
-    price: 4000,
-    status: 'In Transit',
-    statusColor: 'blue',
-    image: '/tablet.png',
-    date: '29/10/2025 00:00:00',
-    invoice: 'S-INV+0942812',
-    amount: 4000,
-    dispatchTo: 'Festus Sila Kenna House (Hse No. 14) Kilifi Close',
-    statusText: 'COMPLETE',
-    items: [
-      { name: "Mara Moja Tablets 20's", qty: 1, price: 185.0, total: 185.0 },
-      {
-        name: "Visionace Plus Caps & Tablets 56's",
-        qty: 1,
-        price: 2220.0,
-        total: 2220.0,
-      },
-      {
-        name: 'St Ives Soothing Chamomile Facial Cleanser 200ml',
-        qty: 1,
-        price: 1595.0,
-        total: 1595.0,
-      },
-    ],
-    shippingAddress: {
-      name: 'Festus Sila',
-      street: 'Kilifi Close, Hse No. 14',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 4000,
-      shipping: 0,
-      total: 4000,
-    },
-    statusStep: 1,
-  },
-]
 function OrderDetailPage() {
   const { orderId } = Route.useParams()
   const navigate = useNavigate()
-  // const { recentOrders } = Route.useLoaderData()
 
   if (!recentOrders) return <div className="p-8 text-center">Loading...</div>
   const order = recentOrders.find((o) => o.orderId === orderId)
@@ -198,10 +41,10 @@ function OrderDetailPage() {
       <BreadCrumbs items={breadcrumbItems} className="my-8" />
 
       <div className="mx-auto px-4 py-8 space-y-10">
-        {/* STATUS CARD — CENTERED */}
+        {/* STATUS CARD */}
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle className="font-medium text-2xl text-[#0D0B26]">
+            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
               Status
             </CardTitle>
             <Separator className="my-4" />
@@ -222,16 +65,15 @@ function OrderDetailPage() {
                         }`}
                       >
                         {step.active ? (
-                          <Check
-                            className="w- h-7 text-white"
-                            strokeWidth={3}
-                          />
+                          <Check className="w-5 h-5 text-white" strokeWidth={3} />
                         ) : (
                           <div className="w-4 h-4 rounded-full bg-gray-300"></div>
                         )}
                       </div>
                       <p
-                        className={`mt-3 text-sm font-medium ${step.active ? 'text-[#0D0B26]' : 'text-gray-400'}`}
+                        className={`mt-3 font-sans text-base font-normal leading-snug ${
+                          step.active ? 'text-[#252525]' : 'text-[#A0A4AC]'
+                        }`}
                       >
                         {step.label}
                       </p>
@@ -259,10 +101,7 @@ function OrderDetailPage() {
                         }`}
                       >
                         {step.active ? (
-                          <Check
-                            className="w-5 h-5 text-white"
-                            strokeWidth={3}
-                          />
+                          <Check className="w-5 h-5 text-white" strokeWidth={3} />
                         ) : (
                           <div className="w-3 h-3 rounded-full bg-gray-300"></div>
                         )}
@@ -275,13 +114,13 @@ function OrderDetailPage() {
                     </div>
                   ))}
                 </div>
-                <div className="grid grid-cols-3 text-center text-xs font-medium">
+                <div className="grid grid-cols-3 text-center">
                   {steps.map((step, idx) => (
                     <p
                       key={idx}
-                      className={
-                        step.active ? 'text-[#0D0B26]' : 'text-gray-400'
-                      }
+                      className={`font-sans text-base font-normal leading-snug ${
+                        step.active ? 'text-[#252525]' : 'text-[#A0A4AC]'
+                      }`}
                     >
                       {step.label}
                     </p>
@@ -295,33 +134,49 @@ function OrderDetailPage() {
         {/* DETAILS CARD */}
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle className="font-medium text-2xl text-[#0D0B26]">
+            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
               Order Details
             </CardTitle>
             <Separator className="my-4" />
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-[15px] font-sans text-[#252525]">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <span className="text-gray-500">Date</span>
-                <p className="font-medium">{order.date}</p>
+                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                  Date
+                </span>
+                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
+                  {order.date}
+                </p>
               </div>
               <div>
-                <span className="text-gray-500">Invoice</span>
-                <p className="font-medium">{order.invoice}</p>
+                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                  Invoice
+                </span>
+                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
+                  {order.invoice}
+                </p>
               </div>
               <div>
-                <span className="text-gray-500">Amount</span>
-                <p className="font-medium">
+                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                  Amount
+                </span>
+                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
                   {order.amount.toLocaleString()} KES
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">Dispatch to</span>
-                <p className="font-medium">{order.dispatchTo}</p>
+                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                  Dispatch to
+                </span>
+                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
+                  {order.dispatchTo}
+                </p>
               </div>
               <div>
-                <span className="text-gray-500">Status</span>
+                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                  Status
+                </span>
                 <Badge className="bg-green-100 text-green-800 text-sm font-medium mt-1">
                   {order.statusText}
                 </Badge>
@@ -333,7 +188,7 @@ function OrderDetailPage() {
         {/* ITEMS TABLE CARD */}
         <Card className="shadow-none">
           <CardHeader>
-            <CardTitle className="font-medium text-2xl text-[#0D0B26]">
+            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
               Items
             </CardTitle>
             <Separator className="my-4" />
@@ -342,16 +197,16 @@ function OrderDetailPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-[#252525] font-sans">
+                  <TableHead className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                     Name
                   </TableHead>
-                  <TableHead className="text-center text-[#252525] font-sans">
+                  <TableHead className="text-center font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                     Qty
                   </TableHead>
-                  <TableHead className="text-right text-[#252525] font-sans">
+                  <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                     Price
                   </TableHead>
-                  <TableHead className="text-right text-[#252525] font-sans">
+                  <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
                     Total
                   </TableHead>
                 </TableRow>
@@ -362,16 +217,16 @@ function OrderDetailPage() {
                     key={idx}
                     className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
                   >
-                    <TableCell className="text-[15px] text-[#252525] font-sans">
+                    <TableCell className="font-sans text-lg font-medium text-[#252525] capitalize">
                       {item.name}
                     </TableCell>
-                    <TableCell className="text-center text-[15px] text-[#252525] font-sans">
+                    <TableCell className="text-center font-sans text-lg font-medium text-[#252525] capitalize">
                       {item.qty}
                     </TableCell>
-                    <TableCell className="text-right text-[15px] text-[#252525] font-sans">
+                    <TableCell className="text-right font-sans text-lg font-medium text-[#252525] capitalize">
                       KES {item.price.toFixed(2)}
                     </TableCell>
-                    <TableCell className="text-right text-[15px] font-medium text-[#252525] font-sans">
+                    <TableCell className="text-right font-sans text-lg font-medium text-[#252525] capitalize">
                       KES {item.total.toFixed(2)}
                     </TableCell>
                   </TableRow>
@@ -381,14 +236,14 @@ function OrderDetailPage() {
           </CardContent>
         </Card>
 
-        {/* ACTION BUTTONS — MATCH UPLOAD/DELETE STYLE */}
+        {/* ACTION BUTTONS */}
         <div className="flex flex-wrap justify-center gap-3 pt-6">
           <Button
             variant="outline"
             onClick={() => navigate({ to: '/orders' })}
             className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
                        border border-[#F8971D] text-[#F8971D] rounded-3xl 
-                       font-medium text-base hover:bg-[#F8971D]/10 transition-all"
+                       font-sans font-medium text-base hover:bg-[#F8971D]/10 transition-all"
           >
             Back to Orders
           </Button>
@@ -396,7 +251,7 @@ function OrderDetailPage() {
           <Button
             className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
                               bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+                              text-white font-sans font-medium text-base shadow-sm hover:opacity-90 transition-all"
           >
             Re-Order
           </Button>
@@ -404,7 +259,7 @@ function OrderDetailPage() {
           <Button
             className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
                               bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+                              text-white font-sans font-medium text-base shadow-sm hover:opacity-90 transition-all"
           >
             <MapPin className="h-5 w-5" />
             Track Order

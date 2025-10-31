@@ -141,47 +141,46 @@ export const recentOrders = [
 
   {
     id: '4',
-    orderId: 'GSO32912984',
-    title: "Mara Moja Tablets 20's",
-    specs: "Mara Moja Tablets 20's",
-    price: 4000,
-    status: 'In Transit',
-    statusColor: 'blue',
-    image: '/tablet.png',
-    date: '29/10/2025 00:00:00',
-    invoice: 'S-INV+0942812',
-    amount: 4000,
-    dispatchTo: 'Festus Sila Kenna House (Hse No. 14) Kilifi Close',
-    statusText: 'COMPLETE',
+    orderId: 'REQ-20461',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'Pending Request',
+    statusColor: 'yellow',
+    image: '/phone.png',
+    date: '25/10/2025 16:20:00',
+    invoice: 'S-INV+0942804',
+    amount: 87696,
+    dispatchTo: 'Alice Wanjiku, Karen, Nairobi',
+    statusText: 'PENDING',
     items: [
-      { name: "Mara Moja Tablets 20's", qty: 1, price: 185.0, total: 185.0 },
       {
-        name: "Visionace Plus Caps & Tablets 56's",
+        name: 'iPhone 14 - Midnight',
         qty: 1,
-        price: 2220.0,
-        total: 2220.0,
-      },
-      {
-        name: 'St Ives Soothing Chamomile Facial Cleanser 200ml',
-        qty: 1,
-        price: 1595.0,
-        total: 1595.0,
+        price: 87696,
+
+        total: 87696,
       },
     ],
-    shippingAddress: {
-      name: 'Festus Sila',
-      street: 'Kilifi Close, Hse No. 14',
+
+     shippingAddress: {
+      name: 'Peter Kimani',
+      street: 'James Gichuru Rd',
       city: 'Nairobi',
       zip: '00100',
       country: 'Kenya',
     },
     summary: {
-      subtotal: 4000,
+      subtotal: 87696,
       shipping: 0,
-      total: 4000,
+      total: 87696,
     },
-    statusStep: 1,
-  },
+    statusStep: 0,
+
+  }
+
+ 
 ]
 
 function OrdersPage() {
