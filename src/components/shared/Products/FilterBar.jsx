@@ -771,7 +771,7 @@ export function FilterBar({
                   onClick={handleClearAll}
                   className="cursor-pointer rounded-3xl border border-transparent px-3 py-1 text-sm font-medium leading-[140%] text-[#F25E5E] transition-colors hover:bg-[#FFF4EE]"
                 >
-                  Clear All
+                  Clear
                 </button>
               </div>
               <div ref={scrollAreaContainerRef}>

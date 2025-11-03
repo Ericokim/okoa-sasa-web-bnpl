@@ -2,8 +2,7 @@ import { useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { X } from 'lucide-react'
-import { PhoneIcon, XIcon } from 'lucide-react'
+import { X, XIcon } from 'lucide-react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {
   Form,
@@ -17,6 +16,8 @@ import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 
+const TENURE_MIN = 6
+const TENURE_MAX = 24
 const DEFAULT_TENURE = 13
 
 const parseCurrencyValue = (value) => {
@@ -49,8 +50,8 @@ const loanCalculatorSchema = z.object({
     }),
   months: z
     .number()
-    .min(6, 'Minimum tenure is 6 months')
-    .max(24, 'Maximum tenure is 24 months'),
+    .min(TENURE_MIN, `Minimum tenure is ${TENURE_MIN} months`)
+    .max(TENURE_MAX, `Maximum tenure is ${TENURE_MAX} months`),
 })
 
 export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
@@ -117,16 +118,22 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-[#252525]/20 backdrop-blur-[4px]" />
-        <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[500px] translate-x-[-50%] translate-y-[-50%] gap-6 rounded-3xl border bg-white p-[30px] shadow-lg duration-200">
-          <div className="flex items-center justify-end">
-            <button
-              onClick={handleCancel}
-              className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
-            >
-              <XIcon className="h-6 w-6 text-[#09244B]" />
-              <span className="sr-only">Close</span>
-            </button>
-          </div>
+        <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[500px] translate-x-[-50%] translate-y-[-50%] gap-6 rounded-3xl border bg-white px-[30px] pb-[34px] pt-8 shadow-lg duration-200">
+          <DialogPrimitive.Close
+            onClick={handleCancel}
+            className="cursor-pointer absolute right-6 top-10 inline-flex h-5 w-5 md:right-[30px] md:top-[30px] opacity-70 items-center justify-center rounded-sm ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
+          >
+            <XIcon className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+
+          {/* <button
+            onClick={() => onOpenChange(false)}
+            className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
+          >
+            <XIcon className="h-6 w-6 text-[#09244B]" />
+            <span className="sr-only">Close</span>
+          </button> */}
 
           <div className="flex flex-col gap-2">
             <DialogPrimitive.Title className="text-2xl font-semibold leading-[140%] capitalize text-[#252525]">
@@ -201,21 +208,23 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 control={form.control}
                 name="months"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col gap-2.5">
-                    <div className="flex items-center justify-center gap-3 h-[38px] mb-4">
-                      <p className="text-base font-medium text-gray-900">
+                  <FormItem className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3">
+                      <p className="text-left text-base font-medium text-gray-900">
                         Loan Tenure
                       </p>
-                      <div className="flex flex-row items-center justify-center h-[38px] w-[104px] gap-2.5 rounded-full border border-[#F47120] px-3.5 py-2.5">
-                        <p className="text-center text-sm font-normal text-[#333333]">
-                          {field.value ?? DEFAULT_TENURE} Months
-                        </p>
+                      <div className="flex flex-1 justify-start ml-13 mx-auto">
+                        <div className="flex h-[38px] min-w-[120px] items-center justify-center gap-2.5 rounded-full border border-[#F47120] px-4">
+                          <p className="text-center text-sm font-medium text-[#333333]">
+                            {field.value ?? DEFAULT_TENURE} Months
+                          </p>
+                        </div>
                       </div>
                     </div>
                     <FormControl>
-                      <div className="flex items-start gap-2.5">
+                      <div className="flex items-center gap-3">
                         <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
-                          Min 06
+                          Min {TENURE_MIN}
                         </span>
                         <div className="relative mt-0.5 w-full max-w-[307px]">
                           <Slider
@@ -223,14 +232,14 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                             onValueChange={(value) =>
                               handleSliderChange(value, field.onChange)
                             }
-                            min={6}
-                            max={24}
+                            min={TENURE_MIN}
+                            max={TENURE_MAX}
                             step={1}
                             className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
                           />
                         </div>
                         <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
-                          Max 24
+                          Max {TENURE_MAX}
                         </span>
                       </div>
                     </FormControl>

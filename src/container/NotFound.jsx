@@ -80,7 +80,6 @@ export default function NotFound({
 
           {/* Show one button for desktop and another for mobile */}
           <ActionButton className="mt-2 hidden lg:block" />
-          <ActionButton isMobile className="mt-2 lg:hidden" />
         </div>
       </main>
     </div>
