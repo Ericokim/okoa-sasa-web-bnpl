@@ -24,7 +24,7 @@ export function RouteComponent() {
               </h2>
             </div>
 
-            <p className="font-sans text-sm sm:text-base text-[#A0A4AC] break-words">
+            <p className="font-sans text-sm sm:text-base text-gray-600 wrap-break-word">
               Permanently delete the account and remove access from all
               workspaces
             </p>

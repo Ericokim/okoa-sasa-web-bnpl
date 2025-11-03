@@ -64,7 +64,7 @@ export function RouteComponent() {
 
         
 
-          <div className="flex flex-wrap gap-4 pt-2 border-t border-border">
+          <div className="flex flex-wrap gap-4 pt-2 -mt-2 ">
             <div className="flex items-center gap-2">
               <Badge
                 variant="secondary"
