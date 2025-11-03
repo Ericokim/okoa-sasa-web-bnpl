@@ -14,6 +14,7 @@ import {
 import { useStateContext } from '@/context/state-context'
 import { cn } from '@/lib/utils'
 import { PhoneIcon, XIcon } from 'lucide-react'
+import logo from '@/assets/images/primaryLogoVertical.png'
 
 export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
   const [step, setStep] = useState(initialStep)
@@ -99,8 +100,11 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
 
             <div className="flex flex-col items-center gap-4 md:gap-6 w-full">
               <img
-                src="https://api.builder.io/api/v1/image/assets/TEMP/39a66955168d541edf4a09720ea52bb31a5ef9a7?width=404"
+                src={logo}
+                srcSet={`${logo} 1x, ${logo} 2x`}
                 alt="Okoa Sasa Logo"
+                loading="lazy"
+                decoding="async"
                 className="w-[202px] h-[184px] object-contain"
               />
 
@@ -238,8 +242,8 @@ function OTPStep({
                   className={cn(
                     'flex h-[48px] w-10 md:h-[50px] md:w-[60px] items-center justify-center rounded-[12px]',
                     'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                    'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#A0A4AC]',
-                    'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                    'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#252525]',
+                    'placeholder:text-[#A0A4AC] transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20',
                   )}
                 />
               ))}
