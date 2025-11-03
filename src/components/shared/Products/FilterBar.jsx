@@ -17,13 +17,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, ChevronUp, List, User } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -380,6 +380,7 @@ export function FilterBar({
   selectedSort,
   loanLimit,
   onLoanLimitClear,
+  isLoanCalculatorOpen = false,
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -430,6 +431,8 @@ export function FilterBar({
   const scrollAreaContainerRef = useRef(null)
   const applyButtonWrapperRef = useRef(null)
   const [applyButtonOffset, setApplyButtonOffset] = useState(null)
+  const location = useLocation()
+  const isFaqActive = location.pathname.startsWith('/FAQs')
 
   useEffect(() => {
     const nextFilters = buildFiltersStateFromSelection(
@@ -744,6 +747,48 @@ export function FilterBar({
     }
   }
 
+  const basePillClasses =
+    'rounded-3xl px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F8971D]/40'
+
+  const allFiltersButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isFiltersOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-transparent bg-[#F9FAFB] text-[#252525] hover:bg-[#F1F5F9] active:bg-[#E6EDF7]'
+  )
+
+  const howItWorksLinkClass = cn(
+    'group border',
+    basePillClasses,
+    isFaqActive
+      ? 'border-transparent bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white shadow-sm'
+      : 'border-[#F8971D] bg-gradient-to-b from-transparent to-transparent text-[#F47120] hover:bg-[#FFF4EE]'
+  )
+
+  const howItWorksTextClass = cn(
+    'text-sm font-normal capitalize md:text-base transition-colors',
+    isFaqActive
+      ? 'text-white'
+      : 'bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent group-hover:bg-none group-hover:text-[#F47120]'
+  )
+
+  const loanLimitButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isLoanCalculatorOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+  )
+
+  const sortButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+  )
+
   return (
     <div
       className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}
@@ -751,7 +796,10 @@ export function FilterBar({
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
         <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
           <PopoverTrigger asChild>
-            <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
+            <button
+              className={allFiltersButtonClass}
+              aria-pressed={isFiltersOpen}
+            >
               <span className="text-sm font-normal capitalize text-black md:text-base">
                 All Filters
               </span>
@@ -1092,9 +1140,9 @@ export function FilterBar({
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
         <Link
           to="/FAQs"
-          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 transition-opacity hover:opacity-90 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
+          className={howItWorksLinkClass}
         >
-          <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
+          <span className={howItWorksTextClass}>
             How it works
           </span>
         </Link>
@@ -1103,7 +1151,8 @@ export function FilterBar({
           onClick={() => {
             onLoanCalculatorOpen?.()
           }}
-          className="cursor-pointer flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
+          className={loanLimitButtonClass}
+          aria-pressed={isLoanCalculatorOpen}
         >
           <span className="text-sm font-normal capitalize text-black md:text-base">
             My Loan Limit
@@ -1174,7 +1223,7 @@ export function FilterBar({
 
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
-            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200">
+            <button className={sortButtonClass} aria-pressed={isOpen}>
               <div className="hidden md:flex flex-col items-start">
                 <span className="text-sm font-normal capitalize text-black md:text-base">
                   Sort By

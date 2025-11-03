@@ -425,6 +425,7 @@ function IndexPage() {
         selectedSort={sortOption}
         loanLimit={loanLimit}
         onLoanLimitClear={handleLoanLimitClear}
+        isLoanCalculatorOpen={showLoanCalculator}
       />
 
       <div className="py-6 md:py-8 lg:py-[38px]">
