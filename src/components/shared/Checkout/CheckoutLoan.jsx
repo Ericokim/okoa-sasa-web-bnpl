@@ -79,7 +79,7 @@ export default function CheckLoanLimitPage({
     defaultValues: savedData || {
       basicPay: '',
       netPay: '',
-      repaymentPeriod: savedData?.repaymentPeriod ?? DEFAULT_TENURE,
+      repaymentPeriod: DEFAULT_TENURE ?? savedData?.repaymentPeriod,
       payslip: null,
     },
   })
