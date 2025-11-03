@@ -69,7 +69,7 @@ function FormLabel({ className, ...props }) {
     <Label
       data-slot="form-label"
       data-error={!!error}
-      className={cn('data-[error=true]:text-brand-primary-start', className)}
+      className={cn('data-[error=true]:text-black', className)}
       htmlFor={formItemId}
       {...props}
     />

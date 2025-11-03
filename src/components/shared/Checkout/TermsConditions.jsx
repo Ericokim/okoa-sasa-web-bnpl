@@ -84,7 +84,7 @@ export default function TermsConditionPage({
           variant="outline"
           onClick={onPrevious}
           disabled={isFirstStep}
-          className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50"
+          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           <p className="text-base font-medium leading-[1.4] capitalize">
             Back{' '}
