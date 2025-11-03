@@ -209,17 +209,17 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 name="months"
                 render={({ field }) => (
                   <FormItem className="flex flex-col gap-3">
-                    <div className="flex items-center gap-3">
-                      <p className="text-left text-base font-medium text-gray-900">
+                    {/* Centered month badge with Loan Tenure label */}
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-base font-medium text-gray-900">
                         Loan Tenure
                       </p>
-                      <div className="flex flex-1 justify-start ml-13 mx-auto">
-                        <div className="flex h-[38px] min-w-[120px] items-center justify-center gap-2.5 rounded-full border border-[#F47120] px-4">
-                          <p className="text-center text-sm font-medium text-[#333333]">
-                            {field.value ?? DEFAULT_TENURE} Months
-                          </p>
-                        </div>
+                      <div className="flex flex-row justify-center items-center px-3.5 py-2.5 gap-2.5 w-[104px] h-[38px] border border-[#F47120] rounded-full">
+                        <p className="text-sm font-normal text-center text-[#333333]">
+                          {field.value ?? DEFAULT_TENURE} Months
+                        </p>
                       </div>
+                      <div className="w-[104px]"></div>
                     </div>
                     <FormControl>
                       <div className="flex items-center gap-3">
