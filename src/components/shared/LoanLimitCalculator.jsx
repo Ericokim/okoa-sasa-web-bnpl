@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X } from 'lucide-react'
+import { PhoneIcon, XIcon } from 'lucide-react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {
   Form,
@@ -52,7 +53,7 @@ const loanCalculatorSchema = z.object({
     .max(24, 'Maximum tenure is 24 months'),
 })
 
-export function LoanLimitCalculator({ open, onOpenChange }) {
+export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   const form = useForm({
     resolver: zodResolver(loanCalculatorSchema),
     defaultValues: {
@@ -89,6 +90,9 @@ export function LoanLimitCalculator({ open, onOpenChange }) {
   }
 
   const onSubmit = () => {
+    if (loanAmount > 0) {
+      onProceed?.(loanAmount)
+    }
     onOpenChange?.(false)
     reset()
   }
@@ -117,9 +121,10 @@ export function LoanLimitCalculator({ open, onOpenChange }) {
           <div className="flex items-center justify-end">
             <button
               onClick={handleCancel}
-              className="text-[#09244B] transition-opacity hover:opacity-70"
+              className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
             >
-              <X className="h-6 w-6" />
+              <XIcon className="h-6 w-6 text-[#09244B]" />
+              <span className="sr-only">Close</span>
             </button>
           </div>
 
@@ -260,7 +265,8 @@ export function LoanLimitCalculator({ open, onOpenChange }) {
 
                 <Button
                   type="submit"
-                  className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white hover:opacity-90"
+                  disabled={loanAmount <= 0}
+                  className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Proceed to device
                 </Button>

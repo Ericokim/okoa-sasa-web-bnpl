@@ -4,6 +4,7 @@ import { formatCurrency } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { MAX_CART_QUANTITY } from '@/context/state-context'
 
 export function CartItem({
   id,
@@ -18,7 +19,10 @@ export function CartItem({
   const navigate = useNavigate()
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
-  const handleIncrement = () => onQuantityChange?.(id, quantity + 1)
+  const handleIncrement = () => {
+    if (quantity >= MAX_CART_QUANTITY) return
+    onQuantityChange?.(id, quantity + 1)
+  }
   const handleDecrement = () =>
     quantity > 1 && onQuantityChange?.(id, quantity - 1)
   const handleRemoveClick = () => setShowDeleteDialog(true)
@@ -64,6 +68,7 @@ export function CartItem({
                 size="icon"
                 className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
                 onClick={handleIncrement}
+                disabled={quantity >= MAX_CART_QUANTITY}
               >
                 <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.75} />
               </Button>
@@ -140,6 +145,7 @@ export function CartItem({
                 onClick={handleIncrement}
                 className="quantity-btn"
                 aria-label="Increase quantity"
+                disabled={quantity >= MAX_CART_QUANTITY}
               >
                 <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.75} />
               </button>

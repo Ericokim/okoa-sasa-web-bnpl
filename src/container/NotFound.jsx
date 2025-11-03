@@ -61,7 +61,7 @@ export default function NotFound({
         {/* Responsive 404 Illustration */}
         <div className="mb-[1.6rem]">
           <img
-            src="/404.png"
+            src="/NotFound.png"
             alt="404 Error - Product not Found"
             className="h-[223px] w-[334px] lg:h-[433px] lg:w-[650px]"
           />

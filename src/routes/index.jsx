@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/shared/Products/ProductCard'
 import { PaginationComponent } from '@/components/shared/PaginationComponent'
 import NotFound from '@/container/NotFound'
 import { useStateContext } from '@/context/state-context'
+import { Button } from '@/components/ui/button'
 
 const PRODUCTS_PER_PAGE = 8
 const DEFAULT_SORT = 'price-low-high'
@@ -149,6 +150,7 @@ function IndexPage() {
   const [activeFilters, setActiveFilters] = useState(parsedSearch.filters)
   const [sortOption, setSortOption] = useState(parsedSearch.sort)
   const [currentPage, setCurrentPage] = useState(parsedSearch.page)
+  const [loanLimit, setLoanLimit] = useState(null)
   const lastSyncedSearchRef = useRef(null)
 
   const handleFiltersChange = useCallback((nextFilters) => {
@@ -170,6 +172,33 @@ function IndexPage() {
       return nextSort
     })
   }, [])
+
+  const handleLoanProceed = useCallback(
+    (loanAmount) => {
+      if (!loanAmount || loanAmount <= 0) return
+      const minBound = filterOptions.price.min
+      const maxBound = filterOptions.price.max
+      if (maxBound <= 0) return
+
+      const clampedMax = Math.max(minBound, Math.min(loanAmount, maxBound))
+      const nextFilters = {
+        ...activeFilters,
+        priceRange: [minBound, clampedMax],
+      }
+
+      setLoanLimit(loanAmount)
+      handleFiltersChange(nextFilters)
+    },
+    [activeFilters, filterOptions.price.max, filterOptions.price.min, handleFiltersChange],
+  )
+
+  const handleLoanLimitClear = useCallback(() => {
+    setLoanLimit(null)
+    handleFiltersChange({
+      ...activeFilters,
+      priceRange: [filterOptions.price.min, filterOptions.price.max],
+    })
+  }, [activeFilters, filterOptions.price.max, filterOptions.price.min, handleFiltersChange])
 
   useEffect(() => {
     if (search?.auth === 'login') {
@@ -195,6 +224,7 @@ function IndexPage() {
 
     const filtered = products.filter((product) => {
       const withinPrice = product.price >= minPrice && product.price <= maxPrice
+      const withinLoanLimit = !loanLimit || product.price <= loanLimit
       const matchesSearch =
         !normalizedSearch ||
         [product.name, product.brand, product.category, product.description]
@@ -205,6 +235,7 @@ function IndexPage() {
 
       return (
         withinPrice &&
+        withinLoanLimit &&
         matchesSelection('brand', product.brand) &&
         matchesSelection('color', product.color) &&
         matchesSelection('storage', product.storage) &&
@@ -237,6 +268,7 @@ function IndexPage() {
     filterOptions.price.min,
     products,
     searchTerm,
+    loanLimit,
   ])
 
   const totalProducts = filteredProducts.length
@@ -259,6 +291,7 @@ function IndexPage() {
     const resetFilters = buildFiltersFromSearch({}, filterOptions)
     handleFiltersChange(resetFilters)
     handleSortChange(DEFAULT_SORT)
+    setLoanLimit(null)
   }
 
   useEffect(() => {
@@ -390,6 +423,8 @@ function IndexPage() {
         initialSort={sortOption}
         selectedFilters={activeFilters}
         selectedSort={sortOption}
+        loanLimit={loanLimit}
+        onLoanLimitClear={handleLoanLimitClear}
       />
 
       <div className="py-6 md:py-8 lg:py-[38px]">
@@ -421,7 +456,38 @@ function IndexPage() {
           </>
         ) : (
           <div className="py-10">
-            <NotFound onAction={handleResetFilters} />
+            {loanLimit ? (
+              <div className="flex flex-col items-center gap-4 rounded-3xl border border-dashed border-[#F8971D]/60 bg-[#FFF7F0] px-6 py-10 text-center">
+                <h3 className="text-xl font-semibold text-[#252525]">
+                  No devices match your loan limit
+                </h3>
+                <p className="max-w-md text-sm text-[#676D75]">
+                  We couldn&apos;t find any products priced at or below KES{' '}
+                  {loanLimit.toLocaleString()}. You can adjust your loan limit or
+                  reset the filters to explore more devices.
+                </p>
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => setShowLoanCalculator(true)}
+                    className="rounded-3xl px-4 py-2"
+                  >
+                    Adjust Loan Limit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleResetFilters}
+                    className="rounded-3xl px-4 py-2"
+                  >
+                    Reset Filters
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <NotFound onAction={handleResetFilters} />
+            )}
           </div>
         )}
       </div>
@@ -430,6 +496,7 @@ function IndexPage() {
       <LoanLimitCalculator
         open={showLoanCalculator}
         onOpenChange={setShowLoanCalculator}
+        onProceed={handleLoanProceed}
       />
     </div>
   )
