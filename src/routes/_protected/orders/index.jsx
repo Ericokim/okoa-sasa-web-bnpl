@@ -8,8 +8,6 @@ import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import { Progress } from '@/components/ui/progress'
 
-
-
 export const recentOrders = [
   {
     id: '1',
@@ -530,20 +528,14 @@ function OrdersPage() {
             Order History
           </h2>
 
-          {/* ==== DESKTOP / TABLET – Horizontal cards (like Recent Orders) ==== */}
-          <div className="hidden md:block space-y-0">
+          {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
+          <div className="hidden md:block">
             <Card className="shadow-none overflow-hidden">
               <CardContent className="p-0">
                 {orderHistory.map((order, idx) => {
-                  const gradient = getGradient('orange')
                   const matched = recentOrders.find(
                     (ro) => ro.orderId === order.orderId.replace('#', ''),
-                  ) || {
-                    image: '/phone.png',
-                    title: order.device,
-                    specs: '',
-                    price: order.loanAmount,
-                  }
+                  ) || { image: '/phone.png', title: order.device }
 
                   return (
                     <div key={order.orderId}>
@@ -560,7 +552,7 @@ function OrdersPage() {
                           />
                         </div>
 
-                        {/* Order info */}
+                        {/* Info */}
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-lg text-gray-900 truncate">
                             {order.device}
@@ -570,18 +562,17 @@ function OrdersPage() {
                             {order.name && ` • ${order.name}`}
                           </p>
                           <p
-                            className={`font-bold text-md bg-linear-to-r ${gradient} bg-clip-text text-transparent whitespace-nowrap`}
+                            className={`font-bold text-md bg-gradient-to-r ${getGradient()} bg-clip-text text-transparent whitespace-nowrap`}
                           >
                             KES {order.loanAmount.toLocaleString()}
                           </p>
                         </div>
 
-                        {/* View Details button */}
-
+                        {/* View Details */}
                         <Button
                           variant="gradient"
                           size="sm"
-                          className="rounded-3xl px-2 md:px-3 py-1 h-auto text-base font-medium"
+                          className="rounded-3xl px-3 py-1 h-auto text-base font-medium"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleViewDetails(order.orderId)
@@ -589,10 +580,8 @@ function OrdersPage() {
                         >
                           View Details
                         </Button>
-                       
                       </div>
 
-                      {/* Separator – stays inside the card */}
                       {idx < orderHistory.length - 1 && (
                         <Separator className="mx-6" />
                       )}
@@ -603,7 +592,7 @@ function OrdersPage() {
             </Card>
           </div>
 
-          {/* ==== MOBILE – Vertical cards (unchanged style) ==== */}
+          {/* ================== MOBILE – Vertical Cards (Status + View Details aligned) ================== */}
           <div className="md:hidden space-y-4">
             {orderHistory.map((order) => {
               const matched = recentOrders.find(
@@ -613,11 +602,32 @@ function OrdersPage() {
               return (
                 <Card
                   key={order.orderId}
-                  className="shadow-none cursor-pointer"
-                  onClick={() => handleViewDetails(order.orderId)}
+                  className="shadow-sm border border-gray-200 rounded-2xl overflow-hidden"
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-start gap-4">
+                    {/* Header */}
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="font-semibold text-lg text-gray-900">
+                          {order.orderId}
+                        </p>
+                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                          <Calendar className="w-4 h-4 mr-1" />
+                          {order.createdDate}
+                        </div>
+                      </div>
+                      <Badge
+                        variant={order.statusVariant}
+                        className={`text-xs font-medium px-2 py-0.5 ${getStatusBadgeClasses(order.status)}`}
+                      >
+                        {order.status}
+                      </Badge>
+                    </div>
+
+                    <Separator className="my-3" />
+
+                    {/* Device + Image */}
+                    <div className="flex gap-3 mb-3">
                       <div className="flex-shrink-0 rounded-xl bg-brand-bg-2 p-2">
                         <img
                           src={matched.image}
@@ -625,43 +635,53 @@ function OrdersPage() {
                           className="h-12 w-12 object-contain"
                         />
                       </div>
-
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-lg text-gray-900">
-                          {order.orderId}
-                        </p>
-                        <p className="text-sm text-gray-600 mt-0.5">
-                          {order.createdDate}
-                          {order.name && ` • ${order.name}`}
-                        </p>
-                        <p className="text-sm font-medium text-gray-900 mt-1">
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-900">
                           {order.device}
                         </p>
-                        <p className="font-bold text-sm text-orange-600 mt-1">
+                        {order.name && (
+                          <p className="text-xs text-gray-500 mt-0.5">
+                            {order.name}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Loan Amount */}
+                    <div className="flex items-start mb-3">
+                      <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500">Loan Amount</p>
+                        <p className="text-sm font-semibold text-gray-900">
                           KES {order.loanAmount.toLocaleString()}
                         </p>
                       </div>
                     </div>
 
-                    <Button
-                      variant="link"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleViewDetails(order.orderId)
-                      }}
-                      className="mt-3 text-orange-600 font-medium underline underline-offset-2 hover:text-orange-700 p-0 h-auto"
-                    >
-                      View Details
-                    </Button>
+                    {/* Status + View Details – Aligned on same line */}
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                      <span className="text-xs font-medium text-gray-500">
+                        {' '}
+                        <span className="text-gray-900"> </span>
+                      </span>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleViewDetails(order.orderId)
+                        }}
+                        className="text-orange-600 text-sm font-medium underline underline-offset-2 hover:text-orange-700 p-0 h-auto"
+                      >
+                        View Details
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               )
             })}
           </div>
         </div>
-
-
       </main>
     </div>
   )
