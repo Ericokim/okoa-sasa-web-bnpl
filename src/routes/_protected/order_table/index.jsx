@@ -59,7 +59,7 @@ function OrdersTableHistory() {
         return 'bg-blue-100 text-blue-800'
       case 'Processing':
         return 'bg-yellow-100 text-yellow-800'
-      case 'Delivered':
+      case 'Rejected':
         return 'bg-red-100 text-red-800'
       default:
         return 'bg-gray-100 text-gray-800'
