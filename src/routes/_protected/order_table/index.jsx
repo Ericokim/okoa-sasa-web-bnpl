@@ -10,62 +10,61 @@ import { recentOrders } from '@/routes/_protected/orders/index'
 function OrdersTableHistory() {
   const navigate = useNavigate()
   const orderHistory = [
-  {
-    orderId: '#REQ-20458',
-    createdDate: 'Oct 12, 2025',
-    name: 'Jane Mwangi',
-    device: 'Samsung Galaxy A35',
-    loanAmount: 38500,
-    status: 'Processing',          // changed
-    statusVariant: 'secondary',
-  },
-  {
-    orderId: '#REQ-20459',
-    createdDate: 'Oct 12, 2025',
-    name: 'Jane Mwangi',
-    device: 'Samsung Galaxy A35',
-    loanAmount: 38500,
-    status: 'On the way',          // changed
-    statusVariant: 'default',
-  },
-  {
-    orderId: '#REQ-20460',
-    createdDate: 'Oct 12, 2025',
-    name: 'Jane Mwangi',
-    device: 'Samsung Galaxy A35',
-    loanAmount: 38500,
-    status: 'Delivered',           // changed
-    statusVariant: 'success',
-  },
-  {
-    orderId: '#REQ-20461',
-    createdDate: 'Oct 12, 2025',
-    name: 'Jane Mwangi',
-    device: 'Samsung Galaxy A35',
-    loanAmount: 38500,
-    status: 'Declined',            // unchanged (kept for completeness)
-    statusVariant: 'destructive',
-  },
-]
+    {
+      orderId: '#REQ-20458',
+      createdDate: 'Oct 12, 2025',
+      name: 'Jane Mwangi',
+      device: 'Samsung Galaxy A35',
+      loanAmount: 38500,
+      status: 'Processing', // changed
+      statusVariant: 'secondary',
+    },
+    {
+      orderId: '#REQ-20459',
+      createdDate: 'Oct 12, 2025',
+      name: 'Jane Mwangi',
+      device: 'Samsung Galaxy A35',
+      loanAmount: 38500,
+      status: 'On the way', // changed
+      statusVariant: 'default',
+    },
+    {
+      orderId: '#REQ-20460',
+      createdDate: 'Oct 12, 2025',
+      name: 'Jane Mwangi',
+      device: 'Samsung Galaxy A35',
+      loanAmount: 38500,
+      status: 'Delivered', // changed
+      statusVariant: 'success',
+    },
+    {
+      orderId: '#REQ-20461',
+      createdDate: 'Oct 12, 2025',
+      name: 'Jane Mwangi',
+      device: 'Samsung Galaxy A35',
+      loanAmount: 38500,
+      status: 'Declined', // unchanged (kept for completeness)
+      statusVariant: 'destructive',
+    },
+  ]
 
-/* ------------------------------------------------------------------ */
-/* Updated badge colour mapping – only the three allowed statuses   */
-/* ------------------------------------------------------------------ */
-const getStatusBadgeClasses = (status) => {
-  switch (status) {
-    case 'Delivered':
-      return 'bg-green-100 text-green-800'
-    case 'On the way':
-      return 'bg-blue-100 text-blue-800'
-    case 'Processing':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'Delivered':
-      return 'bg-red-100 text-red-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  /* ------------------------------------------------------------------ */
+  /* Updated badge colour mapping – only the three allowed statuses   */
+  /* ------------------------------------------------------------------ */
+  const getStatusBadgeClasses = (status) => {
+    switch (status) {
+      case 'Delivered':
+        return 'bg-green-100 text-green-800'
+      case 'On the way':
+        return 'bg-blue-100 text-blue-800'
+      case 'Processing':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'Delivered':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-gray-100 text-gray-800'
+    }
   }
-}
-
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
@@ -80,13 +79,16 @@ const getStatusBadgeClasses = (status) => {
 
   return (
     <div className="min-h-screen">
-      <BreadCrumbs items={breadcrumbItems} className="px-4 pt-6 md:pt-8" />
+      <BreadCrumbs
+        items={breadcrumbItems}
+        className="px-4 pt-6 md:pt-8 -ml-7"
+      />
 
-      <main className="mx-auto px-4 py-6">
-        <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+      <main className="w-full flex flex-col py-4">
+        <h1 className="text-4xl font-semibold text-gray-900 mb-2">
           My Order History
         </h1>
-        <p className="text-gray-600 mb-8">Overview of all your activities</p>
+        <p className="text-gray-600 mb-8">Overview of all of your activities</p>
 
         {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
         <div className="hidden md:block">
@@ -103,27 +105,38 @@ const getStatusBadgeClasses = (status) => {
                       className="flex gap-4 py-4 px-6 items-center cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleViewDetails(order.orderId)}
                     >
+                      {/* Image */}
+                      <div className="shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
+                        <img
+                          src={matched.image}
+                          alt={order.device}
+                          className="h-24 w-24 object-contain"
+                        />
+                      </div>
                       {/* Info */}
                       <div className="flex-1 min-w-0 ">
                         <h4 className="font-medium text-lg text-gray-900 truncate">
                           {order.device}
                         </h4>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-gray-600 mb-2">
                           {order.orderId} • {order.createdDate}
                           {order.name && ` • ${order.name}`}
                         </p>
                         <p
-                          className={`font-bold text-md bg-gradient-to-r ${getGradient()} bg-clip-text text-transparent whitespace-nowrap`}
+                          className={`font-bold text-lg  bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent whitespace-nowrap`}
                         >
                           KES {order.loanAmount.toLocaleString()}
                         </p>
                       </div>
 
                       {/* View Details */}
+
                       <Button
                         variant="gradient"
                         size="sm"
-                        className="rounded-3xl px-3 py-1 h-auto text-base font-medium"
+                        className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleViewDetails(order.orderId)
