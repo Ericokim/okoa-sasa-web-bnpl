@@ -150,7 +150,7 @@ const FAQs = () => {
       </div>
 
       {/* FAQs Section */}
-      <div className="w-full px-4  lg:px-20 py-6 lg:py-5">
+      <div className="w-full px-4  lg:px-20 py-4 lg:py-5">
         <div className="max-w-[335px] md:max-w-[680px] lg:max-w-7xl mx-auto">
           <div className="flex flex-col gap-4 lg:gap-14 items-center lg:items-start w-full">
             {/* Header */}
