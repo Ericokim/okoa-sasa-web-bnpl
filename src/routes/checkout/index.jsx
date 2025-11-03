@@ -89,7 +89,7 @@ export default function CheckoutPage() {
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'iPhone 14', path: `/products/${productId}` },
+    { label: 'cart', path: `/cart` },
     { label: 'Checkout', path: `/Checkout`, isCurrent: true },
   ]
 

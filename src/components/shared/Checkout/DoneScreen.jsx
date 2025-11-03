@@ -9,8 +9,8 @@ const DoneScreen = () => {
 
   return (
     <div className="bg-white grid grid-cols-1 place-items-center w-full max-w-full h-auto rounded-4xl border border-gray-200 p-6">
-      <div className="w-[200px] h-[200px] mb-6">
-        <CheckoutDoneIcon />
+      <div className="mb-6 ml-7 ">
+        <CheckoutDoneIcon size={200} />
       </div>
       <div className="h-auto sm:h-16 sm:mb-0 text-center">
         <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
