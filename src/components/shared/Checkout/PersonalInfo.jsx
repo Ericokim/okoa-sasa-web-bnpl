@@ -63,7 +63,7 @@ export default function PersonalInfoForm({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
+    <div className="flex flex-col items-center justify-center p-0 mb-[50px] sm:p-0 gap-6">
       {/* Form Container */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6 w-full">
         <div className="w-full">
@@ -252,7 +252,7 @@ export default function PersonalInfoForm({
           onClick={form.handleSubmit(onSubmit)}
           disabled={isLastStep}
           type="button"
-          className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[193px] h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
+          className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
           Next: Delivery Details
         </Button>

@@ -75,7 +75,7 @@ const FAQs = () => {
   }
 
   return (
-    <div className="bg-white mb-[100px] overflow-hidden relative w-full">
+    <div className="bg-white mb-4 overflow-hidden relative w-full">
       {/* How It Works Section */}
       <div className="bg-white overflow-hidden relative w-full min-h-[485px] lg:h-[552px]">
         <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-full absolute left-0 top-0" />

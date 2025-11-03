@@ -92,9 +92,9 @@ export default function CheckoutPage() {
         {!isCompleted ? (
           <>
             {/* Stepper Header */}
-            <div className="mb-12 w-full">
+            <div className="mb-9 w-full">
               {/* Desktop View */}
-              <div className="hidden md:block">
+              <div className="hidden lg:block">
                 {/* Circles and Lines Row */}
                 <div className="flex items-center mb-3">
                   {steps.map((step, index) => (
@@ -164,7 +164,7 @@ export default function CheckoutPage() {
               </div>
 
               {/* Mobile View */}
-              <div className="block md:hidden">
+              <div className="block lg:hidden">
                 {/* Circles and Lines Row */}
                 <div className="flex items-center mb-4">
                   {steps.map((step, index) => (
@@ -203,23 +203,25 @@ export default function CheckoutPage() {
                   ))}
                 </div>
 
-                {/* Labels Row - Stacked on Mobile */}
+               {/* Labels Row - Stacked on Mobile & Tablet */}
                 <div className="flex items-start justify-between">
-                  {steps.map((step) => (
+                  {steps.map((step, index) => (
                     <div
                       key={step.id}
-                      className="text-center flex-1 first:text-left last:text-right"
+                      className="flex-1 min-w-0"
+                      style={{
+                        textAlign: index === 0 ? 'left' : index === steps.length - 1 ? 'right' : 'center'
+                      }}
                     >
                       <p
-                        className={`text-[10px] font-medium leading-tight ${
+                        className={`text-[10px] sm:text-[11px] font-medium leading-[1.3] ${
                           step.id <= currentStep
                             ? 'text-[#0D0B26]'
                             : 'text-gray-400'
                         }`}
                         style={{
-                          wordBreak: 'break-word',
-                          maxWidth: '60px',
-                          margin: '0 auto',
+                          wordWrap: 'break-word',
+                          overflowWrap: 'break-word',
                         }}
                       >
                         {step.label}

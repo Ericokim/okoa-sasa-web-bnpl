@@ -24,7 +24,10 @@ import { Slider } from '@/components/ui/slider'
 const loanLimitSchema = z.object({
   basicPay: z.string().min(1, 'Basic pay is required'),
   netPay: z.string().min(1, 'Net pay is required'),
-  repaymentPeriod: z.number().min(6, 'Minimum repayment period is 6 months').max(24, 'Maximum repayment period is 24 months'),
+  repaymentPeriod: z
+    .number()
+    .min(6, 'Minimum repayment period is 6 months')
+    .max(24, 'Maximum repayment period is 24 months'),
   payslip: z.any().refine((file) => file !== null && file !== undefined, {
     message: 'Please upload your latest payslip',
   }),
@@ -72,9 +75,9 @@ export default function CheckLoanLimitPage({
   }
 
   return (
-    <div className="flex flex-col mb-[50px] items-center justify-center p-4 sm:p-0 gap-6">
+    <div className="flex flex-col mb-[50px] items-center justify-center p-0 sm:p-0 gap-6">
       {/* Form Container */}
-      <div className="bg-white w-full h-full rounded-4xl border border-gray-200 p-4 sm:p-6">
+      <div className="bg-white w-full h-full rounded-4xl border border-gray-200 p-4 ">
         <div className="">
           <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
             Check Your Loan Limit
@@ -87,7 +90,10 @@ export default function CheckLoanLimitPage({
         <div className="h-px bg-gray-300 my-4 sm:my-6"></div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 sm:space-y-6"
+          >
             {/* Basic Pay and Net Pay */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[50px]">
               <FormField
@@ -142,8 +148,11 @@ export default function CheckLoanLimitPage({
                   <FormControl>
                     <div>
                       {/* Fixed month badge at top center with Loan Tenure label */}
-                      <div className="flex justify-center items-center gap-3 h-[38px] mb-4">
-                        <p className="text-base font-medium text-gray-900">Loan Tenure</p>
+                      <div className="flex justify-start sm:justify-center items-center gap-3 h-[38px] mb-4">
+                        {' '}
+                        <p className="text-base font-medium text-gray-900">
+                          Loan Tenure
+                        </p>
                         <div className="flex flex-row justify-center items-center px-3.5 py-2.5 gap-2.5 w-[104px] h-[38px] border border-[#F47120] rounded-full">
                           <p className="text-sm font-normal text-center text-[#333333]">
                             {months[0]} Months
@@ -199,7 +208,9 @@ export default function CheckLoanLimitPage({
                         htmlFor="payslip-upload"
                         className="flex items-center justify-between h-11 bg-brand-bg-2 px-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
                       >
-                        <span className={`text-sm ${fileName ? 'text-gray-900' : 'text-gray-400'}`}>
+                        <span
+                          className={`text-sm ${fileName ? 'text-gray-900' : 'text-gray-400'}`}
+                        >
                           {fileName || 'Document Type'}
                         </span>
                         <svg
