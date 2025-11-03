@@ -30,7 +30,7 @@ export default function ProfilePage() {
             My Account
           </h1>
           <p className="text-gray-600">
-            Almost there! Ready to place your order?
+            Keep your account info accurate and up to date for better loan limits.
           </p>
         </div>
 
