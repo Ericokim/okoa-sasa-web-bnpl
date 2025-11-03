@@ -35,7 +35,7 @@ export function RouteComponent() {
         <div className="mb-6 rounded-xl border  p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+              <p className="font-sans text-base font-normal leading-snug text-gray-600">
                 Office Address
               </p>
             </div>
@@ -71,7 +71,7 @@ export function RouteComponent() {
         <div className="rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <p className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+              <p className="font-sans text-base font-normal leading-snug text-gray-600">
                 Home Address
               </p>
             </div>

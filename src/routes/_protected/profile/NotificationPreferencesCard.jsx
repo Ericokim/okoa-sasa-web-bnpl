@@ -46,7 +46,7 @@ export function RouteComponent() {
               <p className="font-sans text-[18px] font-medium leading-[140%]  capitalize text-[#252525] flex-none order-0 flex-grow-0">
                 {item.title}
               </p>
-              <p className="font-sans text-base   text-[#A0A4AC] flex-none order-1">
+              <p className="font-sans text-base   text-gray-600 flex-none order-1">
                 {item.desc}
               </p>
             </div>
