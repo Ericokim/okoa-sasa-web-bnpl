@@ -162,9 +162,9 @@ export function Footer() {
     <footer className="bg-[#161719] py-10 px-4 sm:px-6 md:px-20">
       <div className="mx-auto w-full space-y-10">
         {/* Header Section with Logo and Social Media */}
-        <div className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-[107px]">
+        <div className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
           {/* Logo */}
-          <div className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[335px] xl:w-[395px] h-auto md:h-[109px] lg:mr-auto">
+          <div className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[335px] xl:w-[395px] h-auto">
             <img
               src="/primaryLogoHorizontal.png"
               alt="Okoa Sasa"
@@ -173,7 +173,7 @@ export function Footer() {
           </div>
 
           {/* Social Media Icons */}
-          <div className="flex w-full flex-wrap items-center justify-center gap-4 sm:gap-5 xl:w-[400px] xl:flex-none xl:justify-end xl:self-stretch">
+          <div className="flex items-center justify-center gap-4 sm:gap-5">
             <a
               href="#"
               className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
@@ -207,14 +207,14 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Content Section */}
-        <div className="grid w-full grid-cols-1 sm:grid-cols-2 gap-8 sm:gap-10 lg:grid-cols-[repeat(3,minmax(220px,1fr))] lg:gap-10 lg:items-start xl:grid-cols-[repeat(3,240px)_400px] xl:gap-[48px] xl:justify-between">
+        {/* Content Section - Balanced & Responsive */}
+        <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(200px,1fr))_minmax(280px,380px)] gap-8 md:gap-10 xl:gap-12">
           {/* Useful Links */}
-          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
+          <div className="flex flex-col items-start gap-3 text-left">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">
               Useful Links
             </h3>
-            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
+            <div className="space-y-2.5 text-sm sm:text-base font-medium text-white">
               <Link
                 to="/FAQs"
                 className="block hover:text-brand-primary-start transition-colors"
@@ -237,11 +237,11 @@ export function Footer() {
           </div>
 
           {/* Other Links */}
-          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
+          <div className="flex flex-col items-start gap-3 text-left">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">
               Other Links
             </h3>
-            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
+            <div className="space-y-2.5 text-sm sm:text-base font-medium text-white">
               <div>USSD code *884#</div>
               <Link
                 to="/privacy"
@@ -259,11 +259,11 @@ export function Footer() {
           </div>
 
           {/* Contact Us */}
-          <div className="flex flex-col items-start gap-4 text-left w-full xl:w-[240px]">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
+          <div className="flex flex-col items-start gap-3 text-left">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">
               Contact Us
             </h3>
-            <div className="space-y-2 md:space-y-3 text-sm md:text-base font-medium text-white">
+            <div className="space-y-2.5 text-sm sm:text-base font-medium text-white">
               <div>+09 456 789</div>
               <div>OkoaSASA@gmail.com</div>
               <div>1234 Building, Kenya</div>
@@ -271,19 +271,19 @@ export function Footer() {
           </div>
 
           {/* Newsletter Section */}
-          <div className="flex flex-col gap-6 text-left w-full sm:col-span-2 lg:col-span-3 xl:col-span-1 xl:w-[400px] xl:ml-auto">
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white capitalize">
+          <div className="flex flex-col gap-4 text-left max-w-full">
+            <h3 className="text-lg sm:text-xl font-semibold text-white">
               You Can Find Us On!
             </h3>
-            <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:gap-[10px] xl:flex-row xl:items-center xl:gap-[10px]">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <Input
                 type="email"
                 placeholder="Enter Your Email"
-                className="bg-[#2c2d2f] border-none text-base text-brand-mid-gray placeholder:text-brand-mid-gray rounded-[16px] px-6 py-[13px] h-auto flex-1 xl:min-w-[240px]"
+                className="bg-[#2c2d2f] border-none text-base text-brand-mid-gray placeholder:text-brand-mid-gray rounded-[16px] px-6 py-[13px] h-auto flex-1"
               />
               <Button
                 variant="gradient"
-                className="w-full rounded-[24px] px-6 py-3 text-base font-medium whitespace-nowrap xl:w-auto xl:flex-shrink-0 sm:max-w-[160px]"
+                className="w-full sm:w-auto rounded-[24px] px-6 py-3 text-base font-medium whitespace-nowrap"
                 size="lg"
               >
                 Contact Us
