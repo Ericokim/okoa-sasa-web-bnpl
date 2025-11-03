@@ -303,7 +303,7 @@ export default function DeliveryDetailsForm({
       </div>
 
       {/* Buttons Container - Completely Outside */}
-      <div className="flex flex-col md:flex-row justify-end gap-3 md:gap-4 w-full max-w-full">
+      <div className="flex flex-col-reverse md:flex-row justify-end gap-3 md:gap-4 w-full max-w-full">
         <Button
           onClick={onPrevious}
           disabled={isFirstStep}
@@ -319,7 +319,7 @@ export default function DeliveryDetailsForm({
           disabled={isLastStep}
           className="flex justify-center items-center px-4 py-3 w-full md:w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
-          Next: Delivery Details
+          Next: Order Summary
         </Button>
       </div>
     </div>

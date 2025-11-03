@@ -96,7 +96,7 @@ export default function TermsConditionPage({
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-48 h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl"
         >
           <p className="text-base font-medium leading-[1.4] capitalize text-white">
-            Next: Account Option
+            Next: Checkout Option
           </p>
         </Button>
       </div>

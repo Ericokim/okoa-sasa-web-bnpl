@@ -27,68 +27,75 @@ const parseCurrencyValue = (value) => {
 
 const formatCurrencyInputValue = (value) => {
   if (!value) return ''
-  
+
   // Remove all non-numeric characters except decimal point
   let numericString = value.toString().replace(/[^\d.]/g, '')
-  
+
   // Handle multiple decimal points - keep only the first one
   const parts = numericString.split('.')
   if (parts.length > 2) {
     numericString = parts[0] + '.' + parts.slice(1).join('')
   }
-  
+
   // Limit to 2 decimal places
   if (parts.length === 2 && parts[1].length > 2) {
     numericString = parts[0] + '.' + parts[1].substring(0, 2)
   }
-  
+
   if (!numericString) return ''
-  
+
   // Split into integer and decimal parts
   const [integerPart, decimalPart] = numericString.split('.')
-  
+
   // Format the integer part with commas
-  const formattedInteger = integerPart ? new Intl.NumberFormat('en-KE').format(Number(integerPart)) : ''
-  
+  const formattedInteger = integerPart
+    ? new Intl.NumberFormat('en-KE').format(Number(integerPart))
+    : ''
+
   // Reconstruct with decimal if present
   if (decimalPart !== undefined) {
     return formattedInteger + '.' + decimalPart
   }
-  
+
   return formattedInteger
 }
 
-const loanLimitSchema = z.object({
-  basicPay: z
-    .string()
-    .min(1, 'Basic pay is required')
-    .refine((value) => parseCurrencyValue(value) > 0, {
-      message: 'Basic pay must be greater than zero',
+const loanLimitSchema = z
+  .object({
+    basicPay: z
+      .string()
+      .min(1, 'Basic pay is required')
+      .refine((value) => parseCurrencyValue(value) > 0, {
+        message: 'Basic pay must be greater than zero',
+      }),
+    netPay: z
+      .string()
+      .min(1, 'Net pay is required')
+      .refine((value) => parseCurrencyValue(value) > 0, {
+        message: 'Net pay must be greater than zero',
+      }),
+    repaymentPeriod: z.preprocess(
+      (val) => val ?? DEFAULT_TENURE,
+      z
+        .number()
+        .min(6, 'Minimum repayment period is 6 months')
+        .max(24, 'Maximum repayment period is 24 months'),
+    ),
+    payslip: z.any().refine((file) => file !== null && file !== undefined, {
+      message: 'Please upload your latest payslip',
     }),
-  netPay: z
-    .string()
-    .min(1, 'Net pay is required')
-    .refine((value) => parseCurrencyValue(value) > 0, {
-      message: 'Net pay must be greater than zero',
-    }),
-  repaymentPeriod: z.preprocess(
-    (val) => val ?? DEFAULT_TENURE,
-    z
-      .number()
-      .min(6, 'Minimum repayment period is 6 months')
-      .max(24, 'Maximum repayment period is 24 months'),
-  ),
-  payslip: z.any().refine((file) => file !== null && file !== undefined, {
-    message: 'Please upload your latest payslip',
-  }),
-}).refine((data) => {
-  const basicPay = parseCurrencyValue(data.basicPay)
-  const netPay = parseCurrencyValue(data.netPay)
-  return netPay <= basicPay
-}, {
-  message: 'Net pay cannot be greater than basic pay',
-  path: ['netPay'],
-})
+  })
+  .refine(
+    (data) => {
+      const basicPay = parseCurrencyValue(data.basicPay)
+      const netPay = parseCurrencyValue(data.netPay)
+      return netPay <= basicPay
+    },
+    {
+      message: 'Net pay cannot be greater than basic pay',
+      path: ['netPay'],
+    },
+  )
 
 export default function CheckLoanLimitPage({
   onNext,
@@ -96,7 +103,8 @@ export default function CheckLoanLimitPage({
   isFirstStep,
   isLastStep,
 }) {
-  const { saveCheckoutFormData, getCheckoutFormData, cartProducts } = useStateContext()
+  const { saveCheckoutFormData, getCheckoutFormData, cartProducts } =
+    useStateContext()
 
   const savedData = getCheckoutFormData(1)
 
@@ -189,19 +197,19 @@ export default function CheckLoanLimitPage({
 
   const onSubmit = (data) => {
     console.log(data)
-    
+
     // Save form data with payslip name
-    const dataWithFileName = { 
-      ...data, 
+    const dataWithFileName = {
+      ...data,
       payslipName: fileName,
-      calculatedLoanAmount: loanAmount 
+      calculatedLoanAmount: loanAmount,
     }
     saveCheckoutFormData(1, dataWithFileName)
 
     // Check if cart total exceeds loan limit
     if (grandTotal > loanAmount) {
       setErrorMessage(
-        `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`
+        `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
       )
       setErrorModalOpen(true)
       return
@@ -263,7 +271,7 @@ export default function CheckLoanLimitPage({
                 control={form.control}
                 name="basicPay"
                 render={({ field, fieldState }) => (
-                  <FormItem className="relative">
+                  <FormItem className="relative sm:mb-5">
                     <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                       Basic Pay
                     </FormLabel>
@@ -272,8 +280,8 @@ export default function CheckLoanLimitPage({
                         placeholder="Enter your Basic Pay"
                         type="text"
                         className={`h-11 bg-brand-bg-2 rounded-lg ${
-                          fieldState.error 
-                            ? 'border-primary focus-visible:ring-primary' 
+                          fieldState.error
+                            ? 'border-primary focus-visible:ring-primary'
                             : 'border-gray-300'
                         }`}
                         value={getInputValue(field.value)}
@@ -283,7 +291,7 @@ export default function CheckLoanLimitPage({
                         onBlur={field.onBlur}
                       />
                     </FormControl>
-                    <div className="absolute left-0 top-full mt-1 mb-1">
+                    <div className="absolute left-0 top-full mt-1 mb-2sm:">
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -303,8 +311,8 @@ export default function CheckLoanLimitPage({
                         placeholder="Enter your Net Pay"
                         type="text"
                         className={`h-11 bg-brand-bg-2 rounded-lg ${
-                          fieldState.error 
-                            ? 'border-primary focus-visible:ring-primary' 
+                          fieldState.error
+                            ? 'border-primary focus-visible:ring-primary'
                             : 'border-gray-300'
                         }`}
                         value={getInputValue(field.value)}
@@ -375,10 +383,20 @@ export default function CheckLoanLimitPage({
               <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
                 <div className="flex flex-col items-start justify-center gap-1">
                   <p className="text-center text-sm font-normal leading-[140%] text-[#0D0B26]">
-                    You qualify for a loan of KES {loanAmount.toLocaleString()}, payable within {currentRepaymentPeriod} months.
+                    You qualify for a loan of KES {loanAmount.toLocaleString()},
+                    payable within {currentRepaymentPeriod} months.
                   </p>
                   <p className="text-center text-xs font-normal leading-[140%] text-[#676D75]">
-                    Cart Total: KES {grandTotal.toLocaleString()}
+                    Cart Total:{' '}
+                    <span
+                      className={
+                        grandTotal <= loanAmount
+                          ? 'text-green-600'
+                          : 'text-orange-500'
+                      }
+                    >
+                      KES {grandTotal.toLocaleString()}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -495,7 +513,7 @@ export default function CheckLoanLimitPage({
           label: 'Adjust Cart',
           onClick: () => {
             setErrorModalOpen(false)
-            onPrevious() 
+            onPrevious()
           },
         }}
         secondaryAction={{

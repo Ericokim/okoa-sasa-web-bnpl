@@ -51,7 +51,7 @@ const faqData = [
   {
     question: 'What do I do in case I have forgotten my password?',
     answer:
-      'Please visit the login page and click on the link next to \'Forgot your password?\'; enter the details of the email address that you used when you first registered your account. We will email you a link to this email address which you can click on to reset your password.',
+      "Please visit the login page and click on the link next to 'Forgot your password?'; enter the details of the email address that you used when you first registered your account. We will email you a link to this email address which you can click on to reset your password.",
   },
   {
     question: 'When can I place my order?',
@@ -67,6 +67,8 @@ const faqData = [
 
 const FAQs = () => {
   const [openStates, setOpenStates] = React.useState(faqData.map(() => false))
+  const scrollContainerRef = React.useRef(null)
+  const [currentStep, setCurrentStep] = React.useState(0)
 
   const toggleFAQ = (index) => {
     setOpenStates((prev) =>
@@ -74,14 +76,63 @@ const FAQs = () => {
     )
   }
 
-  return (
-    <div className="bg-white mb-4 overflow-hidden relative w-full">
-      {/* How It Works Section */}
-      <div className="bg-white overflow-hidden relative w-full min-h-[485px] lg:h-[552px]">
-        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-[291px] lg:h-96 w-full absolute left-0 top-0" />
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return
 
-        <div className="absolute left-1/2 top-[42px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] md:max-w-[680px] lg:max-w-7xl px-4  lg:px-0">
-          <div className="flex flex-col gap-10 lg:gap-[60px] items-center">
+    const container = scrollContainerRef.current
+    const scrollLeft = container.scrollLeft
+
+    // For mobile: 1 card per view, for tablet: 2 cards per view
+    const isTablet = window.innerWidth >= 768
+    const cardWidth = isTablet ? 280 + 16 : 300 + 16
+    const cardsPerView = isTablet ? 2 : 1
+    const newStep = Math.round(scrollLeft / (cardWidth * cardsPerView))
+
+    setCurrentStep(newStep)
+  }
+
+  const scrollToStep = (stepIndex) => {
+    if (!scrollContainerRef.current) return
+
+    const container = scrollContainerRef.current
+    const isTablet = window.innerWidth >= 768
+    const cardWidth = isTablet ? 280 + 16 : 300 + 16
+    const cardsPerView = isTablet ? 2 : 1
+    const targetScroll = stepIndex * cardWidth * cardsPerView
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth',
+    })
+  }
+
+  // Calculate steps count based on screen size
+  const getStepsCount = () => {
+    const isTablet = typeof window !== 'undefined' && window.innerWidth >= 768
+    return isTablet ? Math.ceil(steps.length / 2) : steps.length
+  }
+
+  const [stepsCount, setStepsCount] = React.useState(getStepsCount())
+
+  // Update steps count on resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      setStepsCount(getStepsCount())
+      scrollToStep(currentStep)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [currentStep])
+
+  return (
+    <div className="bg-white mb-6 overflow-hidden relative w-full">
+      {/* How It Works Section */}
+      <div className="bg-white overflow-hidden relative w-full min-h-[550px] lg:h-[552px]">
+        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-80 lg:h-96 w-full absolute left-0 top-0" />
+
+        <div className="absolute left-1/2 top-[60px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] md:max-w-[680px] lg:max-w-7xl px-4 lg:px-0">
+          <div className="flex flex-col gap-8 lg:gap-[60px] items-center">
             {/* Header */}
             <div className="flex flex-col gap-2 items-center text-center w-full lg:max-w-[616px]">
               <div className="w-[67px] lg:w-[77px] h-0 border-t-4 border-white rotate-180 mb-2" />
@@ -100,7 +151,7 @@ const FAQs = () => {
                 {steps.map((step, index) => (
                   <div
                     key={index}
-                    className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] flex-1"
+                    className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-sm flex-1"
                   >
                     <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-20 h-20 flex items-center justify-center">
                       {step.icon}
@@ -111,7 +162,10 @@ const FAQs = () => {
                       </p>
                     </div>
                     <div className="relative h-[30px] w-full">
-                      <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
+                      <p
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
+                        style={{ WebkitTextFillColor: 'transparent' }}
+                      >
                         {step.step}
                       </p>
                     </div>
@@ -119,28 +173,57 @@ const FAQs = () => {
                 ))}
               </div>
 
-              {/* Mobile & Tablet - Horizontal Scroll Grid */}
-              <div className="lg:hidden w-full overflow-x-auto">
-                <div className="flex gap-4 pb-4 min-w-max">
-                  {steps.map((step, index) => (
-                    <div
+              {/* Mobile & Tablet - Horizontal Scroll with Carousel Behavior */}
+              <div className="lg:hidden w-full">
+                <div
+                  ref={scrollContainerRef}
+                  className="flex gap-4 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                  onScroll={handleScroll}
+                  style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                  }}
+                >
+                  <div className="flex gap-4 min-w-max">
+                    {steps.map((step, index) => (
+                      <div
+                        key={index}
+                        className="bg-white flex flex-col gap-3 items-center justify-center px-4 py-6 rounded-2xl shadow-sm w-[300px] md:w-[280px] shrink-0 snap-start snap-always mx-auto md:mx-0"
+                      >
+                        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-16 h-16 flex items-center justify-center">
+                          {React.cloneElement(step.icon, { size: 40 })}
+                        </div>
+                        <div className="flex flex-col gap-2 items-center justify-center w-full px-2">
+                          <p className="font-['Public_Sans'] text-[16px] md:text-[16px] font-semibold leading-[1.3] text-[#252525] text-center capitalize">
+                            {step.title}
+                          </p>
+                        </div>
+                        <div className="relative h-[24px] w-full">
+                          <p
+                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[20px] md:text-[22px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
+                            style={{ WebkitTextFillColor: 'transparent' }}
+                          >
+                            {step.step}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Step Indicators - Dynamic count based on screen size */}
+                <div className="flex justify-center gap-2 mt-4">
+                  {Array.from({ length: stepsCount }, (_, index) => (
+                    <button
                       key={index}
-                      className="bg-white flex flex-col gap-4 items-center justify-center px-6 py-8 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-[300px] md:w-[320px] shrink-0"
-                    >
-                      <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-20 h-20 flex items-center justify-center">
-                        {step.icon}
-                      </div>
-                      <div className="flex flex-col gap-3 items-center justify-center w-full px-2">
-                        <p className="font-['Public_Sans'] text-[18px] md:text-[20px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
-                          {step.title}
-                        </p>
-                      </div>
-                      <div className="relative h-[30px] w-full">
-                        <p className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] md:text-[28px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text" style={{ WebkitTextFillColor: 'transparent' }}>
-                          {step.step}
-                        </p>
-                      </div>
-                    </div>
+                      onClick={() => scrollToStep(index)}
+                      className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                        index === currentStep
+                          ? 'bg-[#ee3124] w-6'
+                          : 'bg-gray-300'
+                      }`}
+                      aria-label={`Go to step ${index + 1}`}
+                    />
                   ))}
                 </div>
               </div>
@@ -150,9 +233,9 @@ const FAQs = () => {
       </div>
 
       {/* FAQs Section */}
-      <div className="w-full px-4  lg:px-20 py-4 lg:py-5">
-        <div className="max-w-[335px] md:max-w-[680px] lg:max-w-7xl mx-auto">
-          <div className="flex flex-col gap-4 lg:gap-14 items-center lg:items-start w-full">
+      <div className="w-full">
+        <div className="max-w-full">
+          <div className="flex flex-col gap-6 lg:gap-14 items-center lg:items-start w-full">
             {/* Header */}
             <div className="flex flex-col gap-4 lg:gap-6 items-center w-full">
               <div className="w-[77px] h-0 border-t-4 border-[#f8971d] rotate-180" />
@@ -167,21 +250,19 @@ const FAQs = () => {
             </div>
 
             {/* FAQ Items */}
-            <div className="flex flex-col gap-4 lg:gap-10 w-full">
+            <div className="flex flex-col gap-6 lg:gap-10 w-full">
               {faqData.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-white flex flex-col gap-3 items-start p-4 md:p-6 lg:p-6 rounded-2xl shadow-[0px_4px_24px_0px_rgba(37,37,37,0.08)] w-full"
+                  onClick={() => toggleFAQ(index)}
+                  className="bg-white border flex flex-col gap-3 items-start p-4 md:p-6 lg:p-6 rounded-2xl shadow-sm w-full"
                 >
                   {/* Question Row */}
-                  <div className="flex items-start justify-between w-full">
+                  <div className="flex items-start justify-between cursor-pointer w-full">
                     <h2 className="font-['Public_Sans'] text-[18px] md:text-[20px] lg:text-[24px] font-semibold leading-[1.4] text-[#1c1f21] capitalize text-left flex-1 pr-4">
                       {faq.question}
                     </h2>
-                    <button
-                      onClick={() => toggleFAQ(index)}
-                      className="flex items-center justify-center w-6 h-6 md:w-7 md:h-7 shrink-0"
-                    >
+                    <button className="flex items-center justify-center w-6 h-6 md:w-7 md:h-7 shrink-0">
                       <ChevronDown
                         className={`w-6 h-6 md:w-7 md:h-7 text-[#4e555a] transition-transform duration-300 ${
                           openStates[index] ? 'rotate-180' : ''
