@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { TrashIcon } from '@/assets/icons'
-import { useStateContext } from '@/context/state-context'
+import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
 
 export default function OrderSummaryPage({
@@ -30,6 +30,7 @@ export default function OrderSummaryPage({
   }
 
   const handleIncrement = (productId, currentQuantity) => {
+    if (currentQuantity >= MAX_CART_QUANTITY) return
     updateCartQuantity?.(productId, currentQuantity + 1)
   }
 
@@ -138,9 +139,10 @@ export default function OrderSummaryPage({
 
                           <button
                             onClick={() => handleIncrement(product.id, quantity)}
-                            className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                            className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
                             aria-label="Increase quantity"
                             type="button"
+                            disabled={quantity >= MAX_CART_QUANTITY}
                           >
                             <Plus
                               className="h-4 w-4 text-[#292D32]"

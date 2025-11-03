@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BreadCrumbs } from '../BreadCrumbs'
 import { CartList } from './CartList'
 import { CartSummary } from './CartSummary'
-import { useStateContext } from '@/context/state-context'
+import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
 
 export function Cart({ onCheckout }) {
   const { cartProducts, updateCartQuantity, removeFromCart } =
@@ -11,7 +11,11 @@ export function Cart({ onCheckout }) {
   const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
 
   const handleQuantityChange = (id, newQuantity) => {
-    updateCartQuantity?.(id, Math.max(1, newQuantity))
+    const clampedQuantity = Math.max(
+      1,
+      Math.min(newQuantity, MAX_CART_QUANTITY),
+    )
+    updateCartQuantity?.(id, clampedQuantity)
   }
 
   const handleRemove = (id) => {

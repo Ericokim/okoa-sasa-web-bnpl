@@ -56,7 +56,7 @@ const MenuItems = ({ onLogout }) => (
     <Button
       onClick={onLogout}
       variant="ghost"
-      className="flex w-full items-center gap-2 px-2 py-2 text-md text-red-600 hover:bg-red-50 rounded-lg cursor-pointer transition-colors font-medium h-auto justify-start mt-4"
+      className="flex w-full items-center gap-2 px-2 py-2 text-md text-red-600 hover:bg-red-50 rounded-lg cursor-pointer  font-medium h-auto justify-start mt-4"
     >
       <LogoutIcon className="h-6 w-6" />
       Log Out
@@ -184,7 +184,7 @@ export function UserDropdown({ isMobile = false }) {
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-orange-200">
+        <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-200">
           <div className="overflow-hidden rounded-full">{avatar}</div>
           <div className="hidden md:flex flex-col items-start">
             <span className="font-sans text-base font-medium leading-[140%] text-[#252525]">
