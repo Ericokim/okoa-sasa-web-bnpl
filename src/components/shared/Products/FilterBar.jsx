@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import {
   Popover,
@@ -10,10 +10,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
+import { ChevronDown, ChevronUp, List, User } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -194,7 +197,7 @@ const FilterSection = ({ title, children, isOpen, onToggle }) => (
 const FilterCheckboxItem = ({ label, checked, onChange }) => (
   <button
     onClick={() => onChange(!checked)}
-    className="flex items-center justify-center gap-2 self-stretch rounded-lg px-2 py-1"
+    className="cursor-pointer flex items-center justify-center gap-2 self-stretch rounded-lg px-2 py-1"
   >
     {checked ? <CheckedCheckboxIcon /> : <UncheckedCheckboxIcon />}
     <span className="flex-1 text-left font-['Public_Sans'] text-sm font-medium leading-[140%] text-[#252525]">
@@ -265,6 +268,70 @@ const buildDefaultFilters = (options) => ({
   ram: buildToggleState(options.ram),
 })
 
+const toSelectedList = (filtersState, category) =>
+  Object.entries(filtersState?.[category] ?? {})
+    .filter(([, isSelected]) => isSelected)
+    .map(([value]) => value)
+
+const buildSelectedFiltersPayload = (filtersState) => {
+  if (!filtersState) {
+    return {
+      priceRange: [DEFAULT_OPTIONS.price.min, DEFAULT_OPTIONS.price.max],
+      brand: [],
+      color: [],
+      storage: [],
+      camera: [],
+      display: [],
+      ram: [],
+    }
+  }
+
+  return {
+    priceRange: filtersState.priceRange,
+    brand: toSelectedList(filtersState, 'brand'),
+    color: toSelectedList(filtersState, 'color'),
+    storage: toSelectedList(filtersState, 'storage'),
+    camera: toSelectedList(filtersState, 'camera'),
+    display: toSelectedList(filtersState, 'display'),
+    ram: toSelectedList(filtersState, 'ram'),
+  }
+}
+
+const buildFiltersStateFromSelection = (selection, options) => {
+  const priceMinValue = selection?.priceRange?.[0] ?? options.price.min
+  const priceMaxValue = selection?.priceRange?.[1] ?? options.price.max
+
+  const clampedMin = Math.max(
+    options.price.min,
+    Math.min(priceMinValue, options.price.max),
+  )
+  const clampedMax = Math.max(
+    clampedMin,
+    Math.min(priceMaxValue, options.price.max),
+  )
+
+  return {
+    priceRange: [clampedMin, clampedMax],
+    priceMin: `${clampedMin}`,
+    priceMax: `${clampedMax}`,
+    brand: buildToggleStateFromSelection(options.brand, selection?.brand ?? []),
+    color: buildToggleStateFromSelection(options.color, selection?.color ?? []),
+    storage: buildToggleStateFromSelection(
+      options.storage,
+      selection?.storage ?? [],
+    ),
+    camera: buildToggleStateFromSelection(
+      options.camera,
+      selection?.camera ?? [],
+    ),
+    display: buildToggleStateFromSelection(
+      options.display,
+      selection?.display ?? [],
+    ),
+    ram: buildToggleStateFromSelection(options.ram, selection?.ram ?? []),
+  }
+}
+
 export function FilterBar({
   className = '',
   onLoanCalculatorOpen,
@@ -275,6 +342,8 @@ export function FilterBar({
   selectedFilters,
   selectedSort,
 }) {
+  const [isOpen, setIsOpen] = useState(false)
+
   const normalizedOptions = useMemo(() => {
     const priceMin = options?.price?.min ?? DEFAULT_OPTIONS.price.min
     const priceMaxRaw = options?.price?.max ?? DEFAULT_OPTIONS.price.max
@@ -291,12 +360,9 @@ export function FilterBar({
     }
   }, [options])
 
-  const defaultFilters = useMemo(
-    () => buildDefaultFilters(normalizedOptions),
-    [normalizedOptions],
+  const [filters, setFilters] = useState(() =>
+    buildFiltersStateFromSelection(selectedFilters, normalizedOptions),
   )
-
-  const [filters, setFilters] = useState(defaultFilters)
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
   const validInitialSort = SORT_OPTIONS.some(
     (item) => item.value === initialSort,
@@ -314,57 +380,22 @@ export function FilterBar({
     ram: true,
     brand: true,
   })
+  const scrollAreaContainerRef = useRef(null)
+  const applyButtonWrapperRef = useRef(null)
+  const [applyButtonOffset, setApplyButtonOffset] = useState(null)
 
   useEffect(() => {
-    const priceMinValue =
-      selectedFilters?.priceRange?.[0] ?? normalizedOptions.price.min
-    const priceMaxValue =
-      selectedFilters?.priceRange?.[1] ?? normalizedOptions.price.max
-    const clampedMin = Math.max(
-      normalizedOptions.price.min,
-      Math.min(priceMinValue, normalizedOptions.price.max),
+    const nextFilters = buildFiltersStateFromSelection(
+      selectedFilters,
+      normalizedOptions,
     )
-    const clampedMax = Math.max(
-      clampedMin,
-      Math.min(priceMaxValue, normalizedOptions.price.max),
-    )
-
-    const nextFilters = {
-      priceRange: [clampedMin, clampedMax],
-      priceMin: `${clampedMin}`,
-      priceMax: `${clampedMax}`,
-      brand: buildToggleStateFromSelection(
-        normalizedOptions.brand,
-        selectedFilters?.brand ?? [],
-      ),
-      color: buildToggleStateFromSelection(
-        normalizedOptions.color,
-        selectedFilters?.color ?? [],
-      ),
-      storage: buildToggleStateFromSelection(
-        normalizedOptions.storage,
-        selectedFilters?.storage ?? [],
-      ),
-      camera: buildToggleStateFromSelection(
-        normalizedOptions.camera,
-        selectedFilters?.camera ?? [],
-      ),
-      display: buildToggleStateFromSelection(
-        normalizedOptions.display,
-        selectedFilters?.display ?? [],
-      ),
-      ram: buildToggleStateFromSelection(
-        normalizedOptions.ram,
-        selectedFilters?.ram ?? [],
-      ),
-    }
 
     setFilters((prev) =>
       areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES)
         ? prev
         : nextFilters,
     )
-  }, [defaultFilters, selectedFilters, normalizedOptions])
+  }, [normalizedOptions, selectedFilters])
 
   useEffect(() => {
     const nextSort =
@@ -375,23 +406,77 @@ export function FilterBar({
   }, [validInitialSort, selectedSort])
 
   useEffect(() => {
-    if (!onFiltersChange) return
+    if (!isFiltersOpen) {
+      setApplyButtonOffset(null)
+      return
+    }
 
-    const toSelected = (category) =>
-      Object.entries(filters[category] ?? {})
-        .filter(([, isSelected]) => isSelected)
-        .map(([value]) => value)
+    const container =
+      scrollAreaContainerRef.current?.querySelector(
+        '[data-slot="scroll-area-viewport"]',
+      ) ?? scrollAreaContainerRef.current
 
-    onFiltersChange({
-      priceRange: filters.priceRange,
-      brand: toSelected('brand'),
-      color: toSelected('color'),
-      storage: toSelected('storage'),
-      camera: toSelected('camera'),
-      display: toSelected('display'),
-      ram: toSelected('ram'),
-    })
-  }, [filters, onFiltersChange])
+    if (!container || !applyButtonWrapperRef.current) {
+      return
+    }
+
+    const measure = () => {
+      if (!container || !applyButtonWrapperRef.current) return
+      const containerRect = container.getBoundingClientRect()
+      const buttonRect = applyButtonWrapperRef.current.getBoundingClientRect()
+      const offset = buttonRect.top - containerRect.top
+      const maxOffset = Math.max(0, containerRect.height - buttonRect.height)
+      const clampedOffset = Math.min(Math.max(0, offset), maxOffset)
+      setApplyButtonOffset(clampedOffset)
+    }
+
+    const rafId = requestAnimationFrame(measure)
+
+    const handleResize = () => {
+      requestAnimationFrame(measure)
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(rafId)
+    }
+  }, [isFiltersOpen])
+
+  const handleApplyFilters = useCallback(() => {
+    const minBound = normalizedOptions.price.min
+    const maxBound = normalizedOptions.price.max
+
+    let minValue = parseInt(filters.priceMin || '', 10)
+    let maxValue = parseInt(filters.priceMax || '', 10)
+
+    if (Number.isNaN(minValue)) minValue = filters.priceRange[0]
+    if (Number.isNaN(maxValue)) maxValue = filters.priceRange[1]
+
+    minValue = Math.max(minBound, Math.min(minValue, maxBound))
+    maxValue = Math.max(minBound, Math.min(maxValue, maxBound))
+
+    if (minValue > maxValue) {
+      ;[minValue, maxValue] = [maxValue, minValue]
+    }
+
+    const nextFilters = {
+      ...filters,
+      priceRange: [minValue, maxValue],
+      priceMin: `${minValue}`,
+      priceMax: `${maxValue}`,
+    }
+
+    setFilters(nextFilters)
+    onFiltersChange?.(buildSelectedFiltersPayload(nextFilters))
+    setIsFiltersOpen(false)
+  }, [
+    filters,
+    normalizedOptions.price.max,
+    normalizedOptions.price.min,
+    onFiltersChange,
+  ])
 
   useEffect(() => {
     if (onSortChange) {
@@ -424,31 +509,6 @@ export function FilterBar({
     }))
   }
 
-  const handleApplyPrice = () => {
-    const minBound = normalizedOptions.price.min
-    const maxBound = normalizedOptions.price.max
-
-    let minValue = parseInt(filters.priceMin || '', 10)
-    let maxValue = parseInt(filters.priceMax || '', 10)
-
-    if (Number.isNaN(minValue)) minValue = filters.priceRange[0]
-    if (Number.isNaN(maxValue)) maxValue = filters.priceRange[1]
-
-    minValue = Math.max(minBound, Math.min(minValue, maxBound))
-    maxValue = Math.max(minBound, Math.min(maxValue, maxBound))
-
-    if (minValue > maxValue) {
-      ;[minValue, maxValue] = [maxValue, minValue]
-    }
-
-    setFilters((prev) => ({
-      ...prev,
-      priceRange: [minValue, maxValue],
-      priceMin: `${minValue}`,
-      priceMax: `${maxValue}`,
-    }))
-  }
-
   const handleCheckboxToggle = (category, value, checked) => {
     setFilters((prev) => ({
       ...prev,
@@ -460,12 +520,17 @@ export function FilterBar({
   }
 
   const handleClearAll = () => {
-    setFilters(defaultFilters)
+    setFilters(buildDefaultFilters(normalizedOptions))
   }
 
   const activeFilterChips = useMemo(() => {
     const chips = []
-    const [minPrice, maxPrice] = filters.priceRange
+    const appliedFilters = selectedFilters ?? {}
+    const priceRange = appliedFilters.priceRange ?? [
+      normalizedOptions.price.min,
+      normalizedOptions.price.max,
+    ]
+    const [minPrice, maxPrice] = priceRange
 
     if (
       minPrice > normalizedOptions.price.min ||
@@ -477,37 +542,51 @@ export function FilterBar({
       })
     }
 
-    ;['brand', 'color', 'storage', 'camera', 'display', 'ram'].forEach(
-      (category) => {
-        Object.entries(filters[category] ?? {}).forEach(
-          ([value, isSelected]) => {
-            if (isSelected) {
-              chips.push({
-                category,
-                value,
-                label: value,
-              })
-            }
-          },
-        )
-      },
-    )
+    FILTER_CATEGORIES.forEach((category) => {
+      const values = appliedFilters?.[category] ?? []
+      values.forEach((value) => {
+        chips.push({
+          category,
+          value,
+          label: value,
+        })
+      })
+    })
 
     return chips
-  }, [filters, normalizedOptions.price.max, normalizedOptions.price.min])
+  }, [
+    normalizedOptions.price.max,
+    normalizedOptions.price.min,
+    selectedFilters,
+  ])
 
   const handleRemoveChip = (chip) => {
-    if (chip.category === 'price') {
-      setFilters((prev) => ({
-        ...prev,
-        priceRange: [normalizedOptions.price.min, normalizedOptions.price.max],
-        priceMin: `${normalizedOptions.price.min}`,
-        priceMax: `${normalizedOptions.price.max}`,
-      }))
-      return
+    if (!onFiltersChange) return
+
+    const nextSelected = {
+      priceRange: selectedFilters?.priceRange ?? [
+        normalizedOptions.price.min,
+        normalizedOptions.price.max,
+      ],
     }
 
-    handleCheckboxToggle(chip.category, chip.value, false)
+    FILTER_CATEGORIES.forEach((category) => {
+      nextSelected[category] = [...(selectedFilters?.[category] ?? [])]
+    })
+
+    if (chip.category === 'price') {
+      nextSelected.priceRange = [
+        normalizedOptions.price.min,
+        normalizedOptions.price.max,
+      ]
+    } else {
+      nextSelected[chip.category] = nextSelected[chip.category].filter(
+        (value) => value !== chip.value,
+      )
+    }
+
+    onFiltersChange(nextSelected)
+    setFilters(buildFiltersStateFromSelection(nextSelected, normalizedOptions))
   }
 
   return (
@@ -515,16 +594,8 @@ export function FilterBar({
       className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}
     >
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
-        {activeFilterChips.map((chip) => (
-          <SelectedFilterChip
-            key={`${chip.category}-${chip.label}`}
-            label={chip.label}
-            onRemove={() => handleRemoveChip(chip)}
-          />
-        ))}
-
         <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild className="cursor-pointer">
             <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
               <span className="text-sm font-normal capitalize text-black md:text-base">
                 All Filters
@@ -543,202 +614,224 @@ export function FilterBar({
                 </span>
                 <button
                   onClick={handleClearAll}
-                  className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-[#F25E5E]"
+                  className="cursor-pointer font-['Public_Sans'] text-xs font-medium leading-[140%] text-[#F25E5E] transition-all hover:scale-100"
                 >
                   Clear
                 </button>
               </div>
-              <ScrollArea className="h-[60vh] w-full">
-                <div className="flex flex-col gap-4 px-4 pb-4">
-                  <FilterSection
-                    title="Price"
-                    isOpen={openSections.price}
-                    onToggle={() => toggleSection('price')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      <Slider
-                        value={filters.priceRange}
-                        min={normalizedOptions.price.min}
-                        max={normalizedOptions.price.max}
-                        step={1000}
-                        onValueChange={handlePriceRangeChange}
-                        className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
-                      />
+              <div ref={scrollAreaContainerRef}>
+                <ScrollArea className="h-[60vh] w-full">
+                  <div className="flex flex-col gap-4 px-4 pb-4">
+                    <FilterSection
+                      title="Price"
+                      isOpen={openSections.price}
+                      onToggle={() => toggleSection('price')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        <Slider
+                          value={filters.priceRange}
+                          min={normalizedOptions.price.min}
+                          max={normalizedOptions.price.max}
+                          step={1000}
+                          onValueChange={handlePriceRangeChange}
+                          className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
+                        />
 
-                      <div className="flex items-start gap-2 self-stretch">
-                        <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
-                          <input
-                            type="text"
-                            value={filters.priceMin}
-                            onChange={(event) =>
-                              handlePriceInputChange(
-                                'priceMin',
-                                event.target.value,
-                              )
-                            }
-                            className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
-                            placeholder="Min"
-                          />
+                        <div className="flex items-start gap-2 self-stretch">
+                          <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                            <input
+                              type="text"
+                              value={filters.priceMin}
+                              onChange={(event) =>
+                                handlePriceInputChange(
+                                  'priceMin',
+                                  event.target.value,
+                                )
+                              }
+                              className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                              placeholder="Min"
+                            />
+                          </div>
+                          <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                            <input
+                              type="text"
+                              value={filters.priceMax}
+                              onChange={(event) =>
+                                handlePriceInputChange(
+                                  'priceMax',
+                                  event.target.value,
+                                )
+                              }
+                              className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                              placeholder="Max"
+                            />
+                          </div>
                         </div>
-                        <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
-                          <input
-                            type="text"
-                            value={filters.priceMax}
-                            onChange={(event) =>
-                              handlePriceInputChange(
-                                'priceMax',
-                                event.target.value,
-                              )
-                            }
-                            className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
-                            placeholder="Max"
-                          />
+
+                        <div
+                          ref={applyButtonWrapperRef}
+                          className={`w-full bg-white${
+                            applyButtonOffset !== null ? ' sticky z-10' : ''
+                          }`}
+                          style={
+                            applyButtonOffset !== null
+                              ? { top: `${applyButtonOffset}px` }
+                              : undefined
+                          }
+                        >
+                          <Button
+                            onClick={handleApplyFilters}
+                            variant="default"
+                            className="font-['Public_Sans'] rounded-3xl px-4 py-0 w-full text-base h-8 font-medium leading-[140%]"
+                          >
+                            Apply
+                          </Button>
                         </div>
+
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
                       </div>
+                    </FilterSection>
 
-                      <button
-                        onClick={handleApplyPrice}
-                        className="flex items-center justify-center gap-2 self-stretch rounded-3xl bg-[#F47120] px-4 py-2"
-                      >
-                        <span className="font-['Public_Sans'] text-xs font-medium leading-[140%] text-white">
-                          Apply
-                        </span>
-                      </button>
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                    <FilterSection
+                      title="Color"
+                      isOpen={openSections.color}
+                      onToggle={() => toggleSection('color')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.color.map((color) => (
+                          <FilterCheckboxItem
+                            key={color}
+                            label={color}
+                            checked={filters.color[color]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('color', color, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Color"
-                    isOpen={openSections.color}
-                    onToggle={() => toggleSection('color')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.color.map((color) => (
-                        <FilterCheckboxItem
-                          key={color}
-                          label={color}
-                          checked={filters.color[color]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('color', color, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                    <FilterSection
+                      title="Storage Capacity"
+                      isOpen={openSections.storage}
+                      onToggle={() => toggleSection('storage')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.storage.map((storage) => (
+                          <FilterCheckboxItem
+                            key={storage}
+                            label={storage}
+                            checked={filters.storage[storage]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('storage', storage, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Storage Capacity"
-                    isOpen={openSections.storage}
-                    onToggle={() => toggleSection('storage')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.storage.map((storage) => (
-                        <FilterCheckboxItem
-                          key={storage}
-                          label={storage}
-                          checked={filters.storage[storage]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('storage', storage, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                    <FilterSection
+                      title="Camera Megapixel"
+                      isOpen={openSections.camera}
+                      onToggle={() => toggleSection('camera')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.camera.map((camera) => (
+                          <FilterCheckboxItem
+                            key={camera}
+                            label={camera}
+                            checked={filters.camera[camera]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('camera', camera, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Camera Megapixel"
-                    isOpen={openSections.camera}
-                    onToggle={() => toggleSection('camera')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.camera.map((camera) => (
-                        <FilterCheckboxItem
-                          key={camera}
-                          label={camera}
-                          checked={filters.camera[camera]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('camera', camera, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                    <FilterSection
+                      title="Display Size"
+                      isOpen={openSections.display}
+                      onToggle={() => toggleSection('display')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.display.map((display) => (
+                          <FilterCheckboxItem
+                            key={display}
+                            label={display}
+                            checked={filters.display[display]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('display', display, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Display Size"
-                    isOpen={openSections.display}
-                    onToggle={() => toggleSection('display')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.display.map((display) => (
-                        <FilterCheckboxItem
-                          key={display}
-                          label={display}
-                          checked={filters.display[display]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('display', display, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                    <FilterSection
+                      title="RAM"
+                      isOpen={openSections.ram}
+                      onToggle={() => toggleSection('ram')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.ram.map((ram) => (
+                          <FilterCheckboxItem
+                            key={ram}
+                            label={ram}
+                            checked={filters.ram[ram]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('ram', ram, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="RAM"
-                    isOpen={openSections.ram}
-                    onToggle={() => toggleSection('ram')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.ram.map((ram) => (
-                        <FilterCheckboxItem
-                          key={ram}
-                          label={ram}
-                          checked={filters.ram[ram]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('ram', ram, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
-
-                  <FilterSection
-                    title="Brand"
-                    isOpen={openSections.brand}
-                    onToggle={() => toggleSection('brand')}
-                  >
-                    <div className="flex flex-col items-start gap-3 self-stretch">
-                      {normalizedOptions.brand.map((brand) => (
-                        <FilterCheckboxItem
-                          key={brand}
-                          label={brand}
-                          checked={filters.brand[brand]}
-                          onChange={(checked) =>
-                            handleCheckboxToggle('brand', brand, checked)
-                          }
-                        />
-                      ))}
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
-                </div>
-                <ScrollBar orientation="vertical" />
-              </ScrollArea>
+                    <FilterSection
+                      title="Brand"
+                      isOpen={openSections.brand}
+                      onToggle={() => toggleSection('brand')}
+                    >
+                      <div className="flex flex-col items-start gap-3 self-stretch">
+                        {normalizedOptions.brand.map((brand) => (
+                          <FilterCheckboxItem
+                            key={brand}
+                            label={brand}
+                            checked={filters.brand[brand]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('brand', brand, checked)
+                            }
+                          />
+                        ))}
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
+                  </div>
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
+
+        {activeFilterChips.map((chip) => (
+          <SelectedFilterChip
+            key={`${chip.category}-${chip.label}`}
+            label={chip.label}
+            onRemove={() => handleRemoveChip(chip)}
+          />
+        ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
         <Link
           to="/FAQs"
-          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 transition-opacity hover:opacity-90 md:px-4 md:py-2"
+          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 transition-opacity hover:opacity-90 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
         >
           <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
             How it works
@@ -749,7 +842,7 @@ export function FilterBar({
           onClick={() => {
             onLoanCalculatorOpen?.()
           }}
-          className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2"
+          className="cursor-pointer flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
         >
           <span className="text-sm font-normal capitalize text-black md:text-base">
             My Loan Limit
@@ -818,31 +911,40 @@ export function FilterBar({
           </PopoverContent>
         </Popover> */}
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
-              <span className="text-sm font-normal capitalize text-black md:text-base">
-                Sort By
-              </span>
-              <svg
-                className="h-5 w-5 md:h-6 md:w-6"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19.9201 8.95L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95"
-                  stroke="#292D32"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+        <DropdownMenu onOpenChange={setIsOpen}>
+          <DropdownMenuTrigger asChild className="cursor-pointer">
+            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200">
+              <div className="hidden md:flex flex-col items-start">
+                <span className="text-sm font-normal capitalize text-black md:text-base">
+                  Sort By
+                </span>
+              </div>
+              {/* {isOpen ? (
+                <ChevronUp className="h-5 w-5 text-gray-700" />
+              ) : (
+                <ChevronDown className="h-5 w-5 text-gray-700" />
+              )} */}
+              <div className={`${isOpen ? 'rotate-180' : ''}`}>
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M19.9201 8.95001L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95001"
+                    stroke="#292D32"
+                    stroke-width="1.5"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </div>
             </button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             align="end"
             className="w-[210px] border-none bg-white p-2 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
