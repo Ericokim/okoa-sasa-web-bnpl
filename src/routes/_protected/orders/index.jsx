@@ -299,9 +299,9 @@ function OrdersPage() {
         </h1>
         <p className="text-gray-600 mb-8">Overview of all of your activities</p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Left Column: Recent Orders */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="xl:col-span-2 space-y-6">
             <Card className="shadow-none">
               <CardHeader>
                 <CardTitle className="font-medium text-2xl">
