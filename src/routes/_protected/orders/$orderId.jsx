@@ -17,6 +17,7 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
+import { comma } from '@/lib/utils'
 function OrderStepper({ steps, currentStep, isRejected }) {
   return (
     <div className="w-full ">
@@ -197,7 +198,7 @@ function OrderDetailsPage() {
                 variant={
                   order.statusColor === 'red' ? 'destructive' : 'secondary'
                 }
-                className="text-xs"
+                className="text-sm"
               >
                 {order.status}
               </Badge>
@@ -263,29 +264,33 @@ function OrderDetailsPage() {
             {/* === NEW: Items Table / Mobile Cards === */}
             <div className="mt-8">
               {/* Desktop Table */}
+            
+
               <div className="hidden md:block">
                 <Card className="shadow-none">
-                  <CardHeader>
-                    <CardTitle className=" font-medium mb-3 flex items-center gap-2 text-black">
+                  <CardHeader className="pb-2 pt-4 -mt-8">
+                    {' '}
+                    <CardTitle className="font-medium flex items-center gap-2 text-black text-lg">
                       <List className="w-4 h-4" />
                       Items
                     </CardTitle>
-                    <Separator className="my-4" />
+                    <Separator className="my-2" />{' '}
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="-mt-8">
+                    {' '}
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="font-sans text-base font-normal leading-snug text-gray-600">
                             Name
                           </TableHead>
-                          <TableHead className="text-center font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-center font-sans text-base font-normal leading-snug text-gray-600">
                             Qty
                           </TableHead>
-                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-gray-600">
                             Price
                           </TableHead>
-                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-gray-600">
                             Total
                           </TableHead>
                         </TableRow>
@@ -296,17 +301,17 @@ function OrderDetailsPage() {
                             key={idx}
                             className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
                           >
-                            <TableCell className="font-sans text-md font-medium text-[#252525] capitalize">
+                            <TableCell className="font-sans text-md font-medium text-[#252525] capitalize py-2">
                               {item.name}
                             </TableCell>
-                            <TableCell className="text-center font-sans text-md font-medium text-[#252525] capitalize">
+                            <TableCell className="text-center font-sans text-md font-medium text-[#252525] capitalize py-2">
                               {item.qty}
                             </TableCell>
-                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
-                              KES {item.price.toFixed(2)}
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize py-2">
+                              KES {comma(item.price.toFixed(2))}
                             </TableCell>
-                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
-                              KES {item.total.toFixed(2)}
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize py-2">
+                              KES {comma(item.total.toFixed(2))}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -374,26 +379,28 @@ function OrderDetailsPage() {
           {/* Flex container – row on md+, column on mobile */}
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
             {/* ----- Back to Orders (gradient) ----- */}
+
             <Button
-              onClick={() => navigate({ to: '/orders' })}
               variant="gradient"
-              className="flex items-center justify-center gap-2   px-4 py-3 
-                    bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                    text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+              size="sm"
+              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
+              onClick={() => navigate({ to: '/orders' })}
             >
-              <ChevronLeft className="w-4 h-4" />
               Back to Orders
             </Button>
 
             <Button
               variant="outline"
               onClick={() => navigate({ to: '/' })}
-              className="flex items-center justify-center gap-2 px-4 py-3 
-                      border border-[#F8971D] text-[#F8971D] rounded-3xl 
-                      font-medium text-base hover:bg-[#F8971D]/10 transition-all"
+              size="sm"
+              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                border border-[#F8971D] text-[#F8971D] rounded-3xl 
+                      font-medium text-base hover:bg-[#F8971D]/10 transition-all
+                         w-50"
             >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Devices
+              Back to Home
             </Button>
           </div>
         </div>
