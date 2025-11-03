@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import {
   LinkIcon,
@@ -16,32 +16,124 @@ import {
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
 import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
+import { useSnackbar } from 'notistack'
 
 export function ProductInfo({ product }) {
   const navigate = useNavigate()
-  const { addToCart, updateCartQuantity, isProductInCart } = useStateContext()
-  const [quantity, setQuantity] = useState(1)
+  const { addToCart, updateCartQuantity, cart } = useStateContext()
+  const existingQuantity = useMemo(() => {
+    if (!product?.id) return 0
+    const existing = cart?.find((item) => item.productId === product.id)
+    return existing?.quantity ?? 0
+  }, [cart, product?.id])
+
+  const { enqueueSnackbar } = useSnackbar()
   const maxQuantity = MAX_CART_QUANTITY
+  const remainingQuantity = Math.max(0, maxQuantity - existingQuantity)
+  const [quantity, setQuantity] = useState(() =>
+    remainingQuantity > 0 ? 1 : 0,
+  )
+
+  useEffect(() => {
+    setQuantity((prev) => {
+      if (remainingQuantity <= 0) {
+        return 0
+      }
+
+      if (prev <= 0) {
+        return 1
+      }
+
+      return Math.min(prev, remainingQuantity)
+    })
+  }, [remainingQuantity])
 
   const handleDecrease = () => {
-    if (quantity > 1) setQuantity(quantity - 1)
+    setQuantity((prev) => {
+      if (remainingQuantity <= 0) {
+        return 0
+      }
+      if (prev <= 1) {
+        return 1
+      }
+      return prev - 1
+    })
   }
 
   const handleIncrease = () => {
-    if (quantity < maxQuantity) setQuantity(quantity + 1)
+    setQuantity((prev) => {
+      if (remainingQuantity <= 0) {
+        enqueueSnackbar(
+          `Maximum limit of ${maxQuantity} reached. Reduce the quantity in your cart to add more.`,
+          { variant: 'warning' },
+        )
+        return 0
+      }
+      const current = prev <= 0 ? 1 : prev
+      if (current >= remainingQuantity) {
+        enqueueSnackbar(
+          `Maximum limit of ${maxQuantity} reached. Reduce the quantity in your cart to add more.`,
+          { variant: 'warning' },
+        )
+        return remainingQuantity
+      }
+      return current + 1
+    })
   }
 
   const handleAddToCart = () => {
-    addToCart(product?.id, quantity)
+    if (!product?.id) return
+
+    if (remainingQuantity <= 0) {
+      enqueueSnackbar(
+        `You already have the maximum of ${maxQuantity} in your cart. Reduce that quantity to add more.`,
+        { variant: 'warning' },
+      )
+      return
+    }
+
+    const desiredQuantity = Math.max(1, Number(quantity) || 1)
+
+    if (desiredQuantity > remainingQuantity) {
+      enqueueSnackbar(
+        `Only ${remainingQuantity} more item${remainingQuantity === 1 ? '' : 's'} allowed. Lower the quantity and try again.`,
+        {
+          variant: 'warning',
+        },
+      )
+      return
+    }
+
+    addToCart(product.id, desiredQuantity)
+
+    const nextTotal = existingQuantity + desiredQuantity
+    if (nextTotal >= maxQuantity) {
+      enqueueSnackbar(
+        `Your cart now holds the maximum of ${maxQuantity} for this product. Reduce the quantity to add more later.`,
+        { variant: 'warning' },
+      )
+    }
+    // else {
+    //   enqueueSnackbar(`Added ${desiredQuantity} item${desiredQuantity === 1 ? '' : 's'} to your cart.`, {
+    //     variant: 'success',
+    //   })
+    // }
   }
 
   const handleBuyNow = () => {
-    const clampedQuantity = Math.min(quantity, maxQuantity)
+    if (!product?.id) return
 
-    if (isProductInCart(product?.id)) {
-      updateCartQuantity(product?.id, clampedQuantity)
+    const desiredQuantity = Math.max(1, Number(quantity) || 1)
+
+    if (existingQuantity > 0) {
+      if (remainingQuantity > 0) {
+        const additional = Math.min(desiredQuantity, remainingQuantity)
+        const newTotal = Math.min(existingQuantity + additional, maxQuantity)
+        updateCartQuantity(product.id, newTotal)
+      }
     } else {
-      addToCart(product?.id, clampedQuantity)
+      const initialAdd = Math.min(desiredQuantity, maxQuantity)
+      addToCart(product.id, initialAdd)
     }
 
     navigate({ to: '/checkout/' })
@@ -125,7 +217,7 @@ export function ProductInfo({ product }) {
             size="icon"
             className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
             onClick={handleIncrease}
-            disabled={quantity >= maxQuantity}
+            disabled={remainingQuantity <= 0 || quantity >= remainingQuantity}
           >
             <AddIcon size={18} />
           </Button>
@@ -139,6 +231,7 @@ export function ProductInfo({ product }) {
             size="icon"
             className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
             onClick={handleDecrease}
+            disabled={quantity <= 1}
           >
             <MinusIcon size={18} />
           </Button>
@@ -156,6 +249,7 @@ export function ProductInfo({ product }) {
           variant={'outlineGradient'}
           className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl  px-4 py-3 text-base font-medium capitalize leading-[140%]"
           size="lg"
+          disabled={remainingQuantity <= 0 || quantity <= 0}
         >
           <CartIcon />
           Add to Cart

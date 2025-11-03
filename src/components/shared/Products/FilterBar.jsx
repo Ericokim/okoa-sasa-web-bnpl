@@ -51,7 +51,7 @@ const FILTER_CATEGORIES = [
   'ram',
 ]
 
-const MAX_VISIBLE_CHIPS = 3
+const MAX_VISIBLE_CHIPS = 5
 
 const FilterIcon = () => (
   <svg
@@ -425,7 +425,8 @@ export function FilterBar({
   const applyButtonWrapperRef = useRef(null)
   const [applyButtonOffset, setApplyButtonOffset] = useState(null)
   const location = useLocation()
-  const isFaqActive = location.pathname.startsWith('/FAQs')
+  const pathname = location?.pathname ?? ''
+  const isFaqRouteActive = pathname.toLowerCase().startsWith('/faqs')
 
   useEffect(() => {
     const nextFilters = buildFiltersStateFromSelection(
@@ -754,14 +755,14 @@ export function FilterBar({
   const howItWorksLinkClass = cn(
     'group border',
     basePillClasses,
-    isFaqActive
+    isFaqRouteActive
       ? 'border-transparent bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white shadow-sm'
       : 'border-[#F8971D] bg-gradient-to-b from-transparent to-transparent text-[#F47120] hover:bg-[#FFF4EE]',
   )
 
   const howItWorksTextClass = cn(
     'text-sm font-normal capitalize md:text-base transition-colors',
-    isFaqActive
+    isFaqRouteActive
       ? 'text-white'
       : 'bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent group-hover:bg-none group-hover:text-[#F47120]',
   )
@@ -808,12 +809,14 @@ export function FilterBar({
                 <span className="font-['Public_Sans'] text-base font-medium leading-[140%] text-black">
                   Filters
                 </span>
-                <button
+                <Button
+                  type="button"
                   onClick={handleClearAll}
-                  className="cursor-pointer rounded-3xl border border-transparent px-3 py-1 text-sm font-medium leading-[140%] text-[#F25E5E] transition-colors hover:bg-[#FFF4EE]"
+                  variant="ghost"
+                  className="h-9 rounded-3xl border border-[#F7B896] bg-[#FFF4EE] px-4 text-sm font-medium text-[#EE3124] shadow-none transition-colors hover:bg-[#FFE3D6]"
                 >
-                  Clear
-                </button>
+                  Clear All
+                </Button>
               </div>
               <div ref={scrollAreaContainerRef}>
                 <ScrollArea className="h-[60vh] w-full">
@@ -1108,7 +1111,7 @@ export function FilterBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 text-sm font-medium text-[#252525] outline-none transition-colors hover:bg-[#F1F5F9] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F8971D]/40">
-                +{overflowChips.length} more
+                View more (+{overflowChips.length})
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 rounded-2xl border border-[#E8ECF4] bg-white p-2 shadow-[0_8px_24px_rgba(9,36,75,0.12)]">
@@ -1142,9 +1145,9 @@ export function FilterBar({
         {activeFilterChips.length > 0 && (
           <Button
             type="button"
-            variant="outlineGradient"
+            variant="gradient"
             onClick={handleClearAll}
-            className="h-auto rounded-3xl px-4 py-2 text-sm font-medium capitalize text-[#F47120]"
+            className="h-10 rounded-3xl px-5 py-2 text-sm font-semibold capitalize tracking-[-0.01em] md:text-base"
           >
             Clear All
           </Button>
@@ -1171,34 +1174,30 @@ export function FilterBar({
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
             <button className={sortButtonClass} aria-pressed={isOpen}>
-              <div className="md:flex flex-col items-start">
-                <span className="text-sm font-normal capitalize text-black md:text-base">
-                  Sort By
-                </span>
-              </div>
-              {/* {isOpen ? (
-                <ChevronUp className="h-5 w-5 text-gray-700" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-gray-700" />
-              )} */}
-              <div className={`${isOpen ? 'rotate-180' : ''}`}>
+              <span className="text-sm font-normal capitalize text-black md:text-base">
+                Sort By
+              </span>
+              <span
+                className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              >
                 <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M19.9201 8.95001L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95001"
+                    d="M13.2802 10.0333L8.93355 5.68667C8.42021 5.17333 7.58021 5.17333 7.06688 5.68667L2.72021 10.0333"
                     stroke="#292D32"
-                    stroke-width="1.5"
-                    stroke-miterlimit="10"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.5"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
-              </div>
+              </span>
             </button>
           </DropdownMenuTrigger>
 
