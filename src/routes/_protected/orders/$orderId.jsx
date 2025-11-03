@@ -1,6 +1,14 @@
 import React from 'react'
 import { createFileRoute, useParams } from '@tanstack/react-router'
-import { ChevronLeft, Package, MapPin, Truck, Store, List } from 'lucide-react'
+import {
+  ChevronLeft,
+  Package,
+  MapPin,
+  Truck,
+  Store,
+  List,
+  ListCheck,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -270,7 +278,7 @@ function OrderDetailsPage() {
                   <CardHeader className="pb-2 pt-4 -mt-8">
                     {' '}
                     <CardTitle className="font-medium flex items-center gap-2 text-black text-md">
-                      <List className="w-4 h-4" />
+                      <ListCheck className="w-4 h-4" />
                       Items({order.items.length})
                     </CardTitle>
                     <Separator className="my-2" />{' '}
@@ -322,12 +330,12 @@ function OrderDetailsPage() {
 
               {/* Mobile Cards */}
 
-
               {/* ---------- MOBILE ONLY: Clean, Compact Items List ---------- */}
               <div className="block md:hidden space-y-3">
-                <h3 className="font-sans text-xl font-medium text-black">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <ListCheck className="w-5 h-5" />
                   Items ({order.items.length})
-                </h3>
+                </h4>
 
                 <div className="space-y-2">
                   {order.items.map((item, idx) => (

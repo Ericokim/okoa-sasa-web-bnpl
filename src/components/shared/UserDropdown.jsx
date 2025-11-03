@@ -15,6 +15,8 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
+import logo from '@/assets/images/primaryLogoHorizontal.png'
+
 
 const MenuItems = ({ onLogout }) => (
   <>
@@ -73,9 +75,12 @@ const MobileSheet = ({ trigger, onLogout }) => {
       <SheetContent side="right" className="w-[300px] p-0">
         <div className="p-6 pb-4 flex items-center justify-between">
           <img
-            src="/primaryLogoHorizontal.png"
-            alt="OKOA SASA"
             className="h-7 w-auto"
+            src={logo}
+            srcSet={`${logo} 1x, ${logo} 2x`}
+            alt="Okoa Sasa Logo"
+            loading="lazy"
+            decoding="async"
           />
         </div>
         <Separator />
