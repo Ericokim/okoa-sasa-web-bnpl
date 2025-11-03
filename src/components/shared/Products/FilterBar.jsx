@@ -1174,34 +1174,30 @@ export function FilterBar({
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
             <button className={sortButtonClass} aria-pressed={isOpen}>
-              <div className="md:flex flex-col items-start">
-                <span className="text-sm font-normal capitalize text-black md:text-base">
-                  Sort By
-                </span>
-              </div>
-              {/* {isOpen ? (
-                <ChevronUp className="h-5 w-5 text-gray-700" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-gray-700" />
-              )} */}
-              <div className={`${isOpen ? 'rotate-180' : ''}`}>
+              <span className="text-sm font-normal capitalize text-black md:text-base">
+                Sort By
+              </span>
+              <span
+                className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              >
                 <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M19.9201 8.95001L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95001"
+                    d="M13.2802 10.0333L8.93355 5.68667C8.42021 5.17333 7.58021 5.17333 7.06688 5.68667L2.72021 10.0333"
                     stroke="#292D32"
-                    stroke-width="1.5"
-                    stroke-miterlimit="10"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.5"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
-              </div>
+              </span>
             </button>
           </DropdownMenuTrigger>
 
