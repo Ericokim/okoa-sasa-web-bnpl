@@ -16,12 +16,17 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ListIcon, PinIcon, SingleUserIcon, WorldIcon } from '@/assets/icons'
 import { CustomSelect } from '../Inputs/CustomSelect'
+import { FormInput } from '../Inputs/FormInputs'
+import { FormSelect } from '../Inputs/FormSelect'
+import { FormTextarea } from '../Inputs/FormTextarea'
+import { kenyaPhoneSchema, PhoneInput } from '../Inputs/FormPhone'
+import { useStateContext } from '@/context/state-context'
 
 // Base schema for common fields
 const baseSchema = {
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  recipientNumber: z.string().min(1, 'Recipient number is required'),
+  recipientNumber: kenyaPhoneSchema,
   region: z.string().min(1, 'Please select a region'),
 }
 
@@ -45,14 +50,21 @@ export default function DeliveryDetailsForm({
   isFirstStep,
   isLastStep,
 }) {
-  const [deliveryType, setDeliveryType] = useState('door')
+  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+
+  const savedData = getCheckoutFormData(3)
+
+  const [deliveryType, setDeliveryType] = useState(
+    savedData?.deliveryType || 'door',
+  )
 
   // Choose schema based on delivery type
-  const currentSchema = deliveryType === 'door' ? doorDeliverySchema : pickupStationSchema
+  const currentSchema =
+    deliveryType === 'door' ? doorDeliverySchema : pickupStationSchema
 
   const form = useForm({
     resolver: zodResolver(currentSchema),
-    defaultValues: {
+    defaultValues: savedData || {
       firstName: '',
       lastName: '',
       recipientNumber: '',
@@ -62,13 +74,25 @@ export default function DeliveryDetailsForm({
     },
   })
 
+  useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      form.reset(savedData)
+      if (savedData.deliveryType) {
+        setDeliveryType(savedData.deliveryType)
+      }
+    }
+  }, [savedData, form])
+
   // Reset validation when delivery type changes
   useEffect(() => {
     form.clearErrors()
   }, [deliveryType, form])
 
   const onSubmit = (data) => {
-    console.log({ ...data, deliveryType })
+    const dataWithType = { ...data, deliveryType }
+    console.log(dataWithType)
+    // Save form data to context
+    saveCheckoutFormData(3, dataWithType)
     onNext()
   }
 
@@ -178,198 +202,96 @@ export default function DeliveryDetailsForm({
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 md:space-y-6">
-              {/* Row 1: First Name and Last Name */}
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 md:space-y-6"
+            >
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                <FormField
+                <FormInput
                   control={form.control}
                   name="firstName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        First Name
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="Enter your First Name"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="First Name"
+                  placeholder="Enter your First Name"
+                  icon={SingleUserIcon}
                 />
 
-                <FormField
+                <FormInput
                   control={form.control}
                   name="lastName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Last Name
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="Enter your Last Name"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Last Name"
+                  placeholder="Enter your Last Name"
+                  icon={SingleUserIcon}
                 />
               </div>
 
-              {/* Row 2: Conditional - Door Delivery or Pickup Station */}
               {deliveryType === 'door' ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                    <FormField
+                    <FormInput
                       control={form.control}
                       name="recipientNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Recipient Number
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <ListIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                              <Input
-                                placeholder="Enter Recipient Number"
-                                className="pl-10 h-11 border-gray-300 bg-gray-50"
-                                {...field}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Recipient Number"
+                      placeholder="Enter Recipient Number"
+                      icon={ListIcon}
                     />
 
-                    <FormField
+                    <FormSelect
                       control={form.control}
                       name="region"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Region
-                          </FormLabel>
-                          <FormControl>
-                            <CustomSelect
-                              icon={WorldIcon}
-                              placeholder="Enter your region"
-                              options={regionOptions}
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Region"
+                      placeholder="Enter your region"
+                      options={regionOptions}
+                      icon={WorldIcon}
                     />
                   </div>
 
                   <div className="grid grid-cols-1">
-                    <FormField
+                    <FormTextarea
                       control={form.control}
                       name="deliveryAddress"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Delivery Address
-                          </FormLabel>
-                          <FormControl>
-                            <Textarea
-                              placeholder="Enter delivery address"
-                              className="h-[82px] border-gray-300 bg-gray-50 resize-none"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Delivery Address"
+                      placeholder="Enter delivery address"
+                      minRows={3}
+                      maxRows={6}
                     />
                   </div>
                 </>
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                    <FormField
+                    {/* <FormInput
                       control={form.control}
                       name="recipientNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Recipient Number
-                          </FormLabel>
-                          <FormControl>
-                            <div className="relative">
-                              <ListIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                              <Input
-                                placeholder="Enter Recipient Number"
-                                className="pl-10 h-11 border-gray-300 bg-gray-50"
-                                {...field}
-                              />
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Recipient Number"
+                      placeholder="Enter Recipient Number"
+                      icon={ListIcon}
+                    /> */}
+                    <PhoneInput
+                      control={form.control}
+                      name="recipientNumber"
+                      label="Recipient Number"
+                      placeholder="Enter Recipient Number"
+                      icon={ListIcon}
                     />
 
-                    <FormField
+                    <FormSelect
                       control={form.control}
                       name="region"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Region
-                          </FormLabel>
-                          <FormControl>
-                            <CustomSelect
-                              icon={WorldIcon}
-                              placeholder="Enter your region"
-                              options={regionOptions}
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Region"
+                      placeholder="Enter your region"
+                      options={regionOptions}
+                      icon={WorldIcon}
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                    <FormField
+                    <FormSelect
                       control={form.control}
                       name="pickupStore"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                            Pick Up Store / Post
-                          </FormLabel>
-                          <FormControl>
-                            <CustomSelect
-                              icon={PinIcon}
-                              placeholder="Location"
-                              options={pickupStoreOptions}
-                              value={field.value}
-                              onValueChange={field.onChange}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      label="Pick Up Store / Post"
+                      placeholder="Location"
+                      options={pickupStoreOptions}
+                      icon={PinIcon}
                     />
                     <div className="hidden md:block"></div>
                   </div>

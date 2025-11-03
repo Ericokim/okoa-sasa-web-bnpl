@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils'
 import { useStateContext } from '@/context/state-context'
 import { Input } from '@/components/ui/input'
 import { SuccessIcon } from '@/assets/icons'
+import { Link } from '@tanstack/react-router'
 
 export const Dialog = React.forwardRef(
   (
@@ -453,7 +454,7 @@ export const SuccessAlertDialog = ({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+          className="absolute right-4 cursor-pointer p-1 border border-primary sm:right-4 top-4 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
         >
           <X className="h-4 w-4" />
         </button>
@@ -468,7 +469,9 @@ export const SuccessAlertDialog = ({
 
         {/* Content Section */}
         <div className="text-center px-4 sm:px-8 pb-4 sm:pb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+            {title}
+          </h2>
 
           <p className="text-gray-600 text-sm mb-3 sm:mb-4 leading-relaxed">
             You qualify for a loan of{' '}
@@ -511,7 +514,7 @@ export const ErrorAlertDialog = ({
   title = 'Alert!',
   message,
   primaryAction,
-  secondaryAction,
+  secondaryAction,secLink,primLink
 }) => {
   return (
     <At.AlertDialog className={''} open={isOpen} onOpenChange={onClose}>
@@ -519,7 +522,7 @@ export const ErrorAlertDialog = ({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute right-3 sm:right-4 top-3 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
+          className="absolute right-4 sm:right-4 cursor-pointer p-1 border border-primary top-4 sm:top-4 rounded-sm opacity-70 hover:opacity-100 transition-opacity z-10"
         >
           <X className="h-4 w-4" />
         </button>
@@ -527,13 +530,18 @@ export const ErrorAlertDialog = ({
         {/* Icon Section */}
         <div className="flex items-center justify-center pt-6 sm:pt-10 pb-4 sm:pb-6">
           <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-red-500 flex items-center justify-center">
-            <AlertCircle className="w-8 h-8 sm:w-14 sm:h-14 text-white" strokeWidth={3} />
+            <AlertCircle
+              className="w-8 h-8 sm:w-14 sm:h-14 text-white"
+              strokeWidth={3}
+            />
           </div>
         </div>
 
         {/* Content Section */}
         <div className="text-center px-4 sm:px-8 pb-4 sm:pb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">{title}</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
+            {title}
+          </h2>
 
           <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
         </div>
@@ -541,24 +549,29 @@ export const ErrorAlertDialog = ({
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
           {secondaryAction && (
-            <button
-              onClick={secondaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
-            >
-              {secondaryAction.label}
-            </button>
+            <Link to={secLink}>
+              <button
+                onClick={secondaryAction.onClick}
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
+              >
+                {secondaryAction.label}
+              </button>
+            </Link>
           )}
 
           {primaryAction && (
-            <button
-              onClick={primaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
-              style={{
-                background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
-              }}
-            >
-              {primaryAction.label}
-            </button>
+            <Link to={primLink}>
+              <button
+                onClick={primaryAction.onClick}
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
+                style={{
+                  background:
+                    'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
+                }}
+              >
+                {primaryAction.label}
+              </button>
+            </Link>
           )}
         </div>
       </At.AlertDialogContent>

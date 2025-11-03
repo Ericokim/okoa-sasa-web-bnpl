@@ -19,16 +19,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { EmailIcon, PhoneIcon, SingleUserIcon, UserCardIcon, UserFileIcon, UserMsgIcon } from '@/assets/icons'
+import {
+  EmailIcon,
+  PhoneIcon,
+  SingleUserIcon,
+  UserCardIcon,
+  UserFileIcon,
+  UserMsgIcon,
+} from '@/assets/icons'
 import { CustomSelect } from '../Inputs/CustomSelect'
+import { FormInput } from '../Inputs/FormInputs'
+import { FormSelect } from '../Inputs/FormSelect'
+import { PhoneInput } from '../Inputs/FormPhone'
+import { useStateContext } from '@/context/state-context'
+import React from 'react'
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
-  nationalId: z.string().min(1, 'National ID is required'),
+  nationalId: z
+    .string()
+    .min(6, 'National ID must be at least 6 digits')
+    .max(15, 'National ID must not exceed 15 digits')
+    .regex(/^\d+$/, 'National ID must contain only numbers'),
   employer: z.string().min(1, 'Please select an employer'),
   employeeNumber: z.string().min(1, 'Employee number is required'),
   email: z.string().email('Please enter a valid email address'),
-  phoneNumber: z.string().min(1, 'Phone number is required'),
+  phoneNumber: z
+    .string()
+    .min(1, 'Phone number is required')
+    .refine(
+      (value) => {
+        // Remove any spaces for validation
+        const cleaned = value.replace(/\s/g, '')
+
+        // Check if it starts with +254 (should be 13 characters total)
+        if (cleaned.startsWith('+254')) {
+          return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
+        }
+
+        // Check if it starts with 0 (should be 10 characters total)
+        if (cleaned.startsWith('0')) {
+          return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
+        }
+
+        return false
+      },
+      {
+        message:
+          'Please enter a valid Kenyan phone number (e.g., +254712345678 or 0712345678)',
+      },
+    ),
 })
 
 export default function PersonalInfoForm({
@@ -37,9 +77,13 @@ export default function PersonalInfoForm({
   isFirstStep,
   isLastStep,
 }) {
+  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+
+  const savedData = getCheckoutFormData(2)
+
   const form = useForm({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues: {
+    defaultValues: savedData || {
       fullName: '',
       nationalId: '',
       employer: '',
@@ -49,16 +93,23 @@ export default function PersonalInfoForm({
     },
   })
 
-    const companyOptions = [
+  const companyOptions = [
     { value: 'company1', label: 'Company One' },
     { value: 'company2', label: 'Company Two' },
     { value: 'company3', label: 'Company Three' },
     { value: 'company4', label: 'Company Four' },
   ]
 
+  React.useEffect(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      form.reset(savedData)
+    }
+  }, [savedData, form])
+
   const onSubmit = (data) => {
     console.log(data)
-    // Only proceed to next step if validation passes
+    // Save form data to context
+    saveCheckoutFormData(2, data)
     onNext()
   }
 
@@ -85,151 +136,60 @@ export default function PersonalInfoForm({
             >
               {/* Row 1: Full Name and National ID */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
-                <FormField
+                <FormInput
                   control={form.control}
                   name="fullName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Full Name
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <SingleUserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="Enter your Full Name"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Full Name"
+                  placeholder="Enter your Full Name"
+                  icon={SingleUserIcon}
                 />
-
-                <FormField
+                <FormInput
                   control={form.control}
                   name="nationalId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        National ID Number
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <UserFileIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="Enter ID Number"
-                            type={'number'}
-                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="National ID Number"
+                  placeholder="Enter ID Number (6-15 digits)"
+                  type="text"
+                  icon={UserFileIcon}
                 />
               </div>
 
               {/* Row 2: Employer and Employee Number */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
-                <FormField
+                <FormSelect
                   control={form.control}
                   name="employer"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Employer
-                      </FormLabel>
-                      
-                        <FormControl>
-                          
-                          <CustomSelect
-                                                        icon={UserCardIcon}
-                                                        placeholder="Employer Name"
-                                                        options={companyOptions}
-                                                        value={field.value}
-                                                        onValueChange={field.onChange}
-                                                      />
-                        </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Employer"
+                  placeholder="Employer Name"
+                  options={companyOptions}
+                  icon={UserCardIcon}
                 />
 
-                <FormField
+                <FormInput
                   control={form.control}
                   name="employeeNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Employee Number
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <UserMsgIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="OKOA085"
-                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500 focus-visible:ring-orange-500 invalid:border-orange-300"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Employee Number"
+                  placeholder="OKOA085"
+                  icon={UserMsgIcon}
                 />
               </div>
 
               {/* Row 3: Email and Phone Number */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-[50px]">
-                <FormField
+                <FormInput
                   control={form.control}
                   name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Email
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <EmailIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            type="email"
-                            placeholder="Enter your email"
-                            className="pl-10 h-11 border-gray-300 bg-gray-50 focus-visible:ring-orange-500 invalid:border-orange-300"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Email"
+                  placeholder="Enter your email"
+                  type="email"
+                  icon={EmailIcon}
                 />
 
-                <FormField
+                <PhoneInput
                   control={form.control}
                   name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-                        Phone Number
-                      </FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <PhoneIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                          <Input
-                            placeholder="004583"
-                            className="pl-10 h-11 bg-gray-50 border-gray-300 text-gray-500 focus-visible:ring-orange-500 invalid:border-orange-300"
-                            {...field}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                  label="Phone Number"
+                  placeholder="+254712345678 or 0712345678"
+                  icon={PhoneIcon}
                 />
               </div>
             </form>
@@ -244,7 +204,7 @@ export default function PersonalInfoForm({
           disabled={isFirstStep}
           type="button"
           variant="outline"
-          className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           Back{' '}
         </Button>

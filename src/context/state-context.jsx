@@ -41,8 +41,9 @@ export function ContextProvider({ children }) {
   const [cart, setCart] = useState(initialCart)
   const [products, setProducts] = useState(initialProducts)
   const [searchTerm, setSearchTerm] = useState('')
-
-
+  const [checkoutStep, setCheckoutStep] = useState(1)
+  const [checkoutFormData, setCheckoutFormData] = useState({})
+  const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -77,7 +78,9 @@ export function ContextProvider({ children }) {
         product.id === productId
           ? {
               ...product,
-              ...(changes.inCart !== undefined ? { inCart: changes.inCart } : {}),
+              ...(changes.inCart !== undefined
+                ? { inCart: changes.inCart }
+                : {}),
               ...(changes.cartQuantity !== undefined
                 ? { cartQuantity: changes.cartQuantity }
                 : {}),
@@ -257,6 +260,30 @@ export function ContextProvider({ children }) {
     [products],
   )
 
+  const saveCheckoutFormData = useCallback((stepId, data) => {
+    setCheckoutFormData((prev) => ({
+      ...prev,
+      [stepId]: data,
+    }))
+  }, [])
+
+  const getCheckoutFormData = useCallback(
+    (stepId) => {
+      return checkoutFormData[stepId] || {}
+    },
+    [checkoutFormData],
+  )
+
+  const resetCheckout = useCallback(() => {
+    setCheckoutStep(1)
+    setCheckoutFormData({})
+    setIsCheckoutCompleted(false)
+  }, [])
+
+  const goToCheckoutStep = useCallback((step) => {
+    setCheckoutStep(step)
+  }, [])
+
   const value = {
     isAuthenticated,
     user,
@@ -281,6 +308,15 @@ export function ContextProvider({ children }) {
     findProductById,
     searchTerm,
     setSearchTerm,
+    checkoutStep,
+    setCheckoutStep,
+    checkoutFormData,
+    saveCheckoutFormData,
+    getCheckoutFormData,
+    isCheckoutCompleted,
+    setIsCheckoutCompleted,
+    resetCheckout,
+    goToCheckoutStep,
   }
 
   return <StateContext.Provider value={value}>{children}</StateContext.Provider>
