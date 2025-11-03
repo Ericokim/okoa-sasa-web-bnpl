@@ -161,11 +161,11 @@ export default function CheckLoanLimitPage({
                       </div>
 
                       {/* Slider section */}
-                      <div className="flex items-center justify-center mt-2 gap-2.5">
-                        <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
+                      <div className="flex items-center mt-2 gap-1.5 sm:gap-2.5 -mx-2 px-2">
+                        <span className="text-base font-normal leading-[140%] capitalize text-[#252525] whitespace-nowrap">
                           Min 6
                         </span>
-                        <div className="relative mt-0.5 w-full max-w-[307px]">
+                        <div className="relative mt-0.5 flex-1 min-w-0">
                           <Slider
                             value={months}
                             onValueChange={handleSliderChange}
@@ -175,7 +175,7 @@ export default function CheckLoanLimitPage({
                             className="w-full **:data-[slot=slider-track]:h-3.5 **:data-[slot=slider-track]:rounded-full **:data-[slot=slider-track]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
                           />
                         </div>
-                        <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
+                        <span className="text-base font-normal leading-[140%] capitalize text-[#252525] whitespace-nowrap">
                           Max 24
                         </span>
                       </div>
