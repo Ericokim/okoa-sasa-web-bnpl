@@ -17,7 +17,12 @@ function ProductDetailPage() {
   if (!catalogProduct) {
     return (
       <div className="py-10">
-        <NotFound actionHref="/" />
+        <NotFound
+          title="404 - Page Not Found"
+          description="The page you are looking for doesn't exist."
+          actionLabel="Back to Home"
+          actionHref="/"
+        />
       </div>
     )
   }
