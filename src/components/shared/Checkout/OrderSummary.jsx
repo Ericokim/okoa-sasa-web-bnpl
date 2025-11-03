@@ -57,7 +57,7 @@ export default function OrderSummaryPage({
   const grandTotal = subtotal
 
   return (
-    <div className="flex flex-col items-center justify-center mb-[50px] p-4 sm:p-0 gap-6">
+    <div className="flex flex-col items-center justify-center mb-[50px] p-0 sm:p-0 gap-6">
       {/* Form Container */}
       <div className="bg-white w-full  h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
         <div className="mb-6">

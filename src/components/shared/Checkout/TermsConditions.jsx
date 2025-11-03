@@ -19,7 +19,7 @@ export default function TermsConditionPage({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 sm:p-0 gap-6">
+    <div className="flex flex-col items-center justify-center p-0 sm:p-0 gap-6">
       {/* Main Content Container */}
       <div className="bg-white w-full border h-auto rounded-4xl p-4 sm:p-6">
         <div className="w-full h-auto">

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 
 export default function AccountOptionPage() {
   return (
-    <div className="flex items-center justify-center p-4 sm:p-0">
+    <div className="flex items-center justify-center p-0 sm:p-0">
       <div className="bg-white w-full border h-auto sm:h-[207px] rounded-4xl  p-4 sm:p-6">
         <div className="w-full">
           {/* Header */}
