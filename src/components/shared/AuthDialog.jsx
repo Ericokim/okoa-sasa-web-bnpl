@@ -85,7 +85,7 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
             'rounded-3xl border-0 bg-white p-0 shadow-lg',
             'w-[90vw] max-w-[335px]',
             'md:w-[500px] md:max-w-[500px]',
-            step === 'otp' ? 'min-h-[657px]' : 'min-h-[569px]',
+            step === 'otp' ? 'min-h-[600px]' : 'min-h-[500px]',
             'md:min-h-0 md:h-auto',
           )}
         >

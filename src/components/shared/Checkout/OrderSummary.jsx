@@ -11,12 +11,18 @@ export default function OrderSummaryPage({
   isLastStep,
 }) {
   const navigate = useNavigate()
-  const { cartProducts, removeFromCart, updateCartQuantity, resetCheckout } =
-    useStateContext()
+  const {
+    cartProducts,
+    removeFromCart,
+    updateCartQuantity,
+    clearCart,
+    resetCheckout,
+  } = useStateContext()
   const cartItems = cartProducts ?? []
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
+  const [showClearCartDialog, setShowClearCartDialog] = useState(false)
 
   // Watch for empty cart and redirect to home
   useEffect(() => {
@@ -59,6 +65,20 @@ export default function OrderSummaryPage({
     setItemToDelete(null)
   }
 
+  const handleClearCart = () => {
+    if (!cartItems.length) return
+    setShowClearCartDialog(true)
+  }
+
+  const confirmClearCart = () => {
+    clearCart?.()
+    setShowClearCartDialog(false)
+  }
+
+  const cancelClearCart = () => {
+    setShowClearCartDialog(false)
+  }
+
   const subtotal = cartItems.reduce((total, item) => {
     const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
     return total + item.price * quantity
@@ -83,7 +103,18 @@ export default function OrderSummaryPage({
 
         {/* Product Section */}
         <div className="space-y-6">
-          <h2 className="text-base font-semibold text-[#252525]">Product</h2>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-base font-semibold text-[#252525]">Product</h2>
+            {cartItems.length > 1 && (
+              <button
+                type="button"
+                onClick={handleClearCart}
+                className="flex items-center justify-center rounded-3xl border border-[#F25E5E] px-4 py-2 text-sm font-medium text-[#F25E5E] transition-all hover:bg-[#FFF5F5]"
+              >
+                Clear All
+              </button>
+            )}
+          </div>
 
           {/* Map through cart items */}
           {cartItems.length > 0 ? (
@@ -239,6 +270,7 @@ export default function OrderSummaryPage({
             <div className="mx-auto w-16 h-16 bg-gradient-to-br from-[#F8971D] to-[#EE3124] rounded-full flex items-center justify-center mb-4">
               <TrashIconWhite className="w-8 h-8" fill="white" />
             </div>
+
             <h2 className="text-xl font-bold mb-2 text-gray-900">
               Remove Item from Cart?
             </h2>
@@ -262,6 +294,37 @@ export default function OrderSummaryPage({
                   font-medium text-base hover:bg-[#F8971D]/10 transition-all"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showClearCartDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-[calc(100%-2rem)] max-w-[360px] rounded-[28px] bg-white px-8 py-8 text-center shadow-[0_24px_60px_rgba(9,36,75,0.16)]">
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#F8971D] to-[#EE3124]">
+              <TrashIconWhite className="h-8 w-8 text-white" />
+            </div>
+
+            <h2 className="text-xl font-semibold text-[#252525] mb-2">
+              Clear all items?
+            </h2>
+            <p className="text-sm leading-relaxed text-[#676D75] mb-6">
+              This will remove every product from your order summary. You won&apos;t be able to undo this action.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={confirmClearCart}
+                className="w-full h-[46px] rounded-3xl bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-5 text-base font-medium text-white shadow-sm hover:opacity-90"
+              >
+                Yes, clear order
+              </button>
+              <button
+                onClick={cancelClearCart}
+                className="w-full h-[46px] rounded-3xl border border-[#F8971D] px-5 text-base font-medium text-[#F47120] hover:bg-[#FFF4EE]"
+              >
+                Keep items
               </button>
             </div>
           </div>
