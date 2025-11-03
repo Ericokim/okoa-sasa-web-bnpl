@@ -292,8 +292,8 @@ function OrdersPage() {
 
   return (
     <div className="min-h-screen">
-      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
-      <main className="mx-auto px-4 sm:px-4 lg:px-4 py-4">
+      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8 -ml-3" />
+      <main className="w-full flex flex-col py-4">
         <h1 className="text-4xl font-semibold text-gray-900 mb-2">
           My Order History
         </h1>

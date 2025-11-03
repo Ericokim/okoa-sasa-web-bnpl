@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/table'
 function OrderStepper({ steps, currentStep, isRejected }) {
   return (
-    <div className="w-full">
+    <div className="w-full ">
       {/* Desktop View */}
       <div className="hidden md:block">
         {/* Circles and Lines Row */}
