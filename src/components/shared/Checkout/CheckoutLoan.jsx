@@ -21,17 +21,41 @@ const DEFAULT_TENURE = 13
 
 const parseCurrencyValue = (value) => {
   if (!value) return 0
-  const numericValue = Number(value.toString().replace(/[^\d]/g, ''))
+  const numericValue = Number(value.toString().replace(/[^\d.]/g, ''))
   return Number.isNaN(numericValue) ? 0 : numericValue
 }
 
 const formatCurrencyInputValue = (value) => {
-  const numericString = value.replace(/[^\d]/g, '')
+  if (!value) return ''
+  
+  // Remove all non-numeric characters except decimal point
+  let numericString = value.toString().replace(/[^\d.]/g, '')
+  
+  // Handle multiple decimal points - keep only the first one
+  const parts = numericString.split('.')
+  if (parts.length > 2) {
+    numericString = parts[0] + '.' + parts.slice(1).join('')
+  }
+  
+  // Limit to 2 decimal places
+  if (parts.length === 2 && parts[1].length > 2) {
+    numericString = parts[0] + '.' + parts[1].substring(0, 2)
+  }
+  
   if (!numericString) return ''
-  const numericValue = Number(numericString)
-  return Number.isNaN(numericValue)
-    ? ''
-    : new Intl.NumberFormat('en-KE').format(numericValue)
+  
+  // Split into integer and decimal parts
+  const [integerPart, decimalPart] = numericString.split('.')
+  
+  // Format the integer part with commas
+  const formattedInteger = integerPart ? new Intl.NumberFormat('en-KE').format(Number(integerPart)) : ''
+  
+  // Reconstruct with decimal if present
+  if (decimalPart !== undefined) {
+    return formattedInteger + '.' + decimalPart
+  }
+  
+  return formattedInteger
 }
 
 const loanLimitSchema = z.object({
@@ -57,6 +81,13 @@ const loanLimitSchema = z.object({
   payslip: z.any().refine((file) => file !== null && file !== undefined, {
     message: 'Please upload your latest payslip',
   }),
+}).refine((data) => {
+  const basicPay = parseCurrencyValue(data.basicPay)
+  const netPay = parseCurrencyValue(data.netPay)
+  return netPay <= basicPay
+}, {
+  message: 'Net pay cannot be greater than basic pay',
+  path: ['netPay'],
 })
 
 export default function CheckLoanLimitPage({
@@ -65,40 +96,57 @@ export default function CheckLoanLimitPage({
   isFirstStep,
   isLastStep,
 }) {
-  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+  const { saveCheckoutFormData, getCheckoutFormData, cartProducts } = useStateContext()
 
   const savedData = getCheckoutFormData(1)
 
   const [fileName, setFileName] = useState(savedData?.payslipName || '')
   const [open, setOpen] = useState(false)
+  const [errorModalOpen, setErrorModalOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
 
-  const form = useForm({
-    resolver: zodResolver(loanLimitSchema),
-    defaultValues: savedData || {
+  // Calculate cart grand total
+  const cartItems = cartProducts ?? []
+  const grandTotal = useMemo(() => {
+    return cartItems.reduce((total, item) => {
+      const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
+      return total + item.price * quantity
+    }, 0)
+  }, [cartItems])
+
+  // Prepare default values ensuring they are always strings
+  const defaultValues = useMemo(() => {
+    if (savedData && Object.keys(savedData).length > 0) {
+      return {
+        basicPay: savedData.basicPay?.toString() || '',
+        netPay: savedData.netPay?.toString() || '',
+        repaymentPeriod: savedData.repaymentPeriod ?? DEFAULT_TENURE,
+        payslip: savedData.payslip || null,
+      }
+    }
+    return {
       basicPay: '',
       netPay: '',
-      repaymentPeriod: DEFAULT_TENURE ?? savedData?.repaymentPeriod,
+      repaymentPeriod: DEFAULT_TENURE,
       payslip: null,
-    },
+    }
+  }, [savedData])
+
+  const form = useForm({
+    resolver: zodResolver(loanLimitSchema),
+    defaultValues,
   })
 
   // Reset form with saved data when component mounts
   React.useEffect(() => {
     if (savedData && Object.keys(savedData).length > 0) {
-      form.reset(savedData)
-      if (savedData.payslipName) {
-        setFileName(savedData.payslipName)
-      }
-    }
-  }, [savedData, form])
-
-  React.useEffect(() => {
-    if (savedData && Object.keys(savedData).length > 0) {
       form.reset({
-        ...savedData,
-        repaymentPeriod: savedData.repaymentPeriod ?? DEFAULT_TENURE, // Ensure it's never undefined
+        basicPay: savedData.basicPay?.toString() || '',
+        netPay: savedData.netPay?.toString() || '',
+        repaymentPeriod: savedData.repaymentPeriod ?? DEFAULT_TENURE,
+        payslip: savedData.payslip || null,
       })
       if (savedData.payslipName) {
         setFileName(savedData.payslipName)
@@ -106,12 +154,13 @@ export default function CheckLoanLimitPage({
     }
   }, [savedData, form])
 
+  // Get the current repayment period value from form
+  const currentRepaymentPeriod = form.watch('repaymentPeriod') ?? DEFAULT_TENURE
   const watchedBasicPay = form.watch('basicPay')
   const watchedNetPay = form.watch('netPay')
-  const watchedMonths = form.watch('repaymentPeriod')
 
   const loanAmount = useMemo(() => {
-    const tenure = watchedMonths ?? 0
+    const tenure = currentRepaymentPeriod
     if (tenure <= 0) return 0
 
     const parsedBasicPay = parseCurrencyValue(watchedBasicPay)
@@ -125,25 +174,41 @@ export default function CheckLoanLimitPage({
 
     const roundedToNearestThousand = Math.round(calculatedAmount / 1000) * 1000
     return Math.max(0, roundedToNearestThousand)
-  }, [watchedBasicPay, watchedNetPay, watchedMonths])
-
-  const currentTenure = watchedMonths ?? DEFAULT_TENURE
+  }, [watchedBasicPay, watchedNetPay, currentRepaymentPeriod])
 
   const handleInputChange = (value, onChange) => {
-    onChange(formatCurrencyInputValue(value))
+    // Ensure value is always a string
+    const stringValue = value?.toString() || ''
+    onChange(formatCurrencyInputValue(stringValue))
+  }
+
+  const getInputValue = (fieldValue) => {
+    // Always return a string, even if fieldValue is undefined
+    return fieldValue?.toString() || ''
   }
 
   const onSubmit = (data) => {
     console.log(data)
+    
     // Save form data with payslip name
-    const dataWithFileName = { ...data, payslipName: fileName }
+    const dataWithFileName = { 
+      ...data, 
+      payslipName: fileName,
+      calculatedLoanAmount: loanAmount 
+    }
     saveCheckoutFormData(1, dataWithFileName)
 
-    if (loanAmount > 100000) {
-      setOpen(true)
-    } else {
-      onNext()
+    // Check if cart total exceeds loan limit
+    if (grandTotal > loanAmount) {
+      setErrorMessage(
+        `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`
+      )
+      setErrorModalOpen(true)
+      return
     }
+
+    // Proceed to next step
+    onNext()
   }
 
   const handleFileChange = (e) => {
@@ -193,12 +258,12 @@ export default function CheckLoanLimitPage({
             className="space-y-4 sm:space-y-6"
           >
             {/* Basic Pay and Net Pay */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-[50px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 mb-7 gap-4 sm:gap-[50px]">
               <FormField
                 control={form.control}
                 name="basicPay"
-                render={({ field }) => (
-                  <FormItem>
+                render={({ field, fieldState }) => (
+                  <FormItem className="relative">
                     <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                       Basic Pay
                     </FormLabel>
@@ -206,15 +271,19 @@ export default function CheckLoanLimitPage({
                       <Input
                         placeholder="Enter your Basic Pay"
                         type="text"
-                        className="h-11 bg-brand-bg-2 border-gray-300 rounded-lg"
-                        value={field.value ?? ''}
+                        className={`h-11 bg-brand-bg-2 rounded-lg ${
+                          fieldState.error 
+                            ? 'border-primary focus-visible:ring-primary' 
+                            : 'border-gray-300'
+                        }`}
+                        value={getInputValue(field.value)}
                         onChange={(event) =>
                           handleInputChange(event.target.value, field.onChange)
                         }
                         onBlur={field.onBlur}
                       />
                     </FormControl>
-                    <div className="h-6 mt-1">
+                    <div className="absolute left-0 top-full mt-1 mb-1">
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -224,8 +293,8 @@ export default function CheckLoanLimitPage({
               <FormField
                 control={form.control}
                 name="netPay"
-                render={({ field }) => (
-                  <FormItem>
+                render={({ field, fieldState }) => (
+                  <FormItem className="relative">
                     <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                       Net Pay
                     </FormLabel>
@@ -233,15 +302,19 @@ export default function CheckLoanLimitPage({
                       <Input
                         placeholder="Enter your Net Pay"
                         type="text"
-                        className="h-11 bg-brand-bg-2 border-gray-300 rounded-lg"
-                        value={field.value ?? ''}
+                        className={`h-11 bg-brand-bg-2 rounded-lg ${
+                          fieldState.error 
+                            ? 'border-primary focus-visible:ring-primary' 
+                            : 'border-gray-300'
+                        }`}
+                        value={getInputValue(field.value)}
                         onChange={(event) =>
                           handleInputChange(event.target.value, field.onChange)
                         }
                         onBlur={field.onBlur}
                       />
                     </FormControl>
-                    <div className="h-6 mt-1">
+                    <div className="absolute left-0 top-full mt-1 mb-1">
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -253,8 +326,8 @@ export default function CheckLoanLimitPage({
             <FormField
               control={form.control}
               name="repaymentPeriod"
-              render={({ field }) => (
-                <FormItem>
+              render={({ field, fieldState }) => (
+                <FormItem className="relative">
                   <FormControl>
                     <div>
                       {/* Centered month badge with Loan Tenure label */}
@@ -264,7 +337,7 @@ export default function CheckLoanLimitPage({
                         </p>
                         <div className="flex flex-row justify-center items-center px-3.5 py-2.5 gap-2.5 w-[104px] h-[38px] border border-[#F47120] rounded-full">
                           <p className="text-sm font-normal text-center text-[#333333]">
-                            {field.value ?? DEFAULT_TENURE} Months
+                            {currentRepaymentPeriod} Months
                           </p>
                         </div>
                         <div className="w-[104px]"></div>
@@ -276,10 +349,8 @@ export default function CheckLoanLimitPage({
                         </span>
                         <div className="relative mt-0.5 flex-1 min-w-0">
                           <Slider
-                            value={[field.value ?? DEFAULT_TENURE]}
-                            onValueChange={(value) =>
-                              handleSliderChange(value, field.onChange)
-                            }
+                            value={[currentRepaymentPeriod]}
+                            onValueChange={handleSliderChange}
                             min={6}
                             max={24}
                             step={1}
@@ -292,7 +363,7 @@ export default function CheckLoanLimitPage({
                       </div>
                     </div>
                   </FormControl>
-                  <div className="h-6 mt-1">
+                  <div className="absolute left-0 top-full mt-1">
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -300,39 +371,41 @@ export default function CheckLoanLimitPage({
             />
 
             {/* Loan Qualification Info */}
-            {/* {loanAmount > 0 && (
+            {loanAmount > 0 && (
               <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
                 <div className="flex flex-col items-start justify-center gap-1">
                   <p className="text-center text-sm font-normal leading-[140%] text-[#0D0B26]">
-                    You qualify for a loan of KES {loanAmount.toLocaleString()},
-                    payable within {currentTenure} months.
+                    You qualify for a loan of KES {loanAmount.toLocaleString()}, payable within {currentRepaymentPeriod} months.
+                  </p>
+                  <p className="text-center text-xs font-normal leading-[140%] text-[#676D75]">
+                    Cart Total: KES {grandTotal.toLocaleString()}
                   </p>
                 </div>
               </div>
-            )} */}
+            )}
 
             {/* Upload Payslip */}
             <FormField
               control={form.control}
               name="payslip"
-              render={({ field }) => (
-                <FormItem>
+              render={({ field, fieldState }) => (
+                <FormItem className="relative">
                   <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                     Upload Latest Payslip
                   </FormLabel>
                   <FormControl>
-                    <div className="relative h-11">
+                    <div className="relative">
                       <input
                         type="file"
                         id="payslip-upload"
-                        className="hidden h-11"
+                        className="hidden"
                         accept=".pdf,.jpg,.jpeg,.png"
                         onChange={handleFileChange}
                       />
                       <label
                         htmlFor="payslip-upload"
                         className={`flex items-center justify-between h-11 bg-brand-bg-2 px-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                          form.formState.errors.payslip
+                          fieldState.error
                             ? 'border-primary'
                             : 'border-gray-300'
                         }`}
@@ -371,7 +444,7 @@ export default function CheckLoanLimitPage({
                               fill="#A0A4AC"
                             />
                             <path
-                              d="M12.4998 18.9582H7.49984C2.97484 18.9582 1.0415 17.0248 1.0415 12.4998V7.49984C1.0415 2.97484 2.97484 1.0415 7.49984 1.0415H11.6665C12.0082 1.0415 12.2915 1.32484 12.2915 1.6665C12.2915 2.00817 12.0082 2.2915 11.6665 2.2915H7.49984C3.65817 2.2915 2.2915 3.65817 2.2915 7.49984V12.4998C2.2915 16.3415 3.65817 17.7082 7.49984 17.7082H12.4998C16.3415 17.7082 17.7082 16.3415 17.7082 12.4998V8.33317C17.7082 7.9915 17.9915 7.70817 18.3332 7.70817C18.6748 7.70817 18.9582 7.9915 18.9582 8.33317V12.4998C18.9582 17.0248 17.0248 18.9582 12.4998 18.9582Z"
+                              d="M12.4998 18.9582H7.4998C2.97484 18.9582 1.0415 17.0248 1.0415 12.4998V7.49984C1.0415 2.97484 2.97484 1.0415 7.4998 1.0415H11.6665C12.0082 1.0415 12.2915 1.32484 12.2915 1.6665C12.2915 2.00817 12.0082 2.2915 11.6665 2.2915H7.4998C3.65817 2.2915 2.2915 3.65817 2.2915 7.49984V12.4998C2.2915 16.3415 3.65817 17.7082 7.4998 17.7082H12.4998C16.3415 17.7082 17.7082 16.3415 17.7082 12.4998V8.33317C17.7082 7.9915 17.9915 7.70817 18.3332 7.70817C18.6748 7.70817 18.9582 7.9915 18.9582 8.33317V12.4998C18.9582 17.0248 17.0248 18.9582 12.4998 18.9582Z"
                               fill="#A0A4AC"
                             />
                             <path
@@ -383,7 +456,7 @@ export default function CheckLoanLimitPage({
                       </label>
                     </div>
                   </FormControl>
-                  <div className="h-6 mt-1">
+                  <div className="absolute left-0 top-full mt-1">
                     <FormMessage />
                   </div>
                 </FormItem>
@@ -399,38 +472,36 @@ export default function CheckLoanLimitPage({
           onClick={onPrevious}
           disabled={isFirstStep}
           type="button"
-          className="px-8 py-3 h-12 rounded-full border-2 border-orange-500 bg-white text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50 transition-colors w-full sm:w-auto"
+          variant={'outline'}
+          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           Back
         </Button>
         <Button
           onClick={form.handleSubmit(onSubmit)}
           type="button"
-          className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity w-full sm:w-auto"
-          style={{
-            background: 'linear-gradient(to right, #F97316, #EF4444)',
-          }}
+          className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
           Next: Personal Info
         </Button>
       </div>
 
       <ErrorAlertDialog
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        message="The selected device exceeds your loan limit. Please choose another device within your approved range."
-        secondaryAction={{
-          label: 'Back To Device List',
+        isOpen={errorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        message={errorMessage}
+        primLink={'/cart'}
+        primaryAction={{
+          label: 'Adjust Cart',
           onClick: () => {
-            console.log('Back to device list')
-            setOpen(false)
+            setErrorModalOpen(false)
+            onPrevious() 
           },
         }}
-        primaryAction={{
-          label: 'Choose Another Device',
+        secondaryAction={{
+          label: 'Adjust Tenure',
           onClick: () => {
-            console.log('Choose another device')
-            setOpen(false)
+            setErrorModalOpen(false)
           },
         }}
       />

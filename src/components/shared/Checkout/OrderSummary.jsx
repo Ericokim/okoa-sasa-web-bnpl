@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { TrashIcon } from '@/assets/icons'
 import { useStateContext } from '@/context/state-context'
@@ -11,11 +11,19 @@ export default function OrderSummaryPage({
   isLastStep,
 }) {
   const navigate = useNavigate()
-  const { cartProducts, removeFromCart, updateCartQuantity } = useStateContext()
+  const { cartProducts, removeFromCart, updateCartQuantity, resetCheckout } = useStateContext()
   const cartItems = cartProducts ?? []
   
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
+
+  // Watch for empty cart and redirect to home
+  useEffect(() => {
+    if (cartItems.length === 0) {
+      resetCheckout() // Reset checkout state
+      navigate({ to: '/' }) // Redirect to home
+    }
+  }, [cartItems.length, navigate, resetCheckout])
 
   const handleImageClick = (productId) => {
     navigate({ to: `/products/${productId}` })
@@ -201,8 +209,8 @@ export default function OrderSummaryPage({
           onClick={onPrevious}
           disabled={isFirstStep}
           type="button"
-          className="px-8 py-3 h-12 rounded-full border-2 border-orange-500 bg-white text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50 transition-colors w-full sm:w-auto"
-        >
+         className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+      >
           Back
         </button>
         <button

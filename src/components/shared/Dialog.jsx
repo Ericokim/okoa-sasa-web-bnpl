@@ -514,7 +514,7 @@ export const ErrorAlertDialog = ({
   title = 'Alert!',
   message,
   primaryAction,
-  secondaryAction,
+  secondaryAction,secLink,primLink
 }) => {
   return (
     <At.AlertDialog className={''} open={isOpen} onOpenChange={onClose}>
@@ -549,7 +549,7 @@ export const ErrorAlertDialog = ({
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
           {secondaryAction && (
-            <Link to="/">
+            <Link to={secLink}>
               <button
                 onClick={secondaryAction.onClick}
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
@@ -560,7 +560,7 @@ export const ErrorAlertDialog = ({
           )}
 
           {primaryAction && (
-            <Link to="/">
+            <Link to={primLink}>
               <button
                 onClick={primaryAction.onClick}
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"

@@ -19,10 +19,10 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
           {/* Header */}
           <div className="h-auto sm:h-16 mb-4 sm:mb-0">
             <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
-              Account Option
+              Checkout Option
             </h1>
             <p className="w-full text-sm sm:text-base font-medium leading-[1.4] text-[#676D75]">
-              No Account? Proceed to checkout and you can create an account
+              Proceed to checkout and you can create an account
               after purchase
             </p>
           </div>
@@ -42,7 +42,7 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
                 htmlFor="account-terms"
                 className="w-full flex flex-wrap items-center text-center text-base sm:text-lg font-medium leading-[1.4] capitalize text-[#0D0B26] cursor-pointer select-none"
               >
-                <span className="mr-1">Create an Okoa shopping account.</span>
+                <span className="mr-1">No Account? Create an Okoa Sasa shopping account.</span>
               </label>
             </div>
           </div>

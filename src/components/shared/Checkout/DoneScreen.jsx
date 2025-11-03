@@ -7,16 +7,6 @@ import { useStateContext } from '@/context/state-context'
 const DoneScreen = () => {
   const { resetCheckout } = useStateContext()
 
-  // // Reset checkout when done screen is shown
-  // useEffect(() => {
-  //   // Optional: Add a small delay before resetting
-  //   const timer = setTimeout(() => {
-  //     resetCheckout()
-  //   }, 100)
-
-  //   return () => clearTimeout(timer)
-  // }, [resetCheckout])
-
   return (
     <div className="bg-white grid grid-cols-1 place-items-center w-full max-w-full h-auto rounded-4xl border border-gray-200 p-6">
       <div className="w-[200px] h-[200px] mb-6">
@@ -24,7 +14,7 @@ const DoneScreen = () => {
       </div>
       <div className="h-auto sm:h-16 sm:mb-0 text-center">
         <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525] mb-2">
-          Your Order Has been Received
+          Your Order #OKOA{}123 Has been Received
         </h1>
         <p className="w-full text-sm sm:text-base font-medium leading-[1.4] text-[#676D75]">
           You will be contacted for further information and approval.

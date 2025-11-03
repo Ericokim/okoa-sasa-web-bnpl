@@ -251,7 +251,8 @@ export default function DeliveryDetailsForm({
                       name="deliveryAddress"
                       label="Delivery Address"
                       placeholder="Enter delivery address"
-                      className="h-[82px]"
+                      minRows={3}
+                      maxRows={6}
                     />
                   </div>
                 </>
