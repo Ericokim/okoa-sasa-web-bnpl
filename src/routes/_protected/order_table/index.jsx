@@ -3,70 +3,74 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import {
-  Calendar,
-  Package,
-  DollarSign,
-} from 'lucide-react'
+import { Calendar, Package, DollarSign } from 'lucide-react'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import { recentOrders } from '@/routes/_protected/orders/index'
 
 function OrdersTableHistory() {
   const navigate = useNavigate()
-
   const orderHistory = [
-    {
-      orderId: '#REQ-20458',
-      createdDate: 'Oct 12, 2025',
-      name: 'Jane Mwangi',
-      device: 'Samsung Galaxy A35',
-      loanAmount: 38500,
-      status: 'Pending',
-      statusVariant: 'secondary',
-    },
-    {
-      orderId: '#REQ-20459',
-      createdDate: 'Oct 12, 2025',
-      name: 'Jane Mwangi',
-      device: 'Samsung Galaxy A35',
-      loanAmount: 38500,
-      status: 'Approved',
-      statusVariant: 'default',
-    },
-    {
-      orderId: '#REQ-20460',
-      createdDate: 'Oct 12, 2025',
-      name: 'Jane Mwangi',
-      device: 'Samsung Galaxy A35',
-      loanAmount: 38500,
-      status: 'Fulfilled',
-      statusVariant: 'success',
-    },
-    {
-      orderId: '#REQ-20461',
-      createdDate: 'Oct 12, 2025',
-      name: 'Jane Mwangi',
-      device: 'Samsung Galaxy A35',
-      loanAmount: 38500,
-      status: 'Declined',
-      statusVariant: 'destructive',
-    },
-  ]
+  {
+    orderId: '#REQ-20458',
+    createdDate: 'Oct 12, 2025',
+    name: 'Jane Mwangi',
+    device: 'Samsung Galaxy A35',
+    loanAmount: 38500,
+    status: 'Processing',          // changed
+    statusVariant: 'secondary',
+  },
+  {
+    orderId: '#REQ-20459',
+    createdDate: 'Oct 12, 2025',
+    name: 'Jane Mwangi',
+    device: 'Samsung Galaxy A35',
+    loanAmount: 38500,
+    status: 'On the way',          // changed
+    statusVariant: 'default',
+  },
+  {
+    orderId: '#REQ-20460',
+    createdDate: 'Oct 12, 2025',
+    name: 'Jane Mwangi',
+    device: 'Samsung Galaxy A35',
+    loanAmount: 38500,
+    status: 'Delivered',           // changed
+    statusVariant: 'success',
+  },
+  {
+    orderId: '#REQ-20461',
+    createdDate: 'Oct 12, 2025',
+    name: 'Jane Mwangi',
+    device: 'Samsung Galaxy A35',
+    loanAmount: 38500,
+    status: 'Declined',            // unchanged (kept for completeness)
+    statusVariant: 'destructive',
+  },
+]
+
+/* ------------------------------------------------------------------ */
+/* Updated badge colour mapping – only the three allowed statuses   */
+/* ------------------------------------------------------------------ */
+const getStatusBadgeClasses = (status) => {
+  switch (status) {
+    case 'Delivered':
+      return 'bg-green-100 text-green-800'
+    case 'On the way':
+      return 'bg-blue-100 text-blue-800'
+    case 'Processing':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'Delivered':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+}
+
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
     { label: 'My Order History', path: '/orderHistory', isCurrent: true },
   ]
-
-  const getStatusBadgeClasses = (status) => {
-    switch (status) {
-      case 'Fulfilled': return 'bg-green-100 text-green-800'
-      case 'Approved':  return 'bg-blue-100 text-blue-800'
-      case 'Declined':  return 'bg-red-100 text-red-800'
-      case 'Pending':   return 'bg-yellow-100 text-yellow-800'
-      default:          return 'bg-gray-100 text-gray-800'
-    }
-  }
 
   const getGradient = () => 'from-orange-500 to-amber-500'
 
@@ -90,7 +94,7 @@ function OrdersTableHistory() {
             <CardContent className="p-0">
               {orderHistory.map((order, idx) => {
                 const matched = recentOrders.find(
-                  (ro) => ro.orderId === order.orderId.replace('#', '')
+                  (ro) => ro.orderId === order.orderId.replace('#', ''),
                 ) || { image: '/phone.png', title: order.device }
 
                 return (
@@ -99,17 +103,8 @@ function OrdersTableHistory() {
                       className="flex gap-4 py-4 px-6 items-center cursor-pointer hover:bg-gray-50 transition-colors"
                       onClick={() => handleViewDetails(order.orderId)}
                     >
-                      {/* Image */}
-                      <div className="flex-shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
-                        <img
-                          src={matched.image}
-                          alt={order.device}
-                          className="h-14 w-14 object-contain"
-                        />
-                      </div>
-
                       {/* Info */}
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 ">
                         <h4 className="font-medium text-lg text-gray-900 truncate">
                           {order.device}
                         </h4>
@@ -138,7 +133,9 @@ function OrdersTableHistory() {
                       </Button>
                     </div>
 
-                    {idx < orderHistory.length - 1 && <Separator className="mx-6" />}
+                    {idx < orderHistory.length - 1 && (
+                      <Separator className="mx-6" />
+                    )}
                   </div>
                 )
               })}
@@ -150,7 +147,7 @@ function OrdersTableHistory() {
         <div className="md:hidden space-y-4">
           {orderHistory.map((order) => {
             const matched = recentOrders.find(
-              (ro) => ro.orderId === order.orderId.replace('#', '')
+              (ro) => ro.orderId === order.orderId.replace('#', ''),
             ) || { image: '/phone.png' }
 
             return (
@@ -194,7 +191,9 @@ function OrdersTableHistory() {
                         {order.device}
                       </p>
                       {order.name && (
-                        <p className="text-xs text-gray-500 mt-0.5">{order.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">
+                          {order.name}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -213,8 +212,8 @@ function OrdersTableHistory() {
                   {/* Status + View Details – Aligned on same line */}
                   <div className="flex justify-between items-center pt-2 border-t border-gray-100">
                     <span className="text-xs font-medium text-gray-500">
-                     {' '}
-                      <span className="text-gray-900">{' '}</span>
+                      {' '}
+                      <span className="text-gray-900"> </span>
                     </span>
                     <Button
                       variant="link"

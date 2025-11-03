@@ -325,7 +325,7 @@ function OrdersPage() {
                           <img
                             src={order.image}
                             alt={order.title}
-                            className="h-14 w-14 object-contain"
+                            className="h-24 w-24 object-contain"
                           />
                         </div>
 
@@ -391,7 +391,7 @@ function OrdersPage() {
 
                             <div className="flex justify-end mt-2">
                               <p
-                                className={`font-bold text-sm bg-linear-to-r ${gradient} bg-clip-text text-transparent`}
+                                className={`font-bold text-lg bg-linear-to-r ${gradient} bg-clip-text text-transparent whitespace-nowrap`}
                               >
                                 KES {order.price.toLocaleString()}
                               </p>
@@ -531,7 +531,7 @@ function OrdersPage() {
           {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
           <div className="hidden md:block">
             <Card className="shadow-none overflow-hidden">
-              <CardContent className="p-0">
+              <CardContent className="">
                 {orderHistory.map((order, idx) => {
                   const matched = recentOrders.find(
                     (ro) => ro.orderId === order.orderId.replace('#', ''),
@@ -544,11 +544,11 @@ function OrdersPage() {
                         onClick={() => handleViewDetails(order.orderId)}
                       >
                         {/* Image */}
-                        <div className="flex-shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
+                        <div className="shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
                           <img
                             src={matched.image}
                             alt={order.device}
-                            className="h-14 w-14 object-contain"
+                            className="h-24 w-24 object-contain"
                           />
                         </div>
 
@@ -557,22 +557,36 @@ function OrdersPage() {
                           <h4 className="font-medium text-lg text-gray-900 truncate">
                             {order.device}
                           </h4>
-                          <p className="text-sm text-gray-600">
-                            {order.orderId} • {order.createdDate}
-                            {order.name && ` • ${order.name}`}
+
+                          {/* Increased spacing using • with extra space */}
+                          <p className="text-sm text-gray-600 mt-1 mb-2">
+                            {order.orderId}
+                            <span className="mx-2">•</span>
+                            {order.createdDate}
+                            {order.name && (
+                              <>
+                                <span className="mx-2">•</span>
+                                {order.name}
+                              </>
+                            )}
                           </p>
+
+                          {/* Gradient price – unchanged */}
                           <p
-                            className={`font-bold text-md bg-gradient-to-r ${getGradient()} bg-clip-text text-transparent whitespace-nowrap`}
+                            className={`font-bold text-lg  bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent whitespace-nowrap`}
                           >
                             KES {order.loanAmount.toLocaleString()}
                           </p>
                         </div>
 
                         {/* View Details */}
+
                         <Button
                           variant="gradient"
                           size="sm"
-                          className="rounded-3xl px-3 py-1 h-auto text-base font-medium"
+                          className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleViewDetails(order.orderId)
@@ -583,7 +597,7 @@ function OrdersPage() {
                       </div>
 
                       {idx < orderHistory.length - 1 && (
-                        <Separator className="mx-6" />
+                        <Separator className={'my-4'}/>
                       )}
                     </div>
                   )
@@ -602,7 +616,7 @@ function OrdersPage() {
               return (
                 <Card
                   key={order.orderId}
-                  className="shadow-sm border border-gray-200 rounded-2xl overflow-hidden"
+                  className="shadow-none border border-gray-200 rounded-2xl overflow-hidden"
                 >
                   <CardContent className="p-4">
                     {/* Header */}
@@ -664,17 +678,22 @@ function OrdersPage() {
                         {' '}
                         <span className="text-gray-900"> </span>
                       </span>
+                      {/* View Details */}
+
                       <Button
-                        variant="link"
+                        variant="gradient"
                         size="sm"
+                        className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleViewDetails(order.orderId)
                         }}
-                        className="text-orange-600 text-sm font-medium underline underline-offset-2 hover:text-orange-700 p-0 h-auto"
                       >
                         View Details
                       </Button>
+                     
                     </div>
                   </CardContent>
                 </Card>
