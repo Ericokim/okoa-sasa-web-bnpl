@@ -1,275 +1,411 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import React from 'react'
+import { createFileRoute, useParams } from '@tanstack/react-router'
+import { ChevronLeft, Package, MapPin, Truck, Store, List } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Check, Package, Truck, MapPin } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
+import { useNavigate } from '@tanstack/react-router'
 import { recentOrders } from './index'
-
-
-function OrderDetailPage() {
-  const { orderId } = Route.useParams()
-  const navigate = useNavigate()
-
-  if (!recentOrders) return <div className="p-8 text-center">Loading...</div>
-  const order = recentOrders.find((o) => o.orderId === orderId)
-  if (!order) return <div className="p-8 text-center">Order not found</div>
-
-  const steps = [
-    { label: 'Processing', active: order.statusStep >= 0 },
-    { label: 'On the way', active: order.statusStep >= 1 },
-    { label: 'Delivered', active: order.statusStep >= 2 },
-  ]
-
-  const breadcrumbItems = [
-    { label: 'Home', path: '/' },
-    { label: 'My Orders', path: '/orders' },
-    { label: `Order ${order.orderId}`, path: '', isCurrent: true },
-  ]
-
+import { Check } from 'lucide-react'
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table'
+function OrderStepper({ steps, currentStep, isRejected }) {
   return (
-    <div className="min-h-screen bg-white">
-      <BreadCrumbs items={breadcrumbItems} className="my-8" />
-
-      <div className="mx-auto px-4 py-8 space-y-10">
-        {/* STATUS CARD */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
-              Status
-            </CardTitle>
-            <Separator className="my-4" />
-          </CardHeader>
-
-          <CardContent className="flex justify-center">
-            <div className="w-full max-w-4xl">
-              {/* Desktop: Horizontal Stepper */}
-              <div className="hidden md:flex justify-center items-center gap-8">
-                {steps.map((step, idx) => (
-                  <div key={idx} className="flex items-center flex-1 relative">
-                    <div className="flex flex-col items-center">
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
-                          step.active
-                            ? 'bg-orange-500 border-orange-500'
-                            : 'bg-white border-gray-300'
-                        }`}
-                      >
-                        {step.active ? (
-                          <Check className="w-5 h-5 text-white" strokeWidth={3} />
-                        ) : (
-                          <div className="w-4 h-4 rounded-full bg-gray-300"></div>
-                        )}
-                      </div>
-                      <p
-                        className={`mt-3 font-sans text-base font-normal leading-snug ${
-                          step.active ? 'text-[#252525]' : 'text-[#A0A4AC]'
-                        }`}
-                      >
-                        {step.label}
-                      </p>
-                    </div>
-
-                    {idx < steps.length - 1 && (
-                      <div
-                        className={`flex-1 h-1 mx-1 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
-                      />
-                    )}
+    <div className="w-full">
+      {/* Desktop View */}
+      <div className="hidden md:block">
+        {/* Circles and Lines Row */}
+        <div className="flex items-center mb-3">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.id}>
+              {/* Circle */}
+              <div className="relative shrink-0">
+                {isRejected ? (
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-red-600 font-bold text-lg">X</span>
                   </div>
-                ))}
+                ) : step.id < currentStep ? (
+                  <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                    <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                  </div>
+                ) : step.id === currentStep ? (
+                  <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
+                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                    <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                  </div>
+                )}
               </div>
-
-              {/* Mobile: Vertical Stepper */}
-              <div className="md:hidden space-y-4">
-                <div className="flex items-center">
-                  {steps.map((step, idx) => (
-                    <div key={idx} className="flex items-center flex-1">
-                      <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center border-2 ${
-                          step.active
-                            ? 'bg-orange-500 border-orange-500'
-                            : 'bg-white border-gray-300'
-                        }`}
-                      >
-                        {step.active ? (
-                          <Check className="w-5 h-5 text-white" strokeWidth={3} />
-                        ) : (
-                          <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                        )}
-                      </div>
-                      {idx < steps.length - 1 && (
-                        <div
-                          className={`flex-1 h-[2px] mx-1 ${step.active ? 'bg-orange-500' : 'bg-gray-300'}`}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-                <div className="grid grid-cols-3 text-center">
-                  {steps.map((step, idx) => (
-                    <p
-                      key={idx}
-                      className={`font-sans text-base font-normal leading-snug ${
-                        step.active ? 'text-[#252525]' : 'text-[#A0A4AC]'
-                      }`}
-                    >
-                      {step.label}
-                    </p>
-                  ))}
-                </div>
+              {/* Connector Line */}
+              {index < steps.length - 1 && (
+                <div
+                  className={`h-[3px] flex-1 mx-2 ${
+                    isRejected || step.id < currentStep
+                      ? 'bg-orange-500'
+                      : 'bg-gray-300'
+                  }`}
+                ></div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        {/* Labels Row */}
+        <div className="flex items-center relative">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.id}>
+              <div className="shrink-0 relative" style={{ width: '40px' }}>
+                <p
+                  className={`text-base font-medium leading-[1.4] whitespace-nowrap ${
+                    isRejected || step.id <= currentStep
+                      ? 'text-[#0D0B26]'
+                      : 'text-gray-400'
+                  } ${
+                    index === 0
+                      ? 'text-left'
+                      : index === steps.length - 1
+                        ? 'text-right absolute -mt-2.5 right-0'
+                        : 'text-center -translate-x-1/2'
+                  }`}
+                >
+                  {step.label}
+                </p>
               </div>
+              {index < steps.length - 1 && <div className="flex-1"></div>}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      {/* Mobile View */}
+      <div className="block md:hidden">
+        {/* Circles and Lines Row */}
+        <div className="flex items-center mb-4">
+          {steps.map((step, index) => (
+            <React.Fragment key={step.id}>
+              {/* Circle */}
+              <div className="relative shrink-0">
+                {isRejected ? (
+                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                    <span className="text-red-600 font-bold text-sm">X</span>
+                  </div>
+                ) : step.id < currentStep ? (
+                  <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
+                    <Check className="w-4 h-4 text-white" strokeWidth={3} />
+                  </div>
+                ) : step.id === currentStep ? (
+                  <div className="w-8 h-8 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                  </div>
+                )}
+              </div>
+              {/* Connector Line */}
+              {index < steps.length - 1 && (
+                <div
+                  className={`h-[2px] flex-1 ${
+                    isRejected || step.id < currentStep
+                      ? 'bg-orange-500'
+                      : 'bg-gray-300'
+                  }`}
+                ></div>
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+        {/* Labels Row - Stacked on Mobile */}
+        <div className="flex items-start justify-between">
+          {steps.map((step) => (
+            <div
+              key={step.id}
+              className="text-center flex-1 first:text-left last:text-right"
+            >
+              <p
+                className={`text-[10px] font-medium leading-tight ${
+                  isRejected || step.id <= currentStep
+                    ? 'text-[#0D0B26]'
+                    : 'text-gray-400'
+                }`}
+                style={{
+                  wordBreak: 'break-word',
+                  maxWidth: '60px',
+                  margin: '0 auto',
+                }}
+              >
+                {step.label}
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* DETAILS CARD */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
-              Order Details
-            </CardTitle>
-            <Separator className="my-4" />
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                  Date
-                </span>
-                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
-                  {order.date}
-                </p>
-              </div>
-              <div>
-                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                  Invoice
-                </span>
-                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
-                  {order.invoice}
-                </p>
-              </div>
-              <div>
-                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                  Amount
-                </span>
-                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
-                  {order.amount.toLocaleString()} KES
-                </p>
-              </div>
-              <div>
-                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                  Dispatch to
-                </span>
-                <p className="font-sans font-medium text-lg text-[#252525] capitalize">
-                  {order.dispatchTo}
-                </p>
-              </div>
-              <div>
-                <span className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                  Status
-                </span>
-                <Badge className="bg-green-100 text-green-800 text-sm font-medium mt-1">
-                  {order.statusText}
-                </Badge>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* ITEMS TABLE CARD */}
-        <Card className="shadow-none">
-          <CardHeader>
-            <CardTitle className="font-sans text-2xl font-medium leading-9 text-black">
-              Items
-            </CardTitle>
-            <Separator className="my-4" />
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                    Name
-                  </TableHead>
-                  <TableHead className="text-center font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                    Qty
-                  </TableHead>
-                  <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                    Price
-                  </TableHead>
-                  <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
-                    Total
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {order.items.map((item, idx) => (
-                  <TableRow
-                    key={idx}
-                    className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
-                  >
-                    <TableCell className="font-sans text-lg font-medium text-[#252525] capitalize">
-                      {item.name}
-                    </TableCell>
-                    <TableCell className="text-center font-sans text-lg font-medium text-[#252525] capitalize">
-                      {item.qty}
-                    </TableCell>
-                    <TableCell className="text-right font-sans text-lg font-medium text-[#252525] capitalize">
-                      KES {item.price.toFixed(2)}
-                    </TableCell>
-                    <TableCell className="text-right font-sans text-lg font-medium text-[#252525] capitalize">
-                      KES {item.total.toFixed(2)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-
-        {/* ACTION BUTTONS */}
-        <div className="flex flex-wrap justify-center gap-3 pt-6">
-          <Button
-            variant="outline"
-            onClick={() => navigate({ to: '/orders' })}
-            className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
-                       border border-[#F8971D] text-[#F8971D] rounded-3xl 
-                       font-sans font-medium text-base hover:bg-[#F8971D]/10 transition-all"
-          >
-            Back to Orders
-          </Button>
-
-          <Button
-            className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
-                              bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-sans font-medium text-base shadow-sm hover:opacity-90 transition-all"
-          >
-            Re-Order
-          </Button>
-
-          <Button
-            className="flex items-center justify-center gap-2 w-full sm:w-auto h-[46px] px-4 py-3 
-                              bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                              text-white font-sans font-medium text-base shadow-sm hover:opacity-90 transition-all"
-          >
-            <MapPin className="h-5 w-5" />
-            Track Order
-          </Button>
+          ))}
         </div>
       </div>
     </div>
   )
 }
+const steps = [
+  { id: 1, label: 'Processing' },
+  { id: 2, label: 'On the way' },
+  { id: 3, label: 'Delivered' },
+]
+function OrderDetailsPage() {
+  const { orderId } = useParams({ from: '/_protected/orders/$orderId' })
+  const navigate = useNavigate()
+  const order = recentOrders.find((o) => o.orderId === orderId)
+  if (!order) {
+    return <div className="p-8 text-center">Order not found</div>
+  }
+  const currentStep = order.statusStep === -1 ? 0 : order.statusStep + 1
+  const isRejected = order.statusStep === -1
+  const breadcrumbItems = [
+    { label: 'Home', path: '/' },
+    { label: 'My Orders', path: '/orders' },
+    { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
+  ]
+  return (
+    <div className="min-h-screen">
+      <BreadCrumbs items={breadcrumbItems} className="px-4 pt-6 md:pt-8" />
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* === Stepper === */}
+        <div className="mb-8">
+          <OrderStepper
+            steps={steps}
+            currentStep={currentStep}
+            isRejected={isRejected}
+          />
+        </div>
+        {/* === Order Summary Card === */}
+        <Card className="shadow-none">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-xl">Order {order.orderId}</CardTitle>
+                <p className="text-sm text-gray-500">
+                  Placed on {order.date.split(' ')[0]}
+                </p>
+              </div>
+              <Badge
+                variant={
+                  order.statusColor === 'red' ? 'destructive' : 'secondary'
+                }
+                className="text-xs"
+              >
+                {order.status}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Product */}
+            <div className="flex gap-4">
+              <img
+                src={order.image}
+                alt={order.title}
+                className="w-16 h-16 rounded-lg object-contain bg-gray-100"
+              />
+              <div>
+                <h4 className="font-medium">{order.title}</h4>
+                <p className="text-sm text-gray-600">
+                  {order.specs.split(' + ')[0]}
+                </p>
+                <p className="font-bold text-orange-600 mt-1">
+                  KES {order.price.toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <Separator />
+            {/* Delivery Info */}
+            <div>
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                {order.delivery.type === 'door' ? (
+                  <Truck className="w-5 h-5" />
+                ) : (
+                  <Store className="w-5 h-5" />
+                )}
+                Delivery Method
+              </h4>
+              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+                <p className="font-medium capitalize">
+                  {order.delivery.type === 'door'
+                    ? 'Door Delivery'
+                    : 'Pickup Station'}
+                </p>
+                <p className="text-gray-600">
+                  {order.delivery.recipient.firstName}{' '}
+                  {order.delivery.recipient.lastName} •{' '}
+                  {order.delivery.recipient.phone}
+                </p>
+                {order.delivery.type === 'door' ? (
+                  <p className="text-gray-600 flex items-start gap-1">
+                    <MapPin className="w-4 h-4 mt-0.5 shrink-0" />
+                    {order.delivery.address}
+                  </p>
+                ) : (
+                  <p className="text-gray-600 flex items-center gap-1">
+                    <Package className="w-4 h-4" />
+                    Pickup at:{' '}
+                    <span className="font-medium">
+                      {order.delivery.pickupStore}
+                    </span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <Separator />
+            {/* === NEW: Items Table / Mobile Cards === */}
+            <div className="mt-8">
+              {/* Desktop Table */}
+              <div className="hidden md:block">
+                <Card className="shadow-none">
+                  <CardHeader>
+                    <CardTitle className=" font-medium mb-3 flex items-center gap-2 text-black">
+                      <List className="w-4 h-4" />
+                      Items
+                    </CardTitle>
+                    <Separator className="my-4" />
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                            Name
+                          </TableHead>
+                          <TableHead className="text-center font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                            Qty
+                          </TableHead>
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                            Price
+                          </TableHead>
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                            Total
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {order.items.map((item, idx) => (
+                          <TableRow
+                            key={idx}
+                            className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
+                          >
+                            <TableCell className="font-sans text-md font-medium text-[#252525] capitalize">
+                              {item.name}
+                            </TableCell>
+                            <TableCell className="text-center font-sans text-md font-medium text-[#252525] capitalize">
+                              {item.qty}
+                            </TableCell>
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
+                              KES {item.price.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
+                              KES {item.total.toFixed(2)}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              </div>
 
+              {/* Mobile Cards */}
+              <div className="block md:hidden space-y-4">
+                <h3 className="font-sans text-2xl font-medium text-black">
+                  Items
+                </h3>
+                {order.items.map((item, idx) => (
+                  <Card
+                    key={idx}
+                    className={`p-4 ${idx % 2 === 0 ? 'bg-brand-bg-2' : ''}`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="font-sans text-lg font-medium text-[#252525] capitalize">
+                          {item.name}
+                        </p>
+                        <p className="text-sm text-[#6B7280] mt-1">
+                          Qty: {item.qty}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-sans text-lg font-medium text-[#252525]">
+                          KES {item.price.toFixed(2)}
+                        </p>
+                        <p className="text-sm text-[#6B7280] mt-1">
+                          Total: KES {item.total.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+            {/* Summary */}
+            <div className="flex justify-between text-sm">
+              <span>Subtotal</span>
+              <span>KES {order.summary.subtotal.toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Shipping</span>
+              <span>
+                {order.summary.shipping === 0
+                  ? 'Free'
+                  : `KES ${order.summary.shipping.toLocaleString()}`}
+              </span>
+            </div>
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total</span>
+              <span className="text-orange-600">
+                KES {order.summary.total.toLocaleString()}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="mt-6">
+          {/* Flex container – row on md+, column on mobile */}
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+            {/* ----- Back to Orders (gradient) ----- */}
+            <Button
+              onClick={() => navigate({ to: '/orders' })}
+              variant="gradient"
+              className="flex items-center justify-center gap-2   px-4 py-3 
+                    bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                    text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to Orders
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => navigate({ to: '/' })}
+              className="flex items-center justify-center gap-2 px-4 py-3 
+                      border border-[#F8971D] text-[#F8971D] rounded-3xl 
+                      font-medium text-base hover:bg-[#F8971D]/10 transition-all"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Back to Devices
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
 export const Route = createFileRoute('/_protected/orders/$orderId')({
-  component: OrderDetailPage,
+  component: OrderDetailsPage,
+  loader: ({ params }) => {
+    const order = recentOrders.find((o) => o.orderId === params.orderId)
+    if (!order) throw new Response('Not Found', { status: 404 })
+    return { order }
+  },
 })
