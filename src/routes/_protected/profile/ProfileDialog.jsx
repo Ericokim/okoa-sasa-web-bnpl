@@ -9,6 +9,16 @@ import { Upload, Image as ImageIcon, X, XIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { enqueueSnackbar } from 'notistack'
 import { TrashIcon } from '@/assets/icons'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 
 export function RouteComponent({
   isOpen,
@@ -19,6 +29,7 @@ export function RouteComponent({
   const [preview, setPreview] = useState(currentPhoto)
   const [uploadMode, setUploadMode] = useState(false)
   const [tempFile, setTempFile] = useState(null)
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false)
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -57,12 +68,15 @@ export function RouteComponent({
     setUploadMode(false)
   }
 
-  const handleDelete = () => {
-    if (confirm('Are you sure you want to delete your profile photo?')) {
-      onPhotoChange(null)
-      enqueueSnackbar('Profile photo removed.', { variant: 'info' })
-      onClose()
-    }
+  const handleDeleteClick = () => {
+    setShowDeleteAlert(true)
+  }
+
+  const handleDeleteConfirm = () => {
+    onPhotoChange(null)
+    enqueueSnackbar('Profile photo removed.', { variant: 'info' })
+    setShowDeleteAlert(false)
+    onClose()
   }
 
   const handleUpdatePhoto = () => {
@@ -70,107 +84,135 @@ export function RouteComponent({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogPortal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[#252525]/20 backdrop-blur-sm" />
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogPortal>
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-[#252525]/20 backdrop-blur-sm" />
 
-        <DialogPrimitive.Content
-          className={cn(
-            'fixed top-1/2 left-1/2 z-50 w-[335px] max-w-full -translate-x-1/2 -translate-y-1/2',
-            'rounded-3xl bg-white p-5 shadow-xl md:w-[500px] md:p-8',
-            'animate-in fade-in zoom-in-95 duration-200',
-          )}
-        >
-          {/* Close Button – Orange Border */}
-          <button
-            onClick={onClose}
-            className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
-          >
-            <XIcon className="h-6 w-6 text-[#09244B]" />
-            <span className="sr-only">Close</span>
-          </button>
-
-          {/* Header */}
-          <div className="text-center">
-            <h2 className="text-2xl font-semibold text-[#252525] md:text-[28px]">
-              Profile Photo
-            </h2>
-          </div>
-
-          {/* Avatar Preview */}
-          <div className="mt-6 flex justify-center">
-            <Avatar className="h-48 w-48 rounded-full border-4 border-white shadow-lg">
-              <AvatarImage src={preview} alt="Preview" />
-              <AvatarFallback className="bg-[#F9FAFB]">
-                <ImageIcon className="h-20 w-20 text-[#A0A4AC]" />
-              </AvatarFallback>
-            </Avatar>
-          </div>
-
-          {/* Upload Area */}
-          {uploadMode && (
-            <div
-              {...getRootProps()}
-              className={cn(
-                'mt-6 rounded-2xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors',
-                isDragActive
-                  ? 'border-[#F8971D] bg-[#FFF8F0]'
-                  : 'border-[#E8ECF4] bg-[#F9FAFB]',
-              )}
-            >
-              <input {...getInputProps()} />
-              <Upload className="mx-auto mb-2 h-6 w-6 text-[#676D75]" />
-              <p className="text-sm font-medium text-[#4d4d4e]">
-                {isDragActive
-                  ? 'Drop the image here'
-                  : 'Drag & drop or click to upload'}
-              </p>
-            </div>
-          )}
-
-          {/* Action Buttons – Responsive */}
-          <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
-            {uploadMode ? (
-              <>
-                <Button
-                  onClick={handleSave}
-                  variant="gradient"
-                  className="h-12 w-full rounded-3xl text-base font-medium"
-                >
-                  Save
-                </Button>
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className="h-12 w-full rounded-3xl border-[#F8971D] text-[#F8971D] hover:bg-[#F8971D]/10"
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  onClick={handleUpdatePhoto}
-                  variant="gradient"
-                  className="h-12 w-full rounded-3xl text-base font-medium"
-                >
-                  <Upload className="mr-2 h-5 w-5" />
-                  Update Photo
-                </Button>
-                <Button
-                  onClick={handleDelete}
-                  variant="outline"
-                  className="h-12 w-full rounded-3xl border-[#F8971D] text-[#F8971D] hover:bg-[#F8971D]/10"
-                >
-                  <TrashIcon className="h-4 w-4 mr-2" />
-                  Delete
-                </Button>
-              </>
+          <DialogPrimitive.Content
+            className={cn(
+              'fixed top-1/2 left-1/2 z-50 w-[335px] max-w-full -translate-x-1/2 -translate-y-1/2',
+              'rounded-3xl bg-white p-5 shadow-xl md:w-[500px] md:p-8',
+              'animate-in fade-in zoom-in-95 duration-200',
             )}
-          </div>
-        </DialogPrimitive.Content>
-      </DialogPortal>
-    </Dialog>
+          >
+            {/* Close Button – Orange Border */}
+            <button
+              onClick={onClose}
+              className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
+            >
+              <XIcon className="h-6 w-6 text-[#09244B]" />
+              <span className="sr-only">Close</span>
+            </button>
+
+            {/* Header */}
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-[#252525] md:text-[28px]">
+                Profile Photo
+              </h2>
+            </div>
+
+            {/* Avatar Preview */}
+            <div className="mt-6 flex justify-center">
+              <Avatar className="h-48 w-48 rounded-full border-4 border-white shadow-lg">
+                <AvatarImage src={preview} alt="Preview" />
+                <AvatarFallback className="bg-[#F9FAFB]">
+                  <ImageIcon className="h-20 w-20 text-[#A0A4AC]" />
+                </AvatarFallback>
+              </Avatar>
+            </div>
+
+            {/* Upload Area */}
+            {uploadMode && (
+              <div
+                {...getRootProps()}
+                className={cn(
+                  'mt-6 rounded-2xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors',
+                  isDragActive
+                    ? 'border-[#F8971D] bg-[#FFF8F0]'
+                    : 'border-[#E8ECF4] bg-[#F9FAFB]',
+                )}
+              >
+                <input {...getInputProps()} />
+                <Upload className="mx-auto mb-2 h-6 w-6 text-[#676D75]" />
+                <p className="text-sm font-medium text-[#4d4d4e]">
+                  {isDragActive
+                    ? 'Drop the image here'
+                    : 'Drag & drop or click to upload'}
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons – Responsive */}
+            <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-2">
+              {uploadMode ? (
+                <>
+                  <Button
+                    onClick={handleSave}
+                    variant="gradient"
+                    className="h-12 w-full rounded-3xl text-base font-medium"
+                  >
+                    Save
+                  </Button>
+                  <Button
+                    onClick={handleCancel}
+                    variant="outline"
+                    className="h-12 w-full rounded-3xl border-[#F8971D] text-[#F8971D] hover:bg-[#F8971D]/10"
+                  >
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleUpdatePhoto}
+                    variant="gradient"
+                    className="h-12 w-full rounded-3xl text-base font-medium"
+                  >
+                    <Upload className="mr-2 h-5 w-5" />
+                    Update Photo
+                  </Button>
+                  <Button
+                    onClick={handleDeleteClick}
+                    variant="outline"
+                    className="h-12 w-full rounded-3xl border-[#F8971D] text-[#F8971D] hover:bg-[#F8971D]/10"
+                  >
+                    <TrashIcon className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                </>
+              )}
+            </div>
+          </DialogPrimitive.Content>
+        </DialogPortal>
+      </Dialog>
+
+      <AlertDialog open={showDeleteAlert} onOpenChange={setShowDeleteAlert}>
+        <AlertDialogContent className="max-w-[90vw] rounded-2xl p-6 md:max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-semibold text-[#252525]">
+              Delete Profile Photo?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-[#6B7280]">
+              This action cannot be undone. Your current profile photo will be
+              permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-4 flex gap-3">
+            <AlertDialogCancel className="h-11 flex-1 rounded-3xl border border-[#F8971D] text-[#F8971D] font-medium text-base hover:bg-[#F8971D]/10">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="h-11 flex-1 rounded-3xl   bg-gradient-to-b from-[#F8971D] to-[#EE3124] 
+                  text-white font-medium text-base shadow-sm hover:opacity-90 transition-all  hover:bg-red-700"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }
 
