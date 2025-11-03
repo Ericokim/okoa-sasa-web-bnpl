@@ -21,7 +21,7 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
+    <div className=" w-full flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
       {/* Table Header - Desktop Only */}
       <div className="hidden w-full lg:grid lg:grid-cols-[401px_176px_1fr_auto] lg:items-start lg:gap-4">
         <div className="text-[20px] font-semibold leading-[1.4] text-black">Item</div>

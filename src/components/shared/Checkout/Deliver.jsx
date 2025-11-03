@@ -97,7 +97,7 @@ export default function DeliveryDetailsForm({
   ]
 
   return (
-    <div className="flex flex-col items-center justify-center mb-[50px] p-4 md:p-0 gap-6">
+    <div className="flex flex-col items-center justify-center mb-[50px] p-0 md:p-0 gap-6">
       {/* Form Container - Height now adjusts automatically */}
       <div className="bg-white rounded-2xl border border-gray-200 p-4 md:p-6 w-full ">
         <div className="w-full">
