@@ -264,15 +264,14 @@ function OrderDetailsPage() {
             {/* === NEW: Items Table / Mobile Cards === */}
             <div className="mt-8">
               {/* Desktop Table */}
-            
 
               <div className="hidden md:block">
                 <Card className="shadow-none">
                   <CardHeader className="pb-2 pt-4 -mt-8">
                     {' '}
-                    <CardTitle className="font-medium flex items-center gap-2 text-black text-lg">
+                    <CardTitle className="font-medium flex items-center gap-2 text-black text-md">
                       <List className="w-4 h-4" />
-                      Items
+                      Items({order.items.length})
                     </CardTitle>
                     <Separator className="my-2" />{' '}
                   </CardHeader>
@@ -322,35 +321,51 @@ function OrderDetailsPage() {
               </div>
 
               {/* Mobile Cards */}
-              <div className="block md:hidden space-y-4">
-                <h3 className="font-sans text-2xl font-medium text-black">
-                  Items
+
+
+              {/* ---------- MOBILE ONLY: Clean, Compact Items List ---------- */}
+              <div className="block md:hidden space-y-3">
+                <h3 className="font-sans text-xl font-medium text-black">
+                  Items ({order.items.length})
                 </h3>
-                {order.items.map((item, idx) => (
-                  <Card
-                    key={idx}
-                    className={`p-4 ${idx % 2 === 0 ? 'bg-brand-bg-2' : ''}`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <p className="font-sans text-lg font-medium text-[#252525] capitalize">
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-[#6B7280] mt-1">
-                          Qty: {item.qty}
-                        </p>
+
+                <div className="space-y-2">
+                  {order.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      data-odd={idx % 2 === 1}
+                      className="
+          rounded-lg bg-gray-50 p-3 
+          data-[odd=true]:bg-brand-bg-2
+          flex flex-col gap-1.5
+        "
+                    >
+                      {/* Item Name – Bold & Prominent */}
+                      <p className="font-medium text-sm text-[#252525] capitalize">
+                        Item : {item.name}
+                      </p>
+
+                      {/* Qty + Unit Price – Compact Side-by-Side */}
+                      <div className="flex justify-between text-xs text-black">
+                        <span>Qty : {item.qty}</span>
+                        <span className="mt-4">
+                          Amount: KES{' '}
+                          {item.price.toLocaleString('en-KE', {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
                       </div>
-                      <div className="text-right">
-                        <p className="font-sans text-lg font-medium text-[#252525]">
-                          KES {item.price.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-[#6B7280] mt-1">
-                          Total: KES {item.total.toFixed(2)}
-                        </p>
+
+                      {/* Total – Right-Aligned, Slightly Larger & Bold */}
+                      <div className="flex justify-end text-sm font-semibold text-[#252525]">
+                        Total: KES{' '}
+                        {item.total.toLocaleString('en-KE', {
+                          minimumFractionDigits: 2,
+                        })}
                       </div>
                     </div>
-                  </Card>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
             {/* Summary */}
@@ -360,7 +375,7 @@ function OrderDetailsPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span>
+              <span className="">
                 {order.summary.shipping === 0
                   ? 'Free'
                   : `KES ${order.summary.shipping.toLocaleString()}`}
@@ -368,7 +383,7 @@ function OrderDetailsPage() {
             </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span className="text-orange-600">
+              <span className="text-gradient-to-b from-[#F8971D] to-[#EE3124]">
                 KES {order.summary.total.toLocaleString()}
               </span>
             </div>

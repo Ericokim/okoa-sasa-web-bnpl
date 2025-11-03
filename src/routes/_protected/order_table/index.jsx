@@ -68,7 +68,7 @@ function OrdersTableHistory() {
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Order History', path: '/orderHistory', isCurrent: true },
+    { label: 'All Orders', path: '/allOrders', isCurrent: true },
   ]
 
   const getGradient = () => 'from-orange-500 to-amber-500'
@@ -228,14 +228,19 @@ function OrdersTableHistory() {
                       {' '}
                       <span className="text-gray-900"> </span>
                     </span>
+
+                    {/* View Details */}
+
                     <Button
-                      variant="link"
+                      variant="gradient"
                       size="sm"
+                      className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
                       onClick={(e) => {
                         e.stopPropagation()
                         handleViewDetails(order.orderId)
                       }}
-                      className="text-orange-600 text-sm font-medium underline underline-offset-2 hover:text-orange-700 p-0 h-auto"
                     >
                       View Details
                     </Button>
