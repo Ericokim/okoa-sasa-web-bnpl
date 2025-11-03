@@ -10,6 +10,8 @@ import { productCatalog } from '@/data/products'
 
 const StateContext = createContext(null)
 
+export const MAX_CART_QUANTITY = 5
+
 const buildInitialCart = () =>
   productCatalog
     .filter((product) => product.inCart)
@@ -87,29 +89,43 @@ export function ContextProvider({ children }) {
 
   const addToCart = useCallback(
     (productId, quantity = 1) => {
-      if (quantity <= 0) return
+      if (!quantity || quantity <= 0) return
+      const normalizedQuantity = Math.max(1, Number(quantity) || 0)
       setCart((prevCart) => {
         const existing = prevCart.find((item) => item.productId === productId)
+
         if (existing) {
-          const updatedQuantity = existing.quantity + quantity
+          const updatedQuantity = Math.min(
+            MAX_CART_QUANTITY,
+            existing.quantity + normalizedQuantity,
+          )
+
+          if (updatedQuantity === existing.quantity) {
+            return prevCart
+          }
+
           const nextCart = prevCart.map((item) =>
             item.productId === productId
               ? { ...item, quantity: updatedQuantity }
               : item,
           )
+
           syncProductCartState(productId, {
             inCart: true,
             cartQuantity: updatedQuantity,
           })
+
           return nextCart
         }
 
+        const clampedQuantity = Math.min(MAX_CART_QUANTITY, normalizedQuantity)
+
         syncProductCartState(productId, {
           inCart: true,
-          cartQuantity: quantity,
+          cartQuantity: clampedQuantity,
         })
 
-        return [...prevCart, { productId, quantity }]
+        return [...prevCart, { productId, quantity: clampedQuantity }]
       })
     },
     [syncProductCartState],
@@ -119,9 +135,10 @@ export function ContextProvider({ children }) {
     (productId, quantity) => {
       setCart((prevCart) => {
         const sanitizedQuantity = Math.max(0, Number(quantity) || 0)
+        const clampedQuantity = Math.min(MAX_CART_QUANTITY, sanitizedQuantity)
         const exists = prevCart.find((item) => item.productId === productId)
 
-        if (!exists && sanitizedQuantity <= 0) {
+        if (!exists && clampedQuantity <= 0) {
           syncProductCartState(productId, {
             inCart: false,
             cartQuantity: 0,
@@ -129,7 +146,7 @@ export function ContextProvider({ children }) {
           return prevCart
         }
 
-        if (sanitizedQuantity <= 0) {
+        if (clampedQuantity <= 0) {
           syncProductCartState(productId, {
             inCart: false,
             cartQuantity: 0,
@@ -140,14 +157,14 @@ export function ContextProvider({ children }) {
         const nextCart = exists
           ? prevCart.map((item) =>
               item.productId === productId
-                ? { ...item, quantity: sanitizedQuantity }
+                ? { ...item, quantity: clampedQuantity }
                 : item,
             )
-          : [...prevCart, { productId, quantity: sanitizedQuantity }]
+          : [...prevCart, { productId, quantity: clampedQuantity }]
 
         syncProductCartState(productId, {
           inCart: true,
-          cartQuantity: sanitizedQuantity,
+          cartQuantity: clampedQuantity,
         })
 
         return nextCart

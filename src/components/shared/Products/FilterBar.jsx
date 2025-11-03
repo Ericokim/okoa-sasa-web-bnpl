@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { X } from 'lucide-react'
 import {
   Popover,
@@ -10,13 +17,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { ChevronDown, ChevronUp, List, User } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
-import { Link } from '@tanstack/react-router'
+import { Link, useLocation } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -43,6 +50,8 @@ const FILTER_CATEGORIES = [
   'display',
   'ram',
 ]
+
+const MAX_VISIBLE_CHIPS = 3
 
 const FilterIcon = () => (
   <svg
@@ -206,6 +215,34 @@ const FilterCheckboxItem = ({ label, checked, onChange }) => (
   </button>
 )
 
+const ShowMoreButton = ({
+  category,
+  isExpanded,
+  totalCount,
+  onToggle,
+}) => {
+  const limit = 5
+  if (totalCount <= limit) return null
+
+  const remainingCount = Math.max(0, totalCount - limit)
+
+  return (
+    <button
+      type="button"
+      onClick={onToggle}
+      className="w-full rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-[#F9FAFB]"
+      aria-expanded={isExpanded}
+      aria-controls={`${category}-filters`}
+    >
+      <span className="text-sm font-medium text-[#F47120]">
+        {isExpanded
+          ? '− Show Less'
+          : `+ Show More (${remainingCount} more)`}
+      </span>
+    </button>
+  )
+}
+
 const SelectedFilterChip = ({ label, onRemove }) => (
   <div className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
     <span className="text-sm font-normal capitalize text-black md:text-base">
@@ -341,6 +378,9 @@ export function FilterBar({
   options = DEFAULT_OPTIONS,
   selectedFilters,
   selectedSort,
+  loanLimit,
+  onLoanLimitClear,
+  isLoanCalculatorOpen = false,
 }) {
   const [isOpen, setIsOpen] = useState(false)
 
@@ -363,6 +403,14 @@ export function FilterBar({
   const [filters, setFilters] = useState(() =>
     buildFiltersStateFromSelection(selectedFilters, normalizedOptions),
   )
+  const [expandedCategories, setExpandedCategories] = useState({
+    color: false,
+    storage: false,
+    camera: false,
+    display: false,
+    ram: false,
+    brand: false,
+  })
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
   const validInitialSort = SORT_OPTIONS.some(
     (item) => item.value === initialSort,
@@ -383,6 +431,8 @@ export function FilterBar({
   const scrollAreaContainerRef = useRef(null)
   const applyButtonWrapperRef = useRef(null)
   const [applyButtonOffset, setApplyButtonOffset] = useState(null)
+  const location = useLocation()
+  const isFaqActive = location.pathname.startsWith('/FAQs')
 
   useEffect(() => {
     const nextFilters = buildFiltersStateFromSelection(
@@ -405,7 +455,7 @@ export function FilterBar({
     setSortSelection(nextSort)
   }, [validInitialSort, selectedSort])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!isFiltersOpen) {
       setApplyButtonOffset(null)
       return
@@ -415,32 +465,63 @@ export function FilterBar({
       scrollAreaContainerRef.current?.querySelector(
         '[data-slot="scroll-area-viewport"]',
       ) ?? scrollAreaContainerRef.current
+    const buttonEl = applyButtonWrapperRef.current
 
-    if (!container || !applyButtonWrapperRef.current) {
+    if (!container || !buttonEl) {
       return
     }
 
-    const measure = () => {
-      if (!container || !applyButtonWrapperRef.current) return
+    let frameId = null
+
+    const updateOffset = () => {
+      frameId = null
+      if (!container || !buttonEl) return
       const containerRect = container.getBoundingClientRect()
-      const buttonRect = applyButtonWrapperRef.current.getBoundingClientRect()
+      const buttonRect = buttonEl.getBoundingClientRect()
       const offset = buttonRect.top - containerRect.top
       const maxOffset = Math.max(0, containerRect.height - buttonRect.height)
-      const clampedOffset = Math.min(Math.max(0, offset), maxOffset)
+      const clampedOffset = Math.min(Math.max(offset, 0), maxOffset)
       setApplyButtonOffset(clampedOffset)
     }
 
-    const rafId = requestAnimationFrame(measure)
-
-    const handleResize = () => {
-      requestAnimationFrame(measure)
+    const scheduleUpdate = () => {
+      if (frameId !== null) return
+      frameId = requestAnimationFrame(updateOffset)
     }
 
-    window.addEventListener('resize', handleResize)
+    updateOffset()
+    scheduleUpdate()
+
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(() => scheduleUpdate())
+        : null
+    if (resizeObserver) {
+      resizeObserver.observe(container)
+      resizeObserver.observe(buttonEl)
+    }
+
+    const mutationObserver =
+      typeof MutationObserver !== 'undefined'
+        ? new MutationObserver(() => scheduleUpdate())
+        : null
+    if (mutationObserver) {
+      mutationObserver.observe(container, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+      })
+    }
+
+    window.addEventListener('resize', scheduleUpdate)
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-      cancelAnimationFrame(rafId)
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+      window.removeEventListener('resize', scheduleUpdate)
+      resizeObserver?.disconnect()
+      mutationObserver?.disconnect()
     }
   }, [isFiltersOpen])
 
@@ -520,8 +601,53 @@ export function FilterBar({
   }
 
   const handleClearAll = () => {
-    setFilters(buildDefaultFilters(normalizedOptions))
+    const resetState = buildDefaultFilters(normalizedOptions)
+
+    setFilters(resetState)
+    onLoanLimitClear?.()
+    setExpandedCategories({
+      color: false,
+      storage: false,
+      camera: false,
+      display: false,
+      ram: false,
+      brand: false,
+    })
+    onFiltersChange?.(buildSelectedFiltersPayload(resetState))
   }
+
+  const getVisibleItems = useCallback(
+    (items, category) => {
+      const limit = 5
+      if (expandedCategories[category] || items.length <= limit) {
+        return items
+      }
+
+      const selectedEntries = filters[category] ?? {}
+      const selectedValues = Object.keys(selectedEntries).filter(
+        (value) => selectedEntries[value],
+      )
+
+      const baseItems = items.slice(0, limit)
+      const merged = [...baseItems]
+
+      selectedValues.forEach((value) => {
+        if (!merged.includes(value) && items.includes(value)) {
+          merged.push(value)
+        }
+      })
+
+      return merged
+    },
+    [expandedCategories, filters],
+  )
+
+  const toggleCategoryExpansion = useCallback((category) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }))
+  }, [])
 
   const activeFilterChips = useMemo(() => {
     const chips = []
@@ -553,14 +679,38 @@ export function FilterBar({
       })
     })
 
+    if (loanLimit) {
+      chips.push({
+        category: 'loanLimit',
+        value: loanLimit,
+        label: `Loan limit ≤ KES ${loanLimit.toLocaleString()}`,
+      })
+    }
+
     return chips
   }, [
     normalizedOptions.price.max,
     normalizedOptions.price.min,
     selectedFilters,
+    loanLimit,
   ])
 
+  const visibleChips = useMemo(
+    () => activeFilterChips.slice(0, MAX_VISIBLE_CHIPS),
+    [activeFilterChips],
+  )
+
+  const overflowChips = useMemo(
+    () => activeFilterChips.slice(MAX_VISIBLE_CHIPS),
+    [activeFilterChips],
+  )
+
   const handleRemoveChip = (chip) => {
+    if (chip.category === 'loanLimit') {
+      onLoanLimitClear?.()
+      return
+    }
+
     if (!onFiltersChange) return
 
     const nextSelected = {
@@ -589,14 +739,67 @@ export function FilterBar({
     setFilters(buildFiltersStateFromSelection(nextSelected, normalizedOptions))
   }
 
+  const handleChipRemove = (chip) => {
+    if (chip.category === 'loanLimit') {
+      onLoanLimitClear?.()
+    } else {
+      handleRemoveChip(chip)
+    }
+  }
+
+  const basePillClasses =
+    'rounded-3xl px-3 py-1.5 md:px-4 md:py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F8971D]/40'
+
+  const allFiltersButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isFiltersOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-transparent bg-[#F9FAFB] text-[#252525] hover:bg-[#F1F5F9] active:bg-[#E6EDF7]'
+  )
+
+  const howItWorksLinkClass = cn(
+    'group border',
+    basePillClasses,
+    isFaqActive
+      ? 'border-transparent bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white shadow-sm'
+      : 'border-[#F8971D] bg-gradient-to-b from-transparent to-transparent text-[#F47120] hover:bg-[#FFF4EE]'
+  )
+
+  const howItWorksTextClass = cn(
+    'text-sm font-normal capitalize md:text-base transition-colors',
+    isFaqActive
+      ? 'text-white'
+      : 'bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent group-hover:bg-none group-hover:text-[#F47120]'
+  )
+
+  const loanLimitButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isLoanCalculatorOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+  )
+
+  const sortButtonClass = cn(
+    'flex items-center gap-2 border',
+    basePillClasses,
+    isOpen
+      ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+  )
+
   return (
     <div
       className={`flex flex-col gap-4 border-b border-[#E8ECF4] py-4 md:py-6 lg:flex-row lg:items-center lg:justify-between lg:py-8 ${className}`}
     >
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
         <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <PopoverTrigger asChild className="cursor-pointer">
-            <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 md:px-4 md:py-2">
+          <PopoverTrigger asChild>
+            <button
+              className={allFiltersButtonClass}
+              aria-pressed={isFiltersOpen}
+            >
               <span className="text-sm font-normal capitalize text-black md:text-base">
                 All Filters
               </span>
@@ -614,7 +817,7 @@ export function FilterBar({
                 </span>
                 <button
                   onClick={handleClearAll}
-                  className="cursor-pointer font-['Public_Sans'] text-xs font-medium leading-[140%] text-[#F25E5E] transition-all hover:scale-100"
+                  className="cursor-pointer rounded-3xl border border-transparent px-3 py-1 text-sm font-medium leading-[140%] text-[#F25E5E] transition-colors hover:bg-[#FFF4EE]"
                 >
                   Clear
                 </button>
@@ -670,14 +873,8 @@ export function FilterBar({
 
                         <div
                           ref={applyButtonWrapperRef}
-                          className={`w-full bg-white${
-                            applyButtonOffset !== null ? ' sticky z-10' : ''
-                          }`}
-                          style={
-                            applyButtonOffset !== null
-                              ? { top: `${applyButtonOffset}px` }
-                              : undefined
-                          }
+                          className="sticky z-10 w-full bg-white"
+                          style={{ top: `${applyButtonOffset ?? 0}px` }}
                         >
                           <Button
                             onClick={handleApplyFilters}
@@ -692,13 +889,17 @@ export function FilterBar({
                       </div>
                     </FilterSection>
 
-                    <FilterSection
-                      title="Color"
-                      isOpen={openSections.color}
-                      onToggle={() => toggleSection('color')}
+                  <FilterSection
+                    title="Color"
+                    isOpen={openSections.color}
+                    onToggle={() => toggleSection('color')}
+                  >
+                    <div
+                      id="color-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.color.map((color) => (
+                      {getVisibleItems(normalizedOptions.color, 'color').map(
+                        (color) => (
                           <FilterCheckboxItem
                             key={color}
                             label={color}
@@ -707,18 +908,29 @@ export function FilterBar({
                               handleCheckboxToggle('color', color, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="color"
+                        isExpanded={expandedCategories.color}
+                        totalCount={normalizedOptions.color.length}
+                        onToggle={() => toggleCategoryExpansion('color')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Storage Capacity"
-                      isOpen={openSections.storage}
-                      onToggle={() => toggleSection('storage')}
+                  <FilterSection
+                    title="Storage Capacity"
+                    isOpen={openSections.storage}
+                    onToggle={() => toggleSection('storage')}
+                  >
+                    <div
+                      id="storage-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.storage.map((storage) => (
+                      {getVisibleItems(normalizedOptions.storage, 'storage').map(
+                        (storage) => (
                           <FilterCheckboxItem
                             key={storage}
                             label={storage}
@@ -727,18 +939,29 @@ export function FilterBar({
                               handleCheckboxToggle('storage', storage, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="storage"
+                        isExpanded={expandedCategories.storage}
+                        totalCount={normalizedOptions.storage.length}
+                        onToggle={() => toggleCategoryExpansion('storage')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Camera Megapixel"
-                      isOpen={openSections.camera}
-                      onToggle={() => toggleSection('camera')}
+                  <FilterSection
+                    title="Camera Megapixel"
+                    isOpen={openSections.camera}
+                    onToggle={() => toggleSection('camera')}
+                  >
+                    <div
+                      id="camera-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.camera.map((camera) => (
+                      {getVisibleItems(normalizedOptions.camera, 'camera').map(
+                        (camera) => (
                           <FilterCheckboxItem
                             key={camera}
                             label={camera}
@@ -747,18 +970,29 @@ export function FilterBar({
                               handleCheckboxToggle('camera', camera, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="camera"
+                        isExpanded={expandedCategories.camera}
+                        totalCount={normalizedOptions.camera.length}
+                        onToggle={() => toggleCategoryExpansion('camera')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Display Size"
-                      isOpen={openSections.display}
-                      onToggle={() => toggleSection('display')}
+                  <FilterSection
+                    title="Display Size"
+                    isOpen={openSections.display}
+                    onToggle={() => toggleSection('display')}
+                  >
+                    <div
+                      id="display-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.display.map((display) => (
+                      {getVisibleItems(normalizedOptions.display, 'display').map(
+                        (display) => (
                           <FilterCheckboxItem
                             key={display}
                             label={display}
@@ -767,18 +1001,29 @@ export function FilterBar({
                               handleCheckboxToggle('display', display, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="display"
+                        isExpanded={expandedCategories.display}
+                        totalCount={normalizedOptions.display.length}
+                        onToggle={() => toggleCategoryExpansion('display')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="RAM"
-                      isOpen={openSections.ram}
-                      onToggle={() => toggleSection('ram')}
+                  <FilterSection
+                    title="RAM"
+                    isOpen={openSections.ram}
+                    onToggle={() => toggleSection('ram')}
+                  >
+                    <div
+                      id="ram-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.ram.map((ram) => (
+                      {getVisibleItems(normalizedOptions.ram, 'ram').map(
+                        (ram) => (
                           <FilterCheckboxItem
                             key={ram}
                             label={ram}
@@ -787,18 +1032,29 @@ export function FilterBar({
                               handleCheckboxToggle('ram', ram, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="ram"
+                        isExpanded={expandedCategories.ram}
+                        totalCount={normalizedOptions.ram.length}
+                        onToggle={() => toggleCategoryExpansion('ram')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Brand"
-                      isOpen={openSections.brand}
-                      onToggle={() => toggleSection('brand')}
+                  <FilterSection
+                    title="Brand"
+                    isOpen={openSections.brand}
+                    onToggle={() => toggleSection('brand')}
+                  >
+                    <div
+                      id="brand-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        {normalizedOptions.brand.map((brand) => (
+                      {getVisibleItems(normalizedOptions.brand, 'brand').map(
+                        (brand) => (
                           <FilterCheckboxItem
                             key={brand}
                             label={brand}
@@ -807,10 +1063,17 @@ export function FilterBar({
                               handleCheckboxToggle('brand', brand, checked)
                             }
                           />
-                        ))}
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="brand"
+                        isExpanded={expandedCategories.brand}
+                        totalCount={normalizedOptions.brand.length}
+                        onToggle={() => toggleCategoryExpansion('brand')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
                   </div>
                   <ScrollBar orientation="vertical" />
                 </ScrollArea>
@@ -819,21 +1082,67 @@ export function FilterBar({
           </PopoverContent>
         </Popover>
 
-        {activeFilterChips.map((chip) => (
+        {visibleChips.map((chip) => (
           <SelectedFilterChip
             key={`${chip.category}-${chip.label}`}
             label={chip.label}
-            onRemove={() => handleRemoveChip(chip)}
+            onRemove={() => handleChipRemove(chip)}
           />
         ))}
+
+        {overflowChips.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 text-sm font-medium text-[#252525] outline-none transition-colors hover:bg-[#F1F5F9] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F8971D]/40">
+                +{overflowChips.length} more
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 rounded-2xl border border-[#E8ECF4] bg-white p-2 shadow-[0_8px_24px_rgba(9,36,75,0.12)]">
+              {overflowChips.map((chip) => (
+                <DropdownMenuItem
+                  key={`${chip.category}-${chip.label}`}
+                  onSelect={(event) => {
+                    event.preventDefault()
+                    handleChipRemove(chip)
+                  }}
+                  className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-[#252525] focus:bg-[#FFF4EE] focus:text-[#252525]"
+                >
+                  <span className="truncate">{chip.label}</span>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      handleChipRemove(chip)
+                    }}
+                    className="flex items-center justify-center rounded-full bg-[#F9FAFB] p-1 text-[#09244B] transition-colors hover:bg-[#F1F5F9]"
+                    aria-label={`Remove ${chip.label}`}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {activeFilterChips.length > 0 && (
+          <Button
+            type="button"
+            variant="outlineGradient"
+            onClick={handleClearAll}
+            className="h-auto rounded-3xl px-4 py-2 text-sm font-medium capitalize text-[#F47120]"
+          >
+            Clear All
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
         <Link
           to="/FAQs"
-          className="rounded-3xl border border-[#F8971D] bg-gradient-to-b from-transparent to-transparent px-3 py-1.5 transition-opacity hover:opacity-90 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
+          className={howItWorksLinkClass}
         >
-          <span className="bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-sm font-normal capitalize text-transparent md:text-base">
+          <span className={howItWorksTextClass}>
             How it works
           </span>
         </Link>
@@ -842,7 +1151,8 @@ export function FilterBar({
           onClick={() => {
             onLoanCalculatorOpen?.()
           }}
-          className="cursor-pointer flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200"
+          className={loanLimitButtonClass}
+          aria-pressed={isLoanCalculatorOpen}
         >
           <span className="text-sm font-normal capitalize text-black md:text-base">
             My Loan Limit
@@ -913,7 +1223,7 @@ export function FilterBar({
 
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
-            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2 hover:bg-gray-100 transition-all duration-200">
+            <button className={sortButtonClass} aria-pressed={isOpen}>
               <div className="hidden md:flex flex-col items-start">
                 <span className="text-sm font-normal capitalize text-black md:text-base">
                   Sort By

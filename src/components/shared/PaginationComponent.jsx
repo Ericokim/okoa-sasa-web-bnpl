@@ -60,7 +60,7 @@ export function PaginationComponent({
               size="icon"
               disabled={currentPage === 1}
               onClick={() => goToPage(currentPage - 1)}
-              className="h-10 w-10 rounded-2xl border border-[#E8ECF4] bg-white transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
+              className="cursor-pointer h-10 w-10 rounded-2xl border border-[#E8ECF4] bg-white transition-opacity disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronLeft className="h-5 w-5 text-[#252525] md:h-6 md:w-6" />
             </Button>
@@ -73,7 +73,7 @@ export function PaginationComponent({
                   variant="ghost"
                   size="icon"
                   onClick={() => goToPage(page)}
-                  className={`h-10 w-10 rounded-2xl border ${
+                  className={`h-10 w-10 rounded-2xl border cursor-pointer ${
                     currentPage === page
                       ? 'border-[#F8971D] bg-gradient-to-b from-[rgba(248,151,29,0.12)] to-[rgba(238,49,36,0.12)]'
                       : 'border-[#E8ECF4] bg-white hover:bg-gray-50 transition-colors'
@@ -106,7 +106,7 @@ export function PaginationComponent({
               size="icon"
               disabled={currentPage === totalPages}
               onClick={() => goToPage(currentPage + 1)}
-              className="h-10 w-10 rounded-2xl border border-[#E8ECF4] bg-white transition-opacity hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
+              className="cursor-pointer h-10 w-10 rounded-2xl border border-[#E8ECF4] bg-white transition-opacity hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-30"
             >
               <ChevronRight className="h-5 w-5 text-[#252525] md:h-6 md:w-6" />
             </Button>
