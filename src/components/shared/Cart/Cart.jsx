@@ -5,7 +5,7 @@ import { CartSummary } from './CartSummary'
 import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
 
 export function Cart({ onCheckout }) {
-  const { cartProducts, updateCartQuantity, removeFromCart } =
+  const { cartProducts, updateCartQuantity, removeFromCart, clearCart } =
     useStateContext()
 
   const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
@@ -20,6 +20,10 @@ export function Cart({ onCheckout }) {
 
   const handleRemove = (id) => {
     removeFromCart?.(id)
+  }
+
+  const handleClearCart = () => {
+    clearCart?.()
   }
 
   const { totalItems, subtotal } = useMemo(() => {
@@ -70,6 +74,7 @@ export function Cart({ onCheckout }) {
           shippingCost={0}
           subtotal={subtotal}
           onCheckout={onCheckout}
+          onClearCart={cartItems.length ? handleClearCart : undefined}
         />
       </div>
     </div>
