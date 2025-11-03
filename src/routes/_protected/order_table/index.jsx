@@ -1,5 +1,5 @@
 import { recentOrders } from '@/routes/_protected/orders/index'
-import { Link, createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -23,6 +23,7 @@ import {
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 
 function OrdersTableHistory() {
+  const navigate = useNavigate()
   const orderHistory = [
     {
       orderId: '#REQ-20458',

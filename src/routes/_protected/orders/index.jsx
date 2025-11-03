@@ -8,6 +8,8 @@ import { TrashIcon } from '@/assets/icons'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import { Progress } from '@/components/ui/progress'
 
+
+
 export const recentOrders = [
   {
     id: '1',
@@ -32,6 +34,18 @@ export const recentOrders = [
         total: 87696,
       },
     ],
+    // NEW: Full delivery details
+    delivery: {
+      type: 'door', // 'door' or 'pickup'
+      recipient: {
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '+254712345678',
+      },
+      region: 'nairobi',
+      address: 'Westlands Road, Nairobi, 00100, Kenya',
+      pickupStore: null,
+    },
     shippingAddress: {
       name: 'John Doe',
       street: 'Westlands Road',
@@ -44,7 +58,7 @@ export const recentOrders = [
       shipping: 0,
       total: 87696,
     },
-    statusStep: 0, // 0 = Processing, 1 = On the way, 2 = Delivered
+    statusStep: 0,
   },
 
   {
@@ -70,6 +84,17 @@ export const recentOrders = [
         total: 87696,
       },
     ],
+    delivery: {
+      type: 'pickup',
+      recipient: {
+        firstName: 'Jane',
+        lastName: 'Mwangi',
+        phone: '+254798765432',
+      },
+      region: 'nairobi',
+      address: null,
+      pickupStore: 'City Center Post',
+    },
     shippingAddress: {
       name: 'Jane Mwangi',
       street: 'Argwings Kodhek Rd',
@@ -82,7 +107,7 @@ export const recentOrders = [
       shipping: 0,
       total: 87696,
     },
-    statusStep: -1, // Rejected → no progress
+    statusStep: -1,
   },
 
   {
@@ -108,6 +133,17 @@ export const recentOrders = [
         total: 87696,
       },
     ],
+    delivery: {
+      type: 'door',
+      recipient: {
+        firstName: 'Peter',
+        lastName: 'Kimani',
+        phone: '+254711223344',
+      },
+      region: 'nairobi',
+      address: 'James Gichuru Rd, Lavington, Nairobi, 00100',
+      pickupStore: null,
+    },
     shippingAddress: {
       name: 'Peter Kimani',
       street: 'James Gichuru Rd',
@@ -143,11 +179,20 @@ export const recentOrders = [
         name: 'iPhone 14 - Midnight',
         qty: 1,
         price: 87696,
-
         total: 87696,
       },
     ],
-
+    delivery: {
+      type: 'pickup',
+      recipient: {
+        firstName: 'Alice',
+        lastName: 'Wanjiku',
+        phone: '+254722334455',
+      },
+      region: 'nairobi',
+      address: null,
+      pickupStore: 'Westlands Station',
+    },
     shippingAddress: {
       name: 'Peter Kimani',
       street: 'James Gichuru Rd',
@@ -616,7 +661,7 @@ function OrdersPage() {
           </div>
         </div>
 
-        
+
       </main>
     </div>
   )
