@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils'
 import { PhoneIcon, XIcon } from 'lucide-react'
 import logo from '@/assets/images/primaryLogoVertical.png'
 
-export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
+export function AuthDialog({ open, onOpenChange, initialStep = 'login',onLoginSuccess  }) {
   const [step, setStep] = useState(initialStep)
   const [phoneNumber, setPhoneNumber] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -55,17 +55,22 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login' }) {
     }
   }
 
-  const handleVerifyOTP = (e) => {
-    e.preventDefault()
-    if (otp.length === 6) {
-      login({
-        phoneNumber,
-        name: 'User',
-      })
-      onOpenChange(false)
+ const handleVerifyOTP = (e) => {
+  e.preventDefault()
+  if (otp.length === 6) {
+    login({
+      phoneNumber,
+      name: 'User',
+    })
+    onOpenChange(false)
+    
+    if (onLoginSuccess) {
+      onLoginSuccess()
+    } else {
       navigate({ to: '/' })
     }
   }
+}
 
   const handleResendOTP = () => {
     setIsResending(true)

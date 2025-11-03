@@ -1,6 +1,14 @@
 import React from 'react'
 import { createFileRoute, useParams } from '@tanstack/react-router'
-import { ChevronLeft, Package, MapPin, Truck, Store, List } from 'lucide-react'
+import {
+  ChevronLeft,
+  Package,
+  MapPin,
+  Truck,
+  Store,
+  List,
+  ListCheck,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -17,9 +25,10 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/table'
+import { comma } from '@/lib/utils'
 function OrderStepper({ steps, currentStep, isRejected }) {
   return (
-    <div className="w-full">
+    <div className="w-full ">
       {/* Desktop View */}
       <div className="hidden md:block">
         {/* Circles and Lines Row */}
@@ -197,7 +206,7 @@ function OrderDetailsPage() {
                 variant={
                   order.statusColor === 'red' ? 'destructive' : 'secondary'
                 }
-                className="text-xs"
+                className="text-sm"
               >
                 {order.status}
               </Badge>
@@ -263,29 +272,32 @@ function OrderDetailsPage() {
             {/* === NEW: Items Table / Mobile Cards === */}
             <div className="mt-8">
               {/* Desktop Table */}
+
               <div className="hidden md:block">
                 <Card className="shadow-none">
-                  <CardHeader>
-                    <CardTitle className=" font-medium mb-3 flex items-center gap-2 text-black">
-                      <List className="w-4 h-4" />
-                      Items
+                  <CardHeader className="pb-2 pt-4 -mt-8">
+                    {' '}
+                    <CardTitle className="font-medium flex items-center gap-2 text-black text-md">
+                      <ListCheck className="w-4 h-4" />
+                      Items({order.items.length})
                     </CardTitle>
-                    <Separator className="my-4" />
+                    <Separator className="my-2" />{' '}
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="-mt-8">
+                    {' '}
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className="font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="font-sans text-base font-normal leading-snug text-gray-600">
                             Name
                           </TableHead>
-                          <TableHead className="text-center font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-center font-sans text-base font-normal leading-snug text-gray-600">
                             Qty
                           </TableHead>
-                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-gray-600">
                             Price
                           </TableHead>
-                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-[#A0A4AC]">
+                          <TableHead className="text-right font-sans text-base font-normal leading-snug text-gray-600">
                             Total
                           </TableHead>
                         </TableRow>
@@ -296,17 +308,17 @@ function OrderDetailsPage() {
                             key={idx}
                             className={idx % 2 === 0 ? 'bg-brand-bg-2' : ''}
                           >
-                            <TableCell className="font-sans text-md font-medium text-[#252525] capitalize">
+                            <TableCell className="font-sans text-md font-medium text-[#252525] capitalize py-2">
                               {item.name}
                             </TableCell>
-                            <TableCell className="text-center font-sans text-md font-medium text-[#252525] capitalize">
+                            <TableCell className="text-center font-sans text-md font-medium text-[#252525] capitalize py-2">
                               {item.qty}
                             </TableCell>
-                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
-                              KES {item.price.toFixed(2)}
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize py-2">
+                              KES {comma(item.price.toFixed(2))}
                             </TableCell>
-                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize">
-                              KES {item.total.toFixed(2)}
+                            <TableCell className="text-right font-sans text-md font-medium text-[#252525] capitalize py-2">
+                              KES {comma(item.total.toFixed(2))}
                             </TableCell>
                           </TableRow>
                         ))}
@@ -317,35 +329,51 @@ function OrderDetailsPage() {
               </div>
 
               {/* Mobile Cards */}
-              <div className="block md:hidden space-y-4">
-                <h3 className="font-sans text-2xl font-medium text-black">
-                  Items
-                </h3>
-                {order.items.map((item, idx) => (
-                  <Card
-                    key={idx}
-                    className={`p-4 ${idx % 2 === 0 ? 'bg-brand-bg-2' : ''}`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <p className="font-sans text-lg font-medium text-[#252525] capitalize">
-                          {item.name}
-                        </p>
-                        <p className="text-sm text-[#6B7280] mt-1">
-                          Qty: {item.qty}
-                        </p>
+
+              {/* ---------- MOBILE ONLY: Clean, Compact Items List ---------- */}
+              <div className="block md:hidden space-y-3">
+                <h4 className="font-medium mb-3 flex items-center gap-2">
+                  <ListCheck className="w-5 h-5" />
+                  Items ({order.items.length})
+                </h4>
+
+                <div className="space-y-2">
+                  {order.items.map((item, idx) => (
+                    <div
+                      key={idx}
+                      data-odd={idx % 2 === 1}
+                      className="
+          rounded-lg bg-gray-50 p-3 
+          data-[odd=true]:bg-brand-bg-2
+          flex flex-col gap-1.5
+        "
+                    >
+                      {/* Item Name – Bold & Prominent */}
+                      <p className="font-medium text-sm text-[#252525] capitalize">
+                        Item : {item.name}
+                      </p>
+
+                      {/* Qty + Unit Price – Compact Side-by-Side */}
+                      <div className="flex justify-between text-xs text-black">
+                        <span>Qty : {item.qty}</span>
+                        <span className="mt-4">
+                          Amount: KES{' '}
+                          {item.price.toLocaleString('en-KE', {
+                            minimumFractionDigits: 2,
+                          })}
+                        </span>
                       </div>
-                      <div className="text-right">
-                        <p className="font-sans text-lg font-medium text-[#252525]">
-                          KES {item.price.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-[#6B7280] mt-1">
-                          Total: KES {item.total.toFixed(2)}
-                        </p>
+
+                      {/* Total – Right-Aligned, Slightly Larger & Bold */}
+                      <div className="flex justify-end text-sm font-semibold text-[#252525]">
+                        Total: KES{' '}
+                        {item.total.toLocaleString('en-KE', {
+                          minimumFractionDigits: 2,
+                        })}
                       </div>
                     </div>
-                  </Card>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
             {/* Summary */}
@@ -355,7 +383,7 @@ function OrderDetailsPage() {
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span>
+              <span className="">
                 {order.summary.shipping === 0
                   ? 'Free'
                   : `KES ${order.summary.shipping.toLocaleString()}`}
@@ -363,7 +391,7 @@ function OrderDetailsPage() {
             </div>
             <div className="flex justify-between font-bold text-lg">
               <span>Total</span>
-              <span className="text-orange-600">
+              <span className="text-gradient-to-b from-[#F8971D] to-[#EE3124]">
                 KES {order.summary.total.toLocaleString()}
               </span>
             </div>
@@ -374,26 +402,28 @@ function OrderDetailsPage() {
           {/* Flex container – row on md+, column on mobile */}
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
             {/* ----- Back to Orders (gradient) ----- */}
+
             <Button
-              onClick={() => navigate({ to: '/orders' })}
               variant="gradient"
-              className="flex items-center justify-center gap-2   px-4 py-3 
-                    bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                    text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+              size="sm"
+              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
+              onClick={() => navigate({ to: '/orders' })}
             >
-              <ChevronLeft className="w-4 h-4" />
               Back to Orders
             </Button>
 
             <Button
               variant="outline"
               onClick={() => navigate({ to: '/' })}
-              className="flex items-center justify-center gap-2 px-4 py-3 
-                      border border-[#F8971D] text-[#F8971D] rounded-3xl 
-                      font-medium text-base hover:bg-[#F8971D]/10 transition-all"
+              size="sm"
+              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                border border-[#F8971D] text-[#F8971D] rounded-3xl 
+                      font-medium text-base hover:bg-[#F8971D]/10 transition-all
+                         w-50"
             >
-              <ChevronLeft className="w-4 h-4" />
-              Back to Devices
+              Back to Home
             </Button>
           </div>
         </div>

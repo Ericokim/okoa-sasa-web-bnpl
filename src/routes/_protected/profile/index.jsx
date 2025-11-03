@@ -20,17 +20,17 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen">
       {/* Breadcrumbs – exact same classes */}
-      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8" />
+      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8 -ml-3" />
 
       {/* Main content – exact same responsive padding */}
-      <main className="mx-auto px-4 sm:px-4 lg:px-4 py-4">
+      <main className="w-full flex flex-col py-4">
         {/* Header */}
         <div className="space-y-1 mb-6">
           <h1 className="text-4xl font-semibold text-gray-900">
             My Account
           </h1>
           <p className="text-gray-600">
-            Almost there! Ready to place your order?
+            Keep your account info accurate and up to date for better loan limits.
           </p>
         </div>
 
