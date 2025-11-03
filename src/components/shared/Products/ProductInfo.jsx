@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import {
   LinkIcon,
   FacebookIcon,
@@ -14,12 +15,13 @@ import {
   CartIcon,
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
-import { useStateContext } from '@/context/state-context'
+import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
 
 export function ProductInfo({ product }) {
-  const { addToCart } = useStateContext()
+  const navigate = useNavigate()
+  const { addToCart, updateCartQuantity, isProductInCart } = useStateContext()
   const [quantity, setQuantity] = useState(1)
-  const maxQuantity = 5
+  const maxQuantity = MAX_CART_QUANTITY
 
   const handleDecrease = () => {
     if (quantity > 1) setQuantity(quantity - 1)
@@ -31,6 +33,18 @@ export function ProductInfo({ product }) {
 
   const handleAddToCart = () => {
     addToCart(product?.id, quantity)
+  }
+
+  const handleBuyNow = () => {
+    const clampedQuantity = Math.min(quantity, maxQuantity)
+
+    if (isProductInCart(product?.id)) {
+      updateCartQuantity(product?.id, clampedQuantity)
+    } else {
+      addToCart(product?.id, clampedQuantity)
+    }
+
+    navigate({ to: '/checkout/' })
   }
 
   return (
@@ -152,6 +166,7 @@ export function ProductInfo({ product }) {
           // onClick={onCheckout}
           variant="gradient"
           className="rounded-3xl px-4 md:px-6 py-3 h-auto text-base font-medium"
+          onClick={handleBuyNow}
         >
           Buy Now
         </Button>

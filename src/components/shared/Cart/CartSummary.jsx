@@ -74,6 +74,7 @@ export function CartSummary({
 
         <Button
           onClick={onCheckout}
+          disabled={totalItems === 0}
           variant="gradient"
           className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
              bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 

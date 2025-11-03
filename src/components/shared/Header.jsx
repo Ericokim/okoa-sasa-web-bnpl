@@ -6,9 +6,11 @@ import { cn } from '@/lib/utils'
 import { HomeCartIcon } from '@/assets/icons'
 import { UserDropdown } from '@/components/shared/UserDropdown'
 import { Button } from '@/components/ui/button'
+import logo from '@/assets/images/primaryLogoHorizontal.png'
 
 export function Header() {
-  const { cartCount, getCartCount, searchTerm, setSearchTerm } = useStateContext()
+  const { cartCount, getCartCount, searchTerm, setSearchTerm } =
+    useStateContext()
   const navigate = useNavigate()
 
   const cartItems = typeof cartCount === 'number' ? cartCount : getCartCount()
@@ -23,7 +25,14 @@ export function Header() {
       {/* === DESKTOP HEADER === */}
       <div className="hidden lg:flex items-center justify-between px-8 py-5 lg:px-20 lg:py-6">
         <Link to="/" className="flex h-[43px] w-[158px] shrink-0">
-          <img src="/primaryLogoHorizontal.png" alt="OKOA SASA" className="h-full w-full object-contain" />
+          <img
+            src={logo}
+            srcSet={`${logo} 1x, ${logo} 2x`}
+            alt="Okoa Sasa Logo"
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain"
+          />
         </Link>
 
         {/* Search Bar */}
@@ -75,7 +84,14 @@ export function Header() {
       {/* === MOBILE HEADER === */}
       <div className="flex lg:hidden items-center justify-between px-4 py-3">
         <Link to="/" className="flex h-[35px] w-[130px] shrink-0">
-          <img src="/primaryLogoHorizontal.png" alt="OKOA SASA" className="h-full w-full object-contain" />
+          <img
+            src={logo}
+            srcSet={`${logo} 1x, ${logo} 2x`}
+            alt="Okoa Sasa Logo"
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain"
+          />
         </Link>
 
         <div className="flex items-center gap-5">
