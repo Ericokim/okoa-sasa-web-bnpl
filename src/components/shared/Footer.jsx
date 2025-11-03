@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import logo from '@/assets/images/primaryLogoHorizontal.png'
 
 // Custom Brand Icons
 const FacebookIcon = ({ className }) => (
@@ -166,9 +167,12 @@ export function Footer() {
           {/* Logo */}
           <div className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[335px] xl:w-[395px] h-auto">
             <img
-              src="/primaryLogoHorizontal.png"
-              alt="Okoa Sasa"
-              className="w-full h-full object-contain"
+              src={logo}
+              srcSet={`${logo} 1x, ${logo} 2x`}
+              alt="Okoa Sasa Logo"
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-contain"
             />
           </div>
 

@@ -51,7 +51,7 @@ const FILTER_CATEGORIES = [
   'ram',
 ]
 
-const MAX_VISIBLE_CHIPS = 3
+const MAX_VISIBLE_CHIPS = 5
 
 const FilterIcon = () => (
   <svg
@@ -215,12 +215,7 @@ const FilterCheckboxItem = ({ label, checked, onChange }) => (
   </button>
 )
 
-const ShowMoreButton = ({
-  category,
-  isExpanded,
-  totalCount,
-  onToggle,
-}) => {
+const ShowMoreButton = ({ category, isExpanded, totalCount, onToggle }) => {
   const limit = 5
   if (totalCount <= limit) return null
 
@@ -235,9 +230,7 @@ const ShowMoreButton = ({
       aria-controls={`${category}-filters`}
     >
       <span className="text-sm font-medium text-[#F47120]">
-        {isExpanded
-          ? '− Show Less'
-          : `+ Show More (${remainingCount} more)`}
+        {isExpanded ? '− Show Less' : `+ Show More (${remainingCount} more)`}
       </span>
     </button>
   )
@@ -432,7 +425,8 @@ export function FilterBar({
   const applyButtonWrapperRef = useRef(null)
   const [applyButtonOffset, setApplyButtonOffset] = useState(null)
   const location = useLocation()
-  const isFaqActive = location.pathname.startsWith('/FAQs')
+  const pathname = location?.pathname ?? ''
+  const isFaqRouteActive = pathname.toLowerCase().startsWith('/faqs')
 
   useEffect(() => {
     const nextFilters = buildFiltersStateFromSelection(
@@ -755,22 +749,22 @@ export function FilterBar({
     basePillClasses,
     isFiltersOpen
       ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
-      : 'border-transparent bg-[#F9FAFB] text-[#252525] hover:bg-[#F1F5F9] active:bg-[#E6EDF7]'
+      : 'border-transparent bg-[#F9FAFB] text-[#252525] hover:bg-[#F1F5F9] active:bg-[#E6EDF7]',
   )
 
   const howItWorksLinkClass = cn(
     'group border',
     basePillClasses,
-    isFaqActive
+    isFaqRouteActive
       ? 'border-transparent bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white shadow-sm'
-      : 'border-[#F8971D] bg-gradient-to-b from-transparent to-transparent text-[#F47120] hover:bg-[#FFF4EE]'
+      : 'border-[#F8971D] bg-gradient-to-b from-transparent to-transparent text-[#F47120] hover:bg-[#FFF4EE]',
   )
 
   const howItWorksTextClass = cn(
     'text-sm font-normal capitalize md:text-base transition-colors',
-    isFaqActive
+    isFaqRouteActive
       ? 'text-white'
-      : 'bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent group-hover:bg-none group-hover:text-[#F47120]'
+      : 'bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent group-hover:bg-none group-hover:text-[#F47120]',
   )
 
   const loanLimitButtonClass = cn(
@@ -778,7 +772,7 @@ export function FilterBar({
     basePillClasses,
     isLoanCalculatorOpen
       ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
-      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]',
   )
 
   const sortButtonClass = cn(
@@ -786,7 +780,7 @@ export function FilterBar({
     basePillClasses,
     isOpen
       ? 'border-[#F8971D] bg-[#FFF4EE] text-[#F47120] shadow-sm'
-      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]'
+      : 'border-[#E8ECF4] text-[#252525] hover:bg-[#F1F5F9]',
   )
 
   return (
@@ -815,12 +809,14 @@ export function FilterBar({
                 <span className="font-['Public_Sans'] text-base font-medium leading-[140%] text-black">
                   Filters
                 </span>
-                <button
+                <Button
+                  type="button"
                   onClick={handleClearAll}
-                  className="cursor-pointer rounded-3xl border border-transparent px-3 py-1 text-sm font-medium leading-[140%] text-[#F25E5E] transition-colors hover:bg-[#FFF4EE]"
+                  variant="ghost"
+                  className="h-9 rounded-3xl border border-[#F7B896] bg-[#FFF4EE] px-4 text-sm font-medium text-[#EE3124] shadow-none transition-colors hover:bg-[#FFE3D6]"
                 >
-                  Clear
-                </button>
+                  Clear All
+                </Button>
               </div>
               <div ref={scrollAreaContainerRef}>
                 <ScrollArea className="h-[60vh] w-full">
@@ -841,7 +837,7 @@ export function FilterBar({
                         />
 
                         <div className="flex items-start gap-2 self-stretch">
-                          <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                          <div className="flex flex-1 items-center justify-center">
                             <input
                               type="text"
                               value={filters.priceMin}
@@ -851,11 +847,22 @@ export function FilterBar({
                                   event.target.value,
                                 )
                               }
-                              className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                              // className={cn(
+                              //   "flex items-center rounded-[12px] justify-center h-8 w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#252525] placeholder:text-[#A0A4AC] outline-none ",
+                              //   'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                              //   'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                              //   'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#A0A4AC]',
+                              // )}
+                              className={cn(
+                                'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
+                                'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                                'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
+                                'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                              )}
                               placeholder="Min"
                             />
                           </div>
-                          <div className="flex flex-1 items-center justify-center gap-2.5 rounded-lg border border-[#E8ECF4] px-3 py-1">
+                          <div className="flex flex-1 items-center justify-center rounded-lg">
                             <input
                               type="text"
                               value={filters.priceMax}
@@ -865,7 +872,14 @@ export function FilterBar({
                                   event.target.value,
                                 )
                               }
-                              className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#A0A4AC] outline-none"
+                              //  className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#252525] placeholder:text-[#A0A4AC] outline-none"
+
+                              className={cn(
+                                'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
+                                'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                                'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
+                                'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                              )}
                               placeholder="Max"
                             />
                           </div>
@@ -889,48 +903,50 @@ export function FilterBar({
                       </div>
                     </FilterSection>
 
-                  <FilterSection
-                    title="Color"
-                    isOpen={openSections.color}
-                    onToggle={() => toggleSection('color')}
-                  >
-                    <div
-                      id="color-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="Color"
+                      isOpen={openSections.color}
+                      onToggle={() => toggleSection('color')}
                     >
-                      {getVisibleItems(normalizedOptions.color, 'color').map(
-                        (color) => (
-                          <FilterCheckboxItem
-                            key={color}
-                            label={color}
-                            checked={filters.color[color]}
-                            onChange={(checked) =>
-                              handleCheckboxToggle('color', color, checked)
-                            }
-                          />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="color"
-                        isExpanded={expandedCategories.color}
-                        totalCount={normalizedOptions.color.length}
-                        onToggle={() => toggleCategoryExpansion('color')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                      <div
+                        id="color-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(normalizedOptions.color, 'color').map(
+                          (color) => (
+                            <FilterCheckboxItem
+                              key={color}
+                              label={color}
+                              checked={filters.color[color]}
+                              onChange={(checked) =>
+                                handleCheckboxToggle('color', color, checked)
+                              }
+                            />
+                          ),
+                        )}
+                        <ShowMoreButton
+                          category="color"
+                          isExpanded={expandedCategories.color}
+                          totalCount={normalizedOptions.color.length}
+                          onToggle={() => toggleCategoryExpansion('color')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Storage Capacity"
-                    isOpen={openSections.storage}
-                    onToggle={() => toggleSection('storage')}
-                  >
-                    <div
-                      id="storage-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="Storage Capacity"
+                      isOpen={openSections.storage}
+                      onToggle={() => toggleSection('storage')}
                     >
-                      {getVisibleItems(normalizedOptions.storage, 'storage').map(
-                        (storage) => (
+                      <div
+                        id="storage-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(
+                          normalizedOptions.storage,
+                          'storage',
+                        ).map((storage) => (
                           <FilterCheckboxItem
                             key={storage}
                             label={storage}
@@ -939,29 +955,30 @@ export function FilterBar({
                               handleCheckboxToggle('storage', storage, checked)
                             }
                           />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="storage"
-                        isExpanded={expandedCategories.storage}
-                        totalCount={normalizedOptions.storage.length}
-                        onToggle={() => toggleCategoryExpansion('storage')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                        ))}
+                        <ShowMoreButton
+                          category="storage"
+                          isExpanded={expandedCategories.storage}
+                          totalCount={normalizedOptions.storage.length}
+                          onToggle={() => toggleCategoryExpansion('storage')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Camera Megapixel"
-                    isOpen={openSections.camera}
-                    onToggle={() => toggleSection('camera')}
-                  >
-                    <div
-                      id="camera-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="Camera Megapixel"
+                      isOpen={openSections.camera}
+                      onToggle={() => toggleSection('camera')}
                     >
-                      {getVisibleItems(normalizedOptions.camera, 'camera').map(
-                        (camera) => (
+                      <div
+                        id="camera-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(
+                          normalizedOptions.camera,
+                          'camera',
+                        ).map((camera) => (
                           <FilterCheckboxItem
                             key={camera}
                             label={camera}
@@ -970,29 +987,30 @@ export function FilterBar({
                               handleCheckboxToggle('camera', camera, checked)
                             }
                           />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="camera"
-                        isExpanded={expandedCategories.camera}
-                        totalCount={normalizedOptions.camera.length}
-                        onToggle={() => toggleCategoryExpansion('camera')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                        ))}
+                        <ShowMoreButton
+                          category="camera"
+                          isExpanded={expandedCategories.camera}
+                          totalCount={normalizedOptions.camera.length}
+                          onToggle={() => toggleCategoryExpansion('camera')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Display Size"
-                    isOpen={openSections.display}
-                    onToggle={() => toggleSection('display')}
-                  >
-                    <div
-                      id="display-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="Display Size"
+                      isOpen={openSections.display}
+                      onToggle={() => toggleSection('display')}
                     >
-                      {getVisibleItems(normalizedOptions.display, 'display').map(
-                        (display) => (
+                      <div
+                        id="display-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(
+                          normalizedOptions.display,
+                          'display',
+                        ).map((display) => (
                           <FilterCheckboxItem
                             key={display}
                             label={display}
@@ -1001,79 +1019,78 @@ export function FilterBar({
                               handleCheckboxToggle('display', display, checked)
                             }
                           />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="display"
-                        isExpanded={expandedCategories.display}
-                        totalCount={normalizedOptions.display.length}
-                        onToggle={() => toggleCategoryExpansion('display')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                        ))}
+                        <ShowMoreButton
+                          category="display"
+                          isExpanded={expandedCategories.display}
+                          totalCount={normalizedOptions.display.length}
+                          onToggle={() => toggleCategoryExpansion('display')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="RAM"
-                    isOpen={openSections.ram}
-                    onToggle={() => toggleSection('ram')}
-                  >
-                    <div
-                      id="ram-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="RAM"
+                      isOpen={openSections.ram}
+                      onToggle={() => toggleSection('ram')}
                     >
-                      {getVisibleItems(normalizedOptions.ram, 'ram').map(
-                        (ram) => (
-                          <FilterCheckboxItem
-                            key={ram}
-                            label={ram}
-                            checked={filters.ram[ram]}
-                            onChange={(checked) =>
-                              handleCheckboxToggle('ram', ram, checked)
-                            }
-                          />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="ram"
-                        isExpanded={expandedCategories.ram}
-                        totalCount={normalizedOptions.ram.length}
-                        onToggle={() => toggleCategoryExpansion('ram')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                      <div
+                        id="ram-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(normalizedOptions.ram, 'ram').map(
+                          (ram) => (
+                            <FilterCheckboxItem
+                              key={ram}
+                              label={ram}
+                              checked={filters.ram[ram]}
+                              onChange={(checked) =>
+                                handleCheckboxToggle('ram', ram, checked)
+                              }
+                            />
+                          ),
+                        )}
+                        <ShowMoreButton
+                          category="ram"
+                          isExpanded={expandedCategories.ram}
+                          totalCount={normalizedOptions.ram.length}
+                          onToggle={() => toggleCategoryExpansion('ram')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
 
-                  <FilterSection
-                    title="Brand"
-                    isOpen={openSections.brand}
-                    onToggle={() => toggleSection('brand')}
-                  >
-                    <div
-                      id="brand-filters"
-                      className="flex flex-col items-start gap-3 self-stretch"
+                    <FilterSection
+                      title="Brand"
+                      isOpen={openSections.brand}
+                      onToggle={() => toggleSection('brand')}
                     >
-                      {getVisibleItems(normalizedOptions.brand, 'brand').map(
-                        (brand) => (
-                          <FilterCheckboxItem
-                            key={brand}
-                            label={brand}
-                            checked={filters.brand[brand]}
-                            onChange={(checked) =>
-                              handleCheckboxToggle('brand', brand, checked)
-                            }
-                          />
-                        ),
-                      )}
-                      <ShowMoreButton
-                        category="brand"
-                        isExpanded={expandedCategories.brand}
-                        totalCount={normalizedOptions.brand.length}
-                        onToggle={() => toggleCategoryExpansion('brand')}
-                      />
-                      <div className="h-px self-stretch bg-[#E8ECF4]" />
-                    </div>
-                  </FilterSection>
+                      <div
+                        id="brand-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(normalizedOptions.brand, 'brand').map(
+                          (brand) => (
+                            <FilterCheckboxItem
+                              key={brand}
+                              label={brand}
+                              checked={filters.brand[brand]}
+                              onChange={(checked) =>
+                                handleCheckboxToggle('brand', brand, checked)
+                              }
+                            />
+                          ),
+                        )}
+                        <ShowMoreButton
+                          category="brand"
+                          isExpanded={expandedCategories.brand}
+                          totalCount={normalizedOptions.brand.length}
+                          onToggle={() => toggleCategoryExpansion('brand')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
                   </div>
                   <ScrollBar orientation="vertical" />
                 </ScrollArea>
@@ -1094,7 +1111,7 @@ export function FilterBar({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-3xl bg-[#F9FAFB] px-3 py-1.5 text-sm font-medium text-[#252525] outline-none transition-colors hover:bg-[#F1F5F9] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F8971D]/40">
-                +{overflowChips.length} more
+                View more (+{overflowChips.length})
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 rounded-2xl border border-[#E8ECF4] bg-white p-2 shadow-[0_8px_24px_rgba(9,36,75,0.12)]">
@@ -1128,9 +1145,9 @@ export function FilterBar({
         {activeFilterChips.length > 0 && (
           <Button
             type="button"
-            variant="outlineGradient"
+            variant="gradient"
             onClick={handleClearAll}
-            className="h-auto rounded-3xl px-4 py-2 text-sm font-medium capitalize text-[#F47120]"
+            className="h-10 rounded-3xl px-5 py-2 text-sm font-semibold capitalize tracking-[-0.01em] md:text-base"
           >
             Clear All
           </Button>
@@ -1138,13 +1155,8 @@ export function FilterBar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2 md:justify-end md:gap-3">
-        <Link
-          to="/FAQs"
-          className={howItWorksLinkClass}
-        >
-          <span className={howItWorksTextClass}>
-            How it works
-          </span>
+        <Link to="/FAQs" className={howItWorksLinkClass}>
+          <span className={howItWorksTextClass}>How it works</span>
         </Link>
 
         <button
@@ -1159,99 +1171,33 @@ export function FilterBar({
           </span>
         </button>
 
-        {/* <Popover>
-          <PopoverTrigger asChild>
-            <button className="flex items-center gap-2 rounded-3xl border border-[#E8ECF4] px-3 py-1.5 md:px-4 md:py-2">
-              <span className="text-sm font-normal capitalize text-black md:text-base">
-                My Loan Limit
-              </span>
-              <svg
-                className="h-5 w-5 md:h-6 md:w-6"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M19.9201 8.95L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95"
-                  stroke="#292D32"
-                  strokeWidth="1.5"
-                  strokeMiterlimit="10"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            align="start"
-            className="w-[210px] rounded-2xl bg-white p-4 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
-          >
-            <div className="flex flex-col gap-2">
-              {[
-                { value: 'basic', label: 'Basic Pay' },
-                { value: 'net', label: 'Net Pay' },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => {
-                    onLoanCalculatorOpen?.()
-                    setSelectedPaymentType(option.value)
-                  }}
-                  className={`flex items-center justify-between gap-2 rounded-lg px-3 py-3 ${
-                    selectedPaymentType === option.value
-                      ? 'bg-[rgba(244,113,32,0.12)]'
-                      : ''
-                  }`}
-                >
-                  <span
-                    className={`flex-1 text-left text-sm font-medium leading-[140%] ${
-                      selectedPaymentType === option.value
-                        ? 'text-[#F47120]'
-                        : 'text-[#252525]'
-                    }`}
-                  >
-                    {option.label}
-                  </span>
-                  {selectedPaymentType === option.value && <CheckIcon />}
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover> */}
-
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
             <button className={sortButtonClass} aria-pressed={isOpen}>
-              <div className="hidden md:flex flex-col items-start">
-                <span className="text-sm font-normal capitalize text-black md:text-base">
-                  Sort By
-                </span>
-              </div>
-              {/* {isOpen ? (
-                <ChevronUp className="h-5 w-5 text-gray-700" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-gray-700" />
-              )} */}
-              <div className={`${isOpen ? 'rotate-180' : ''}`}>
+              <span className="text-sm font-normal capitalize text-black md:text-base">
+                Sort By
+              </span>
+              <span
+                className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+                aria-hidden="true"
+              >
                 <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M19.9201 8.95001L13.4001 15.47C12.6301 16.24 11.3701 16.24 10.6001 15.47L4.08008 8.95001"
+                    d="M13.2802 10.0333L8.93355 5.68667C8.42021 5.17333 7.58021 5.17333 7.06688 5.68667L2.72021 10.0333"
                     stroke="#292D32"
-                    stroke-width="1.5"
-                    stroke-miterlimit="10"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeWidth="1.5"
+                    strokeMiterlimit="10"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
                 </svg>
-              </div>
+              </span>
             </button>
           </DropdownMenuTrigger>
 
