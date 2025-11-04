@@ -17,13 +17,13 @@ import { matchSorter } from "match-sorter";
  */
 const Styles = {
   control: {
-    base: "flex !min-h-10 w-full rounded-md border border-input bg-transparent pl-3 py-1 pr-1 gap-1 text-sm shadow-sm transition-colors hover:cursor-pointer",
+    base: "flex !min-h-10 w-full rounded-md border border-input bg-transparent pl-3 py-1 pr-1 gap-1 text-base shadow-sm transition-colors hover:cursor-pointer",
     focus: "outline-none ring-1 ring-ring",
     disabled: "cursor-not-allowed opacity-50",
     error: "border-error", // Error border style
     success: "border-success", // Success border style
   },
-  placeholder: "text-sm text-gray-400 dark:text-gray-600",
+  placeholder: "text-base text-gray-400 dark:text-gray-600",
   valueContainer: "gap-1",
   multiValue:
     "inline-flex items-center gap-2 rounded-md border border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 px-1.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
@@ -33,7 +33,7 @@ const Styles = {
   menu: "p-1 mt-2 border bg-popover shadow-md rounded-md text-popover-foreground",
   groupHeading: "py-2 px-1 text-secondary-foreground text-sm font-semibold",
   option: {
-    base: "hover:cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5 rounded-sm !text-sm !cursor-default !select-none !outline-none font-sans",
+    base: "hover:cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1.5 rounded-sm !text-base !cursor-default !select-none !outline-none font-sans",
     focus: "active:bg-accent/90 bg-accent text-accent-foreground",
     disabled: "pointer-events-none opacity-50",
   },
@@ -166,6 +166,8 @@ export const defaultClassNames = createClassNames({});
 export const defaultStyles = {
   input: (base) => ({
     ...base,
+    fontSize: "16px",
+    lineHeight: "1.5",
     "input:focus": {
       boxShadow: "none",
     },

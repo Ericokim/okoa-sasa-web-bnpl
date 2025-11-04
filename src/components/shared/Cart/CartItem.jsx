@@ -66,11 +66,10 @@ export function CartItem({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
-                onClick={handleIncrement}
-                disabled={quantity >= MAX_CART_QUANTITY}
+                className="h-10 w-10 rounded-full text-lg flex items-center justify-center mb-0.5"
+                onClick={handleDecrement}
               >
-                <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.75} />
+                <Minus className="h-4 w-4 text-[#252525]" strokeWidth={1.75} />
               </Button>
 
               <span className="flex w-8 justify-center text-base sm:text-lg font-semibold text-[#252525]">
@@ -80,10 +79,11 @@ export function CartItem({
               <Button
                 variant="outline"
                 size="icon"
-                className="h-10 w-10 rounded-full text-lg flex items-center justify-center mb-0.5"
-                onClick={handleDecrement}
+                className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
+                onClick={handleIncrement}
+                disabled={quantity >= MAX_CART_QUANTITY}
               >
-                <Minus className="h-4 w-4 text-[#252525]" strokeWidth={1.75} />
+                <Plus className="h-4 w-4 text-[#292D32]" strokeWidth={1.75} />
               </Button>
             </div>
           </div>

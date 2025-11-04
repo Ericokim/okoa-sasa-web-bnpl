@@ -1179,7 +1179,7 @@ const TagInput = React.forwardRef(
         <div
           ref={containerRef}
           className={cn(
-            "min-h-[2.5rem] w-full rounded-md border bg-background px-3 py-2 text-sm",
+            "min-h-[2.5rem] w-full rounded-md border bg-background px-3 py-2 text-base",
             "cursor-text transition-colors duration-200",
             getBorderColor(),
             disabled && "cursor-not-allowed bg-muted opacity-50",
@@ -1211,7 +1211,7 @@ const TagInput = React.forwardRef(
                         onKeyDown={(e) => handleEditKeyDown(e, index)}
                         onBlur={() => handleEditBlur(index)}
                         className={cn(
-                          "border-none bg-transparent outline-none text-sm font-medium px-0 py-0",
+                          "border-none bg-transparent outline-none text-base font-medium px-0 py-0",
                           "focus:ring-0 focus:border-none focus:outline-none",
                           editInputColor,
                         )}
@@ -1291,7 +1291,7 @@ const TagInput = React.forwardRef(
               disabled={disabled}
               placeholder={safeValue.length === 0 ? placeholder : ""}
               className={cn(
-                "border-none bg-transparent outline-none text-sm h-auto p-0 shadow-none",
+                "border-none bg-transparent outline-none text-base h-auto p-0 shadow-none",
                 "placeholder:text-muted-foreground min-w-0 flex-1",
                 "focus:ring-0 focus:ring-offset-0 focus:border-none focus:shadow-none focus:outline-none",
                 "focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-none focus-visible:shadow-none focus-visible:outline-none",

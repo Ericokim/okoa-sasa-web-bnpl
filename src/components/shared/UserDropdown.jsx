@@ -297,7 +297,7 @@ export function UserDropdown({ isMobile = false }) {
   return (
     <DropdownMenu onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-200">
+        <button className="flex items-center gap-3 px-4 py-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-orange-200 cursor-pointer">
           <div className="overflow-hidden rounded-full">{avatar}</div>
           <div className="hidden md:flex flex-col items-start">
             <span className="font-sans text-base font-medium leading-[140%] text-[#252525]">
