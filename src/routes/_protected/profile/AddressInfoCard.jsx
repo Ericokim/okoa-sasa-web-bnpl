@@ -43,7 +43,7 @@ export function RouteComponent() {
             {editing !== 'office' && (
               <button
                 onClick={() => startEdit('office')}
-                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
                 <EditIcon />
                 <span>Edit</span>
@@ -77,9 +77,10 @@ export function RouteComponent() {
             </div>
 
             {editing !== 'home' && (
+              
               <button
                 onClick={() => startEdit('home')}
-                className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                className=" cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
                 <EditIcon />
                 <span>Edit</span>
