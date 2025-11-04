@@ -237,7 +237,7 @@ export const TrashIcon = ({ size = 24, className = '' }) => (
     className={className}
   />
 )
-export const TrashSolidWhiteIcon = ({ size = 24, className = '' }) => (
+export const TrashSolidWhiteIcon = ({ size = 36, className = '' }) => (
   <img
     src={solidWhiteTrashIcon}
     alt="trash"
