@@ -239,6 +239,21 @@ code {
     }
   }
 
+  /* Prevent horizontal overflow and ensure responsive behavior */
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  img, video, canvas, svg {
+    max-width: 100%;
+    height: auto;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

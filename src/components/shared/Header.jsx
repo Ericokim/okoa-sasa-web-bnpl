@@ -23,8 +23,8 @@ export function Header() {
   return (
     <header className="w-full border-b border-[#E8ECF4] bg-white">
       {/* === DESKTOP HEADER === */}
-      <div className="hidden lg:flex items-center justify-between px-8 py-5 lg:px-20 lg:py-6">
-        <Link to="/" className="flex h-[43px] w-[158px] shrink-0">
+      <div className="hidden lg:flex items-center justify-between mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-5 lg:py-6">
+        <Link to="/" className="flex h-[40px] w-[140px] lg:h-[43px] lg:w-[158px] xl:h-[48px] xl:w-[180px] shrink-0">
           <img
             src={logo}
             srcSet={`${logo} 1x, ${logo} 2x`}
@@ -36,7 +36,7 @@ export function Header() {
         </Link>
 
         {/* Search Bar */}
-        <div className="flex-1 mx-8 max-w-[690px]">
+        <div className="flex-1 mx-4 lg:mx-6 xl:mx-8 max-w-[500px] lg:max-w-[600px] xl:max-w-[690px]">
           <div className="flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3">
             <Search className="h-6 w-6 text-[#A0A4AC]" />
             <input
@@ -63,17 +63,17 @@ export function Header() {
         </div>
 
         {/* Cart + User */}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-4 lg:gap-5 xl:gap-6">
           <Link to="/cart" className="flex items-center gap-1.5 relative">
             <div className="relative">
-              <HomeCartIcon className="h-6 w-6" strokeWidth={1.5} />
+              <HomeCartIcon className="h-5 w-5 lg:h-6 lg:w-6" strokeWidth={1.5} />
               {cartItems > 0 && (
                 <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs font-semibold rounded-full h-4 w-4 flex items-center justify-center">
                   {cartItems}
                 </span>
               )}
             </div>
-            <span className="text-base leading-[140%]">Cart</span>
+            <span className="text-sm lg:text-base leading-[140%]">Cart</span>
           </Link>
 
           {/* Desktop */}
@@ -85,7 +85,7 @@ export function Header() {
 
     
 
-      <div className="flex lg:hidden items-center justify-between px-4 py-3">
+      <div className="flex lg:hidden items-center justify-between mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3">
         <Link to="/" className="flex h-[35px] w-[130px] shrink-0">
           <img
             src={logo}
@@ -115,7 +115,7 @@ export function Header() {
       </div>
 
       {/* === MOBILE SEARCH BAR === */}
-      <div className="border-t border-[#E8ECF4] px-4 py-3 lg:hidden">
+      <div className="border-t border-[#E8ECF4] mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3 lg:hidden">
         <div className="flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3">
           <Search className="h-5 w-5 text-[#A0A4AC]" />
           <input
