@@ -29,7 +29,7 @@ export function RouteComponent() {
         {!editing && (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
+            className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
           >
             <EditIcon />
             Edit
