@@ -62,7 +62,7 @@ export function Cart({ onCheckout }) {
       </div>
 
       {/* Cart Content - Two Column Layout */}
-      <div className="flex w-full flex-col items-start gap-5 lg:flex-row lg:justify-center">
+      <div className="flex w-full flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,412px)] lg:items-stretch lg:gap-[30px]">
         <CartList
           items={cartItems}
           onQuantityChange={handleQuantityChange}
