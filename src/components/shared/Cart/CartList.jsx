@@ -22,30 +22,30 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
 
   return (
     <div className="w-full flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
-      {/* Table Header - Desktop Only */}
-      <div className="hidden w-full lg:grid lg:grid-cols-[401px_176px_1fr_auto] lg:items-start lg:gap-4">
-        <div className="text-[20px] font-semibold leading-[1.4] text-black">Item</div>
-        <div className="text-center text-[20px] font-semibold leading-[1.4] text-black">
+      {/* Table Header - Desktop Only (lg+ screens) */}
+      <div className="hidden w-full lg:grid lg:grid-cols-[minmax(260px,1fr)_minmax(110px,140px)_minmax(90px,120px)_auto] lg:items-start lg:gap-3 xl:grid-cols-[minmax(320px,1fr)_minmax(140px,180px)_minmax(120px,150px)_auto] xl:gap-4 2xl:grid-cols-[minmax(380px,1fr)_minmax(160px,200px)_minmax(140px,180px)_auto] 2xl:gap-6">
+        <div className="text-lg xl:text-xl font-semibold leading-[1.4] text-black">Item</div>
+        <div className="text-center text-lg xl:text-xl font-semibold leading-[1.4] text-black">
           Quantity
         </div>
-        <div className="text-right text-[20px] font-semibold leading-[1.4] text-black">
+        <div className="text-right text-lg xl:text-xl font-semibold leading-[1.4] text-black">
           Subtotal
         </div>
-        <span className="text-right text-[20px] font-semibold leading-[1.4] text-black opacity-0">
+        <span className="text-right text-lg xl:text-xl font-semibold leading-[1.4] text-black opacity-0">
           Remove
         </span>
       </div>
 
-      {/* Mobile Header */}
+      {/* Mobile & Tablet Header */}
       <div className="flex items-center justify-between self-stretch lg:hidden">
-        <h3 className="text-lg font-semibold text-black">Items</h3>
-        <span className="text-sm text-[#676D75]">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
+        <h3 className="text-lg sm:text-xl font-semibold text-black">Items</h3>
+        <span className="text-sm sm:text-base text-[#676D75]">{items.length} {items.length === 1 ? 'item' : 'items'}</span>
       </div>
 
       <div className="h-px self-stretch bg-[#E8ECF4]"></div>
 
       {/* Cart Items */}
-      <div className="flex w-full flex-col items-center justify-center gap-3 self-stretch">
+      <div className="flex w-full flex-col items-center justify-center gap-3 lg:gap-4 self-stretch">
         {items.map((item, index) => (
           <div key={item.id || index} className="w-full">
             <CartItem
@@ -54,7 +54,7 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
               onRemove={onRemove}
             />
             {index < items.length - 1 && (
-              <div className="my-3 h-px w-full bg-[#E8ECF4]"></div>
+              <div className="my-3 lg:my-4 h-px w-full bg-[#E8ECF4]"></div>
             )}
           </div>
         ))}
