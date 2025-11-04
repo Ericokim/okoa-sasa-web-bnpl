@@ -187,7 +187,6 @@ export function ProductInfo({ product }) {
             disabled={existingQuantity + quantity >= maxQuantity}
           >
             <AddIcon size={18} />
-            <AddIcon size={18} />
           </Button>
         </div>
 
