@@ -71,7 +71,7 @@ export function RouteComponent() {
                 onClick={() => setOpen(false)}
                 variant="outline"
                 className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
-             border border-[#F8971D] text-[#F8971D] rounded-[24px] 
+             border border-[#F8971D] text-[#F8971D] rounded-3xl
              font-medium text-base hover:bg-[#F8971D]/10 transition-all"
               >
                 Cancel
