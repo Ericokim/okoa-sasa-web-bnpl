@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { TrashIconWhite } from '@/assets/icons'
+import { TrashSolidWhiteIcon,TrashIconWhite } from '@/assets/icons'
 
 export function RouteComponent() {
   const [open, setOpen] = useState(false)
@@ -33,7 +33,9 @@ export function RouteComponent() {
           {/* Button – full width on mobile, auto on desktop */}
           <Button
             onClick={() => setOpen(true)}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-3 
+            className="
+          
+            w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3   h-[46px]
                  bg-red-400 hover:bg-red-600 rounded-3xl 
                  text-white font-medium text-sm sm:text-base"
           >
@@ -47,7 +49,7 @@ export function RouteComponent() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 text-center">
             <div className="mx-auto w-16 h-16 bg-linear-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mb-4">
-              <TrashIconWhite />
+              <TrashSolidWhiteIcon />
             </div>
             <h2 className="text-xl font-bold mb-2">
               Are You Sure You Want To Delete This Account?

@@ -11,6 +11,7 @@ import boxIcon from '@/assets/icons/box.svg'
 import truckIcon from '@/assets/icons/truck.svg'
 import verifyIcon from '@/assets/icons/verify.svg'
 import trashIcon from '@/assets/icons/trash.svg'
+import solidWhiteTrashIcon from '@/assets/icons/solidwhitetrash.svg'
 import homeIcon from '@/assets/icons/home.svg'
 import trashWhite from '@/assets/icons/trashwhite.svg'
 import editIcon from '@/assets/icons/edit.svg'
@@ -236,7 +237,15 @@ export const TrashIcon = ({ size = 24, className = '' }) => (
     className={className}
   />
 )
-
+export const TrashSolidWhiteIcon = ({ size = 24, className = '' }) => (
+  <img
+    src={solidWhiteTrashIcon}
+    alt="trash"
+    width={size}
+    height={size}
+    className={className}
+  />
+)
 export const VerifyIcon = ({ size = 24, className = '' }) => (
   <img
     src={verifyIcon}
