@@ -432,7 +432,7 @@ function IndexPage() {
   ])
 
   return (
-    <div className="mx-auto max-w-screen-2xl">
+    <div className="mx-auto ">
       <FilterBar
         options={filterOptions}
         onLoanCalculatorOpen={() => setShowLoanCalculator(true)}

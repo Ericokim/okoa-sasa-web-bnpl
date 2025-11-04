@@ -128,8 +128,8 @@ const FAQs = () => {
   return (
     <div className="bg-white mb-6 overflow-hidden relative w-full">
       {/* How It Works Section */}
-      <div className="bg-white overflow-hidden relative w-full min-h-[600px] lg:h-[600px]">
-        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-80 lg:h-96 w-full absolute left-0 top-0" />
+      <div className="bg-white overflow-x-hidden relative w-full min-h-[600px] lg:h-[600px]">
+        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-80 lg:h-96 w-screen absolute left-1/2 top-0 -translate-x-1/2" />
 
         <div className="absolute left-1/2 top-[60px] lg:top-20 -translate-x-1/2 w-full max-w-[360px] md:max-w-[650px] lg:max-w-7xl px-4 lg:px-0">
           <div className="flex flex-col gap-8 lg:gap-[60px] items-center">
