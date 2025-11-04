@@ -266,12 +266,12 @@ export default function CheckLoanLimitPage({
             className="space-y-4 sm:space-y-6"
           >
             {/* Basic Pay and Net Pay */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 mb-7 gap-4 sm:gap-[50px]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 mb-5 gap-4 sm:gap-[50px]">
               <FormField
                 control={form.control}
                 name="basicPay"
                 render={({ field, fieldState }) => (
-                  <FormItem className="relative sm:mb-5">
+                  <FormItem className="flex flex-col h-full">
                     <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                       Basic Pay
                     </FormLabel>
@@ -291,7 +291,7 @@ export default function CheckLoanLimitPage({
                         onBlur={field.onBlur}
                       />
                     </FormControl>
-                    <div className="absolute left-0 top-full mt-1 mb-2sm:">
+                    <div className="min-h-5 mt-1">
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -302,7 +302,7 @@ export default function CheckLoanLimitPage({
                 control={form.control}
                 name="netPay"
                 render={({ field, fieldState }) => (
-                  <FormItem className="relative">
+                  <FormItem className="flex flex-col h-full">
                     <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                       Net Pay
                     </FormLabel>
@@ -322,7 +322,7 @@ export default function CheckLoanLimitPage({
                         onBlur={field.onBlur}
                       />
                     </FormControl>
-                    <div className="absolute left-0 top-full mt-1 mb-1">
+                    <div className="min-h-5 mt-1">
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -407,7 +407,7 @@ export default function CheckLoanLimitPage({
               control={form.control}
               name="payslip"
               render={({ field, fieldState }) => (
-                <FormItem className="relative">
+                <FormItem className="relative mb-1">
                   <FormLabel className="block text-sm font-medium text-gray-900 mb-2">
                     Upload Latest Payslip
                   </FormLabel>
@@ -474,7 +474,7 @@ export default function CheckLoanLimitPage({
                       </label>
                     </div>
                   </FormControl>
-                  <div className="absolute left-0 top-full mt-1">
+                  <div className="absolute left-0 top-full mt-1 ">
                     <FormMessage />
                   </div>
                 </FormItem>
