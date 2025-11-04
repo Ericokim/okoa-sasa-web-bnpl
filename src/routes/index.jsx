@@ -152,6 +152,7 @@ function IndexPage() {
   const [currentPage, setCurrentPage] = useState(parsedSearch.page)
   const [loanLimit, setLoanLimit] = useState(null)
   const lastSyncedSearchRef = useRef(null)
+  const syncingFromSearchRef = useRef(false)
 
   const handleFiltersChange = useCallback((nextFilters) => {
     setActiveFilters((prev) => {
@@ -309,20 +310,37 @@ function IndexPage() {
       areFiltersEqual(last.filters, normalized.filters)
 
     if (!hasSynced) {
+      let didUpdate = false
       if (!areFiltersEqual(activeFilters, normalized.filters)) {
         setActiveFilters(normalized.filters)
+        didUpdate = true
       }
       if (sortOption !== normalized.sort) {
         setSortOption(normalized.sort)
+        didUpdate = true
       }
       if (currentPage !== normalized.page) {
         setCurrentPage(normalized.page)
+        didUpdate = true
+      }
+      if (didUpdate) {
+        syncingFromSearchRef.current = true
       }
       lastSyncedSearchRef.current = normalized
     }
   }, [parsedSearch, activeFilters, sortOption, currentPage])
 
   useEffect(() => {
+    if (syncingFromSearchRef.current) {
+      syncingFromSearchRef.current = false
+      lastSyncedSearchRef.current = {
+        page: currentPage,
+        sort: sortOption,
+        filters: activeFilters,
+      }
+      return
+    }
+
     const [minPrice, maxPrice] = activeFilters.priceRange ?? [
       filterOptions.price.min,
       filterOptions.price.max,
