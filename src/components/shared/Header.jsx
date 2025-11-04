@@ -100,8 +100,8 @@ export function Header() {
         <div className="flex items-center gap-5">
           {/* Cart */}
           <Link to="/cart" className="relative">
-            <div className="h-9 w-9.5 rounded-full flex items-center justify-center border-2 border-gray-200">
-              <HomeCartIcon className="h-5 w-5" strokeWidth={1.5} />
+            <div className="h-9 w-9 rounded-full flex items-center justify-center border-2 border-gray-200">
+              <HomeCartIcon className="h-5 w-5 items-center" strokeWidth={1.5} />
             </div>
             {cartItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
