@@ -23,7 +23,7 @@ export function Header() {
   return (
     <header className="w-full border-b border-[#E8ECF4] bg-white">
       {/* === DESKTOP HEADER === */}
-      <div className="hidden lg:flex items-center justify-between mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-5 lg:py-6">
+      <div className="hidden lg:flex items-center justify-between mx-auto px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-5 lg:py-6">
         <Link to="/" className="flex h-[40px] w-[140px] lg:h-[43px] lg:w-[158px] xl:h-[48px] xl:w-[180px] shrink-0">
           <img
             src={logo}
@@ -85,7 +85,7 @@ export function Header() {
 
     
 
-      <div className="flex lg:hidden items-center justify-between mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3">
+      <div className="flex lg:hidden items-center justify-between mx-auto px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3">
         <Link to="/" className="flex h-[35px] w-[130px] shrink-0">
           <img
             src={logo}
@@ -115,7 +115,7 @@ export function Header() {
       </div>
 
       {/* === MOBILE SEARCH BAR === */}
-      <div className="border-t border-[#E8ECF4] mx-auto max-w-screen-2xl px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3 lg:hidden">
+      <div className="border-t border-[#E8ECF4] mx-auto px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3 lg:hidden">
         <div className="flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3">
           <Search className="h-5 w-5 text-[#A0A4AC]" />
           <input
