@@ -9,17 +9,88 @@ const phoneValidation = (value) => {
   if (!value) return false
   return isValidPhoneNumber(value, 'KE')
 }
+
+const sanitizeKenyanPhoneNumber = (value = '') => {
+  if (!value) return ''
+
+  const characters = value.split('')
+  const sanitized = characters.reduce((acc, char) => {
+    if (char === '+' && acc.length === 0) {
+      acc.push(char)
+      return acc
+    }
+
+    if (/\d/.test(char)) {
+      acc.push(char)
+    }
+
+    return acc
+  }, [])
+
+  return sanitized.join('')
+}
+
+const isValidKenyanPhoneNumber = (value) => {
+  const sanitized = sanitizeKenyanPhoneNumber(value)
+
+  if (!sanitized) return false
+
+  if (sanitized.startsWith('+254')) {
+    return /^\+254\d{9}$/.test(sanitized)
+  }
+
+  if (sanitized.startsWith('0')) {
+    return /^0\d{9}$/.test(sanitized)
+  }
+
+  return false
+}
+
+export const normalizeKenyanPhoneNumber = (value = '') => {
+  const sanitized = sanitizeKenyanPhoneNumber(value)
+
+  if (!sanitized) return ''
+
+  if (sanitized.startsWith('+254')) {
+    return `+254${sanitized.slice(4, 13)}`
+  }
+
+  if (sanitized.startsWith('0')) {
+    return `+254${sanitized.slice(1, 10)}`
+  }
+
+  return sanitized
+}
+
+const sanitizeOtpValue = (value = '') =>
+  value.replace(/[^0-9]/g, '').slice(0, 6)
+
+const isValidOtp = (value = '') => /^\d{6}$/.test(value)
+
+export const normalizeOtpValue = (value = '') => sanitizeOtpValue(value)
+
+export const OTPVerificationSchema = zodResolver(
+  z.object({
+    otp: z
+      .string()
+      .min(6, { message: 'Enter the 6-digit code' })
+      .max(6, { message: 'Enter the 6-digit code' })
+      .refine(isValidOtp, {
+        message: 'OTP must only contain numbers',
+      }),
+  }),
+)
 // Export only the ready-to-use resolver
 export const LoginSchema = zodResolver(
   z.object({
     phoneNumber: z
       .string()
       .min(1, { message: 'Phone number is required' })
-      .refine(phoneValidation, { message: 'Phone number is not valid' })
-      .regex(
-        /^\+254[17]\d{8}$/,
-        'Phone number must be in format +254XXXXXXXXX',
-      ),
+      .refine(isValidKenyanPhoneNumber, {
+        message:
+          'Please enter a valid Kenyan phone number (e.g., +254XX... or 07XX... or 01XX...)',
+      })
+      .transform((value) => normalizeKenyanPhoneNumber(value)),
 
     rememberMe: z.boolean().optional(),
   }),

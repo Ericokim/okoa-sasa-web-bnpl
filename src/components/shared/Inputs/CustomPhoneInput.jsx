@@ -162,7 +162,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
           <div className="p-3 border-b bg-background sticky top-0 z-10">
             <input
               ref={searchInputRef}
-              className="w-full h-9 px-3 text-sm border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+              className="w-full h-9 px-3 text-base border border-input rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
               placeholder="Search country..."
               type="text"
               value={searchQuery}

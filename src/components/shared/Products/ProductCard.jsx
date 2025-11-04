@@ -17,7 +17,14 @@ export function ProductCard({
       <CardContent className="p-0">
         <Link to={`/products/${id}`} className="flex flex-col gap-4 group">
           <div className="relative flex items-center justify-center rounded-2xl bg-[#F9FAFB] p-7 h-[280px] group-hover:bg-gray-100 transition-colors">
-            <img src={image} alt={title} className="w-56 h-56 object-contain" />
+            <img
+              src={image}
+              srcSet={`${image} 1x, ${image} 2x`}
+              alt={title}
+              loading="lazy"
+              decoding="async"
+              className="w-56 h-56 object-contain"
+            />
             {hasCartButton && (
               <Button
                 size="icon"
