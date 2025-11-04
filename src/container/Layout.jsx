@@ -9,7 +9,7 @@ export default function Layout() {
   return (
     <div className="relative flex min-h-screen flex-col bg-background w-full">
       <Header />
-      <main className={`flex-1 w-full ${!isFaqPage ? 'px-5 md:px-6' : ''}`}>
+      <main className={`flex-1 w-full ${!isFaqPage ? 'px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12' : ''}`}>
         <Outlet />
       </main>
       <Footer />

@@ -185,14 +185,6 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
 
-          {/* <button
-            onClick={() => onOpenChange(false)}
-            className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
-          >
-            <XIcon className="h-6 w-6 text-[#09244B]" />
-            <span className="sr-only">Close</span>
-          </button> */}
-
           <div className="flex flex-col gap-2">
             <DialogPrimitive.Title className="text-2xl font-semibold leading-[140%] capitalize text-[#252525]">
               Loan Limit Calculator
@@ -309,9 +301,7 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                             min={TENURE_MIN}
                             max={TENURE_MAX}
                             step={1}
-                            aria-invalid={
-                              fieldState.error ? 'true' : undefined
-                            }
+                            aria-invalid={fieldState.error ? 'true' : undefined}
                             className={cn(
                               'w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]',
                               fieldState.error &&
