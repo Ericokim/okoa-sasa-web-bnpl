@@ -44,8 +44,8 @@ const steps = [
   },
   {
     id: 6,
-    name: 'Account Option',
-    label: 'Account Option',
+    name: 'Checkout Option',
+    label: 'Checkout Option',
     component: AccountOptionPage,
   },
 ]
