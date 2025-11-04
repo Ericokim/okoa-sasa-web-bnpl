@@ -51,13 +51,13 @@ export function Header() {
               onClick={clearSearch}
               aria-label="Clear search"
               className={cn(
-                'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-white',
+                'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all duration-200 hover:text-white',
                 searchTerm
-                  ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
+                  ? 'bg-primary text-white hover:opacity-90 hover:scale-105'
                   : 'pointer-events-none opacity-0',
               )}
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="size-4" />
             </button>
           </div>
         </div>
@@ -82,6 +82,9 @@ export function Header() {
       </div>
 
       {/* === MOBILE HEADER === */}
+
+    
+
       <div className="flex lg:hidden items-center justify-between px-4 py-3">
         <Link to="/" className="flex h-[35px] w-[130px] shrink-0">
           <img
@@ -97,7 +100,9 @@ export function Header() {
         <div className="flex items-center gap-5">
           {/* Cart */}
           <Link to="/cart" className="relative">
-            <HomeCartIcon className="h-5 w-5" strokeWidth={1.5} />
+            <div className="h-9 w-9 rounded-full flex items-center justify-center border-2 border-gray-200">
+              <HomeCartIcon className="h-5 w-5 items-center" strokeWidth={1.5} />
+            </div>
             {cartItems > 0 && (
               <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-medium">
                 {cartItems}
@@ -125,13 +130,13 @@ export function Header() {
             onClick={clearSearch}
             aria-label="Clear search"
             className={cn(
-              'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-[#EE3124]',
+              'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all duration-200 hover:text-white',
               searchTerm
-                ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
+                ? 'bg-primary text-white hover:opacity-90 hover:scale-105'
                 : 'pointer-events-none opacity-0',
             )}
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4" />
           </button>
         </div>
       </div>

@@ -15,10 +15,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogPortal } from '@/components/ui/dialog'
+import { cn } from '@/lib/utils'
 
 const TENURE_MIN = 6
 const TENURE_MAX = 24
 const DEFAULT_TENURE = 13
+const MIN_PAY_AMOUNT = 1000
+const MAX_PAY_AMOUNT = 10000000
 
 const parseCurrencyValue = (value) => {
   if (!value) return 0
@@ -35,24 +39,78 @@ const formatCurrencyInputValue = (value) => {
     : new Intl.NumberFormat('en-KE').format(numericValue)
 }
 
-const loanCalculatorSchema = z.object({
-  basicPay: z
-    .string()
-    .min(1, 'Basic pay is required')
-    .refine((value) => parseCurrencyValue(value) > 0, {
-      message: 'Basic pay must be greater than zero',
-    }),
-  netPay: z
-    .string()
-    .min(1, 'Net pay is required')
-    .refine((value) => parseCurrencyValue(value) > 0, {
-      message: 'Net pay must be greater than zero',
-    }),
-  months: z
-    .number()
-    .min(TENURE_MIN, `Minimum tenure is ${TENURE_MIN} months`)
-    .max(TENURE_MAX, `Maximum tenure is ${TENURE_MAX} months`),
-})
+const loanCalculatorSchema = z
+  .object({
+    basicPay: z
+      .string()
+      .min(1, 'Basic pay is required')
+      .refine((value) => parseCurrencyValue(value) > 0, {
+        message: 'Basic pay must be greater than zero',
+      }),
+    netPay: z
+      .string()
+      .min(1, 'Net pay is required')
+      .refine((value) => parseCurrencyValue(value) > 0, {
+        message: 'Net pay must be greater than zero',
+      }),
+    months: z
+      .number()
+      .int('Tenure must be a whole number of months')
+      .min(TENURE_MIN, `Minimum tenure is ${TENURE_MIN} months`)
+      .max(TENURE_MAX, `Maximum tenure is ${TENURE_MAX} months`),
+  })
+  .superRefine((values, ctx) => {
+    const basicPayValue = parseCurrencyValue(values.basicPay)
+    const netPayValue = parseCurrencyValue(values.netPay)
+
+    if (basicPayValue > 0 && basicPayValue < MIN_PAY_AMOUNT) {
+      ctx.addIssue({
+        path: ['basicPay'],
+        code: z.ZodIssueCode.custom,
+        message: `Basic pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
+          'en-KE',
+        )}`,
+      })
+    }
+
+    if (basicPayValue > MAX_PAY_AMOUNT) {
+      ctx.addIssue({
+        path: ['basicPay'],
+        code: z.ZodIssueCode.custom,
+        message: `Basic pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
+          'en-KE',
+        )}`,
+      })
+    }
+
+    if (netPayValue > 0 && netPayValue < MIN_PAY_AMOUNT) {
+      ctx.addIssue({
+        path: ['netPay'],
+        code: z.ZodIssueCode.custom,
+        message: `Net pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
+          'en-KE',
+        )}`,
+      })
+    }
+
+    if (netPayValue > MAX_PAY_AMOUNT) {
+      ctx.addIssue({
+        path: ['netPay'],
+        code: z.ZodIssueCode.custom,
+        message: `Net pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
+          'en-KE',
+        )}`,
+      })
+    }
+
+    if (basicPayValue > 0 && netPayValue > basicPayValue) {
+      ctx.addIssue({
+        path: ['netPay'],
+        code: z.ZodIssueCode.custom,
+        message: 'Net pay cannot exceed basic pay',
+      })
+    }
+  })
 
 export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   const form = useForm({
@@ -115,8 +173,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   }, [open, reset])
 
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
-      <DialogPrimitive.Portal>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogPortal>
         <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-[#252525]/20 backdrop-blur-[4px]" />
         <DialogPrimitive.Content className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[500px] translate-x-[-50%] translate-y-[-50%] gap-6 rounded-3xl border bg-white px-[30px] pb-[34px] pt-8 shadow-lg duration-200">
           <DialogPrimitive.Close
@@ -150,8 +208,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 <FormField
                   control={form.control}
                   name="basicPay"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col gap-2.5">
+                  render={({ field, fieldState }) => (
+                    <FormItem className="flex flex-1 flex-col">
                       <FormLabel className="text-base font-normal leading-[140%] capitalize text-[#252525]">
                         Basic Pay
                       </FormLabel>
@@ -162,15 +220,23 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                           value={field.value ?? ''}
                           onChange={(event) =>
                             handleInputChange(
-                              event.target.value,
+                              event.target.value ?? '',
                               field.onChange,
                             )
                           }
                           onBlur={field.onBlur}
-                          className="rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] px-4 py-3 text-sm leading-[140%] placeholder:text-[#A0A4AC] focus-visible:ring-0 focus-visible:ring-offset-0"
+                          fieldState={fieldState}
+                          className={cn(
+                            'h-10 rounded-xl bg-[#F9FAFB] px-4 py-3 text-sm leading-[140%] placeholder:text-[#A0A4AC] focus-visible:ring-0 focus-visible:ring-offset-0',
+                            fieldState.error
+                              ? 'border-destructive'
+                              : 'border-[#E8ECF4]',
+                          )}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="min-h-5 mt-1">
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -178,8 +244,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 <FormField
                   control={form.control}
                   name="netPay"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col gap-2.5">
+                  render={({ field, fieldState }) => (
+                    <FormItem className="flex flex-1 flex-col">
                       <FormLabel className="text-base font-normal leading-[140%] capitalize text-[#252525]">
                         Net Pay
                       </FormLabel>
@@ -190,15 +256,23 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                           value={field.value ?? ''}
                           onChange={(event) =>
                             handleInputChange(
-                              event.target.value,
+                              event.target.value ?? '',
                               field.onChange,
                             )
                           }
                           onBlur={field.onBlur}
-                          className="rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] px-4 py-3 text-sm leading-[140%] placeholder:text-[#A0A4AC] focus-visible:ring-0 focus-visible:ring-offset-0"
+                          fieldState={fieldState}
+                          className={cn(
+                            'h-10 rounded-xl bg-[#F9FAFB] px-4 py-3 text-sm leading-[140%] placeholder:text-[#A0A4AC] focus-visible:ring-0 focus-visible:ring-offset-0',
+                            fieldState.error
+                              ? 'border-destructive'
+                              : 'border-[#E8ECF4]',
+                          )}
                         />
                       </FormControl>
-                      <FormMessage />
+                      <div className="min-h-5 mt-1">
+                        <FormMessage />
+                      </div>
                     </FormItem>
                   )}
                 />
@@ -207,8 +281,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
               <FormField
                 control={form.control}
                 name="months"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col gap-3">
+                render={({ field, fieldState }) => (
+                  <FormItem className="relative flex flex-col gap-3">
                     {/* Centered month badge with Loan Tenure label */}
                     <div className="flex items-center justify-between mb-4">
                       <p className="text-base font-medium text-gray-900">
@@ -235,7 +309,14 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                             min={TENURE_MIN}
                             max={TENURE_MAX}
                             step={1}
-                            className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
+                            aria-invalid={
+                              fieldState.error ? 'true' : undefined
+                            }
+                            className={cn(
+                              'w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]',
+                              fieldState.error &&
+                                '[&_[data-slot=slider-track]]:border-destructive [&_[data-slot=slider-thumb]]:border-destructive [&_[data-slot=slider-thumb]]:ring-destructive/20',
+                            )}
                           />
                         </div>
                         <span className="text-base font-normal leading-[140%] capitalize text-[#252525]">
@@ -243,7 +324,9 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                         </span>
                       </div>
                     </FormControl>
-                    <FormMessage />
+                    <div className="mt-1 min-h-5">
+                      <FormMessage />
+                    </div>
                   </FormItem>
                 )}
               />
@@ -277,14 +360,14 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                   disabled={loanAmount <= 0}
                   className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Proceed to device
+                  Proceed to devices
                 </Button>
               </div>
             </form>
           </Form>
         </DialogPrimitive.Content>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+      </DialogPortal>
+    </Dialog>
   )
 }
 

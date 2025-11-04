@@ -1,130 +1,155 @@
 import { useState } from 'react'
 import { Box, ChevronDown, ChevronUp, List, User } from 'lucide-react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useStateContext } from '@/context/state-context'
 import { useAccountStore } from '@/data/accountStore'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { Button } from '@/components/ui/button'
-import { BoxWhiteIcon, ProfileIcon, LogoutIcon,FileIcon, TruckIcon, XIcon } from '@/assets/icons'
+import { BoxWhiteIcon, ProfileIcon, LogoutIcon, ListIcon } from '@/assets/icons'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Sheet, SheetClose, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import logo from '@/assets/images/primaryLogoHorizontal.png'
 import { X } from 'lucide-react'
-const MobileSeparatedMenuItems = ({ onLogout }) => (
-  <>
-    {/* Order History */}
-    <SheetClose asChild>
+import { cn } from '@/lib/utils'
+
+const MobileSeparatedMenuItems = ({ onLogout }) => {
+  const router = useRouterState()
+  const currentPath = router.location.pathname
+
+  const listItems = [
+    { path: '/orders', label: 'Order History', icon: BoxWhiteIcon },
+    { path: '/profile', label: 'My Account', icon: ProfileIcon },
+    { path: '/order_table', label: 'All Orders', icon: ListIcon },
+  ]
+
+  const isActivePath = (path) =>
+    currentPath === path || currentPath.startsWith(`${path}/`)
+
+  return (
+    <>
+      {listItems.map(({ path, label, icon: Icon }, index) => {
+        const isActive = isActivePath(path)
+        const isFirst = index === 0
+
+        return (
+          <div key={path} className={cn('flex flex-col', isFirst && '-mt-4')}>
+            {/* Separator only between items (not above first, not below last) */}
+            {index > 0 && <Separator className="bg-gray-200 my-1 " />}
+
+            <SheetClose asChild>
+              <Link
+                to={path}
+                className={cn(
+                  'group flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] rounded-lg transition-colors duration-150 h-auto justify-start',
+                  isActive
+                    ? 'bg-orange-50 text-orange-600'
+                    : 'text-[#252525] hover:bg-orange-50 hover:text-orange-600',
+                )}
+              >
+                <Icon
+                  className={cn(
+                    'h-5 w-5 flex-shrink-0 transition-colors duration-150',
+                    isActive
+                      ? 'text-orange-600'
+                      : 'text-[#252525] group-hover:text-orange-600',
+                  )}
+                />
+                <span className="truncate">{label}</span>
+              </Link>
+            </SheetClose>
+          </div>
+        )
+      })}
+
+      {/* Separator before Log Out */}
+      <Separator className="bg-gray-200 my-1 " />
+
+      {/* Log Out */}
       <Button
-        asChild
+        onClick={onLogout}
         variant="ghost"
-        className="-mt-4 flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] text-[#252525] hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors h-auto justify-start"
+        className={cn(
+          'group mt-4 flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-150 h-auto justify-start',
+        )}
       >
-        <Link to="/orders">
-          <BoxWhiteIcon className="h-5 w-5 text-[#252525]" />
-          Order History
-        </Link>
+        <LogoutIcon className="h-5 w-5 group-hover:scale-105 transition-transform" />
+        <span>Log Out</span>
       </Button>
-    </SheetClose>
-    <Separator className="bg-gray-200" />
+    </>
+  )
+}
 
-    {/* My Account */}
-    <SheetClose asChild>
+export const MenuItems = ({ onLogout, onNavigate }) => {
+  const router = useRouterState()
+  const currentPath = router.location.pathname
+
+  const listItems = [
+    { path: '/orders', label: 'Order History', icon: BoxWhiteIcon },
+    { path: '/profile', label: 'My Account', icon: ProfileIcon },
+    { path: '/order_table', label: 'All Orders', icon: ListIcon },
+  ]
+
+  const isActivePath = (path) =>
+    currentPath === path || currentPath.startsWith(`${path}/`)
+
+  return (
+    <nav className="flex flex-col w-full gap-1">
+      {listItems.map(({ path, label, icon: Icon }) => {
+        const isActive = isActivePath(path)
+        return (
+          <Link
+            key={path}
+            to={path}
+            onClick={onNavigate}
+            className={cn(
+              'group flex w-full items-center gap-2 px-3 py-2 rounded-lg font-sans text-base font-medium leading-[140%] transition-colors duration-150 h-auto justify-start',
+              isActive
+                ? 'bg-orange-50 text-orange-600'
+                : 'text-black hover:bg-orange-50 hover:text-orange-600',
+            )}
+          >
+            <Icon
+              className={cn(
+                'h-5 w-5 flex-shrink-0 transition-colors duration-150',
+                isActive
+                  ? 'text-orange-600'
+                  : 'text-black group-hover:text-orange-600',
+              )}
+            />
+            <span className="truncate">{label}</span>
+          </Link>
+        )
+      })}
+
+      <DropdownMenuSeparator className="my-2" />
+
       <Button
-        asChild
+        onClick={onLogout}
         variant="ghost"
-        className="flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] text-[#252525] hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors h-auto justify-start"
+        className={cn(
+          'group flex w-full items-center gap-2 px-3 py-2 rounded-lg font-sans text-base font-medium leading-[140%] transition-colors duration-150 h-auto justify-start mt-2',
+          'text-red-600 hover:bg-red-50 active:scale-[0.98]',
+        )}
       >
-        <Link to="/profile">
-          <ProfileIcon className="h-5 w-5 text-[#252525]" />
-          My Account
-        </Link>
+        <LogoutIcon className="h-5 w-5 group-hover:scale-105 transition-transform" />
+        <span>Log Out</span>
       </Button>
-    </SheetClose>
-    <Separator className="bg-gray-200" />
-
-    {/* All Orders */}
-    <SheetClose asChild>
-      <Button
-        asChild
-        variant="ghost"
-        className="ml-1 flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] text-[#252525] hover:bg-orange-50 hover:text-orange-600 rounded-lg transition-colors h-auto justify-start"
-      >
-        <Link to="/order_table">
-          <List className="h-5 w-5 text-[#252525]" />
-          All Orders
-        </Link>
-      </Button>
-    </SheetClose>
-    <Separator className="bg-gray-200" />
-
-    {/* Log Out */}
-    <Button
-      onClick={onLogout}
-      variant="ghost"
-      className="mt-4 flex w-full items-center gap-3 px-4 py-2 font-sans text-base font-medium leading-[140%] text-red-600 hover:bg-red-50 rounded-lg transition-colors h-auto justify-start"
-    >
-      <LogoutIcon className="h-5 w-5" />
-      Log Out
-    </Button>
-  </>
-)
-
-
-const MenuItems = ({ onLogout }) => (
-  <>
-    <Button
-      asChild
-      variant="ghost"
-      className="flex w-full items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
-    >
-      <Link to="/orders">
-        <BoxWhiteIcon className="h-5 w-5 text-black" />
-        Order History
-      </Link>
-    </Button>
-
-    <Button
-      asChild
-      variant="ghost"
-      className="flex w-full items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
-    >
-      <Link to="/profile">
-        <ProfileIcon className="h-5 w-5 text-black" />
-        My Account
-      </Link>
-    </Button>
-
-    <Button
-      asChild
-      variant="ghost"
-      className="flex w-full items-center gap-2 px-2 py-2 font-sans text-md font-medium leading-[140%] text-black hover:bg-orange-50 hover:text-orange-600 rounded-lg cursor-pointer transition-colors h-auto justify-start"
-    >
-      <Link to="/order_table">
-        <List className="h-5 w-5 text-black" />
-        All Orders
-      </Link>
-    </Button>
-
-    <DropdownMenuSeparator className="my-1" />
-
-    <Button
-      onClick={onLogout}
-      variant="ghost"
-      className="flex w-full items-center gap-2 px-2 py-2 text-md text-red-600 hover:bg-red-50 rounded-lg cursor-pointer  font-medium h-auto justify-start mt-4"
-    >
-      <LogoutIcon className="h-6 w-6" />
-      Log Out
-    </Button>
-  </>
-)
-
+    </nav>
+  )
+}
 
 const MobileSheet = ({ trigger, onLogout }) => {
   const { personalInfo } = useAccountStore()
@@ -133,10 +158,9 @@ const MobileSheet = ({ trigger, onLogout }) => {
     <Sheet>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
 
-      <SheetContent 
-        side="right" 
+      <SheetContent
+        side="right"
         className="w-[300px] p-0 bg-white flex flex-col"
-        // ADD THIS LINE to hide the default close button
         hideCloseButton
       >
         {/* Your Custom Close Button */}
@@ -172,7 +196,8 @@ const MobileSheet = ({ trigger, onLogout }) => {
               className="w-full h-full object-cover"
             />
             <AvatarFallback className="bg-brand-bg-2 text-sm font-medium">
-              {personalInfo.firstName?.[0]}{personalInfo.lastName?.[0]}
+              {personalInfo.firstName?.[0]}
+              {personalInfo.lastName?.[0]}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -194,7 +219,6 @@ const MobileSheet = ({ trigger, onLogout }) => {
     </Sheet>
   )
 }
-
 
 export function UserDropdown({ isMobile = false }) {
   const [showAuthDialog, setShowAuthDialog] = useState(false)

@@ -4,11 +4,69 @@ import { twMerge } from 'tailwind-merge'
 import { EncryptStorage } from 'encrypt-storage'
 import { parsePhoneNumber } from 'libphonenumber-js/min'
 
-let encryptStorage = new EncryptStorage(`SJKXSAJJ898NMSNxs89SJs9snOXNS8}`, {
-  prefix: '@',
-  encAlgorithm: 'Rabbit', //'AES' | 'Rabbit' | 'RC4' | 'RC4Drop';
-  doNotEncryptValues: false,
-})
+const isBrowser = typeof window !== 'undefined'
+
+const createMemoryStorage = () => {
+  const store = new Map()
+  return {
+    getItem: (key) => (store.has(key) ? store.get(key) : null),
+    setItem: (key, value) => {
+      store.set(key, String(value))
+    },
+    removeItem: (key) => {
+      store.delete(key)
+    },
+    clear: () => {
+      store.clear()
+    },
+  }
+}
+
+const resolveLocalStorage = () => {
+  if (!isBrowser) return null
+
+  try {
+    const storage = window.localStorage
+    const testKey = '__storage_test__'
+    storage.setItem(testKey, testKey)
+    storage.removeItem(testKey)
+    return storage
+  } catch (_error) {
+    return null
+  }
+}
+
+const browserLocalStorage = resolveLocalStorage()
+
+export const safeLocalStorage = browserLocalStorage ?? createMemoryStorage()
+
+const createMemoryEncryptStorage = () => {
+  const storage = createMemoryStorage()
+  return {
+    setItem: storage.setItem,
+    getItem: storage.getItem,
+    removeItem: storage.removeItem,
+    clear: storage.clear,
+  }
+}
+
+const resolveEncryptStorage = () => {
+  if (!browserLocalStorage) {
+    return createMemoryEncryptStorage()
+  }
+
+  try {
+    return new EncryptStorage(`SJKXSAJJ898NMSNxs89SJs9snOXNS8}`, {
+      prefix: '@',
+      encAlgorithm: 'Rabbit',
+      doNotEncryptValues: false,
+    })
+  } catch (_error) {
+    return createMemoryEncryptStorage()
+  }
+}
+
+const encryptStorage = resolveEncryptStorage()
 export function cn(...inputs) {
   return twMerge(clsx(inputs))
 }
@@ -29,25 +87,42 @@ export const clearStorageData = () => {
 
   // Save items to preserve
   preserveKeys.forEach((key) => {
-    const value = localStorage.getItem(key)
-    if (value) {
-      preserved[key] = value
+    try {
+      const value = safeLocalStorage.getItem(key)
+      if (value !== null && value !== undefined) {
+        preserved[key] = value
+      }
+    } catch {
+      // Swallow storage errors to avoid crashing the app
     }
   })
 
   // Clear only specific auth-related keys instead of clearing everything
   const authKeys = ['userInfo', 'token', 'name']
   authKeys.forEach((key) => {
-    encryptStorage.removeItem(key)
+    try {
+      encryptStorage.removeItem?.(key)
+    } catch {
+      // ignore
+    }
   })
 
   // Clear encrypted storage
-  encryptStorage.clear()
+  try {
+    encryptStorage.clear?.()
+  } catch {
+    // ignore
+  }
 
   // Ensure theme is still there (redundant safety check)
   Object.entries(preserved).forEach(([key, value]) => {
-    if (!localStorage.getItem(key)) {
-      localStorage.setItem(key, value)
+    try {
+      const existing = safeLocalStorage.getItem(key)
+      if (existing === null || existing === undefined) {
+        safeLocalStorage.setItem(key, value)
+      }
+    } catch {
+      // ignore
     }
   })
 }

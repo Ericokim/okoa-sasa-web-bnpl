@@ -16,7 +16,12 @@ import { cn } from '@/lib/utils'
 import { PhoneIcon, XIcon } from 'lucide-react'
 import logo from '@/assets/images/primaryLogoVertical.png'
 
-export function AuthDialog({ open, onOpenChange, initialStep = 'login',onLoginSuccess  }) {
+export function AuthDialog({
+  open,
+  onOpenChange,
+  initialStep = 'login',
+  onLoginSuccess,
+}) {
   const [step, setStep] = useState(initialStep)
   const [phoneNumber, setPhoneNumber] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
@@ -55,22 +60,22 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login',onLoginSu
     }
   }
 
- const handleVerifyOTP = (e) => {
-  e.preventDefault()
-  if (otp.length === 6) {
-    login({
-      phoneNumber,
-      name: 'User',
-    })
-    onOpenChange(false)
-    
-    if (onLoginSuccess) {
-      onLoginSuccess()
-    } else {
-      navigate({ to: '/' })
+  const handleVerifyOTP = (e) => {
+    e.preventDefault()
+    if (otp.length === 6) {
+      login({
+        phoneNumber,
+        name: 'User',
+      })
+      onOpenChange(false)
+
+      if (onLoginSuccess) {
+        onLoginSuccess()
+      } else {
+        navigate({ to: '/' })
+      }
     }
   }
-}
 
   const handleResendOTP = () => {
     setIsResending(true)
@@ -86,20 +91,22 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login',onLoginSu
         <DialogPrimitive.Content
           className={cn(
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-            'fixed top-[50%] left-[50%] z-50 grid w-full translate-x-[-50%] translate-y-[-50%] gap-6 duration-200',
-            'rounded-3xl border-0 bg-white p-0 shadow-lg',
-            'w-[90vw] max-w-[335px]',
-            'md:w-[500px] md:max-w-[500px]',
-            step === 'otp' ? 'min-h-[600px]' : 'min-h-[500px]',
-            'md:min-h-0 md:h-auto',
+            'fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] duration-200',
+            'w-[90vw] max-w-[350px] max-h-[85vh] overflow-y-auto',
+            'sm:w-[85vw] sm:max-w-[400px] sm:max-h-[80vh]',
+            'md:max-w-[500px] md:max-h-[75vh]',
+            'rounded-3xl border-0 bg-white shadow-lg',
           )}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
         >
-          <div className="relative w-full p-5 md:p-[30px] flex flex-col items-center gap-6">
+          <div className="relative w-full p-4 sm:p-6 md:p-8 pb-6 sm:pb-8 md:pb-10 flex flex-col items-center gap-4 sm:gap-6">
             <button
               onClick={() => onOpenChange(false)}
+              //   className="absolute right-4 sm:right-6 md:right-8 top-4 sm:top-6 md:top-8 flex h-8 w-8 items-center justify-center rounded-sm bg-[#F9FAFB] border border-[#E8ECF4] text-[#676D75] transition-all duration-200 hover:bg-[#F1F5F9] hover:text-[#F47120] hover:border-[#F47120] focus:outline-none focus:ring-2 focus:ring-[#F47120]/20 z-10"
               className="absolute right-5 md:right-[30px] top-5 md:top-[30px] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-10"
             >
-              <XIcon className="h-6 w-6 text-[#09244B]" />
+              <XIcon className="h-5 w-5" />
               <span className="sr-only">Close</span>
             </button>
 
@@ -110,7 +117,7 @@ export function AuthDialog({ open, onOpenChange, initialStep = 'login',onLoginSu
                 alt="Okoa Sasa Logo"
                 loading="lazy"
                 decoding="async"
-                className="w-[202px] h-[184px] object-contain"
+                className="w-[150px] h-[136px] sm:w-[180px] sm:h-[164px] md:w-[202px] md:h-[184px] object-contain"
               />
 
               {step === 'login' ? (
@@ -176,7 +183,8 @@ function LoginStep({
               placeholder="+254"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#4d4d4e] text-sm font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC]"
+              className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#4d4d4e] text-base font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC] focus:outline-none focus:ring-2 focus:ring-[#F47120]/20 focus:border-[#F47120]"
+              autoComplete="tel"
             />
           </div>
         </div>
@@ -237,18 +245,19 @@ function OTPStep({
             maxLength={6}
             value={otp}
             onChange={(value) => setOtp(value)}
-            className="w-full"
+            className="w-full max-w-none"
           >
-            <InputOTPGroup className="w-full justify-center gap-[6px] md:gap-[9px] flex-wrap">
+            <InputOTPGroup className="w-full justify-between gap-1 sm:gap-2 md:gap-3 flex-nowrap">
               {[0, 1, 2, 3, 4, 5].map((index) => (
                 <InputOTPSlot
                   key={index}
                   index={index}
                   className={cn(
-                    'flex h-[48px] w-10 md:h-[50px] md:w-[60px] items-center justify-center rounded-[12px]',
+                    'flex h-[48px] w-10 sm:w-10 md:h-[50px] md:w-[60px] items-center justify-center rounded-[12px] sm:rounded-[10px] md:rounded-[12px]',
                     'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                    'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#252525]',
-                    'placeholder:text-[#A0A4AC] transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20',
+                    'flex-1 max-w-[44px] sm:max-w-[48px] md:max-w-none',
+                    'border border-[#E8ECF4] bg-[#F9FAFB] text-sm sm:text-base md:text-lg font-medium leading-[1.4] font-["Public_Sans"] text-[#252525]',
+                    'placeholder:text-[#A0A4AC] transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:outline-none',
                   )}
                 />
               ))}
