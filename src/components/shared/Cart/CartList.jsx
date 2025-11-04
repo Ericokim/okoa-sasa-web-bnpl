@@ -4,7 +4,7 @@ import { ShoppingCart } from 'lucide-react'
 export function CartList({ items = [], onQuantityChange, onRemove }) {
   if (!items || items.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl border border-[#E8ECF4] p-12 md:p-24">
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 rounded-2xl border border-[#E8ECF4] p-12 md:p-24 w-full">
         <div className="flex flex-col items-center gap-4">
           <ShoppingCart className="h-16 w-16 text-[#A0A4AC] md:h-24 md:w-24" strokeWidth={1.5} />
           <div className="flex flex-col items-center gap-2">
@@ -21,7 +21,7 @@ export function CartList({ items = [], onQuantityChange, onRemove }) {
   }
 
   return (
-    <div className=" w-full flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
+    <div className="w-full flex flex-1 flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6">
       {/* Table Header - Desktop Only */}
       <div className="hidden w-full lg:grid lg:grid-cols-[401px_176px_1fr_auto] lg:items-start lg:gap-4">
         <div className="text-[20px] font-semibold leading-[1.4] text-black">Item</div>

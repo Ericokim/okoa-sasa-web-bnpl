@@ -226,6 +226,12 @@ code {
 }
 
 @layer base {
+  @supports (-webkit-touch-callout: none) {
+    :where(input, textarea, select) {
+      font-size: 16px !important;
+    }
+  }
+
   * {
     @apply border-border outline-ring/50;
   }

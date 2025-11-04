@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { X } from 'lucide-react'
 import {
   Popover,
@@ -18,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { ChevronDown, ChevronUp, List, User } from 'lucide-react'
 import { Slider } from '@/components/ui/slider'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link, useLocation } from '@tanstack/react-router'
@@ -51,7 +43,7 @@ const FILTER_CATEGORIES = [
   'ram',
 ]
 
-const MAX_VISIBLE_CHIPS = 5
+const MAX_VISIBLE_CHIPS = 3
 
 const FilterIcon = () => (
   <svg
@@ -206,7 +198,7 @@ const FilterSection = ({ title, children, isOpen, onToggle }) => (
 const FilterCheckboxItem = ({ label, checked, onChange }) => (
   <button
     onClick={() => onChange(!checked)}
-    className="cursor-pointer flex items-center justify-center gap-2 self-stretch rounded-lg px-2 py-1"
+    className="cursor-pointer flex items-center justify-center gap-2 self-stretch rounded-lg px-2 py-1 "
   >
     {checked ? <CheckedCheckboxIcon /> : <UncheckedCheckboxIcon />}
     <span className="flex-1 text-left font-['Public_Sans'] text-sm font-medium leading-[140%] text-[#252525]">
@@ -421,9 +413,6 @@ export function FilterBar({
     ram: true,
     brand: true,
   })
-  const scrollAreaContainerRef = useRef(null)
-  const applyButtonWrapperRef = useRef(null)
-  const [applyButtonOffset, setApplyButtonOffset] = useState(null)
   const location = useLocation()
   const pathname = location?.pathname ?? ''
   const isFaqRouteActive = pathname.toLowerCase().startsWith('/faqs')
@@ -448,76 +437,6 @@ export function FilterBar({
         : validInitialSort
     setSortSelection(nextSort)
   }, [validInitialSort, selectedSort])
-
-  useLayoutEffect(() => {
-    if (!isFiltersOpen) {
-      setApplyButtonOffset(null)
-      return
-    }
-
-    const container =
-      scrollAreaContainerRef.current?.querySelector(
-        '[data-slot="scroll-area-viewport"]',
-      ) ?? scrollAreaContainerRef.current
-    const buttonEl = applyButtonWrapperRef.current
-
-    if (!container || !buttonEl) {
-      return
-    }
-
-    let frameId = null
-
-    const updateOffset = () => {
-      frameId = null
-      if (!container || !buttonEl) return
-      const containerRect = container.getBoundingClientRect()
-      const buttonRect = buttonEl.getBoundingClientRect()
-      const offset = buttonRect.top - containerRect.top
-      const maxOffset = Math.max(0, containerRect.height - buttonRect.height)
-      const clampedOffset = Math.min(Math.max(offset, 0), maxOffset)
-      setApplyButtonOffset(clampedOffset)
-    }
-
-    const scheduleUpdate = () => {
-      if (frameId !== null) return
-      frameId = requestAnimationFrame(updateOffset)
-    }
-
-    updateOffset()
-    scheduleUpdate()
-
-    const resizeObserver =
-      typeof ResizeObserver !== 'undefined'
-        ? new ResizeObserver(() => scheduleUpdate())
-        : null
-    if (resizeObserver) {
-      resizeObserver.observe(container)
-      resizeObserver.observe(buttonEl)
-    }
-
-    const mutationObserver =
-      typeof MutationObserver !== 'undefined'
-        ? new MutationObserver(() => scheduleUpdate())
-        : null
-    if (mutationObserver) {
-      mutationObserver.observe(container, {
-        attributes: true,
-        childList: true,
-        subtree: true,
-      })
-    }
-
-    window.addEventListener('resize', scheduleUpdate)
-
-    return () => {
-      if (frameId !== null) {
-        cancelAnimationFrame(frameId)
-      }
-      window.removeEventListener('resize', scheduleUpdate)
-      resizeObserver?.disconnect()
-      mutationObserver?.disconnect()
-    }
-  }, [isFiltersOpen])
 
   const handleApplyFilters = useCallback(() => {
     const minBound = normalizedOptions.price.min
@@ -805,180 +724,160 @@ export function FilterBar({
             className="w-[300px] rounded-2xl border-none bg-white p-0 shadow-[0_4px_24px_0_rgba(37,37,37,0.08)]"
           >
             <div className="flex h-full flex-col">
+              {/* Header */}
               <div className="flex items-center justify-between px-4 pt-4 pb-3">
                 <span className="font-['Public_Sans'] text-base font-medium leading-[140%] text-black">
                   Filters
                 </span>
-                <Button
-                  type="button"
+                <button
                   onClick={handleClearAll}
-                  variant="ghost"
-                  className="h-9 rounded-3xl border border-[#F7B896] bg-[#FFF4EE] px-4 text-sm font-medium text-[#EE3124] shadow-none transition-colors hover:bg-[#FFE3D6]"
+                  className="cursor-pointer rounded-3xl border border-transparent px-3 py-1 text-sm font-medium leading-[140%] text-[#F25E5E] transition-colors hover:bg-[#FFF4EE]"
                 >
-                  Clear All
-                </Button>
+                  Clear
+                </button>
               </div>
-              <div ref={scrollAreaContainerRef}>
-                <ScrollArea className="h-[60vh] w-full">
-                  <div className="flex flex-col gap-4 px-4 pb-4">
-                    <FilterSection
-                      title="Price"
-                      isOpen={openSections.price}
-                      onToggle={() => toggleSection('price')}
-                    >
-                      <div className="flex flex-col items-start gap-3 self-stretch">
-                        <Slider
-                          value={filters.priceRange}
-                          min={normalizedOptions.price.min}
-                          max={normalizedOptions.price.max}
-                          step={1000}
-                          onValueChange={handlePriceRangeChange}
-                          className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
-                        />
 
-                        <div className="flex items-start gap-2 self-stretch">
-                          <div className="flex flex-1 items-center justify-center">
-                            <input
-                              type="text"
-                              value={filters.priceMin}
-                              onChange={(event) =>
-                                handlePriceInputChange(
-                                  'priceMin',
-                                  event.target.value,
-                                )
-                              }
-                              // className={cn(
-                              //   "flex items-center rounded-[12px] justify-center h-8 w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#252525] placeholder:text-[#A0A4AC] outline-none ",
-                              //   'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
-                              //   'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                              //   'border border-[#E8ECF4] bg-[#F9FAFB] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#A0A4AC]',
-                              // )}
-                              className={cn(
-                                'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
-                                'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                                'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
-                                'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
-                              )}
-                              placeholder="Min"
-                            />
-                          </div>
-                          <div className="flex flex-1 items-center justify-center rounded-lg">
-                            <input
-                              type="text"
-                              value={filters.priceMax}
-                              onChange={(event) =>
-                                handlePriceInputChange(
-                                  'priceMax',
-                                  event.target.value,
-                                )
-                              }
-                              //  className="w-full font-['Public_Sans'] text-sm font-normal leading-[140%] text-[#252525] placeholder:text-[#A0A4AC] outline-none"
+              {/* Scrollable Content */}
+              <ScrollArea className="h-[calc(60vh-72px)] w-full">
+                <div className="flex flex-col gap-4 px-4 pb-4">
+                  {/* Price Section */}
+                  <FilterSection
+                    title="Price"
+                    isOpen={openSections.price}
+                    onToggle={() => toggleSection('price')}
+                  >
+                    <div className="flex flex-col items-start gap-3 self-stretch">
+                      <Slider
+                        value={filters.priceRange}
+                        min={normalizedOptions.price.min}
+                        max={normalizedOptions.price.max}
+                        step={1000}
+                        onValueChange={handlePriceRangeChange}
+                        className="w-full [&_[data-slot=slider-track]]:h-3.5 [&_[data-slot=slider-track]]:rounded-full [&_[data-slot=slider-track]]:border [&_[data-slot=slider-track]]:border-black/[0.06] [&_[data-slot=slider-track]]:bg-[#F5F5F5] [&_[data-slot=slider-range]]:bg-gradient-to-b [&_[data-slot=slider-range]]:from-[#F8971D] [&_[data-slot=slider-range]]:to-[#EE3124] [&_[data-slot=slider-thumb]]:size-5 [&_[data-slot=slider-thumb]]:border [&_[data-slot=slider-thumb]]:border-black/15 [&_[data-slot=slider-thumb]]:bg-white [&_[data-slot=slider-thumb]]:shadow-[0_6px_14px_0_rgba(0,0,0,0.15)]"
+                      />
 
-                              className={cn(
-                                'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
-                                'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                                'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
-                                'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
-                              )}
-                              placeholder="Max"
-                            />
-                          </div>
+                      <div className="flex items-start gap-2 self-stretch">
+                        <div className="flex flex-1 items-center justify-center">
+                          <input
+                            type="text"
+                            value={filters.priceMin}
+                            onChange={(event) =>
+                              handlePriceInputChange(
+                                'priceMin',
+                                event.target.value,
+                              )
+                            }
+                            className={cn(
+                              'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
+                              'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                              'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
+                              'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                            )}
+                            placeholder="Min"
+                          />
                         </div>
-
-                        <div
-                          ref={applyButtonWrapperRef}
-                          className="sticky z-10 w-full bg-white"
-                          style={{ top: `${applyButtonOffset ?? 0}px` }}
-                        >
-                          <Button
-                            onClick={handleApplyFilters}
-                            variant="default"
-                            className="font-['Public_Sans'] rounded-3xl px-4 py-0 w-full text-base h-8 font-medium leading-[140%]"
-                          >
-                            Apply
-                          </Button>
+                        <div className="flex flex-1 items-center justify-center rounded-lg">
+                          <input
+                            type="text"
+                            value={filters.priceMax}
+                            onChange={(event) =>
+                              handlePriceInputChange(
+                                'priceMax',
+                                event.target.value,
+                              )
+                            }
+                            className={cn(
+                              'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
+                              'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
+                              'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
+                              'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
+                            )}
+                            placeholder="Max"
+                          />
                         </div>
-
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
                       </div>
-                    </FilterSection>
 
-                    <FilterSection
-                      title="Color"
-                      isOpen={openSections.color}
-                      onToggle={() => toggleSection('color')}
-                    >
-                      <div
-                        id="color-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(normalizedOptions.color, 'color').map(
-                          (color) => (
-                            <FilterCheckboxItem
-                              key={color}
-                              label={color}
-                              checked={filters.color[color]}
-                              onChange={(checked) =>
-                                handleCheckboxToggle('color', color, checked)
-                              }
-                            />
-                          ),
-                        )}
-                        <ShowMoreButton
-                          category="color"
-                          isExpanded={expandedCategories.color}
-                          totalCount={normalizedOptions.color.length}
-                          onToggle={() => toggleCategoryExpansion('color')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Storage Capacity"
-                      isOpen={openSections.storage}
-                      onToggle={() => toggleSection('storage')}
+                  {/* Color Section */}
+                  <FilterSection
+                    title="Color"
+                    isOpen={openSections.color}
+                    onToggle={() => toggleSection('color')}
+                  >
+                    <div
+                      id="color-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div
-                        id="storage-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(
-                          normalizedOptions.storage,
-                          'storage',
-                        ).map((storage) => (
+                      {getVisibleItems(normalizedOptions.color, 'color').map(
+                        (color) => (
                           <FilterCheckboxItem
-                            key={storage}
-                            label={storage}
-                            checked={filters.storage[storage]}
+                            key={color}
+                            label={color}
+                            checked={filters.color[color]}
                             onChange={(checked) =>
-                              handleCheckboxToggle('storage', storage, checked)
+                              handleCheckboxToggle('color', color, checked)
                             }
                           />
-                        ))}
-                        <ShowMoreButton
-                          category="storage"
-                          isExpanded={expandedCategories.storage}
-                          totalCount={normalizedOptions.storage.length}
-                          onToggle={() => toggleCategoryExpansion('storage')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="color"
+                        isExpanded={expandedCategories.color}
+                        totalCount={normalizedOptions.color.length}
+                        onToggle={() => toggleCategoryExpansion('color')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Camera Megapixel"
-                      isOpen={openSections.camera}
-                      onToggle={() => toggleSection('camera')}
+                  {/* Storage Section */}
+                  <FilterSection
+                    title="Storage Capacity"
+                    isOpen={openSections.storage}
+                    onToggle={() => toggleSection('storage')}
+                  >
+                    <div
+                      id="storage-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div
-                        id="camera-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(
-                          normalizedOptions.camera,
-                          'camera',
-                        ).map((camera) => (
+                      {getVisibleItems(
+                        normalizedOptions.storage,
+                        'storage',
+                      ).map((storage) => (
+                        <FilterCheckboxItem
+                          key={storage}
+                          label={storage}
+                          checked={filters.storage[storage]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('storage', storage, checked)
+                          }
+                        />
+                      ))}
+                      <ShowMoreButton
+                        category="storage"
+                        isExpanded={expandedCategories.storage}
+                        totalCount={normalizedOptions.storage.length}
+                        onToggle={() => toggleCategoryExpansion('storage')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
+
+                  {/* Camera Section */}
+                  <FilterSection
+                    title="Camera Megapixel"
+                    isOpen={openSections.camera}
+                    onToggle={() => toggleSection('camera')}
+                  >
+                    <div
+                      id="camera-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
+                    >
+                      {getVisibleItems(normalizedOptions.camera, 'camera').map(
+                        (camera) => (
                           <FilterCheckboxItem
                             key={camera}
                             label={camera}
@@ -987,113 +886,127 @@ export function FilterBar({
                               handleCheckboxToggle('camera', camera, checked)
                             }
                           />
-                        ))}
-                        <ShowMoreButton
-                          category="camera"
-                          isExpanded={expandedCategories.camera}
-                          totalCount={normalizedOptions.camera.length}
-                          onToggle={() => toggleCategoryExpansion('camera')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="camera"
+                        isExpanded={expandedCategories.camera}
+                        totalCount={normalizedOptions.camera.length}
+                        onToggle={() => toggleCategoryExpansion('camera')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="Display Size"
-                      isOpen={openSections.display}
-                      onToggle={() => toggleSection('display')}
+                  {/* Display Section */}
+                  <FilterSection
+                    title="Display Size"
+                    isOpen={openSections.display}
+                    onToggle={() => toggleSection('display')}
+                  >
+                    <div
+                      id="display-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div
-                        id="display-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(
-                          normalizedOptions.display,
-                          'display',
-                        ).map((display) => (
+                      {getVisibleItems(
+                        normalizedOptions.display,
+                        'display',
+                      ).map((display) => (
+                        <FilterCheckboxItem
+                          key={display}
+                          label={display}
+                          checked={filters.display[display]}
+                          onChange={(checked) =>
+                            handleCheckboxToggle('display', display, checked)
+                          }
+                        />
+                      ))}
+                      <ShowMoreButton
+                        category="display"
+                        isExpanded={expandedCategories.display}
+                        totalCount={normalizedOptions.display.length}
+                        onToggle={() => toggleCategoryExpansion('display')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
+
+                  {/* RAM Section */}
+                  <FilterSection
+                    title="RAM"
+                    isOpen={openSections.ram}
+                    onToggle={() => toggleSection('ram')}
+                  >
+                    <div
+                      id="ram-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
+                    >
+                      {getVisibleItems(normalizedOptions.ram, 'ram').map(
+                        (ram) => (
                           <FilterCheckboxItem
-                            key={display}
-                            label={display}
-                            checked={filters.display[display]}
+                            key={ram}
+                            label={ram}
+                            checked={filters.ram[ram]}
                             onChange={(checked) =>
-                              handleCheckboxToggle('display', display, checked)
+                              handleCheckboxToggle('ram', ram, checked)
                             }
                           />
-                        ))}
-                        <ShowMoreButton
-                          category="display"
-                          isExpanded={expandedCategories.display}
-                          totalCount={normalizedOptions.display.length}
-                          onToggle={() => toggleCategoryExpansion('display')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="ram"
+                        isExpanded={expandedCategories.ram}
+                        totalCount={normalizedOptions.ram.length}
+                        onToggle={() => toggleCategoryExpansion('ram')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
 
-                    <FilterSection
-                      title="RAM"
-                      isOpen={openSections.ram}
-                      onToggle={() => toggleSection('ram')}
+                  {/* Brand Section */}
+                  <FilterSection
+                    title="Brand"
+                    isOpen={openSections.brand}
+                    onToggle={() => toggleSection('brand')}
+                  >
+                    <div
+                      id="brand-filters"
+                      className="flex flex-col items-start gap-3 self-stretch"
                     >
-                      <div
-                        id="ram-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(normalizedOptions.ram, 'ram').map(
-                          (ram) => (
-                            <FilterCheckboxItem
-                              key={ram}
-                              label={ram}
-                              checked={filters.ram[ram]}
-                              onChange={(checked) =>
-                                handleCheckboxToggle('ram', ram, checked)
-                              }
-                            />
-                          ),
-                        )}
-                        <ShowMoreButton
-                          category="ram"
-                          isExpanded={expandedCategories.ram}
-                          totalCount={normalizedOptions.ram.length}
-                          onToggle={() => toggleCategoryExpansion('ram')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
+                      {getVisibleItems(normalizedOptions.brand, 'brand').map(
+                        (brand) => (
+                          <FilterCheckboxItem
+                            key={brand}
+                            label={brand}
+                            checked={filters.brand[brand]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle('brand', brand, checked)
+                            }
+                          />
+                        ),
+                      )}
+                      <ShowMoreButton
+                        category="brand"
+                        isExpanded={expandedCategories.brand}
+                        totalCount={normalizedOptions.brand.length}
+                        onToggle={() => toggleCategoryExpansion('brand')}
+                      />
+                      <div className="h-px self-stretch bg-[#E8ECF4]" />
+                    </div>
+                  </FilterSection>
+                </div>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
 
-                    <FilterSection
-                      title="Brand"
-                      isOpen={openSections.brand}
-                      onToggle={() => toggleSection('brand')}
-                    >
-                      <div
-                        id="brand-filters"
-                        className="flex flex-col items-start gap-3 self-stretch"
-                      >
-                        {getVisibleItems(normalizedOptions.brand, 'brand').map(
-                          (brand) => (
-                            <FilterCheckboxItem
-                              key={brand}
-                              label={brand}
-                              checked={filters.brand[brand]}
-                              onChange={(checked) =>
-                                handleCheckboxToggle('brand', brand, checked)
-                              }
-                            />
-                          ),
-                        )}
-                        <ShowMoreButton
-                          category="brand"
-                          isExpanded={expandedCategories.brand}
-                          totalCount={normalizedOptions.brand.length}
-                          onToggle={() => toggleCategoryExpansion('brand')}
-                        />
-                        <div className="h-px self-stretch bg-[#E8ECF4]" />
-                      </div>
-                    </FilterSection>
-                  </div>
-                  <ScrollBar orientation="vertical" />
-                </ScrollArea>
+              {/* Fixed Footer with Apply Button */}
+              <div className="border-t border-[#E8ECF4] bg-white px-4 py-3">
+                <Button
+                  onClick={handleApplyFilters}
+                  variant="gradient"
+                  className="w-full flex-1 rounded-3xl px-4 py-3 text-base font-medium leading-[140%] capitalize text-white transition-all hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Apply
+                </Button>
               </div>
             </div>
           </PopoverContent>
@@ -1122,7 +1035,7 @@ export function FilterBar({
                     event.preventDefault()
                     handleChipRemove(chip)
                   }}
-                  className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-[#252525] focus:bg-[#FFF4EE] focus:text-[#252525]"
+                  className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-[#252525] focus:text-[#252525]"
                 >
                   <span className="truncate">{chip.label}</span>
                   <button
@@ -1145,9 +1058,9 @@ export function FilterBar({
         {activeFilterChips.length > 0 && (
           <Button
             type="button"
-            variant="gradient"
+            variant="outlineGradient"
             onClick={handleClearAll}
-            className="h-10 rounded-3xl px-5 py-2 text-sm font-semibold capitalize tracking-[-0.01em] md:text-base"
+            className="h-auto rounded-3xl px-4 py-2 text-sm font-medium capitalize text-[#F47120]"
           >
             Clear All
           </Button>

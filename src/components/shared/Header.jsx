@@ -51,13 +51,13 @@ export function Header() {
               onClick={clearSearch}
               aria-label="Clear search"
               className={cn(
-                'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-white',
+                'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all duration-200 hover:text-white',
                 searchTerm
-                  ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
+                  ? 'bg-primary text-white hover:opacity-90 hover:scale-105'
                   : 'pointer-events-none opacity-0',
               )}
             >
-              <X className="h-3.5 w-3.5" />
+              <X className="size-4" />
             </button>
           </div>
         </div>
@@ -130,13 +130,13 @@ export function Header() {
             onClick={clearSearch}
             aria-label="Clear search"
             className={cn(
-              'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all hover:text-[#EE3124]',
+              'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all duration-200 hover:text-white',
               searchTerm
-                ? 'bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90'
+                ? 'bg-primary text-white hover:opacity-90 hover:scale-105'
                 : 'pointer-events-none opacity-0',
             )}
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4" />
           </button>
         </div>
       </div>
