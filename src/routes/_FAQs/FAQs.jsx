@@ -84,7 +84,7 @@ const FAQs = () => {
 
     // For mobile: 1 card per view, for tablet: 2 cards per view
     const isTablet = window.innerWidth >= 768
-    const cardWidth = isTablet ? 280 + 20 : 320 + 20
+    const cardWidth = isTablet ? 280 + 20 : 280 + 20
     const cardsPerView = isTablet ? 2 : 1
     const newStep = Math.round(scrollLeft / (cardWidth * cardsPerView))
 
@@ -96,7 +96,7 @@ const FAQs = () => {
 
     const container = scrollContainerRef.current
     const isTablet = window.innerWidth >= 768
-    const cardWidth = isTablet ? 280 + 20 : 320 + 20
+    const cardWidth = isTablet ? 280 + 20 : 280 + 20
     const cardsPerView = isTablet ? 2 : 1
     const targetScroll = stepIndex * cardWidth * cardsPerView
 
@@ -233,7 +233,7 @@ const FAQs = () => {
       </div>
 
       {/* FAQs Section */}
-      <div className="w-full px-5">
+      <div className="w-full px-6 md:px-6 sm:px-6 xl:px-20 lg:px-20  ">
         <div className="max-w-full">
           <div className="flex flex-col gap-6 lg:gap-14 items-center lg:items-start w-full">
             {/* Header */}
