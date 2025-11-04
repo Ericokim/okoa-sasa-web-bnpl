@@ -44,7 +44,7 @@ export function Header() {
               onChange={(e) => setSearchTerm(e.target.value)}
               type="text"
               placeholder="Search for Devices"
-              className="flex-1 bg-transparent text-sm text-[#111111] placeholder:text-[#95979b] outline-none"
+              className="flex-1 bg-transparent text-base text-[#111111] placeholder:text-[#95979b] outline-none"
             />
             <button
               type="button"
@@ -123,7 +123,7 @@ export function Header() {
             onChange={(e) => setSearchTerm(e.target.value)}
             type="text"
             placeholder="Search for Devices"
-            className="flex-1 bg-transparent text-sm text-[#111111] placeholder:text-[#A0A4AC] outline-none"
+            className="flex-1 bg-transparent text-base text-[#111111] placeholder:text-[#A0A4AC] outline-none"
           />
           <button
             type="button"

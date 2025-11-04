@@ -125,7 +125,7 @@ const DateInput = ({ dataValue = new Date(), value, onChange }) => {
   };
 
   return (
-    <div className="flex border rounded-lg items-center text-sm px-0 w-fit">
+    <div className="flex border rounded-lg items-center text-base px-0 w-fit">
       <Input
         type="text"
         ref={monthRef}

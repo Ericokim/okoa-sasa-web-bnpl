@@ -202,24 +202,14 @@ export function ProductInfo({ product }) {
       {/* Quantity Selector */}
       <div className="flex flex-col gap-2">
         <div className="flex w-[250px] items-center justify-between rounded-3xl bg-[#F9FAFB] px-4 py-2">
-          {/* <Button
-            // variant={}
-            size={'icon'}
-            onClick={handleIncrease}
-            disabled={quantity >= maxQuantity}
-            className="flex h-6 w-6 border border-[#E8ECF4] items-center justify-center rounded-full bg-white transition-colors hover:bg-white disabled:opacity-50 md:h-[30px] md:w-[30px]"
-          >
-            <AddIcon size={18} />
-          </Button> */}
-
           <Button
             variant="outline"
             size="icon"
             className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
-            onClick={handleIncrease}
-            disabled={remainingQuantity <= 0 || quantity >= remainingQuantity}
+            onClick={handleDecrease}
+            disabled={quantity <= 1}
           >
-            <AddIcon size={18} />
+            <MinusIcon size={18} />
           </Button>
 
           <span className="min-w-[30px] text-center text-sm font-bold capitalize leading-[140%] text-[#252525] md:text-lg">
@@ -230,10 +220,10 @@ export function ProductInfo({ product }) {
             variant="outline"
             size="icon"
             className="h-10 w-10 rounded-full text-lg flex items-center justify-center"
-            onClick={handleDecrease}
-            disabled={quantity <= 1}
+            onClick={handleIncrease}
+            disabled={remainingQuantity <= 0 || quantity >= remainingQuantity}
           >
-            <MinusIcon size={18} />
+            <AddIcon size={18} />
           </Button>
         </div>
         <p className="text-xs font-normal leading-[140%] text-[#A0A4AC] md:text-sm md:font-medium">
