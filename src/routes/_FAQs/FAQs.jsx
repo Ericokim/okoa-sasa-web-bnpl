@@ -84,7 +84,7 @@ const FAQs = () => {
 
     // For mobile: 1 card per view, for tablet: 2 cards per view
     const isTablet = window.innerWidth >= 768
-    const cardWidth = isTablet ? 280 + 16 : 300 + 16
+    const cardWidth = isTablet ? 280 + 20 : 320 + 20
     const cardsPerView = isTablet ? 2 : 1
     const newStep = Math.round(scrollLeft / (cardWidth * cardsPerView))
 
@@ -96,7 +96,7 @@ const FAQs = () => {
 
     const container = scrollContainerRef.current
     const isTablet = window.innerWidth >= 768
-    const cardWidth = isTablet ? 280 + 16 : 300 + 16
+    const cardWidth = isTablet ? 280 + 20 : 320 + 20
     const cardsPerView = isTablet ? 2 : 1
     const targetScroll = stepIndex * cardWidth * cardsPerView
 
@@ -128,10 +128,10 @@ const FAQs = () => {
   return (
     <div className="bg-white mb-6 overflow-hidden relative w-full">
       {/* How It Works Section */}
-      <div className="bg-white overflow-hidden relative w-full min-h-[550px] lg:h-[552px]">
+      <div className="bg-white overflow-hidden relative w-full min-h-[600px] lg:h-[600px]">
         <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] h-80 lg:h-96 w-full absolute left-0 top-0" />
 
-        <div className="absolute left-1/2 top-[60px] lg:top-20 -translate-x-1/2 w-full max-w-[335px] md:max-w-[680px] lg:max-w-7xl px-4 lg:px-0">
+        <div className="absolute left-1/2 top-[60px] lg:top-20 -translate-x-1/2 w-full max-w-[360px] md:max-w-[650px] lg:max-w-7xl px-4 lg:px-0">
           <div className="flex flex-col gap-8 lg:gap-[60px] items-center">
             {/* Header */}
             <div className="flex flex-col gap-2 items-center text-center w-full lg:max-w-[616px]">
@@ -147,23 +147,23 @@ const FAQs = () => {
             {/* Steps Grid - Scrollable on mobile and tablet */}
             <div className="w-full">
               {/* Desktop Grid */}
-              <div className="hidden lg:grid grid-cols-6 gap-3 w-full">
+              <div className="hidden lg:grid grid-cols-6 gap-4 w-full">
                 {steps.map((step, index) => (
                   <div
                     key={index}
-                    className="bg-white flex flex-col gap-4 items-center justify-center px-3 py-4 rounded-2xl shadow-sm flex-1"
+                    className="bg-white flex flex-col gap-5 items-center justify-center px-4 py-6 rounded-2xl shadow-sm flex-1 min-h-[280px]"
                   >
-                    <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-20 h-20 flex items-center justify-center">
-                      {step.icon}
+                    <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-22 h-22 flex items-center justify-center">
+                      {React.cloneElement(step.icon, { size: 50 })}
                     </div>
-                    <div className="flex flex-col gap-3 items-center justify-center w-[178px]">
-                      <p className="font-['Public_Sans'] text-base font-normal leading-[1.4] text-[#252525] text-center capitalize">
+                    <div className="flex flex-col gap-3 items-center justify-center w-full px-3">
+                      <p className="font-['Public_Sans'] text-[16px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
                         {step.title}
                       </p>
                     </div>
-                    <div className="relative h-[30px] w-full">
+                    <div className="relative h-[32px] w-full">
                       <p
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[26px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
                         style={{ WebkitTextFillColor: 'transparent' }}
                       >
                         {step.step}
@@ -177,30 +177,30 @@ const FAQs = () => {
               <div className="lg:hidden w-full">
                 <div
                   ref={scrollContainerRef}
-                  className="flex gap-4 pb-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+                  className="flex gap-5 pb-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide md:px-4"
                   onScroll={handleScroll}
                   style={{
                     scrollbarWidth: 'none',
                     msOverflowStyle: 'none',
                   }}
                 >
-                  <div className="flex gap-4 min-w-max">
+                  <div className="flex gap-5 min-w-max px-4 md:px-0">
                     {steps.map((step, index) => (
                       <div
                         key={index}
-                        className="bg-white flex flex-col gap-3 items-center justify-center px-4 py-6 rounded-2xl shadow-sm w-[300px] md:w-[280px] shrink-0 snap-start snap-always mx-auto md:mx-0"
+                        className="bg-white flex flex-col gap-4 items-center justify-center px-5 py-8 rounded-2xl shadow-sm w-[320px] md:w-[280px] min-h-[260px] shrink-0 snap-start snap-always md:mx-2"
                       >
-                        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-16 h-16 flex items-center justify-center">
-                          {React.cloneElement(step.icon, { size: 40 })}
+                        <div className="bg-linear-to-b from-[#f8971d] to-[#ee3124] overflow-hidden rounded-full w-18 h-18 flex items-center justify-center">
+                          {React.cloneElement(step.icon, { size: 44 })}
                         </div>
-                        <div className="flex flex-col gap-2 items-center justify-center w-full px-2">
-                          <p className="font-['Public_Sans'] text-[16px] md:text-[16px] font-semibold leading-[1.3] text-[#252525] text-center capitalize">
+                        <div className="flex flex-col gap-3 items-center justify-center w-full px-3">
+                          <p className="font-['Public_Sans'] text-[16px] md:text-[16px] font-semibold leading-[1.4] text-[#252525] text-center capitalize">
                             {step.title}
                           </p>
                         </div>
-                        <div className="relative h-[24px] w-full">
+                        <div className="relative h-[28px] w-full">
                           <p
-                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[20px] md:text-[22px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
+                            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-['Public_Sans'] text-[22px] md:text-[24px] font-semibold leading-[1.4] text-center capitalize bg-linear-to-b from-[#f8971d] to-[#ee3124] bg-clip-text"
                             style={{ WebkitTextFillColor: 'transparent' }}
                           >
                             {step.step}
@@ -212,7 +212,7 @@ const FAQs = () => {
                 </div>
 
                 {/* Step Indicators - Dynamic count based on screen size */}
-                <div className="flex justify-center gap-2 mt-4">
+                <div className="flex justify-center gap-2 mt-6">
                   {Array.from({ length: stepsCount }, (_, index) => (
                     <button
                       key={index}
@@ -233,7 +233,7 @@ const FAQs = () => {
       </div>
 
       {/* FAQs Section */}
-      <div className="w-full">
+      <div className="w-full px-5">
         <div className="max-w-full">
           <div className="flex flex-col gap-6 lg:gap-14 items-center lg:items-start w-full">
             {/* Header */}
