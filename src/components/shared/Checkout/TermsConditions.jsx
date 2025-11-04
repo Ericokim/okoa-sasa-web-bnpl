@@ -36,7 +36,7 @@ export default function TermsConditionPage({
           <div className="h-px bg-gray-300 my-4 sm:my-6"></div>
 
           {/* Checkbox Section */}
-          <div className="mb-6 sm:mb-0">
+          <div className="mb-0">
             <div className="flex flex-row items-start sm:items-center p-0 gap-3 w-full h-auto sm:h-[34px]">
               <Checkbox
                 id="terms"
@@ -74,7 +74,7 @@ export default function TermsConditionPage({
           </div>
 
           {/* Spacer for desktop to maintain height */}
-          <div className="hidden sm:block h-[60px]"></div>
+          <div className="hidden sm:block h-[16px]"></div>
         </div>
       </div>
 

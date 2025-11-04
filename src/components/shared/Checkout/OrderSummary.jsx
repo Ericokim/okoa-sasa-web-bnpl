@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Minus, Plus } from 'lucide-react'
 import { TrashIcon, TrashIconWhite } from '@/assets/icons'
-import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
+import { useStateContext } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
+import { ErrorAlertDialog } from '../Dialog'
 
 export default function OrderSummaryPage({
   onNext,
@@ -17,12 +18,33 @@ export default function OrderSummaryPage({
     updateCartQuantity,
     clearCart,
     resetCheckout,
+    getCheckoutFormData,
   } = useStateContext()
   const cartItems = cartProducts ?? []
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [itemToDelete, setItemToDelete] = useState(null)
   const [showClearCartDialog, setShowClearCartDialog] = useState(false)
+  const [errorModalOpen, setErrorModalOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  // Fixed shipping fee
+  const shippingFee = 100
+
+  // Get loan limit data from checkout form
+  const loanData = getCheckoutFormData(1)
+  const loanLimit = loanData?.calculatedLoanAmount || 0
+
+  // Calculate cart totals
+  const subtotal = cartItems.reduce((total, item) => {
+    const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
+    return total + item.price * quantity
+  }, 0)
+
+  const grandTotal = subtotal + shippingFee
+
+  // Check if cart exceeds loan limit
+  const exceedsLoanLimit = grandTotal > loanLimit
 
   // Watch for empty cart and redirect to home
   useEffect(() => {
@@ -37,7 +59,6 @@ export default function OrderSummaryPage({
   }
 
   const handleIncrement = (productId, currentQuantity) => {
-    if (currentQuantity >= MAX_CART_QUANTITY) return
     updateCartQuantity?.(productId, currentQuantity + 1)
   }
 
@@ -79,12 +100,19 @@ export default function OrderSummaryPage({
     setShowClearCartDialog(false)
   }
 
-  const subtotal = cartItems.reduce((total, item) => {
-    const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
-    return total + item.price * quantity
-  }, 0)
+  const handleNext = () => {
+    // Validate against loan limit before proceeding
+    if (exceedsLoanLimit) {
+      setErrorMessage(
+        `Your order total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanLimit.toLocaleString()}). Please adjust your cart or update your loan details.`,
+      )
+      setErrorModalOpen(true)
+      return
+    }
 
-  const grandTotal = subtotal
+    // Proceed to next step if within loan limit
+    onNext()
+  }
 
   return (
     <div className="flex flex-col items-start mb-[50px] p-0 sm:p-0 gap-6 w-full">
@@ -175,10 +203,9 @@ export default function OrderSummaryPage({
                               onClick={() =>
                                 handleIncrement(product.id, quantity)
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                               aria-label="Increase quantity"
                               type="button"
-                              disabled={quantity >= MAX_CART_QUANTITY}
                             >
                               <Plus
                                 className="h-4 w-4 text-[#292D32]"
@@ -216,14 +243,83 @@ export default function OrderSummaryPage({
 
         {/* Totals Section */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
+          {/* Mobile & Tablet View - without extra div */}
+          <div className="flex flex-col w-full lg:hidden">
+            {/* Loan Limit */}
+            {loanLimit > 0 && (
+              <div className="flex justify-between items-center mb-1.5">
+                <span className="text-base font-medium text-[#676D75]">
+                  Loan Limit
+                </span>
+                <span className={`text-base font-medium ${
+                  exceedsLoanLimit ? 'text-orange-500' : 'text-green-600'
+                }`}>
+                  KES {loanLimit.toLocaleString()}
+                </span>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-base font-medium text-[#676D75]">
+                Subtotal
+              </span>
+              <span className="text-base font-medium text-[#252525]">
+                KES {subtotal.toLocaleString()}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center mb-1.5">
+              <span className="text-base font-medium text-[#676D75]">
+                Shipping Fee
+              </span>
+              <span className="text-base font-medium text-[#252525]">
+                KES {shippingFee.toLocaleString()}
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-semibold text-[#252525]">
+                Grand Total
+              </span>
+              <span className="text-lg font-bold text-[#F97316]">
+                KES {grandTotal.toLocaleString()}
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop View - with extra div */}
+          <div className="hidden lg:flex items-center justify-between">
+            <div className="w-1/2"></div>
             <div className="flex flex-col justify-between w-1/2">
+              {/* Loan Limit */}
+              {loanLimit > 0 && (
+                <div className="flex justify-between mb-1.5">
+                  <span className="text-base font-medium text-[#676D75]">
+                    Loan Limit
+                  </span>
+                  <span className={`text-base font-medium ${
+                    exceedsLoanLimit ? 'text-orange-500' : 'text-green-600'
+                  }`}>
+                    KES {loanLimit.toLocaleString()}
+                  </span>
+                </div>
+              )}
+
               <div className="flex justify-between mb-1.5">
                 <span className="text-base font-medium text-[#676D75]">
                   Subtotal
                 </span>
                 <span className="text-base font-medium text-[#252525]">
                   KES {subtotal.toLocaleString()}
+                </span>
+              </div>
+
+              <div className="flex justify-between mb-1.5">
+                <span className="text-base font-medium text-[#676D75]">
+                  Shipping Fee
+                </span>
+                <span className="text-base font-medium text-[#252525]">
+                  KES {shippingFee.toLocaleString()}
                 </span>
               </div>
 
@@ -236,7 +332,6 @@ export default function OrderSummaryPage({
                 </span>
               </div>
             </div>
-            <div className="w-1/2"></div>
           </div>
         </div>
       </div>
@@ -252,7 +347,7 @@ export default function OrderSummaryPage({
           Back
         </button>
         <button
-          onClick={onNext}
+          onClick={handleNext}
           type="button"
           className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity w-full sm:w-auto"
           style={{
@@ -311,7 +406,8 @@ export default function OrderSummaryPage({
               Clear all items?
             </h2>
             <p className="text-sm leading-relaxed text-[#676D75] mb-6">
-              This will remove every product from your order summary. You won&apos;t be able to undo this action.
+              This will remove every product from your order summary. You
+              won&apos;t be able to undo this action.
             </p>
             <div className="flex flex-col gap-3">
               <button
@@ -330,6 +426,26 @@ export default function OrderSummaryPage({
           </div>
         </div>
       )}
+
+      {/* Loan Limit Error Modal */}
+     <ErrorAlertDialog
+        isOpen={errorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        message={errorMessage}
+        // primLink={'/cart'}
+        primaryAction={{
+          label: 'Adjust Order',
+          onClick: () => {
+            setErrorModalOpen(false)
+          },
+        }}
+        // secondaryAction={{
+        //   label: 'Adjust Order',
+        //   onClick: () => {
+        //     setErrorModalOpen(false)
+        //   },
+        // }}
+      />
     </div>
   )
 }
