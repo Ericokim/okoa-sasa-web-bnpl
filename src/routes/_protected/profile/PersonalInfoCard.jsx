@@ -3,20 +3,88 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useAccountStore } from '@/data/accountStore'
 import { Separator } from '@/components/ui/separator'
 import { EditIcon } from '@/assets/icons'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Form } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import { EmailIcon, PhoneIcon, SingleUserIcon, UserFileIcon, UserCardIcon, UserMsgIcon } from '@/assets/icons'
+import { PhoneInput } from '@/components/shared/Inputs/FormPhone'
+import { FormInput } from '@/components/shared/Inputs/FormInputs'
+
+// Validation schema
+const personalInfoSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
+  phone: z.string().min(1, 'Phone number is required').refine(
+    (value) => {
+      if (!value || value.trim() === '') return false
+      const cleaned = value.replace(/\s/g, '')
+      if (cleaned.startsWith('+254')) {
+        return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
+      }
+      if (cleaned.startsWith('0')) {
+        return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
+      }
+      return false
+    },
+    {
+      message: 'Please enter a valid Kenyan phone number',
+    },
+  ),
+  company: z.string().min(1, 'Company is required'),
+  ID: z.string().min(1, 'ID number is required').min(6, 'ID number must be at least 6 digits'),
+  employeeId: z.string().min(1, 'Employee number is required'),
+})
 
 export function RouteComponent() {
   const { personalInfo, updatePersonalInfo } = useAccountStore()
   const [editing, setEditing] = useState(false)
-  const [form, setForm] = useState(personalInfo)
 
-  const handleSave = () => {
-    updatePersonalInfo(form)
+  // Initialize form with personalInfo
+  const form = useForm({
+    resolver: zodResolver(personalInfoSchema),
+    defaultValues: {
+      firstName: personalInfo.firstName || '',
+      lastName: personalInfo.lastName || '',
+      email: personalInfo.email || '',
+      phone: personalInfo.phone || '',
+      company: personalInfo.company || '',
+      ID: personalInfo.ID || '',
+      employeeId: personalInfo.employeeId || '',
+    },
+  })
+
+  const handleSave = (data) => {
+    updatePersonalInfo(data)
     setEditing(false)
   }
 
   const handleCancel = () => {
-    setForm(personalInfo)
+    form.reset({
+      firstName: personalInfo.firstName || '',
+      lastName: personalInfo.lastName || '',
+      email: personalInfo.email || '',
+      phone: personalInfo.phone || '',
+      company: personalInfo.company || '',
+      ID: personalInfo.ID || '',
+      employeeId: personalInfo.employeeId || '',
+    })
     setEditing(false)
+  }
+
+  const handleEdit = () => {
+    form.reset({
+      firstName: personalInfo.firstName || '',
+      lastName: personalInfo.lastName || '',
+      email: personalInfo.email || '',
+      phone: personalInfo.phone || '',
+      company: personalInfo.company || '',
+      ID: personalInfo.ID || '',
+      employeeId: personalInfo.employeeId || '',
+    })
+    setEditing(true)
   }
 
   return (
@@ -28,7 +96,7 @@ export function RouteComponent() {
 
         {!editing && (
           <button
-            onClick={() => setEditing(true)}
+            onClick={handleEdit}
             className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
           >
             <EditIcon />
@@ -113,108 +181,97 @@ export function RouteComponent() {
           </div>
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Row 1: First Name + Last Name */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                First Name
-              </label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.firstName}
-                onChange={(e) =>
-                  setForm({ ...form, firstName: e.target.value })
-                }
+        /* ========== EDIT MODE ========== */
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSave)} className="space-y-6">
+            {/* Row 1: First Name + Last Name */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormInput
+                control={form.control}
+                name="firstName"
+                label="First Name"
+                placeholder="Enter your first name"
+                icon={SingleUserIcon}
+              />
+              <FormInput
+                control={form.control}
+                name="lastName"
+                label="Last Name"
+                placeholder="Enter your last name"
+                icon={SingleUserIcon}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Last Name
-              </label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.lastName}
-                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-              />
-            </div>
-          </div>
 
-          {/* Row 2: Company + Email */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Company</label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.company}
-                onChange={(e) => setForm({ ...form, company: e.target.value })}
+            {/* Row 2: Company + Email */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormInput
+                control={form.control}
+                name="company"
+                label="Company"
+                placeholder="Enter your company"
+                icon={UserCardIcon}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <input
+              <FormInput
+                control={form.control}
+                name="email"
+                label="Email"
+                placeholder="Enter your email"
                 type="email"
-                className="w-full border rounded-md px-3 py-2"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                icon={EmailIcon}
               />
             </div>
-          </div>
 
-          {/* Row 3: Phone + Employee No */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Phone</label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            {/* Row 3: Phone + ID No */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <PhoneInput
+                control={form.control}
+                name="phone"
+                label="Phone Number"
+                placeholder="+254712345678 or 0712345678"
+                icon={PhoneIcon}
+              />
+              <FormInput
+                control={form.control}
+                name="ID"
+                label="ID Number"
+                placeholder="Enter ID number (6+ digits)"
+                icon={UserFileIcon}
+                numbersOnly={true}
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">ID No</label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.idNo || ''}
-                onChange={(e) => setForm({ ...form, idNo: e.target.value })}
-                placeholder="12345678"
-              />
-            </div>
-          </div>
 
-          {/* Row 4: ID No → Full Width (spans 2 columns) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <label className="block text-sm font-medium mb-1">
-                Employee No
-              </label>
-              <input
-                className="w-full border rounded-md px-3 py-2"
-                value={form.employeeNo || ''}
-                onChange={(e) =>
-                  setForm({ ...form, employeeNo: e.target.value })
-                }
-                placeholder="EMP12345"
-              />
+            {/* Row 4: Employee No */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="sm:col-span-2">
+                <FormInput
+                  control={form.control}
+                  name="employeeId"
+                  label="Employee Number"
+                  placeholder="Enter employee number"
+                  icon={UserMsgIcon}
+                />
+              </div>
             </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <button
-              onClick={handleSave}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 font-medium transition-colors"
-            >
-              Save 
-            </button>
-            <button
-              onClick={handleCancel}
-              className="flex-1 border border-gray-300 rounded-full py-2 font-medium hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
+            {/* Action Buttons */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="submit"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 font-medium transition-colors"
+              >
+                Save
+              </Button>
+              <Button
+                type="button"
+                onClick={handleCancel}
+                variant="outline"
+                className="flex-1 border border-gray-300 rounded-full py-2 font-medium hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Form>
       )}
     </div>
   )
