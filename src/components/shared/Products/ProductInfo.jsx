@@ -15,7 +15,7 @@ import {
   CartIcon,
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
-import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
+import { useStateContext } from '@/context/state-context'
 import { useSnackbar } from 'notistack'
 
 export function ProductInfo({ product }) {
@@ -35,7 +35,6 @@ export function ProductInfo({ product }) {
   const isInCart = existingQuantity > 0
 
   const { enqueueSnackbar } = useSnackbar()
-  const maxQuantity = MAX_CART_QUANTITY
 
   // Reset local quantity when product changes
   useEffect(() => {
@@ -49,29 +48,11 @@ export function ProductInfo({ product }) {
   }
 
   const handleIncrease = () => {
-    // Check if adding this quantity would exceed max
-    if (existingQuantity + quantity >= maxQuantity) {
-      enqueueSnackbar(`Maximum limit of ${maxQuantity} reached.`, {
-        variant: 'warning',
-      })
-      return
-    }
-    
     setQuantity(quantity + 1)
   }
 
   const handleAddToCart = () => {
     if (!product?.id) return
-
-    // Check if adding this quantity would exceed max
-    if (existingQuantity + quantity > maxQuantity) {
-      const remaining = maxQuantity - existingQuantity
-      enqueueSnackbar(
-        `Can only add ${remaining} more. Maximum limit is ${maxQuantity}.`,
-        { variant: 'warning' }
-      )
-      return
-    }
 
     if (isInCart) {
       // Update cart with new total quantity
@@ -89,19 +70,14 @@ export function ProductInfo({ product }) {
     if (!product?.id) return
 
     // Add current quantity to cart if needed
-    if (existingQuantity + quantity <= maxQuantity) {
-      if (isInCart) {
-        updateCartQuantity(product.id, existingQuantity + quantity)
-      } else {
-        addToCart(product.id, quantity)
-      }
+    if (isInCart) {
+      updateCartQuantity(product.id, existingQuantity + quantity)
+    } else {
+      addToCart(product.id, quantity)
     }
 
     navigate({ to: '/checkout/' })
   }
-
-  const wouldExceedMax = existingQuantity + quantity > maxQuantity
-  const remainingSpace = maxQuantity - existingQuantity
 
   return (
     <div className="flex flex-col gap-5 md:gap-5">
@@ -184,31 +160,9 @@ export function ProductInfo({ product }) {
             size="icon"
             className="h-10 w-10 rounded-full text-lg flex items-center justify-center disabled:opacity-30 transition-all hover:border-[#F8971D]"
             onClick={handleIncrease}
-            disabled={existingQuantity + quantity >= maxQuantity}
           >
             <AddIcon size={18} />
           </Button>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <p className="text-xs font-normal leading-[140%] text-[#A0A4AC] md:text-sm md:font-medium">
-            Maximum purchase {maxQuantity}
-          </p>
-
-          {isInCart && (
-            <p className="text-xs font-medium leading-[140%] text-[#F8971D]">
-              {existingQuantity} items already in cart
-              {remainingSpace > 0
-                ? ` • ${remainingSpace} more can be added`
-                : ' • Cart limit reached'}
-            </p>
-          )}
-
-          {!isInCart && (
-            <p className="text-xs font-medium leading-[140%] text-[#676D75]">
-              Select quantity to add to cart
-            </p>
-          )}
         </div>
       </div>
 
@@ -218,12 +172,11 @@ export function ProductInfo({ product }) {
         <Button
           onClick={handleAddToCart}
           variant={'outlineGradient'}
-          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl px-4 py-3 text-base font-medium capitalize leading-[140%] disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl px-4 py-3 text-base font-medium capitalize leading-[140%]"
           size="lg"
-          disabled={wouldExceedMax}
         >
           <CartIcon />
-          {wouldExceedMax ? 'Cart Full' : `Add ${quantity} to Cart`}
+          Add {quantity} to Cart
         </Button>
 
         {/* Buy Now Button */}
