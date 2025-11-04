@@ -24,7 +24,7 @@ export function CartSummary({
   const isCartEmpty = totalItems === 0
 
   return (
-    <div className="flex w-full flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6 lg:w-[412px] lg:sticky lg:top-8">
+    <div className="flex w-full flex-col items-start gap-6 rounded-2xl border border-[#E8ECF4] p-4 md:p-6 lg:w-[412px] lg:sticky lg:top-8 lg:self-start">
       {/* Title */}
       <div className="flex flex-col items-start gap-3 self-stretch">
         <h2 className="self-stretch text-xl font-semibold capitalize leading-[140%] text-black md:text-2xl">

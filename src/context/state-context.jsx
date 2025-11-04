@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from 'react'
 import { productCatalog } from '@/data/products'
+import { safeLocalStorage } from '@/lib/utils'
 
 const StateContext = createContext(null)
 
@@ -47,29 +48,41 @@ export function ContextProvider({ children }) {
 
   // Check for stored auth on mount
   useEffect(() => {
-    const storedAuth = localStorage.getItem('isAuthenticated')
-    const storedUser = localStorage.getItem('user')
+    try {
+      const storedAuth = safeLocalStorage.getItem('isAuthenticated')
+      const storedUser = safeLocalStorage.getItem('user')
 
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true)
-      if (storedUser) {
-        setUser(JSON.parse(storedUser))
+      if (storedAuth === 'true') {
+        setIsAuthenticated(true)
+        if (storedUser) {
+          setUser(JSON.parse(storedUser))
+        }
       }
+    } catch {
+      // Ignore storage read errors
     }
   }, [])
 
   const login = (userData) => {
     setIsAuthenticated(true)
     setUser(userData)
-    localStorage.setItem('isAuthenticated', 'true')
-    localStorage.setItem('user', JSON.stringify(userData))
+    try {
+      safeLocalStorage.setItem('isAuthenticated', 'true')
+      safeLocalStorage.setItem('user', JSON.stringify(userData))
+    } catch {
+      // Ignore persistence errors (e.g., private mode)
+    }
   }
 
   const logout = () => {
     setIsAuthenticated(false)
     setUser(null)
-    localStorage.removeItem('isAuthenticated')
-    localStorage.removeItem('user')
+    try {
+      safeLocalStorage.removeItem('isAuthenticated')
+      safeLocalStorage.removeItem('user')
+    } catch {
+      // Ignore
+    }
   }
 
   const syncProductCartState = useCallback((productId, changes) => {
