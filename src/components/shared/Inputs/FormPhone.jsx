@@ -9,32 +9,6 @@ import {
 import { Input } from '@/components/ui/input'
 import * as z from 'zod'
 
-// Kenyan phone number validation schema
-export const kenyaPhoneSchema = z
-  .string()
-  .min(1, 'Phone number is required')
-  .refine(
-    (value) => {
-      // Remove any spaces for validation
-      const cleaned = value.replace(/\s/g, '')
-      
-      // Check if it starts with +254 (should be 13 characters total)
-      if (cleaned.startsWith('+254')) {
-        return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
-      }
-      
-      // Check if it starts with 0 (should be 10 characters total)
-      if (cleaned.startsWith('0')) {
-        return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
-      }
-      
-      return false
-    },
-    {
-      message: 'Please enter a valid phone number (e.g., +254712345678 or 0712345678)',
-    }
-  )
-
 export function PhoneInput({
   control,
   name,

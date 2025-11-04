@@ -14,13 +14,40 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { ListIcon, PinIcon, SingleUserIcon, WorldIcon } from '@/assets/icons'
+import { ListIcon, PinIcon, SingleUserIcon, WorldIcon, PhoneIcon } from '@/assets/icons'
 import { CustomSelect } from '../Inputs/CustomSelect'
 import { FormInput } from '../Inputs/FormInputs'
 import { FormSelect } from '../Inputs/FormSelect'
 import { FormTextarea } from '../Inputs/FormTextarea'
-import { kenyaPhoneSchema, PhoneInput } from '../Inputs/FormPhone'
+import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
+
+// Phone validation schema
+const kenyaPhoneSchema = z
+  .string()
+  .min(1, 'Phone number is required')
+  .refine(
+    (value) => {
+      // Remove any spaces for validation
+      const cleaned = value.replace(/\s/g, '')
+
+      // Check if it starts with +254 (should be 13 characters total)
+      if (cleaned.startsWith('+254')) {
+        return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
+      }
+
+      // Check if it starts with 0 (should be 10 characters total)
+      if (cleaned.startsWith('0')) {
+        return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
+      }
+
+      return false
+    },
+    {
+      message:
+        'Please enter a valid Kenyan phone number (e.g., +254712345678 or 0712345678)',
+    },
+  )
 
 // Base schema for common fields
 const baseSchema = {
@@ -227,12 +254,12 @@ export default function DeliveryDetailsForm({
               {deliveryType === 'door' ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                    <FormInput
+                    <PhoneInput
                       control={form.control}
                       name="recipientNumber"
                       label="Recipient Number"
-                      placeholder="Enter Recipient Number"
-                      icon={ListIcon}
+                      placeholder="+254712345678 or 0712345678"
+                      icon={PhoneIcon}
                     />
 
                     <FormSelect
@@ -259,19 +286,12 @@ export default function DeliveryDetailsForm({
               ) : (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[50px]">
-                    {/* <FormInput
-                      control={form.control}
-                      name="recipientNumber"
-                      label="Recipient Number"
-                      placeholder="Enter Recipient Number"
-                      icon={ListIcon}
-                    /> */}
                     <PhoneInput
                       control={form.control}
                       name="recipientNumber"
                       label="Recipient Number"
-                      placeholder="Enter Recipient Number"
-                      icon={ListIcon}
+                      placeholder="+254712345678 or 0712345678"
+                      icon={PhoneIcon}
                     />
 
                     <FormSelect
