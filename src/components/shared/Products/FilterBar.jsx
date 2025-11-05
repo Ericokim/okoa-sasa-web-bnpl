@@ -712,7 +712,7 @@ export function FilterBar({
     >
       <div className="flex flex-wrap items-center gap-2 md:gap-[26px]">
         <Popover open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
-          <PopoverTrigger asChild>
+          <PopoverTrigger asChild className="cursor-pointer">
             <button
               className={allFiltersButtonClass}
               aria-pressed={isFiltersOpen}
@@ -1063,6 +1063,17 @@ export function FilterBar({
             My Loan Limit
           </span>
         </button>
+
+        {/* <Button
+          onClick={() => {
+            onLoanCalculatorOpen?.()
+          }}
+          variant={'outline'}
+          className="flex h-11 w-full items-center justify-center gap-2.5 self-stretch rounded-3xl px-4 py-3 text-base font-medium capitalize leading-[140%]"
+          size="lg"
+        >
+          My Loan Limit
+        </Button> */}
 
         <DropdownMenu onOpenChange={setIsOpen}>
           <DropdownMenuTrigger asChild className="cursor-pointer">
