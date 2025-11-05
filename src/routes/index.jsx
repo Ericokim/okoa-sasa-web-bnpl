@@ -8,6 +8,7 @@ import { PaginationComponent } from '@/components/shared/PaginationComponent'
 import NotFound from '@/container/NotFound'
 import { useStateContext } from '@/context/state-context'
 import { Button } from '@/components/ui/button'
+import { productsQueryOptions, applyCartState } from '@/lib/queries/products'
 
 const PRODUCTS_PER_PAGE = 8
 const DEFAULT_SORT = 'price-low-high'
@@ -92,12 +93,30 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
-  const { products, searchTerm } = useStateContext()
+  const { searchTerm, setProducts, cart } = useStateContext()
+  const { products: loaderProducts = [] } = Route.useLoaderData()
 
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showLoanCalculator, setShowLoanCalculator] = useState(false)
+  const products = loaderProducts
+
+  useEffect(() => {
+    setProducts((prevProducts = []) => {
+      const nextProducts = applyCartState(products, cart)
+      if (prevProducts.length !== nextProducts.length) {
+        return nextProducts
+      }
+
+      const isSame = prevProducts.every(
+        (prevItem, index) => prevItem === nextProducts[index],
+      )
+
+      return isSame ? prevProducts : nextProducts
+    })
+  }, [products, cart, setProducts])
+
   const filterOptions = useMemo(() => {
     if (products.length === 0) {
       return {
@@ -450,17 +469,32 @@ function IndexPage() {
         {filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-6 2xl:gap-[30px]">
-              {paginatedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  id={product.id}
-                  title={product.name}
-                  price={`KES ${product.price.toLocaleString()}`}
-                  oldPrice={`KES ${product.originalPrice.toLocaleString()}`}
-                  image={product.image}
-                  hasCartButton={product.inCart}
-                />
-              ))}
+              {paginatedProducts.map((product) => {
+                const priceLabel =
+                  product.priceLabel ??
+                  `KES ${Number(product.price ?? 0).toLocaleString()}`
+                const hasDiscount =
+                  Number(product.originalPrice ?? 0) >
+                  Number(product.price ?? 0)
+                const oldPriceLabel = hasDiscount
+                  ? product.originalPriceLabel ??
+                    `KES ${Number(
+                      product.originalPrice ?? product.price ?? 0,
+                    ).toLocaleString()}`
+                  : priceLabel
+
+                return (
+                  <ProductCard
+                    key={product.id}
+                    id={product.id}
+                    title={product.name}
+                    price={priceLabel}
+                    oldPrice={oldPriceLabel}
+                    image={product.image}
+                    hasCartButton={product.inCart}
+                  />
+                )
+              })}
             </div>
 
             {showPagination && (
@@ -522,6 +556,9 @@ function IndexPage() {
 }
 
 export const Route = createFileRoute('/')({
+  loader: async ({ context: { queryClient } }) => {
+    return queryClient.ensureQueryData(productsQueryOptions())
+  },
   component: IndexPage,
   validateSearch: (search) => ({
     auth: search?.auth,

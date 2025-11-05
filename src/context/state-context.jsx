@@ -11,13 +11,7 @@ import { safeLocalStorage } from '@/lib/utils'
 
 const StateContext = createContext(null)
 
-const buildInitialCart = () =>
-  productCatalog
-    .filter((product) => product.inCart)
-    .map((product) => ({
-      productId: product.id,
-      quantity: Math.max(1, product.cartQuantity ?? 1),
-    }))
+const buildInitialCart = () => []
 
 const buildInitialProducts = (initialCart) =>
   productCatalog.map((product) => {
@@ -262,7 +256,21 @@ export function ContextProvider({ children }) {
   }, [clearCart])
 
   const findProductById = useCallback(
-    (productId) => products.find((p) => p.id === Number(productId)),
+    (productId) => {
+      if (productId === undefined || productId === null) {
+        return undefined
+      }
+
+      const targetId = String(productId)
+      return products.find((product) => {
+        const productIdMatch = product?.id !== undefined
+        const productSkuMatch = product?.sku !== undefined
+        return (
+          (productIdMatch && String(product.id) === targetId) ||
+          (productSkuMatch && String(product.sku) === targetId)
+        )
+      })
+    },
     [products],
   )
 
