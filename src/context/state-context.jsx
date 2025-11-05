@@ -11,8 +11,6 @@ import { safeLocalStorage } from '@/lib/utils'
 
 const StateContext = createContext(null)
 
-export const MAX_CART_QUANTITY = 5
-
 const buildInitialCart = () =>
   productCatalog
     .filter((product) => product.inCart)
@@ -111,10 +109,7 @@ export function ContextProvider({ children }) {
         const existing = prevCart.find((item) => item.productId === productId)
 
         if (existing) {
-          const updatedQuantity = Math.min(
-            MAX_CART_QUANTITY,
-            existing.quantity + normalizedQuantity,
-          )
+          const updatedQuantity = existing.quantity + normalizedQuantity
 
           if (updatedQuantity === existing.quantity) {
             return prevCart
@@ -134,14 +129,12 @@ export function ContextProvider({ children }) {
           return nextCart
         }
 
-        const clampedQuantity = Math.min(MAX_CART_QUANTITY, normalizedQuantity)
-
         syncProductCartState(productId, {
           inCart: true,
-          cartQuantity: clampedQuantity,
+          cartQuantity: normalizedQuantity,
         })
 
-        return [...prevCart, { productId, quantity: clampedQuantity }]
+        return [...prevCart, { productId, quantity: normalizedQuantity }]
       })
     },
     [syncProductCartState],
@@ -151,7 +144,7 @@ export function ContextProvider({ children }) {
     (productId, quantity) => {
       setCart((prevCart) => {
         const sanitizedQuantity = Math.max(0, Number(quantity) || 0)
-        const clampedQuantity = Math.min(MAX_CART_QUANTITY, sanitizedQuantity)
+        const clampedQuantity = sanitizedQuantity
         const exists = prevCart.find((item) => item.productId === productId)
 
         if (!exists && clampedQuantity <= 0) {

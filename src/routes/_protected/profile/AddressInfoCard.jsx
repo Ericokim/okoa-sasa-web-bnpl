@@ -1,21 +1,37 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Form } from '@/components/ui/form'
 import { useAccountStore } from '@/data/accountStore'
 import { EditIcon } from '@/assets/icons'
+import { Button } from '@/components/ui/button'
+import { FormTextarea } from '@/components/shared/Inputs/FormTextarea'
+
+// Validation schema for address
+const addressSchema = z.object({
+  street: z
+    .string()
+    .min(1, 'Address is required')
+    .min(10, 'Address must be at least 10 characters')
+    .max(500, 'Address is too long'),
+})
 
 export function RouteComponent() {
   const { addresses, updateAddress } = useAccountStore()
   const [editing, setEditing] = useState(null)
-  const [street, setStreet] = useState('')
 
   const startEdit = (type) => {
-    const addr = addresses.find((a) => a.type === type)
-    setStreet(addr?.street || '')
     setEditing(type)
   }
 
-  const save = () => {
-    if (editing) updateAddress(editing, { street })
+  const saveAddress = (type, data) => {
+    updateAddress(type, data)
+    setEditing(null)
+  }
+
+  const cancelEdit = () => {
     setEditing(null)
   }
 
@@ -30,9 +46,9 @@ export function RouteComponent() {
 
       <hr className="my-4 border-gray-200" />
 
-      {/* Office */}
+      {/* Office Address */}
       {office && (
-        <div className="mb-6 rounded-xl border  p-4">
+        <div className="mb-6 rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
               <p className="font-sans text-base font-normal leading-snug text-gray-600">
@@ -53,10 +69,10 @@ export function RouteComponent() {
 
           {editing === 'office' ? (
             <AddressEditForm
-              value={street}
-              onChange={setStreet}
-              onSave={save}
-              onCancel={() => setEditing(null)}
+              type="office"
+              initialData={office}
+              onSave={saveAddress}
+              onCancel={cancelEdit}
             />
           ) : (
             <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
@@ -66,7 +82,7 @@ export function RouteComponent() {
         </div>
       )}
 
-      {/* Home */}
+      {/* Home Address */}
       {home && (
         <div className="rounded-xl border p-4">
           <div className="flex items-center justify-between mb-2">
@@ -77,10 +93,9 @@ export function RouteComponent() {
             </div>
 
             {editing !== 'home' && (
-              
               <button
                 onClick={() => startEdit('home')}
-                className=" cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
+                className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50 transition-colors"
               >
                 <EditIcon />
                 <span>Edit</span>
@@ -90,10 +105,10 @@ export function RouteComponent() {
 
           {editing === 'home' ? (
             <AddressEditForm
-              value={street}
-              onChange={setStreet}
-              onSave={save}
-              onCancel={() => setEditing(null)}
+              type="home"
+              initialData={home}
+              onSave={saveAddress}
+              onCancel={cancelEdit}
             />
           ) : (
             <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
@@ -106,39 +121,64 @@ export function RouteComponent() {
   )
 }
 
+// Reusable Edit Form with Validation
+function AddressEditForm({ type, initialData, onSave, onCancel }) {
+  const form = useForm({
+    resolver: zodResolver(addressSchema),
+    defaultValues: {
+      street: initialData?.street || '',
+    },
+  })
+
+  const handleSave = (data) => {
+    onSave(type, data)
+  }
+
+  const handleCancel = () => {
+    form.reset()
+    onCancel()
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSave)} className="space-y-4">
+        <FormTextarea
+          control={form.control}
+          name="street"
+          label=""
+          placeholder="Enter complete address (street, building, floor, city, postal code)"
+          minRows={3}
+          maxRows={6}
+          className="bg-white border-gray-300 focus-visible:ring-orange-500"
+          // If your FormTextarea supports icons, uncomment the line below:
+          // icon={LocationIcon}
+        />
+
+        <div className="flex gap-3 pt-2">
+          <Button
+            type="submit"
+            className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 font-medium transition-colors"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? 'Saving...' : 'Save'}
+          </Button>
+          <Button
+            type="button"
+            onClick={handleCancel}
+            variant="outline"
+            className="flex-1 border border-gray-300 rounded-full py-2 font-medium hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Form>
+  )
+}
+
 export const Route = createFileRoute('/_protected/profile/AddressInfoCard')({
   component: RouteComponent,
 })
 
 export const component = RouteComponent
 export const AddressInfoCard = RouteComponent
-
-// Reusable Edit Form — Updated with Textarea
-function AddressEditForm({ value, onChange, onSave, onCancel }) {
-  return (
-    <div className="space-y-3">
-      <textarea
-        rows={3}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-base focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all resize-y min-h-[80px]"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Enter street address"
-      />
-
-      <div className="flex gap-2">
-        <button
-          onClick={onSave}
-          className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 text-sm font-medium transition-colors"
-        >
-          Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="flex-1 border border-gray-300 hover:bg-gray-100 rounded-full py-2 text-sm font-medium transition-colors"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  )
-}

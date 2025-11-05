@@ -7,7 +7,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import * as z from 'zod'
 
 export function PhoneInput({
   control,
@@ -20,7 +19,7 @@ export function PhoneInput({
 }) {
   const handlePhoneChange = (e, field) => {
     const value = e.target.value
-    
+
     // Allow only + symbol, numbers, and handle backspace
     const filteredValue = value
       .split('')
@@ -31,7 +30,7 @@ export function PhoneInput({
         return /\d/.test(char)
       })
       .join('')
-    
+
     // Enforce maximum length based on format
     let maxLength
     if (filteredValue.startsWith('+254')) {
@@ -42,7 +41,7 @@ export function PhoneInput({
       // Allow typing to begin
       maxLength = 13
     }
-    
+
     const finalValue = filteredValue.slice(0, maxLength)
     field.onChange(finalValue)
   }
@@ -53,32 +52,35 @@ export function PhoneInput({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem className="relative">
-          <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
-            {label}
-          </FormLabel>
-          <FormControl>
-            <div className="relative">
-              {Icon && (
-                <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              )}
-              <Input
-                type="text"
-                placeholder={placeholder}
-                disabled={disabled}
-                className={`${Icon ? 'pl-10' : 'pl-4'} h-11 bg-gray-50 focus-visible:ring-primary ${
-                  fieldState.error 
-                    ? 'border-primary focus-visible:ring-primary' 
-                    : 'border-gray-300'
-                } ${className}`}
-                value={field.value}
-                onChange={(e) => handlePhoneChange(e, field)}
-                onBlur={field.onBlur}
-                name={field.name}
-              />
+          <div className="flex flex-col">
+            <FormLabel className="text-sm mb-[3px] font-medium text-gray-900">
+              {label}
+            </FormLabel>
+            <FormControl>
+              <div className="relative">
+                {Icon && (
+                  <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                )}
+                <Input
+                  type="text"
+                  placeholder={placeholder}
+                  disabled={disabled}
+                  className={`${Icon ? 'pl-10' : 'pl-4'} h-11 bg-gray-50 focus-visible:ring-primary ${
+                    fieldState.error
+                      ? 'border-primary focus-visible:ring-primary'
+                      : 'border-gray-300'
+                  } ${className}`}
+                  value={field.value}
+                  onChange={(e) => handlePhoneChange(e, field)}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                />
+              </div>
+            </FormControl>
+            {/* Ultra minimal space for error message */}
+            <div className=" mt-2">
+              <FormMessage className="text-sm text-primary leading-none" />
             </div>
-          </FormControl>
-          <div className="absolute left-0 top-full mb-1 mt-1">
-            <FormMessage />
           </div>
         </FormItem>
       )}

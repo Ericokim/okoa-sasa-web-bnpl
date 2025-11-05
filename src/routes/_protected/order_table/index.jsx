@@ -68,7 +68,7 @@ function OrdersTableHistory() {
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'All Orders', path: '/allOrders', isCurrent: true },
+    { label: 'Order History', path: '/orderHistory', isCurrent: true },
   ]
 
   const getGradient = () => 'from-orange-500 to-amber-500'
@@ -86,15 +86,14 @@ function OrdersTableHistory() {
 
       <main className="w-full flex flex-col py-4">
         <h1 className="text-4xl font-semibold text-gray-900 mb-2">
-          All My Orders
+          My Order History
         </h1>
         <p className="text-gray-600 mb-8">Overview of all of your activities</p>
 
         {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
 
-            {/* Order History - Responsive Layout */}
+        {/* Order History - Responsive Layout */}
         <div className="-mt-2">
-        
           {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
           <div className="hidden md:block">
             <Card className="shadow-none overflow-hidden">
@@ -164,7 +163,7 @@ function OrdersTableHistory() {
                       </div>
 
                       {idx < orderHistory.length - 1 && (
-                        <Separator className={'my-4'}/>
+                        <Separator className={'my-4'} />
                       )}
                     </div>
                   )
@@ -228,31 +227,27 @@ function OrdersTableHistory() {
                       </div>
                     </div>
 
-                    {/* Loan Amount */}
-                    <div className="flex items-start mb-3">
-                      <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
-                      <div>
-                        <p className="text-xs text-gray-500">Loan Amount</p>
-                        <p className="text-sm font-semibold text-gray-900">
-                          KES {order.loanAmount.toLocaleString()}
-                        </p>
+                    {/* Loan Amount + View Details – Aligned on same line */}
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-start">
+                        <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
+                        <div>
+                          <p className="text-xs text-gray-500">Loan Amount</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            KES {order.loanAmount.toLocaleString()}
+                          </p>
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Status + View Details – Aligned on same line */}
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
-                      <span className="text-xs font-medium text-gray-500">
-                        {' '}
-                        <span className="text-gray-900"> </span>
-                      </span>
-                      {/* View Details */}
-
+                      {/* View Details Button */}
                       <Button
                         variant="gradient"
                         size="sm"
-                        className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
-                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
+                        className="h-[46px] px-4 py-3 
+                         bg-gradient-to-b from-[#F8971D] to-[#EE3124] 
+                         rounded-3xl text-white font-medium text-base 
+                         shadow-sm hover:opacity-90 transition-all 
+                         min-w-[120px] flex items-center justify-center"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleViewDetails(order.orderId)
@@ -260,15 +255,15 @@ function OrdersTableHistory() {
                       >
                         View Details
                       </Button>
-                     
                     </div>
+
+                
                   </CardContent>
                 </Card>
               )
             })}
           </div>
         </div>
-     
       </main>
     </div>
   )

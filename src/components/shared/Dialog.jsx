@@ -448,6 +448,9 @@ export const SuccessAlertDialog = ({
   secondaryAction,
   decorativeIcons,
 }) => {
+  const hasBothButtons = primaryAction && secondaryAction
+  const hasSingleButton = primaryAction || secondaryAction
+
   return (
     <At.AlertDialog open={isOpen} onOpenChange={onClose}>
       <At.AlertDialogContent className="max-w-md w-[90vw] sm:w-full p-0 gap-0 mx-auto">
@@ -481,11 +484,13 @@ export const SuccessAlertDialog = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
+        <div className={`${hasBothButtons ? 'flex flex-col sm:flex-row' : 'flex flex-col'} gap-3 px-4 sm:px-8 pb-6 sm:pb-8`}>
           {secondaryAction && (
             <button
               onClick={secondaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
+              className={`flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors ${
+                hasBothButtons ? 'sm:w-[208px]' : 'w-full'
+              } h-[46px] ${hasBothButtons ? 'order-2 sm:order-1' : ''}`}
             >
               {secondaryAction.label}
             </button>
@@ -494,7 +499,9 @@ export const SuccessAlertDialog = ({
           {primaryAction && (
             <button
               onClick={primaryAction.onClick}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
+              className={`flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all ${
+                hasBothButtons ? 'sm:w-[208px]' : 'w-full'
+              } h-[46px] ${hasBothButtons ? 'order-1 sm:order-2' : ''}`}
               style={{
                 background: 'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',
               }}
@@ -514,8 +521,13 @@ export const ErrorAlertDialog = ({
   title = 'Alert!',
   message,
   primaryAction,
-  secondaryAction,secLink,primLink
+  secondaryAction,
+  secLink,
+  primLink
 }) => {
+  const hasBothButtons = primaryAction && secondaryAction
+  const hasSingleButton = primaryAction || secondaryAction
+
   return (
     <At.AlertDialog className={''} open={isOpen} onOpenChange={onClose}>
       <At.AlertDialogContent className="max-w-md w-[90vw] sm:w-full rounded-4xl p-0 gap-0 mx-auto">
@@ -547,12 +559,14 @@ export const ErrorAlertDialog = ({
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row gap-3 px-4 sm:px-8 pb-6 sm:pb-8">
+        <div className={`${hasBothButtons ? 'flex flex-col sm:flex-row' : 'flex flex-col'} gap-3 px-4 sm:px-8 pb-6 sm:pb-8`}>
           {secondaryAction && (
-            <Link to={secLink}>
+            <Link to={secLink} className={hasBothButtons ? 'sm:w-[208px]' : 'w-full'}>
               <button
                 onClick={secondaryAction.onClick}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors w-full sm:w-[208px] h-[46px] order-2 sm:order-1"
+                className={`flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-3xl border-2 border-orange-500 text-orange-500 font-medium hover:bg-orange-50 transition-colors ${
+                  hasBothButtons ? 'sm:w-[208px]' : 'w-full'
+                } h-[46px] ${hasBothButtons ? 'order-2 sm:order-1' : ''}`}
               >
                 {secondaryAction.label}
               </button>
@@ -560,10 +574,12 @@ export const ErrorAlertDialog = ({
           )}
 
           {primaryAction && (
-            <Link to={primLink}>
+            <Link to={primLink} className={hasBothButtons ? 'sm:w-[208px]' : 'w-full'}>
               <button
                 onClick={primaryAction.onClick}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all w-full sm:w-[208px] h-[46px] order-1 sm:order-2"
+                className={`flex flex-row justify-center items-center px-4 py-3 gap-2.5 rounded-[24px] text-white font-medium hover:opacity-90 transition-all ${
+                  hasBothButtons ? 'sm:w-[208px]' : 'w-full'
+                } h-[46px] ${hasBothButtons ? 'order-1 sm:order-2' : ''}`}
                 style={{
                   background:
                     'linear-gradient(180deg, #F8971D 0%, #EE3124 100%)',

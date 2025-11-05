@@ -4,7 +4,6 @@ import { formatCurrency } from '@/lib/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { MAX_CART_QUANTITY } from '@/context/state-context'
 
 export function CartItem({
   id,
@@ -20,7 +19,6 @@ export function CartItem({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const handleIncrement = () => {
-    if (quantity >= MAX_CART_QUANTITY) return
     onQuantityChange?.(id, quantity + 1)
   }
   const handleDecrement = () =>
@@ -81,7 +79,6 @@ export function CartItem({
                 size="icon"
                 className="h-7 w-7 lg:h-8 lg:w-8 xl:h-10 xl:w-10 rounded-full text-lg flex items-center justify-center"
                 onClick={handleIncrement}
-                disabled={quantity >= MAX_CART_QUANTITY}
               >
                 <Plus className="h-3 w-3 lg:h-3 lg:w-3 xl:h-4 xl:w-4 text-[#292D32]" strokeWidth={1.75} />
               </Button>
@@ -152,7 +149,6 @@ export function CartItem({
               size="icon"
               className="h-8 w-8 rounded-full flex items-center justify-center"
               onClick={handleIncrement}
-              disabled={quantity >= MAX_CART_QUANTITY}
             >
               <Plus className="h-3 w-3 text-[#292D32]" strokeWidth={1.75} />
             </Button>
@@ -208,7 +204,6 @@ export function CartItem({
                 onClick={handleIncrement}
                 className="quantity-btn h-8 w-8 sm:h-10 sm:w-10"
                 aria-label="Increase quantity"
-                disabled={quantity >= MAX_CART_QUANTITY}
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-[#292D32]" strokeWidth={1.75} />
               </button>
@@ -282,9 +277,3 @@ export function CartItem({
     </>
   )
 }
-
-/* ✅ Shared utility classes (tailwind.config or globals.css)
-.quantity-btn {
-  @apply flex h-10 w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:border-[#F8971D];
-}
-*/

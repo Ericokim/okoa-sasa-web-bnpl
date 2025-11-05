@@ -20,6 +20,13 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
     }
   }
 
+  const handleSubmitOrder = () => {
+    // Submit order logic - for now, just move to next step
+    if (onNext) {
+      onNext()
+    }
+  }
+
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-0 sm:p-0 gap-6">
       <div className="bg-white w-full border h-auto rounded-4xl p-4 sm:p-6">
@@ -56,38 +63,62 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-            <Button
-              onClick={() => setShowAuthDialog(true)}
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-            >
-             Sign In
-            </Button>
+          {/* Action Buttons - Conditionally rendered based on checkbox state */}
+          {!isAccepted ? (
+            // Original buttons when checkbox is unchecked
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+              <Button
+                onClick={() => setShowAuthDialog(true)}
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+              >
+                Sign In
+              </Button>
 
-            <Button
-              onClick={handleGuestCheckout}
-              variant="outline"
-              className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-            >
-              Continue As Guest
-            </Button>
-          </div>
+              <Button
+                onClick={handleGuestCheckout}
+                variant="outline"
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+              >
+                Continue As Guest
+              </Button>
+            </div>
+          ) : (
+            // New buttons when checkbox is checked
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+              <Button
+                onClick={handleSubmitOrder}
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+              >
+                Submit Order
+              </Button>
+
+              <Button
+                onClick={onPrevious}
+                variant="outline"
+                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+              >
+                Back
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Back Button */}
-      <div className="flex justify-end w-full">
-        <Button
-          onClick={onPrevious}
-          disabled={isFirstStep}
-          type="button"
-          variant="outline"
-          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
-        >
-          Back
-        </Button>
-      </div>
+      {/* Back Button - Hidden when checkbox is checked */}
+      {!isAccepted && (
+        <div className="flex justify-end w-full">
+          <Button
+            onClick={onPrevious}
+            disabled={isFirstStep}
+            type="button"
+            variant="outline"
+            className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+          >
+            Back
+          </Button>
+        </div>
+      )}
+
       <AuthDialog onLoginSuccess={handleLoginSuccess} open={showAuthDialog} onOpenChange={setShowAuthDialog} />
     </div>
   )

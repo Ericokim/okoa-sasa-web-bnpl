@@ -45,7 +45,7 @@ const kenyaPhoneSchema = z
     },
     {
       message:
-        'Please enter a valid Kenyan phone number (e.g., +254712345678 or 0712345678)',
+        'Please enter a valid Kenyan phone number',
     },
   )
 
@@ -89,31 +89,49 @@ export default function DeliveryDetailsForm({
   const currentSchema =
     deliveryType === 'door' ? doorDeliverySchema : pickupStationSchema
 
+  // Initialize form with savedData directly in defaultValues
   const form = useForm({
     resolver: zodResolver(currentSchema),
-    defaultValues: savedData || {
-      firstName: '',
-      lastName: '',
-      recipientNumber: '',
-      region: '',
-      pickupStore: '',
-      deliveryAddress: '',
+    defaultValues: {
+      firstName: savedData?.firstName || '',
+      lastName: savedData?.lastName || '',
+      recipientNumber: savedData?.recipientNumber || '',
+      region: savedData?.region || '',
+      pickupStore: savedData?.pickupStore || '',
+      deliveryAddress: savedData?.deliveryAddress || '',
     },
   })
 
+  // Update form when savedData changes (with proper dependency management)
   useEffect(() => {
-    if (savedData && Object.keys(savedData).length > 0) {
-      form.reset(savedData)
+    if (savedData) {
+      // Only reset if there are actual changes to avoid unnecessary updates
+      const currentValues = form.getValues()
+      const hasChanges = Object.keys(savedData).some(
+        key => savedData[key] !== currentValues[key]
+      )
+      
+      if (hasChanges) {
+        form.reset({
+          firstName: savedData.firstName || '',
+          lastName: savedData.lastName || '',
+          recipientNumber: savedData.recipientNumber || '',
+          region: savedData.region || '',
+          pickupStore: savedData.pickupStore || '',
+          deliveryAddress: savedData.deliveryAddress || '',
+        })
+      }
+      
       if (savedData.deliveryType) {
         setDeliveryType(savedData.deliveryType)
       }
     }
-  }, [savedData, form])
+  }, [savedData]) // Only depend on savedData, not form
 
   // Reset validation when delivery type changes
   useEffect(() => {
     form.clearErrors()
-  }, [deliveryType, form])
+  }, [deliveryType]) // Remove form from dependencies
 
   const onSubmit = (data) => {
     const dataWithType = { ...data, deliveryType }

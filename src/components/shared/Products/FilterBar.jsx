@@ -16,6 +16,7 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link, useLocation } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { CurrencyFilterInput, formatCurrencyInputValue, parseCurrencyValue } from '../Inputs/FormFilter'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -442,8 +443,8 @@ export function FilterBar({
     const minBound = normalizedOptions.price.min
     const maxBound = normalizedOptions.price.max
 
-    let minValue = parseInt(filters.priceMin || '', 10)
-    let maxValue = parseInt(filters.priceMax || '', 10)
+    let minValue = parseCurrencyValue(filters.priceMin || '')
+    let maxValue = parseCurrencyValue(filters.priceMax || '')
 
     if (Number.isNaN(minValue)) minValue = filters.priceRange[0]
     if (Number.isNaN(maxValue)) maxValue = filters.priceRange[1]
@@ -458,8 +459,8 @@ export function FilterBar({
     const nextFilters = {
       ...filters,
       priceRange: [minValue, maxValue],
-      priceMin: `${minValue}`,
-      priceMax: `${maxValue}`,
+      priceMin: formatCurrencyInputValue(`${minValue}`),
+      priceMax: formatCurrencyInputValue(`${maxValue}`),
     }
 
     setFilters(nextFilters)
@@ -496,10 +497,9 @@ export function FilterBar({
   }
 
   const handlePriceInputChange = (field, value) => {
-    const numericValue = value.replace(/[^\d]/g, '')
     setFilters((prev) => ({
       ...prev,
-      [field]: numericValue,
+      [field]: value,
     }))
   }
 
@@ -757,44 +757,20 @@ export function FilterBar({
                       />
 
                       <div className="flex items-start gap-2 self-stretch">
-                        <div className="flex flex-1 items-center justify-center">
-                          <input
-                            type="text"
-                            value={filters.priceMin}
-                            onChange={(event) =>
-                              handlePriceInputChange(
-                                'priceMin',
-                                event.target.value,
-                              )
-                            }
-                            className={cn(
-                              'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
-                              'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                              'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
-                              'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
-                            )}
-                            placeholder="Min"
-                          />
-                        </div>
-                        <div className="flex flex-1 items-center justify-center rounded-lg">
-                          <input
-                            type="text"
-                            value={filters.priceMax}
-                            onChange={(event) =>
-                              handlePriceInputChange(
-                                'priceMax',
-                                event.target.value,
-                              )
-                            }
-                            className={cn(
-                              'flex h-8 w-full px-2 items-center justify-center rounded-[12px]',
-                              'shrink-0 first:rounded-[12px] first:rounded-l-[12px] last:rounded-[12px] last:rounded-r-[12px]',
-                              'border border-[#E8ECF4] bg-[#ffffff] text-base font-medium leading-[1.4] font-["Public_Sans"] text-[#686869]',
-                              'transition-colors focus:border-[#F8971D] focus:ring-2 focus:ring-[#F8971D]/20 focus:text-[#252525]',
-                            )}
-                            placeholder="Max"
-                          />
-                        </div>
+                        <CurrencyFilterInput
+                          value={filters.priceMin}
+                          onChange={(value) =>
+                            handlePriceInputChange('priceMin', value)
+                          }
+                          placeholder="KES Min"
+                        />
+                        <CurrencyFilterInput
+                          value={filters.priceMax}
+                          onChange={(value) =>
+                            handlePriceInputChange('priceMax', value)
+                          }
+                          placeholder="KES Max"
+                        />
                       </div>
 
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
