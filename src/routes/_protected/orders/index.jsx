@@ -12,32 +12,31 @@ export const recentOrders = [
   {
     id: '1',
     orderId: 'REQ-20458',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'In Progress',
-    statusColor: 'blue',
+    title: 'Samsung Galaxy A35',
+    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
+    price: 38500,
+    status: 'Pending', // From orderHistory
+    statusColor: 'yellow',
+    statusVariant: 'secondary', // From orderHistory
     image: '/phone.png',
-    date: '28/10/2025 14:30:00',
+    date: '12/10/2025 14:30:00',
     invoice: 'S-INV+0942801',
-    amount: 87696,
-    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
-    statusText: 'PROCESSING',
+    amount: 38500,
+    dispatchTo: 'Jane Mwangi, Westlands, Nairobi, 00100',
+    statusText: 'PENDING',
     items: [
       {
-        name: 'iPhone 14 - Midnight',
+        name: 'Samsung Galaxy A35 - Navy',
         qty: 1,
-        price: 87696,
-        total: 87696,
+        price: 38500,
+        total: 38500,
       },
     ],
-    // NEW: Full delivery details
     delivery: {
-      type: 'door', // 'door' or 'pickup'
+      type: 'door',
       recipient: {
-        firstName: 'John',
-        lastName: 'Doe',
+        firstName: 'Jane',
+        lastName: 'Mwangi',
         phone: '+254712345678',
       },
       region: 'nairobi',
@@ -45,140 +44,41 @@ export const recentOrders = [
       pickupStore: null,
     },
     shippingAddress: {
-      name: 'John Doe',
+      name: 'Jane Mwangi',
       street: 'Westlands Road',
       city: 'Nairobi',
       zip: '00100',
       country: 'Kenya',
     },
     summary: {
-      subtotal: 87696,
+      subtotal: 38500,
       shipping: 0,
-      total: 87696,
+      total: 38500,
     },
-    statusStep: 0,
-  },
-
-  {
-    id: '7',
-    orderId: 'REQ-20458',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'In Progress',
-    statusColor: 'blue',
-    image: '/phone.png',
-    date: '28/10/2025 14:30:00',
-    invoice: 'S-INV+0942801',
-    amount: 87696,
-    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
-    statusText: 'PROCESSING',
-    items: [
-      {
-        name: 'iPhone 14 - Midnight',
-        qty: 1,
-        price: 87696,
-        total: 87696,
-      },
-    ],
-    // NEW: Full delivery details
-    delivery: {
-      type: 'door', // 'door' or 'pickup'
-      recipient: {
-        firstName: 'John',
-        lastName: 'Doe',
-        phone: '+254712345678',
-      },
-      region: 'nairobi',
-      address: 'Westlands Road, Nairobi, 00100, Kenya',
-      pickupStore: null,
-    },
-    shippingAddress: {
-      name: 'John Doe',
-      street: 'Westlands Road',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 87696,
-      shipping: 0,
-      total: 87696,
-    },
-    statusStep: 0,
-  },
-  {
-    id: '20',
-    orderId: 'REQ-20458',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'In Progress',
-    statusColor: 'blue',
-    image: '/phone.png',
-    date: '28/10/2025 14:30:00',
-    invoice: 'S-INV+0942801',
-    amount: 87696,
-    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
-    statusText: 'PROCESSING',
-    items: [
-      {
-        name: 'iPhone 14 - Midnight',
-        qty: 1,
-        price: 87696,
-        total: 87696,
-      },
-    ],
-    // NEW: Full delivery details
-    delivery: {
-      type: 'door', // 'door' or 'pickup'
-      recipient: {
-        firstName: 'John',
-        lastName: 'Doe',
-        phone: '+254712345678',
-      },
-      region: 'nairobi',
-      address: 'Westlands Road, Nairobi, 00100, Kenya',
-      pickupStore: null,
-    },
-    shippingAddress: {
-      name: 'John Doe',
-      street: 'Westlands Road',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 87696,
-      shipping: 0,
-      total: 87696,
-    },
-    statusStep: 0,
+    statusStep: 0, // Pending → first step
   },
 
   {
     id: '2',
     orderId: 'REQ-20459',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'Rejected',
-    statusColor: 'red',
+    title: 'Samsung Galaxy A35',
+    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
+    price: 38500,
+    status: 'Approved', // From orderHistory
+    statusColor: 'blue',
+    statusVariant: 'default', // From orderHistory
     image: '/phone.png',
-    date: '27/10/2025 09:15:00',
+    date: '12/10/2025 09:15:00',
     invoice: 'S-INV+0942802',
-    amount: 87696,
+    amount: 38500,
     dispatchTo: 'Jane Mwangi, Kilimani, Nairobi',
-    statusText: 'REJECTED',
+    statusText: 'APPROVED',
     items: [
       {
-        name: 'iPhone 14 - Midnight',
+        name: 'Samsung Galaxy A35 - Navy',
         qty: 1,
-        price: 87696,
-        total: 87696,
+        price: 38500,
+        total: 38500,
       },
     ],
     delivery: {
@@ -200,41 +100,41 @@ export const recentOrders = [
       country: 'Kenya',
     },
     summary: {
-      subtotal: 87696,
+      subtotal: 38500,
       shipping: 0,
-      total: 87696,
+      total: 38500,
     },
-    statusStep: -1,
+    statusStep: 1, // Approved → "On the way"
   },
 
   {
     id: '3',
     orderId: 'REQ-20460',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'Pending Request',
-    statusColor: 'yellow',
+    title: 'Samsung Galaxy A35',
+    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
+    price: 38500,
+    status: 'Fulfilled', // From orderHistory
+    statusColor: 'green',
+    statusVariant: 'success', // From orderHistory
     image: '/phone.png',
-    date: '26/10/2025 11:45:00',
+    date: '12/10/2025 11:45:00',
     invoice: 'S-INV+0942803',
-    amount: 87696,
-    dispatchTo: 'Peter Kimani, Lavington, Nairobi',
-    statusText: 'PENDING',
+    amount: 38500,
+    dispatchTo: 'Jane Mwangi, Lavington, Nairobi',
+    statusText: 'FULFILLED',
     items: [
       {
-        name: 'iPhone 14 - Midnight',
+        name: 'Samsung Galaxy A35 - Navy',
         qty: 1,
-        price: 87696,
-        total: 87696,
+        price: 38500,
+        total: 38500,
       },
     ],
     delivery: {
       type: 'door',
       recipient: {
-        firstName: 'Peter',
-        lastName: 'Kimani',
+        firstName: 'Jane',
+        lastName: 'Mwangi',
         phone: '+254711223344',
       },
       region: 'nairobi',
@@ -242,48 +142,48 @@ export const recentOrders = [
       pickupStore: null,
     },
     shippingAddress: {
-      name: 'Peter Kimani',
+      name: 'Jane Mwangi',
       street: 'James Gichuru Rd',
       city: 'Nairobi',
       zip: '00100',
       country: 'Kenya',
     },
     summary: {
-      subtotal: 87696,
+      subtotal: 38500,
       shipping: 0,
-      total: 87696,
+      total: 38500,
     },
-    statusStep: 0,
+    statusStep: 2, // Fulfilled → final step "Delivered"
   },
 
   {
     id: '4',
     orderId: 'REQ-20461',
-    title: 'iPhone 14',
-    specs:
-      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
-    price: 87696,
-    status: 'Pending Request',
-    statusColor: 'yellow',
+    title: 'Samsung Galaxy A35',
+    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
+    price: 38500,
+    status: 'Declined', // From orderHistory
+    statusColor: 'red',
+    statusVariant: 'destructive', // From orderHistory
     image: '/phone.png',
-    date: '25/10/2025 16:20:00',
+    date: '12/10/2025 16:20:00',
     invoice: 'S-INV+0942804',
-    amount: 87696,
-    dispatchTo: 'Alice Wanjiku, Karen, Nairobi',
-    statusText: 'PENDING',
+    amount: 38500,
+    dispatchTo: 'Jane Mwangi, Karen, Nairobi',
+    statusText: 'DECLINED',
     items: [
       {
-        name: 'iPhone 14 - Midnight',
+        name: 'Samsung Galaxy A35 - Navy',
         qty: 1,
-        price: 87696,
-        total: 87696,
+        price: 38500,
+        total: 38500,
       },
     ],
     delivery: {
       type: 'pickup',
       recipient: {
-        firstName: 'Alice',
-        lastName: 'Wanjiku',
+        firstName: 'Jane',
+        lastName: 'Mwangi',
         phone: '+254722334455',
       },
       region: 'nairobi',
@@ -291,20 +191,21 @@ export const recentOrders = [
       pickupStore: 'Westlands Station',
     },
     shippingAddress: {
-      name: 'Peter Kimani',
-      street: 'James Gichuru Rd',
+      name: 'Jane Mwangi',
+      street: 'Ngong Road',
       city: 'Nairobi',
       zip: '00100',
       country: 'Kenya',
     },
     summary: {
-      subtotal: 87696,
+      subtotal: 38500,
       shipping: 0,
-      total: 87696,
+      total: 38500,
     },
-    statusStep: 0,
+    statusStep: -1, // Declined → rejected
   },
 ]
+
 function OrdersPage() {
   const navigate = useNavigate()
 
