@@ -26,13 +26,13 @@ export default function ProfilePage() {
   //   channel: "ussd",
   // });
 
-  if (isLoading) return <p>Loading products...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  // if (isLoading) return <p>Loading products...</p>;
+  // if (error) return <p>Error: {error.message}</p>;
 
-  const products = data?.data || [];
-  const totalCount = data?.totalCount || 0;
+  // const products = data?.data || [];
+  // const totalCount = data?.totalCount || 0;
 
-  console.log('Fetched products:', products);
+  // console.log('Fetched products:', products);
 
   return (
     <div className="min-h-screen">
