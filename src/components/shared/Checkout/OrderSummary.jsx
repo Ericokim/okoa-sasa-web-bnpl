@@ -4,6 +4,7 @@ import { TrashIcon, TrashIconWhite } from '@/assets/icons'
 import { useStateContext } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
 import { ErrorAlertDialog } from '../Dialog'
+import { Button } from '@/components/ui/button'
 
 export default function OrderSummaryPage({
   onNext,
@@ -338,15 +339,16 @@ export default function OrderSummaryPage({
 
       {/* Buttons Container */}
       <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
-        <button
+        <Button
           onClick={onPrevious}
           disabled={isFirstStep}
           type="button"
+          variant={"outline"}
           className="flex justify-center items-center px-4 py-3 w-full sm:w-[193px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleNext}
           type="button"
           className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity w-full sm:w-auto"
@@ -355,7 +357,7 @@ export default function OrderSummaryPage({
           }}
         >
           Next: Terms & Condition
-        </button>
+        </Button>
       </div>
 
       {/* Delete Confirmation Modal */}

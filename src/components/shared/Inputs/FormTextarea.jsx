@@ -74,7 +74,7 @@ export function FormTextarea({
                 disabled={disabled}
                 rows={minRows}
                 onInput={(e) => handleInput(e, field)}
-                className={`border-gray-300 bg-gray-50 resize-none focus-visible:ring-primary invalid:border-primary transition-all duration-150 ${className}`}
+                className={`border-gray-300 bg-gray-50 resize-none transition-all duration-150 ${className}`}
                 style={{ overflow: 'hidden' }}
                 {...field}
               />
