@@ -74,7 +74,7 @@ export function RouteComponent({
 
   const handleDeleteConfirm = () => {
     onPhotoChange(null)
-    enqueueSnackbar('Profile photo removed.', { variant: 'info' })
+    enqueueSnackbar('Profile photo removed.', { variant: 'success' })
     setShowDeleteAlert(false)
     onClose()
   }
