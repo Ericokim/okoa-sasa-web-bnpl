@@ -177,7 +177,7 @@ function OrderDetailsPage() {
   const isRejected = order.statusStep === -1
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Orders', path: '/orders' },
+    { label: 'My Order History', path: '/order_table' },
     { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
   ]
   return (
@@ -408,7 +408,7 @@ function OrderDetailsPage() {
               size="sm"
               className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
                            bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-full"
               onClick={() => navigate({ to: '/orders' })}
             >
               Back to Orders
@@ -421,7 +421,7 @@ function OrderDetailsPage() {
               className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
                 border border-[#F8971D] text-[#F8971D] rounded-3xl 
                       font-medium text-base hover:bg-[#F8971D]/10 transition-all
-                         w-50"
+                         w-full"
             >
               Back to Home
             </Button>
