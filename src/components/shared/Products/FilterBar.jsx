@@ -16,7 +16,11 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { Link, useLocation } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { CurrencyFilterInput, formatCurrencyInputValue, parseCurrencyValue } from '../Inputs/FormFilter'
+import {
+  CurrencyFilterInput,
+  formatCurrencyInputValue,
+  parseCurrencyValue,
+} from '../Inputs/FormFilter'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -1052,7 +1056,7 @@ export function FilterBar({
           onClick={() => {
             onLoanCalculatorOpen?.()
           }}
-          className={loanLimitButtonClass}
+          className={`cursor-pointer ${loanLimitButtonClass}`}
           aria-pressed={isLoanCalculatorOpen}
         >
           <span className="text-sm font-normal capitalize text-black md:text-base">
