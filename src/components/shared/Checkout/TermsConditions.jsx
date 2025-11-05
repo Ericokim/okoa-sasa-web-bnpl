@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from '@tanstack/react-router'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { useStateContext } from '@/context/state-context'
 
 export default function TermsConditionPage({
   onNext,
@@ -9,13 +10,36 @@ export default function TermsConditionPage({
   isFirstStep,
   isLastStep,
 }) {
-  const [isAccepted, setIsAccepted] = useState(false)
+  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+  
+  // Use step 5 for Terms & Conditions
+  const savedData = getCheckoutFormData(5)
+  
+  const [isAccepted, setIsAccepted] = useState(savedData?.isAccepted || false)
+
+  // Save data when isAccepted changes
+  useEffect(() => {
+    saveCheckoutFormData(5, { isAccepted })
+  }, [isAccepted, saveCheckoutFormData])
+
+  // Also load saved data on component mount
+  useEffect(() => {
+    if (savedData?.isAccepted !== undefined) {
+      setIsAccepted(savedData.isAccepted)
+    }
+  }, [savedData])
 
   const handleTextClick = (e) => {
     if (e.target.tagName === 'A') {
       return
     }
     setIsAccepted(!isAccepted)
+  }
+
+  const handleNext = () => {
+    // Ensure data is saved before proceeding
+    saveCheckoutFormData(5, { isAccepted })
+    onNext()
   }
 
   return (
@@ -92,7 +116,7 @@ export default function TermsConditionPage({
         </Button>
         <Button
           disabled={!isAccepted || isLastStep}
-          onClick={onNext}
+          onClick={handleNext}
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-48 h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl"
         >
           <p className="text-base font-medium leading-[1.4] capitalize text-white">

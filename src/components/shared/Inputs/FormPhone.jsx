@@ -65,9 +65,9 @@ export function PhoneInput({
                   type="text"
                   placeholder={placeholder}
                   disabled={disabled}
-                  className={`${Icon ? 'pl-10' : 'pl-4'} h-11 bg-gray-50 focus-visible:ring-primary ${
+                  className={`${Icon ? 'pl-10' : 'pl-4'} h-11 bg-gray-50 ${
                     fieldState.error
-                      ? 'border-primary focus-visible:ring-primary'
+                      ? 'border-primary '
                       : 'border-gray-300'
                   } ${className}`}
                   value={field.value}
