@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { BreadCrumbs } from '../BreadCrumbs'
 import { CartList } from './CartList'
 import { CartSummary } from './CartSummary'
-import { useStateContext, MAX_CART_QUANTITY } from '@/context/state-context'
+import { useStateContext } from '@/context/state-context'
 
 export function Cart({ onCheckout }) {
   const { cartProducts, updateCartQuantity, removeFromCart, clearCart } =
@@ -11,10 +11,7 @@ export function Cart({ onCheckout }) {
   const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
 
   const handleQuantityChange = (id, newQuantity) => {
-    const clampedQuantity = Math.max(
-      1,
-      Math.min(newQuantity, MAX_CART_QUANTITY),
-    )
+    const clampedQuantity = Math.max(1, newQuantity)
     updateCartQuantity?.(id, clampedQuantity)
   }
 
@@ -61,8 +58,8 @@ export function Cart({ onCheckout }) {
         </p>
       </div>
 
-      {/* Cart Content - Two Column Layout */}
-      <div className="flex w-full flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,412px)] lg:items-stretch lg:gap-[30px]">
+      {/* Cart Content - Responsive Layout */}
+      <div className="flex w-full flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_minmax(380px,420px)] 2xl:gap-8">
         <CartList
           items={cartItems}
           onQuantityChange={handleQuantityChange}

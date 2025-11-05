@@ -160,7 +160,7 @@ const TikTokIcon = ({ className }) => (
 
 export function Footer() {
   return (
-    <footer className="bg-[#161719] py-10 px-4 sm:px-6 md:px-20">
+    <footer className="bg-[#161719] py-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
       <div className="mx-auto w-full space-y-10">
         {/* Header Section with Logo and Social Media */}
         <div className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
@@ -212,7 +212,7 @@ export function Footer() {
         </div>
 
         {/* Content Section - Balanced & Responsive */}
-        <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(200px,1fr))_minmax(280px,380px)] gap-8 md:gap-10 xl:gap-12">
+        <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-[repeat(3,minmax(200px,1fr))_minmax(280px,380px)] gap-6 md:gap-8 lg:gap-10 xl:gap-12">
           {/* Useful Links */}
           <div className="flex flex-col items-start gap-3 text-left">
             <h3 className="text-lg sm:text-xl font-semibold text-white">
@@ -226,7 +226,7 @@ export function Footer() {
                 How it Works
               </Link>
               <Link
-                to="/faqs"
+                to="/FAQs"
                 className="block hover:text-brand-primary-start transition-colors"
               >
                 FAQs

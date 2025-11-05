@@ -432,7 +432,7 @@ function IndexPage() {
   ])
 
   return (
-    <div className="mx-auto">
+    <div className="mx-auto ">
       <FilterBar
         options={filterOptions}
         onLoanCalculatorOpen={() => setShowLoanCalculator(true)}
@@ -449,7 +449,7 @@ function IndexPage() {
       <div className="py-6 md:py-8 lg:py-[38px]">
         {filteredProducts.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-4 lg:gap-[30px]">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-6 2xl:gap-[30px]">
               {paginatedProducts.map((product) => (
                 <ProductCard
                   key={product.id}
