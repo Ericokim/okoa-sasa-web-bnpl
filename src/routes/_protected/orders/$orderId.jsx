@@ -50,24 +50,19 @@ function OrderStepper({ steps, currentStep, isRejected }) {
     <div className="w-full">
       {/* ---------- Desktop ---------- */}
       <div className="hidden md:block">
-        {/* Circles + Lines */}
         <div className="flex items-center mb-3">
           {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
-              {/* Circle */}
               <div className="relative shrink-0">
                 {step.id < currentStep ? (
-                  /* Completed: solid orange + check */
                   <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
                     <Check className="w-6 h-6 text-white" strokeWidth={3} />
                   </div>
                 ) : step.id === currentStep ? (
-                  /* Current: orange ring + dot */
                   <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
                     <div className="w-3 h-3 rounded-full bg-orange-500" />
                   </div>
                 ) : (
-                  /* Future: gray ring + dot */
                   <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
                     <div className="w-3 h-3 rounded-full bg-gray-300" />
                   </div>
