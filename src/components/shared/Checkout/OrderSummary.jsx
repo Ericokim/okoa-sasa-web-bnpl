@@ -4,6 +4,7 @@ import { TrashIcon, TrashIconWhite } from '@/assets/icons'
 import { useStateContext } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
 import { ErrorAlertDialog } from '../Dialog'
+import { Button } from '@/components/ui/button'
 
 export default function OrderSummaryPage({
   onNext,
@@ -137,7 +138,7 @@ export default function OrderSummaryPage({
               <button
                 type="button"
                 onClick={handleClearCart}
-                className="flex items-center justify-center rounded-3xl border border-[#F25E5E] px-4 py-2 text-sm font-medium text-[#F25E5E] transition-all hover:bg-[#FFF5F5]"
+                className="flex cursor-pointer items-center justify-center rounded-3xl border border-[#F25E5E] px-4 py-2 text-sm font-medium text-[#F25E5E] transition-all hover:bg-[#FFF5F5]"
               >
                 Clear All
               </button>
@@ -185,7 +186,7 @@ export default function OrderSummaryPage({
                               onClick={() =>
                                 handleDecrement(product.id, quantity)
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                              className="flex cursor-pointer h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                               aria-label="Decrease quantity"
                               type="button"
                             >
@@ -203,7 +204,7 @@ export default function OrderSummaryPage({
                               onClick={() =>
                                 handleIncrement(product.id, quantity)
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                              className="flex cursor-pointer h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                               aria-label="Increase quantity"
                               type="button"
                             >
@@ -217,7 +218,7 @@ export default function OrderSummaryPage({
 
                         <button
                           onClick={() => handleDeleteClick(product)}
-                          className="flex h-8 w-8 items-center justify-center transition-opacity hover:opacity-80"
+                          className="flex cursor-pointer h-8 w-8 items-center justify-center transition-opacity hover:opacity-80"
                           aria-label="Remove item"
                           type="button"
                         >
@@ -338,15 +339,16 @@ export default function OrderSummaryPage({
 
       {/* Buttons Container */}
       <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 w-full max-w-full">
-        <button
+        <Button
           onClick={onPrevious}
           disabled={isFirstStep}
           type="button"
-          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+          variant={"outline"}
+          className="flex justify-center items-center px-4 py-3 w-full sm:w-[193px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleNext}
           type="button"
           className="px-8 py-3 h-12 text-white rounded-full font-medium hover:opacity-90 transition-opacity w-full sm:w-auto"
@@ -355,7 +357,7 @@ export default function OrderSummaryPage({
           }}
         >
           Next: Terms & Condition
-        </button>
+        </Button>
       </div>
 
       {/* Delete Confirmation Modal */}

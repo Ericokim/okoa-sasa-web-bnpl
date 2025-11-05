@@ -45,9 +45,9 @@ export function FormSelect({
                     <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 z-10 pointer-events-none" />
                   )}
                   <SelectTrigger
-                    className={`${Icon ? 'pl-10' : 'pl-4'} py-3.5 h-11 w-full bg-gray-50 focus-visible:ring-primary ${
+                    className={`${Icon ? 'pl-10' : 'pl-4'} py-3.5 h-11 w-full bg-gray-50 ${
                       fieldState.error
-                        ? 'border-primary focus-visible:ring-primary'
+                        ? 'border-primary '
                         : 'border-gray-300'
                     }`}
                   >
