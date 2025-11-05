@@ -138,7 +138,7 @@ export default function OrderSummaryPage({
               <button
                 type="button"
                 onClick={handleClearCart}
-                className="flex items-center justify-center rounded-3xl border border-[#F25E5E] px-4 py-2 text-sm font-medium text-[#F25E5E] transition-all hover:bg-[#FFF5F5]"
+                className="flex cursor-pointer items-center justify-center rounded-3xl border border-[#F25E5E] px-4 py-2 text-sm font-medium text-[#F25E5E] transition-all hover:bg-[#FFF5F5]"
               >
                 Clear All
               </button>
@@ -186,7 +186,7 @@ export default function OrderSummaryPage({
                               onClick={() =>
                                 handleDecrement(product.id, quantity)
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                              className="flex cursor-pointer h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                               aria-label="Decrease quantity"
                               type="button"
                             >
@@ -204,7 +204,7 @@ export default function OrderSummaryPage({
                               onClick={() =>
                                 handleIncrement(product.id, quantity)
                               }
-                              className="flex h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                              className="flex cursor-pointer h-7 w-7 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                               aria-label="Increase quantity"
                               type="button"
                             >
@@ -218,7 +218,7 @@ export default function OrderSummaryPage({
 
                         <button
                           onClick={() => handleDeleteClick(product)}
-                          className="flex h-8 w-8 items-center justify-center transition-opacity hover:opacity-80"
+                          className="flex cursor-pointer h-8 w-8 items-center justify-center transition-opacity hover:opacity-80"
                           aria-label="Remove item"
                           type="button"
                         >
