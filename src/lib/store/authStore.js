@@ -1,26 +1,55 @@
-import { create } from 'zustand';
+// src/store/authStore.js
+import { create } from "zustand";
+import { EncryptStorage } from "encrypt-storage";
 
-const useAuthStore = create((set, get) => ({
+// -----------------------------------------------------------
+// 1. YOUR SECRET – NEVER commit this file!
+//     Put this in .env → VITE_ENCRYPT_KEY=64-random-chars
+// -----------------------------------------------------------
+const SECRET_KEY = import.meta.env.VITE_ENCRYPT_KEY || "DEV-CHANGE-ME-NOW-64-CHARS";
+
+// -----------------------------------------------------------
+// 2. Encrypted localStorage wrapper
+// -----------------------------------------------------------
+const encrypted = new EncryptStorage(SECRET_KEY, {
+  prefix: "@masoko",
+  encAlgorithm: "Rabbit",     
+  storageType: "localStorage",
+});
+
+
+export const useAuthStore = create((set, get) => ({
+  // Load encrypted data (or empty)
   token: null,
-  expiry: null,  // We'll store the expiry timestamp here
+  expiresAt: null,
 
+  // Initialise from storage on first run
+  __init: () => {
+    const raw = encrypted.getItem("auth");
+    if (raw && raw.token && raw.expiresAt) {
+      set({ token: raw.token, expiresAt: raw.expiresAt });
+    }
+  },
+
+  // Save fresh token (encrypted)
   setToken: (access_token, expires_in) => {
-    const expiry = Date.now() + expires_in * 1000;  // Convert seconds to milliseconds
-    set({ token: access_token, expiry });
+    const expiresAt = Date.now() + expires_in * 1000 - 30_000; // 30 sec early
+    const payload = { token: access_token, expiresAt };
+    encrypted.setItem("auth", payload);
+    set(payload);
   },
 
-  isTokenValid: () => {
-    const state = get();
-    return state.token && state.expiry && Date.now() < state.expiry;
+  // Wipe everything
+  clear: () => {
+    encrypted.removeItem("auth");
+    set({ token: null, expiresAt: null });
   },
 
-  logout: () => {
-    set({ token: null, expiry: null });
-      // Add any other logout logic, like clearing localStorage if needed
-      
-    },
-  
-  
+  // Is token still valid?
+  isValid: () => {
+    const { token, expiresAt } = get();
+    return !!token && !!expiresAt && Date.now() < expiresAt;
+  },
 }));
 
-export default useAuthStore;
+useAuthStore.getState().__init();
