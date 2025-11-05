@@ -27,20 +27,20 @@ import {
 } from '@/components/ui/table'
 import { comma } from '@/lib/utils'
 
-  const getStatusBadgeClasses = (status) => {
-    switch (status) {
-      case 'Delivered':
-        return 'bg-green-100 text-green-800'
-      case 'In Progress':
-        return 'bg-blue-100 text-blue-800'
-      case 'Pending Request':
-        return 'bg-yellow-100 text-yellow-800'
-      case 'Rejected':
-        return 'bg-red-100 text-red-800'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+const getStatusBadgeClasses = (status) => {
+  switch (status) {
+    case 'Delivered':
+      return 'bg-green-100 text-green-800'
+    case 'In Progress':
+      return 'bg-blue-100 text-blue-800'
+    case 'Pending Request':
+      return 'bg-yellow-100 text-yellow-800'
+    case 'Rejected':
+      return 'bg-red-100 text-red-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
   }
+}
 function OrderStepper({ steps, currentStep, isRejected }) {
   return (
     <div className="w-full ">
@@ -411,30 +411,41 @@ function OrderDetailsPage() {
           </CardContent>
         </Card>
 
+      
         <div className="mt-6">
-          {/* Flex container – row on md+, column on mobile */}
-          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-            {/* ----- Back to Orders (gradient) ----- */}
-
+          <div className="flex flex-col md:flex-row gap-3 justify-center items-stretch">
+            {/* Back to Orders – Gradient */}
             <Button
               variant="gradient"
               size="sm"
-              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
-                           bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
-                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-full"
+              className="
+        flex items-center justify-center gap-2 
+        h-12 px-6 py-3 
+        bg-gradient-to-b from-[#F8971D] to-[#EE3124] 
+        rounded-full 
+        text-white font-medium text-base 
+        shadow-sm hover:opacity-90 transition-opacity 
+        w-full md:w-auto md:flex-1 md:max-w-[200px]
+      "
               onClick={() => navigate({ to: '/order_table' })}
             >
               Back to Orders
             </Button>
 
+            {/* Back to Home – Outline */}
             <Button
               variant="outline"
-              onClick={() => navigate({ to: '/' })}
               size="sm"
-              className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
-                border border-[#F8971D] text-[#F8971D] rounded-3xl 
-                      font-medium text-base hover:bg-[#F8971D]/10 transition-all
-                         w-full"
+              className="
+        flex items-center justify-center gap-2 
+        h-12 px-6 py-3 
+        border border-[#F8971D] text-[#F8971D] 
+        rounded-full 
+        font-medium text-base 
+        hover:bg-[#F8971D]/10 transition-colors 
+        w-full md:w-auto md:flex-1 md:max-w-[200px]
+      "
+              onClick={() => navigate({ to: '/' })}
             >
               Back to Home
             </Button>
