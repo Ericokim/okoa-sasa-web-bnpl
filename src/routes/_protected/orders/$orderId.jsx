@@ -177,7 +177,7 @@ function OrderDetailsPage() {
   const isRejected = order.statusStep === -1
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Orders', path: '/orders' },
+    { label: 'My Order History', path: '/order_table' },
     { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
   ]
   return (

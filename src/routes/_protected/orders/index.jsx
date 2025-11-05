@@ -250,7 +250,7 @@ function OrdersPage() {
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Order History', path: `/orderHistory`, isCurrent: true },
+    { label: 'My Order History', path: `/orders`, isCurrent: true },
   ]
 
   const getStatusBadgeClasses = (status) => {
