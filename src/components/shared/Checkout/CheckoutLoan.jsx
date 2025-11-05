@@ -26,7 +26,7 @@ const loanLimitSchema = z
       .refine((value) => parseCurrencyValue(value) > 0, {
         message: 'Net pay must be greater than zero',
       }),
-    repaymentPeriod: z.preprocess(
+    tenure: z.preprocess(
       (val) => val ?? DEFAULT_TENURE,
       z
         .number()
@@ -79,14 +79,14 @@ export default function CheckLoanLimitPage({
       return {
         basicPay: savedData.basicPay?.toString() || '',
         netPay: savedData.netPay?.toString() || '',
-        repaymentPeriod: savedData.repaymentPeriod ?? DEFAULT_TENURE,
+        tenure: savedData.tenure ?? DEFAULT_TENURE,
         payslip: savedData.payslip || null,
       }
     }
     return {
       basicPay: '',
       netPay: '',
-      repaymentPeriod: DEFAULT_TENURE,
+      tenure: DEFAULT_TENURE,
       payslip: null,
     }
   }, [savedData])
@@ -102,14 +102,14 @@ export default function CheckLoanLimitPage({
       form.reset({
         basicPay: savedData.basicPay?.toString() || '',
         netPay: savedData.netPay?.toString() || '',
-        repaymentPeriod: savedData.repaymentPeriod ?? DEFAULT_TENURE,
+        tenure: savedData.tenure ?? DEFAULT_TENURE,
         payslip: savedData.payslip || null,
       })
     }
   }, [savedData, form])
 
   // Get the current values for calculations
-  const currentRepaymentPeriod = form.watch('repaymentPeriod') ?? DEFAULT_TENURE
+  const currentRepaymentPeriod = form.watch('tenure') ?? DEFAULT_TENURE
   const watchedBasicPay = form.watch('basicPay')
   const watchedNetPay = form.watch('netPay')
 
@@ -130,27 +130,89 @@ export default function CheckLoanLimitPage({
     return Math.max(0, roundedToNearestThousand)
   }, [watchedBasicPay, watchedNetPay, currentRepaymentPeriod])
 
-  const onSubmit = (data) => {
-    console.log(data)
-
-    // Save form data
-    const dataWithFileName = {
-      ...data,
-      calculatedLoanAmount: loanAmount,
+  // Helper function to get file information
+  const getFileInfo = (file) => {
+    if (!file) return null
+    
+    // If file is already an object with the required structure, return it
+    if (file.name && file.type && file.format && file.url) {
+      return file
     }
-    saveCheckoutFormData(1, dataWithFileName)
+    
+    // If it's a File object, extract information
+    if (file instanceof File) {
+      const fileExtension = file.name.split('.').pop()?.toLowerCase() || ''
+      const formatMap = {
+        'pdf': 'pdf',
+        'jpg': 'image',
+        'jpeg': 'image',
+        'png': 'image',
+        'doc': 'document',
+        'docx': 'document'
+      }
+      
+      return {
+        name: file.name,
+        type: 'payslip', // or you can make this dynamic based on your needs
+        format: formatMap[fileExtension] || 'document',
+        url: URL.createObjectURL(file) // This creates a temporary blob URL
+      }
+    }
+    
+    return null
+  }
 
-    // Check if cart total exceeds loan limit
-    if (grandTotal > loanAmount) {
-      setErrorMessage(
-        `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
-      )
+  const onSubmit = async (data) => {
+    // console.log('Form data:', data)
+
+    try {
+      // Prepare the document payload
+      const documentPayload = []
+      const payslipDocument = getFileInfo(data.payslip)
+      
+      if (payslipDocument) {
+        documentPayload.push(payslipDocument)
+      }
+
+      // Prepare credit data
+      const creditData = {
+        basicSalary: parseCurrencyValue(data.basicPay),
+        netSalary: parseCurrencyValue(data.netPay),
+        tenure: data.tenure
+      }
+
+      // Prepare the complete payload
+      const completePayload = {
+        documents: documentPayload,
+        creditData: creditData,
+        calculatedLoanAmount: loanAmount,
+        formData: data // Keep the original form data if needed
+      }
+
+      // Save form data with the complete payload
+      saveCheckoutFormData(1, {
+        ...data,
+        calculatedLoanAmount: loanAmount,
+        apiPayload: completePayload 
+      })
+
+      // Check if cart total exceeds loan limit
+      if (grandTotal > loanAmount) {
+        setErrorMessage(
+          `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
+        )
+        setErrorModalOpen(true)
+        return
+      }
+
+      // Proceed to next step
+      onNext()
+
+    } catch (error) {
+      console.error('Error processing form submission:', error)
+      setErrorMessage('An error occurred while processing your request. Please try again.')
       setErrorModalOpen(true)
-      return
     }
-
-    // Proceed to next step
-    onNext()
   }
 
   return (
@@ -193,7 +255,7 @@ export default function CheckLoanLimitPage({
             {/* Repayment Period Slider */}
             <RepaymentPeriodSlider
               control={form.control}
-              name="repaymentPeriod"
+              name="tenure"
               label="Loan Tenure"
               min={6}
               max={24}

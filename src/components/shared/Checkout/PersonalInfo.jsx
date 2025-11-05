@@ -117,11 +117,30 @@ export default function PersonalInfoForm({
         })
       }
     }
-  }, [savedData])
+  }, [savedData, form])
 
   const onSubmit = (data) => {
-    console.log(data)
-    saveCheckoutFormData(2, data)
+    // console.log('Form data:', data)
+    
+    // Structure the data according to the customer object requirements
+    const customerPayload = {
+      customer: {
+        fullName: data.fullName,
+        phoneNumber: data.phoneNumber,
+        email: data.email,
+        employer: data.employer,
+        employeeNumber: data.employeeNumber
+      },
+      nationalId: data.nationalId,
+      formData: data
+    }
+
+   
+    saveCheckoutFormData(2, {
+      ...data, 
+      apiPayload: customerPayload 
+    })
+
     onNext()
   }
 
