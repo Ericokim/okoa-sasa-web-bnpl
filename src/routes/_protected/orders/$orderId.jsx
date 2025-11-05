@@ -409,7 +409,7 @@ function OrderDetailsPage() {
               className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
                            bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
                           text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-full"
-              onClick={() => navigate({ to: '/orders' })}
+              onClick={() => navigate({ to: '/order_table' })}
             >
               Back to Orders
             </Button>
