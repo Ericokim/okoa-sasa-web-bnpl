@@ -30,7 +30,7 @@ const MobileSeparatedMenuItems = ({ onLogout }) => {
   const currentPath = router.location.pathname
 
   const listItems = [
-    { path: '/order_table', label: 'Order History', icon: BoxWhiteIcon },
+    { path: '/orders', label: 'Order History', icon: BoxWhiteIcon },
     { path: '/profile', label: 'My Account', icon: ProfileIcon },
   ]
 
@@ -96,7 +96,7 @@ export const MenuItems = ({ onLogout, onNavigate }) => {
   const currentPath = router.location.pathname
 
   const listItems = [
-    { path: '/order_table', label: 'Order History', icon: BoxWhiteIcon },
+    { path: '/orders', label: 'Order History', icon: BoxWhiteIcon },
     { path: '/profile', label: 'My Account', icon: ProfileIcon },
   ]
 

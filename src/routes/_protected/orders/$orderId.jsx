@@ -192,7 +192,7 @@ function OrderDetailsPage() {
   const isRejected = order.statusStep === -1
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Order History', path: '/order_table' },
+    { label: 'My Order History', path: '/orders' },
     { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
   ]
   return (
@@ -343,7 +343,6 @@ function OrderDetailsPage() {
 
               {/* Mobile Cards */}
 
-              {/* ---------- MOBILE ONLY: Clean, Compact Items List ---------- */}
               <div className="block md:hidden space-y-3">
                 <h4 className="font-medium mb-3 flex items-center gap-2">
                   <ListCheck className="w-5 h-5" />
