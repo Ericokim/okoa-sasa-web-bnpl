@@ -133,10 +133,72 @@ export default function DeliveryDetailsForm({
     form.clearErrors()
   }, [deliveryType]) // Remove form from dependencies
 
+  // Options arrays
+  const regionOptions = [
+    { value: 'nairobi', label: 'Nairobi', id: 'nairobi-001' },
+    { value: 'kisumu', label: 'Kisumu', id: 'kisumu-002' },
+    { value: 'coast', label: 'Coast', id: 'coast-003' },
+    { value: 'eastern', label: 'Eastern', id: 'eastern-004' },
+  ]
+
+  const pickupStoreOptions = [
+    { value: 'store1', label: 'Main Street Store', id: 'store-001' },
+    { value: 'store2', label: 'City Center Post', id: 'store-002' },
+    { value: 'store3', label: 'Westlands Station', id: 'store-003' },
+  ]
+
+  // Helper function to get region and store details
+  const getRegionDetails = (regionValue) => {
+    const region = regionOptions.find(opt => opt.value === regionValue)
+    return {
+      region: region?.label || '',
+      regionId: region?.id || ''
+    }
+  }
+
+  const getStoreDetails = (storeValue) => {
+    const store = pickupStoreOptions.find(opt => opt.value === storeValue)
+    return {
+      store: store?.label || '',
+      storeId: store?.id || ''
+    }
+  }
+
   const onSubmit = (data) => {
-    const dataWithType = { ...data, deliveryType }
-    console.log(dataWithType)
-    // Save form data to context
+    console.log('Form data:', data)
+
+    // Prepare the shipping detail payload
+    const regionDetails = getRegionDetails(data.region)
+    const storeDetails = deliveryType === 'pickup' ? getStoreDetails(data.pickupStore) : {}
+
+    const shippingDetailPayload = {
+      shippingDetail: {
+        recipientName: `${data.firstName} ${data.lastName}`,
+        recipientPhoneNumber: data.recipientNumber,
+        type: deliveryType === 'door' ? 'Delivery' : 'Pickup',
+        recipientEmail: '', 
+        recipientAddress: data.deliveryAddress || '',
+        region: regionDetails.region,
+        regionId: regionDetails.regionId,
+        storeId: storeDetails.storeId || '',
+        store: storeDetails.store || ''
+      },
+      // Keep original form data for internal use
+      formData: {
+        ...data,
+        deliveryType
+      }
+    }
+
+    console.log('Shipping detail payload:', shippingDetailPayload)
+
+    // Save both the original form data and the structured payload
+    const dataWithType = { 
+      ...data, 
+      deliveryType,
+      apiPayload: shippingDetailPayload 
+    }
+    
     saveCheckoutFormData(3, dataWithType)
     onNext()
   }
@@ -150,20 +212,6 @@ export default function DeliveryDetailsForm({
       form.setValue('deliveryAddress', '')
     }
   }
-
-  // Options arrays
-  const regionOptions = [
-    { value: 'nairobi', label: 'Nairobi' },
-    { value: 'kisumu', label: 'Kisumu' },
-    { value: 'coast', label: 'Coast' },
-    { value: 'eastern', label: 'Eastern' },
-  ]
-
-  const pickupStoreOptions = [
-    { value: 'store1', label: 'Main Street Store' },
-    { value: 'store2', label: 'City Center Post' },
-    { value: 'store3', label: 'Westlands Station' },
-  ]
 
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-0 md:p-0 gap-6">

@@ -19,7 +19,27 @@ export default function TermsConditionPage({
 
   // Save data when isAccepted changes
   useEffect(() => {
-    saveCheckoutFormData(5, { isAccepted })
+    const userConsents = [
+      {
+        consentType: 'TermsAndConditions',
+        isConsentGiven: isAccepted,
+        ipAddress: 'unknown', // Placeholder since we removed getClientIP
+        userAgent: navigator.userAgent || 'unknown'
+      },
+      {
+        consentType: 'PrivacyPolicy',
+        isConsentGiven: isAccepted,
+        ipAddress: 'unknown', // Placeholder since we removed getClientIP
+        userAgent: navigator.userAgent || 'unknown'
+      }
+    ]
+
+    saveCheckoutFormData(5, { 
+      isAccepted,
+      apiPayload: {
+        userConsents
+      }
+    })
   }, [isAccepted, saveCheckoutFormData])
 
   // Also load saved data on component mount
@@ -36,9 +56,31 @@ export default function TermsConditionPage({
     setIsAccepted(!isAccepted)
   }
 
-  const handleNext = () => {
-    // Ensure data is saved before proceeding
-    saveCheckoutFormData(5, { isAccepted })
+  const onSubmit = () => {
+    // Prepare the consent data
+    const userConsents = [
+      {
+        consentType: 'TermsAndConditions',
+        isConsentGiven: isAccepted,
+        ipAddress: 'unknown',
+        userAgent: navigator.userAgent || 'unknown'
+      },
+      {
+        consentType: 'PrivacyPolicy',
+        isConsentGiven: isAccepted,
+        ipAddress: 'unknown', 
+        userAgent: navigator.userAgent || 'unknown'
+      }
+    ]
+    // Save to context
+    saveCheckoutFormData(5, {
+      isAccepted,
+      apiPayload: {
+        userConsents
+      }
+    })
+
+    // Proceed to next step
     onNext()
   }
 
@@ -116,7 +158,7 @@ export default function TermsConditionPage({
         </Button>
         <Button
           disabled={!isAccepted || isLastStep}
-          onClick={handleNext}
+          onClick={onSubmit}
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-48 h-[46px] bg-gradient-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl"
         >
           <p className="text-base font-medium leading-[1.4] capitalize text-white">

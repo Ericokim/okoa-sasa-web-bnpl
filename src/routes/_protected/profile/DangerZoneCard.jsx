@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { TrashSolidWhiteIcon,TrashIconWhite } from '@/assets/icons'
+import { TrashSolidWhiteIcon, TrashIconWhite } from '@/assets/icons'
 
 export function RouteComponent() {
   const [open, setOpen] = useState(false)
@@ -31,15 +31,14 @@ export function RouteComponent() {
           </div>
 
           {/* Button – full width on mobile, auto on desktop */}
+
+
           <Button
             onClick={() => setOpen(true)}
-            className="
-          
-            w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3   h-[46px]
-                 bg-red-400 hover:bg-red-600 rounded-3xl 
-                 text-white font-medium text-sm sm:text-base"
+            className="w-full sm:w-auto rounded-3xl px-6 py-3 text-base font-medium whitespace-nowrap  bg-red-400 hover:bg-red-600 "
+            size="lg"
           >
-            <TrashIconWhite className="w-5 h-5" />
+            <TrashIconWhite />
             Delete Account
           </Button>
         </div>
