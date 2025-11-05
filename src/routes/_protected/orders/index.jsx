@@ -60,6 +60,105 @@ export const recentOrders = [
   },
 
   {
+    id: '7',
+    orderId: 'REQ-20458',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'In Progress',
+    statusColor: 'blue',
+    image: '/phone.png',
+    date: '28/10/2025 14:30:00',
+    invoice: 'S-INV+0942801',
+    amount: 87696,
+    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
+    statusText: 'PROCESSING',
+    items: [
+      {
+        name: 'iPhone 14 - Midnight',
+        qty: 1,
+        price: 87696,
+        total: 87696,
+      },
+    ],
+    // NEW: Full delivery details
+    delivery: {
+      type: 'door', // 'door' or 'pickup'
+      recipient: {
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '+254712345678',
+      },
+      region: 'nairobi',
+      address: 'Westlands Road, Nairobi, 00100, Kenya',
+      pickupStore: null,
+    },
+    shippingAddress: {
+      name: 'John Doe',
+      street: 'Westlands Road',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 87696,
+      shipping: 0,
+      total: 87696,
+    },
+    statusStep: 0,
+  },
+  {
+    id: '20',
+    orderId: 'REQ-20458',
+    title: 'iPhone 14',
+    specs:
+      'iPhone 14 - 6.1" - 6GB RAM - 128 GB ROM - Midnight + free Cover + Screen Protector',
+    price: 87696,
+    status: 'In Progress',
+    statusColor: 'blue',
+    image: '/phone.png',
+    date: '28/10/2025 14:30:00',
+    invoice: 'S-INV+0942801',
+    amount: 87696,
+    dispatchTo: 'John Doe, Westlands, Nairobi, 00100',
+    statusText: 'PROCESSING',
+    items: [
+      {
+        name: 'iPhone 14 - Midnight',
+        qty: 1,
+        price: 87696,
+        total: 87696,
+      },
+    ],
+    // NEW: Full delivery details
+    delivery: {
+      type: 'door', // 'door' or 'pickup'
+      recipient: {
+        firstName: 'John',
+        lastName: 'Doe',
+        phone: '+254712345678',
+      },
+      region: 'nairobi',
+      address: 'Westlands Road, Nairobi, 00100, Kenya',
+      pickupStore: null,
+    },
+    shippingAddress: {
+      name: 'John Doe',
+      street: 'Westlands Road',
+      city: 'Nairobi',
+      zip: '00100',
+      country: 'Kenya',
+    },
+    summary: {
+      subtotal: 87696,
+      shipping: 0,
+      total: 87696,
+    },
+    statusStep: 0,
+  },
+
+  {
     id: '2',
     orderId: 'REQ-20459',
     title: 'iPhone 14',
@@ -292,7 +391,10 @@ function OrdersPage() {
 
   return (
     <div className="min-h-screen">
-      <BreadCrumbs items={breadcrumbItems} className="px-0 pt-4 md:pt-8 -ml-3" />
+      <BreadCrumbs
+        items={breadcrumbItems}
+        className="px-0 pt-4 md:pt-8 -ml-3"
+      />
       <main className="w-full flex flex-col py-4">
         <h1 className="text-4xl font-semibold text-gray-900 mb-2">
           My Order History
@@ -597,7 +699,7 @@ function OrdersPage() {
                       </div>
 
                       {idx < orderHistory.length - 1 && (
-                        <Separator className={'my-4'}/>
+                        <Separator className={'my-4'} />
                       )}
                     </div>
                   )
@@ -693,7 +795,6 @@ function OrdersPage() {
                       >
                         View Details
                       </Button>
-                     
                     </div>
                   </CardContent>
                 </Card>

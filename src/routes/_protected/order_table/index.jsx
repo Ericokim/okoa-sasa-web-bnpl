@@ -43,7 +43,7 @@ function OrdersTableHistory() {
       name: 'Jane Mwangi',
       device: 'Samsung Galaxy A35',
       loanAmount: 38500,
-      status: 'Declined', // unchanged (kept for completeness)
+      status: 'Rejected', // unchanged (kept for completeness)
       statusVariant: 'destructive',
     },
   ]
@@ -90,64 +90,84 @@ function OrdersTableHistory() {
         </h1>
         <p className="text-gray-600 mb-8">Overview of all of your activities</p>
 
-        {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
-
         {/* Order History - Responsive Layout */}
         <div className="-mt-2">
-          {/* ================== DESKTOP / TABLET – Horizontal Cards ================== */}
+          {/* ================== DESKTOP – Compact + VERTICAL-ONLY Scroll ================== */}
           <div className="hidden md:block">
             <Card className="shadow-none overflow-hidden">
-              <CardContent className="">
-                {orderHistory.map((order, idx) => {
-                  const matched = recentOrders.find(
-                    (ro) => ro.orderId === order.orderId.replace('#', ''),
-                  ) || { image: '/phone.png', title: order.device }
+              <CardContent className="p-0">
+                {/* ---- VERTICAL-ONLY SCROLL CONTAINER ---- */}
+                <div className="overflow-y-auto overflow-x-hidden">
+                  {orderHistory.map((order, idx) => {
+                    const matched = recentOrders.find(
+                      (ro) => ro.orderId === order.orderId.replace('#', ''),
+                    ) || { image: '/phone.png', title: order.device }
 
-                  return (
-                    <div key={order.orderId}>
-                      <div
-                        className="flex gap-4 py-4 px-6 items-center cursor-pointer hover:bg-gray-50 transition-colors"
-                        onClick={() => handleViewDetails(order.orderId)}
-                      >
-                        {/* Image */}
-                        <div className="shrink-0 rounded-2xl bg-brand-bg-2 p-3 overflow-hidden">
-                          <img
-                            src={matched.image}
-                            alt={order.device}
-                            className="h-24 w-24 object-contain"
-                          />
-                        </div>
+                    return (
+                      <div key={order.orderId}>
+                        {/* ---- COMPACT ROW ---- */}
+                        <div
+                          className="relative flex px-5 py-2.5 cursor-pointer hover:bg-gray-50 transition-colors"
+                          onClick={() => handleViewDetails(order.orderId)}
+                        >
+                          {/* LEFT – Image + Info */}
+                          <div className="flex gap-3 flex-1">
+                            <div className="shrink-0 rounded-2xl bg-brand-bg-2 p-2.5 overflow-hidden">
+                              <img
+                                src={matched.image}
+                                alt={order.device}
+                                className="h-20 w-20 object-contain"
+                              />
+                            </div>
 
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-lg text-gray-900 truncate">
-                            {order.device}
-                          </h4>
+                            <div className="flex flex-col justify-center min-w-0">
+                              <h4 className="font-medium text-base text-gray-900 truncate">
+                                {order.device}
+                              </h4>
 
-                          {/* Increased spacing using • with extra space */}
-                          <p className="text-sm text-gray-600 mt-1 mb-2">
-                            {order.orderId}
-                            <span className="mx-2">•</span>
-                            {order.createdDate}
-                            {order.name && (
-                              <>
-                                <span className="mx-2">•</span>
-                                {order.name}
-                              </>
-                            )}
-                          </p>
+                              <p className="text-xs text-gray-600 mt-0.5">
+                                {order.orderId}
+                                <span className="mx-1.5">•</span>
+                                {order.createdDate}
+                                {order.name && (
+                                  <>
+                                    <span className="mx-1.5">•</span>
+                                    {order.name}
+                                  </>
+                                )}
+                              </p>
 
-                          {/* Gradient price – unchanged */}
-                          <p
-                            className={`font-bold text-lg  bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent whitespace-nowrap`}
-                          >
-                            KES {order.loanAmount.toLocaleString()}
-                          </p>
-                        </div>
+                              <p className="font-bold text-base bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent whitespace-nowrap">
+                                KES {order.loanAmount.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
 
-                        {/* View Details */}
+                          {/* RIGHT – Status + Button */}
+                          <div className="ml-3 flex flex-col justify-between">
+                            <Badge
+                              variant="secondary"
+                              className={`self-end text-xs font-medium px-2 py-0.5 rounded-full ${getStatusBadgeClasses(
+                                order.status,
+                              )}`}
+                            >
+                              {order.status}
+                            </Badge>
 
-                        <Button
+                            {/* <Button
+                              variant="gradient"
+                              size="sm"
+                              className="flex items-center justify-center gap-1.5 h-9 px-3.5 
+                               bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                               text-white font-medium text-sm shadow-sm hover:opacity-90 transition-all"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleViewDetails(order.orderId)
+                              }}
+                            >
+                              View Details
+                            </Button> */}
+                              <Button
                           variant="gradient"
                           size="sm"
                           className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
@@ -160,14 +180,17 @@ function OrdersTableHistory() {
                         >
                           View Details
                         </Button>
-                      </div>
+                          </div>
+                        </div>
 
-                      {idx < orderHistory.length - 1 && (
-                        <Separator className={'my-4'} />
-                      )}
-                    </div>
-                  )
-                })}
+                        {/* Separator */}
+                        {idx < orderHistory.length - 1 && (
+                          <Separator className="mx-5 my-0" />
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -227,27 +250,31 @@ function OrdersTableHistory() {
                       </div>
                     </div>
 
-                    {/* Loan Amount + View Details – Aligned on same line */}
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-start">
-                        <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
-                        <div>
-                          <p className="text-xs text-gray-500">Loan Amount</p>
-                          <p className="text-sm font-semibold text-gray-900">
-                            KES {order.loanAmount.toLocaleString()}
-                          </p>
-                        </div>
+                    {/* Loan Amount */}
+                    <div className="flex items-start mb-3">
+                      <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
+                      <div>
+                        <p className="text-xs text-gray-500">Loan Amount</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          KES {order.loanAmount.toLocaleString()}
+                        </p>
                       </div>
+                    </div>
 
-                      {/* View Details Button */}
+                    {/* Status + View Details – Aligned on same line */}
+                    <div className="flex justify-between items-center pt-2 border-t border-gray-100">
+                      <span className="text-xs font-medium text-gray-500">
+                        {' '}
+                        <span className="text-gray-900"> </span>
+                      </span>
+                      {/* View Details */}
+
                       <Button
                         variant="gradient"
                         size="sm"
-                        className="h-[46px] px-4 py-3 
-                         bg-gradient-to-b from-[#F8971D] to-[#EE3124] 
-                         rounded-3xl text-white font-medium text-base 
-                         shadow-sm hover:opacity-90 transition-all 
-                         min-w-[120px] flex items-center justify-center"
+                        className="flex items-center justify-center gap-2 h-[46px] px-4 py-3 
+                           bg-gradient-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
+                          text-white font-medium text-base shadow-sm hover:opacity-90 transition-all w-50"
                         onClick={(e) => {
                           e.stopPropagation()
                           handleViewDetails(order.orderId)
@@ -255,9 +282,9 @@ function OrdersTableHistory() {
                       >
                         View Details
                       </Button>
-                    </div>
 
-                
+                      
+                    </div>
                   </CardContent>
                 </Card>
               )
