@@ -243,7 +243,7 @@ export default function CheckLoanLimitPage({
           disabled={isFirstStep}
           type="button"
           variant={'outline'}
-          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+          className="flex justify-center items-center px-4 py-3 w-full sm:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           Back
         </Button>
@@ -255,7 +255,6 @@ export default function CheckLoanLimitPage({
           Next: Personal Info
         </Button>
       </div>
-
       <ErrorAlertDialog
         isOpen={errorModalOpen}
         onClose={() => setErrorModalOpen(false)}
