@@ -27,76 +27,77 @@ import {
 } from '@/components/ui/table'
 import { comma } from '@/lib/utils'
 
-const getStatusBadgeClasses = (status) => {
-  switch (status) {
-    case 'Delivered':
-      return 'bg-green-100 text-green-800'
-    case 'In Progress':
-      return 'bg-blue-100 text-blue-800'
-    case 'Pending Request':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'Rejected':
-      return 'bg-red-100 text-red-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  const getStatusBadgeClasses = (status) => {
+    switch (status) {
+      case 'Fulfilled':
+        return 'bg-green-100 text-green-800'
+      case 'Approved':
+        return 'bg-blue-100 text-blue-800'
+      case 'Declined':
+        return 'bg-red-100 text-red-800'
+      case 'Pending':
+        return 'bg-yellow-100 text-yellow-800'
+      default:
+        return ''
+    }
   }
-}
+
+
+
 function OrderStepper({ steps, currentStep, isRejected }) {
+
   return (
-    <div className="w-full ">
-      {/* Desktop View */}
+    <div className="w-full">
+      {/* ---------- Desktop ---------- */}
       <div className="hidden md:block">
-        {/* Circles and Lines Row */}
+        {/* Circles + Lines */}
         <div className="flex items-center mb-3">
-          {steps.map((step, index) => (
+          {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               {/* Circle */}
               <div className="relative shrink-0">
-                {isRejected ? (
-                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                    <span className="text-red-600 font-bold text-lg">X</span>
-                  </div>
-                ) : step.id < currentStep ? (
+                {step.id < currentStep ? (
+                  /* Completed: solid orange + check */
                   <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
                     <Check className="w-6 h-6 text-white" strokeWidth={3} />
                   </div>
                 ) : step.id === currentStep ? (
+                  /* Current: orange ring + dot */
                   <div className="w-10 h-10 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-orange-500" />
                   </div>
                 ) : (
+                  /* Future: gray ring + dot */
                   <div className="w-10 h-10 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-                    <div className="w-3 h-3 rounded-full bg-gray-300"></div>
+                    <div className="w-3 h-3 rounded-full bg-gray-300" />
                   </div>
                 )}
               </div>
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
+
+              {/* Connector line */}
+              {idx < steps.length - 1 && (
                 <div
                   className={`h-[3px] flex-1 mx-2 ${
-                    isRejected || step.id < currentStep
-                      ? 'bg-orange-500'
-                      : 'bg-gray-300'
+                    step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
                   }`}
-                ></div>
+                />
               )}
             </React.Fragment>
           ))}
         </div>
-        {/* Labels Row */}
+
+        {/* Labels */}
         <div className="flex items-center relative">
-          {steps.map((step, index) => (
+          {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
-              <div className="shrink-0 relative" style={{ width: '40px' }}>
+              <div className="shrink-0" style={{ width: '40px' }}>
                 <p
                   className={`text-base font-medium leading-[1.4] whitespace-nowrap ${
-                    isRejected || step.id <= currentStep
-                      ? 'text-[#0D0B26]'
-                      : 'text-gray-400'
+                    step.id <= currentStep ? 'text-[#0D0B26]' : 'text-gray-400'
                   } ${
-                    index === 0
+                    idx === 0
                       ? 'text-left'
-                      : index === steps.length - 1
+                      : idx === steps.length - 1
                         ? 'text-right absolute -mt-2.5 right-0'
                         : 'text-center -translate-x-1/2'
                   }`}
@@ -104,51 +105,48 @@ function OrderStepper({ steps, currentStep, isRejected }) {
                   {step.label}
                 </p>
               </div>
-              {index < steps.length - 1 && <div className="flex-1"></div>}
+              {idx < steps.length - 1 && <div className="flex-1" />}
             </React.Fragment>
           ))}
         </div>
       </div>
-      {/* Mobile View */}
+
+      {/* ---------- Mobile ---------- */}
       <div className="block md:hidden">
-        {/* Circles and Lines Row */}
+        {/* Circles + Lines */}
         <div className="flex items-center mb-4">
-          {steps.map((step, index) => (
+          {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               {/* Circle */}
               <div className="relative shrink-0">
-                {isRejected ? (
-                  <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
-                    <span className="text-red-600 font-bold text-sm">X</span>
-                  </div>
-                ) : step.id < currentStep ? (
+                {step.id < currentStep ? (
                   <div className="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center">
                     <Check className="w-4 h-4 text-white" strokeWidth={3} />
                   </div>
                 ) : step.id === currentStep ? (
                   <div className="w-8 h-8 rounded-full bg-white border-2 border-orange-500 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
                   </div>
                 ) : (
                   <div className="w-8 h-8 rounded-full bg-white border-2 border-gray-300 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                    <div className="w-2 h-2 rounded-full bg-gray-300" />
                   </div>
                 )}
               </div>
-              {/* Connector Line */}
-              {index < steps.length - 1 && (
+
+              {/* Connector line */}
+              {idx < steps.length - 1 && (
                 <div
                   className={`h-[2px] flex-1 ${
-                    isRejected || step.id < currentStep
-                      ? 'bg-orange-500'
-                      : 'bg-gray-300'
+                    step.id < currentStep ? 'bg-orange-500' : 'bg-gray-300'
                   }`}
-                ></div>
+                />
               )}
             </React.Fragment>
           ))}
         </div>
-        {/* Labels Row - Stacked on Mobile */}
+
+        {/* Labels */}
         <div className="flex items-start justify-between">
           {steps.map((step) => (
             <div
@@ -157,9 +155,7 @@ function OrderStepper({ steps, currentStep, isRejected }) {
             >
               <p
                 className={`text-[10px] font-medium leading-tight ${
-                  isRejected || step.id <= currentStep
-                    ? 'text-[#0D0B26]'
-                    : 'text-gray-400'
+                  step.id <= currentStep ? 'text-[#0D0B26]' : 'text-gray-400'
                 }`}
                 style={{
                   wordBreak: 'break-word',
@@ -176,6 +172,7 @@ function OrderStepper({ steps, currentStep, isRejected }) {
     </div>
   )
 }
+
 const steps = [
   { id: 1, label: 'Processing' },
   { id: 2, label: 'On the way' },
@@ -192,7 +189,7 @@ function OrderDetailsPage() {
   const isRejected = order.statusStep === -1
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
-    { label: 'My Order History', path: '/order_table' },
+    { label: 'My Order History', path: '/orders' },
     { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
   ]
   return (
@@ -343,7 +340,6 @@ function OrderDetailsPage() {
 
               {/* Mobile Cards */}
 
-              {/* ---------- MOBILE ONLY: Clean, Compact Items List ---------- */}
               <div className="block md:hidden space-y-3">
                 <h4 className="font-medium mb-3 flex items-center gap-2">
                   <ListCheck className="w-5 h-5" />
