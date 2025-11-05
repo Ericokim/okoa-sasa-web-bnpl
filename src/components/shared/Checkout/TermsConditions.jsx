@@ -26,7 +26,7 @@ export default function TermsConditionPage({
           {/* Header */}
           <div className="space-y-2 mb-4 sm:mb-0">
             <h1 className="w-full text-xl sm:text-2xl font-semibold leading-[1.4] capitalize text-[#252525]">
-              Terms & Condition
+              Terms & Conditions
             </h1>
             <p className="w-full text-sm sm:text-base font-medium leading-[1.4] text-[#676D75]">
               Review our terms and conditions before proceeding
@@ -84,7 +84,7 @@ export default function TermsConditionPage({
           variant="outline"
           onClick={onPrevious}
           disabled={isFirstStep}
-          className="flex justify-center items-center px-4 py-3 w-full md:w-[146px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
+          className="flex justify-center items-center px-4 py-3 w-full sm:w-[193px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
         >
           <p className="text-base font-medium leading-[1.4] capitalize">
             Back{' '}
