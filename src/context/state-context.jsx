@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useMemo,
   useCallback,
+  useRef,
 } from 'react'
 import { productCatalog } from '@/data/products'
 import { safeLocalStorage } from '@/lib/utils'
@@ -12,6 +13,9 @@ import { safeLocalStorage } from '@/lib/utils'
 const StateContext = createContext(null)
 
 const buildInitialCart = () => []
+
+const normalizeProductId = (value) =>
+  value === undefined || value === null ? '' : String(value)
 
 const buildInitialProducts = (initialCart) =>
   productCatalog.map((product) => {
@@ -33,10 +37,32 @@ export function ContextProvider({ children }) {
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState(initialCart)
   const [products, setProducts] = useState(initialProducts)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [searchTerm, setSearchTermState] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  const searchDebounceRef = useRef()
   const [checkoutStep, setCheckoutStep] = useState(1)
   const [checkoutFormData, setCheckoutFormData] = useState({})
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
+
+  useEffect(() => {
+    if (searchDebounceRef.current) {
+      clearTimeout(searchDebounceRef.current)
+    }
+
+    searchDebounceRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm.trim())
+    }, 300)
+
+    return () => {
+      if (searchDebounceRef.current) {
+        clearTimeout(searchDebounceRef.current)
+      }
+    }
+  }, [searchTerm])
+
+  const setSearchTerm = useCallback((value) => {
+    setSearchTermState(typeof value === 'string' ? value : String(value ?? ''))
+  }, [])
 
   // Check for stored auth on mount
   useEffect(() => {
@@ -78,9 +104,11 @@ export function ContextProvider({ children }) {
   }
 
   const syncProductCartState = useCallback((productId, changes) => {
+    const normalizedId = normalizeProductId(productId)
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
-        product.id === productId
+        normalizeProductId(product.id) === normalizedId ||
+        normalizeProductId(product.sku) === normalizedId
           ? {
               ...product,
               ...(changes.inCart !== undefined
@@ -99,8 +127,11 @@ export function ContextProvider({ children }) {
     (productId, quantity = 1) => {
       if (!quantity || quantity <= 0) return
       const normalizedQuantity = Math.max(1, Number(quantity) || 0)
+      const normalizedId = normalizeProductId(productId)
       setCart((prevCart) => {
-        const existing = prevCart.find((item) => item.productId === productId)
+        const existing = prevCart.find(
+          (item) => normalizeProductId(item.productId) === normalizedId,
+        )
 
         if (existing) {
           const updatedQuantity = existing.quantity + normalizedQuantity
@@ -110,12 +141,12 @@ export function ContextProvider({ children }) {
           }
 
           const nextCart = prevCart.map((item) =>
-            item.productId === productId
+            normalizeProductId(item.productId) === normalizedId
               ? { ...item, quantity: updatedQuantity }
               : item,
           )
 
-          syncProductCartState(productId, {
+          syncProductCartState(normalizedId, {
             inCart: true,
             cartQuantity: updatedQuantity,
           })
@@ -123,12 +154,15 @@ export function ContextProvider({ children }) {
           return nextCart
         }
 
-        syncProductCartState(productId, {
+        syncProductCartState(normalizedId, {
           inCart: true,
           cartQuantity: normalizedQuantity,
         })
 
-        return [...prevCart, { productId, quantity: normalizedQuantity }]
+        return [
+          ...prevCart,
+          { productId: normalizedId, quantity: normalizedQuantity },
+        ]
       })
     },
     [syncProductCartState],
@@ -136,13 +170,16 @@ export function ContextProvider({ children }) {
 
   const updateCartQuantity = useCallback(
     (productId, quantity) => {
+      const normalizedId = normalizeProductId(productId)
       setCart((prevCart) => {
         const sanitizedQuantity = Math.max(0, Number(quantity) || 0)
         const clampedQuantity = sanitizedQuantity
-        const exists = prevCart.find((item) => item.productId === productId)
+        const exists = prevCart.find(
+          (item) => normalizeProductId(item.productId) === normalizedId,
+        )
 
         if (!exists && clampedQuantity <= 0) {
-          syncProductCartState(productId, {
+          syncProductCartState(normalizedId, {
             inCart: false,
             cartQuantity: 0,
           })
@@ -150,22 +187,24 @@ export function ContextProvider({ children }) {
         }
 
         if (clampedQuantity <= 0) {
-          syncProductCartState(productId, {
+          syncProductCartState(normalizedId, {
             inCart: false,
             cartQuantity: 0,
           })
-          return prevCart.filter((item) => item.productId !== productId)
+          return prevCart.filter(
+            (item) => normalizeProductId(item.productId) !== normalizedId,
+          )
         }
 
         const nextCart = exists
           ? prevCart.map((item) =>
-              item.productId === productId
+              normalizeProductId(item.productId) === normalizedId
                 ? { ...item, quantity: clampedQuantity }
                 : item,
             )
-          : [...prevCart, { productId, quantity: clampedQuantity }]
+          : [...prevCart, { productId: normalizedId, quantity: clampedQuantity }]
 
-        syncProductCartState(productId, {
+        syncProductCartState(normalizedId, {
           inCart: true,
           cartQuantity: clampedQuantity,
         })
@@ -178,10 +217,13 @@ export function ContextProvider({ children }) {
 
   const removeFromCart = useCallback(
     (productId) => {
+      const normalizedId = normalizeProductId(productId)
       setCart((prevCart) =>
-        prevCart.filter((item) => item.productId !== productId),
+        prevCart.filter(
+          (item) => normalizeProductId(item.productId) !== normalizedId,
+        ),
       )
-      syncProductCartState(productId, { inCart: false, cartQuantity: 0 })
+      syncProductCartState(normalizedId, { inCart: false, cartQuantity: 0 })
     },
     [syncProductCartState],
   )
@@ -199,7 +241,12 @@ export function ContextProvider({ children }) {
 
   const toggleProductInCart = useCallback(
     (productId) => {
-      if (cart.some((item) => item.productId === productId)) {
+      const normalizedId = normalizeProductId(productId)
+      if (
+        cart.some(
+          (item) => normalizeProductId(item.productId) === normalizedId,
+        )
+      ) {
         removeFromCart(productId)
       } else {
         addToCart(productId, 1)
@@ -223,7 +270,12 @@ export function ContextProvider({ children }) {
   )
 
   const isProductInCart = useCallback(
-    (productId) => cart.some((item) => item.productId === productId),
+    (productId) => {
+      const normalizedId = normalizeProductId(productId)
+      return cart.some(
+        (item) => normalizeProductId(item.productId) === normalizedId,
+      )
+    },
     [cart],
   )
 
@@ -232,20 +284,32 @@ export function ContextProvider({ children }) {
     [cart],
   )
 
-  const cartProducts = useMemo(
-    () =>
-      cart
-        .map((item) => {
-          const product = products.find((p) => p.id === item.productId)
-          if (!product) return null
-          return {
-            ...product,
-            quantity: item.quantity,
-          }
+  const cartProducts = useMemo(() => {
+    if (!Array.isArray(cart) || !Array.isArray(products)) {
+      return []
+    }
+
+    return cart
+      .map((item) => {
+        const targetId = String(item.productId)
+        const product = products.find((p) => {
+          if (!p) return false
+          const idMatch =
+            p.id !== undefined && String(p.id) === targetId
+          const skuMatch =
+            p.sku !== undefined && String(p.sku) === targetId
+          return idMatch || skuMatch
         })
-        .filter(Boolean),
-    [cart, products],
-  )
+
+        if (!product) return null
+
+        return {
+          ...product,
+          quantity: item.quantity,
+        }
+      })
+      .filter(Boolean)
+  }, [cart, products])
 
   const getCartCount = useCallback(() => cartCount, [cartCount])
 
@@ -321,6 +385,7 @@ export function ContextProvider({ children }) {
     clearProductCart,
     findProductById,
     searchTerm,
+    debouncedSearchTerm,
     setSearchTerm,
     checkoutStep,
     setCheckoutStep,

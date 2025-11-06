@@ -21,6 +21,7 @@ import {
   formatCurrencyInputValue,
   parseCurrencyValue,
 } from '../Inputs/FormFilter'
+import { DEFAULT_FILTER_VALUES } from '@/constants/filterDefaults'
 
 const SORT_OPTIONS = [
   { value: 'price-low-high', label: 'Price: Low to High' },
@@ -31,15 +32,11 @@ const SORT_OPTIONS = [
 
 const DEFAULT_OPTIONS = {
   price: { min: 0, max: 200000 },
-  brand: [],
-  color: [],
-  storage: [],
-  camera: [],
-  display: [],
-  ram: [],
+  ...DEFAULT_FILTER_VALUES,
 }
 
 const FILTER_CATEGORIES = [
+  'category',
   'brand',
   'color',
   'storage',
@@ -47,6 +44,16 @@ const FILTER_CATEGORIES = [
   'display',
   'ram',
 ]
+
+const CATEGORY_LABELS = {
+  category: 'Category',
+  brand: 'Brand',
+  color: 'Color',
+  storage: 'Storage Capacity',
+  camera: 'Camera Megapixel',
+  display: 'Display Size',
+  ram: 'RAM',
+}
 
 const MAX_VISIBLE_CHIPS = 3
 
@@ -287,6 +294,7 @@ const buildDefaultFilters = (options) => ({
   priceRange: [options.price.min, options.price.max],
   priceMin: `${options.price.min}`,
   priceMax: `${options.price.max}`,
+  category: buildToggleState(options.category),
   brand: buildToggleState(options.brand),
   color: buildToggleState(options.color),
   storage: buildToggleState(options.storage),
@@ -315,6 +323,7 @@ const buildSelectedFiltersPayload = (filtersState) => {
 
   return {
     priceRange: filtersState.priceRange,
+    category: toSelectedList(filtersState, 'category'),
     brand: toSelectedList(filtersState, 'brand'),
     color: toSelectedList(filtersState, 'color'),
     storage: toSelectedList(filtersState, 'storage'),
@@ -356,6 +365,10 @@ const buildFiltersStateFromSelection = (selection, options) => {
       selection?.display ?? [],
     ),
     ram: buildToggleStateFromSelection(options.ram, selection?.ram ?? []),
+    category: buildToggleStateFromSelection(
+      options.category,
+      selection?.category ?? [],
+    ),
   }
 }
 
@@ -373,6 +386,7 @@ export function FilterBar({
   isLoanCalculatorOpen = false,
 }) {
   const [isOpen, setIsOpen] = useState(false)
+  const syncingFiltersRef = useRef(false)
 
   const normalizedOptions = useMemo(() => {
     const priceMin = options?.price?.min ?? DEFAULT_OPTIONS.price.min
@@ -381,12 +395,34 @@ export function FilterBar({
 
     return {
       price: { min: priceMin, max: priceMax },
-      brand: uniqueList(options?.brand ?? DEFAULT_OPTIONS.brand),
-      color: uniqueList(options?.color ?? DEFAULT_OPTIONS.color),
-      storage: uniqueList(options?.storage ?? DEFAULT_OPTIONS.storage),
-      camera: uniqueList(options?.camera ?? DEFAULT_OPTIONS.camera),
-      display: uniqueList(options?.display ?? DEFAULT_OPTIONS.display),
-      ram: uniqueList(options?.ram ?? DEFAULT_OPTIONS.ram),
+      category: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.category ?? []),
+        ...(options?.category ?? []),
+      ]),
+      brand: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.brand ?? []),
+        ...(options?.brand ?? []),
+      ]),
+      color: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.color ?? []),
+        ...(options?.color ?? []),
+      ]),
+      storage: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.storage ?? []),
+        ...(options?.storage ?? []),
+      ]),
+      camera: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.camera ?? []),
+        ...(options?.camera ?? []),
+      ]),
+      display: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.display ?? []),
+        ...(options?.display ?? []),
+      ]),
+      ram: uniqueList([
+        ...(DEFAULT_FILTER_VALUES.ram ?? []),
+        ...(options?.ram ?? []),
+      ]),
     }
   }, [options])
 
@@ -399,6 +435,7 @@ export function FilterBar({
     camera: false,
     display: false,
     ram: false,
+    category: false,
     brand: false,
   })
   const [selectedPaymentType, setSelectedPaymentType] = useState('basic')
@@ -416,6 +453,7 @@ export function FilterBar({
     camera: true,
     display: true,
     ram: true,
+    category: true,
     brand: true,
   })
   const location = useLocation()
@@ -428,12 +466,24 @@ export function FilterBar({
       normalizedOptions,
     )
 
+    syncingFiltersRef.current = true
     setFilters((prev) =>
       areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES)
         ? prev
         : nextFilters,
     )
   }, [normalizedOptions, selectedFilters])
+
+  useEffect(() => {
+    if (syncingFiltersRef.current) {
+      syncingFiltersRef.current = false
+      return
+    }
+
+    if (onFiltersChange) {
+      onFiltersChange(buildSelectedFiltersPayload(filters))
+    }
+  }, [filters, onFiltersChange])
 
   useEffect(() => {
     const nextSort =
@@ -468,13 +518,11 @@ export function FilterBar({
     }
 
     setFilters(nextFilters)
-    onFiltersChange?.(buildSelectedFiltersPayload(nextFilters))
     setIsFiltersOpen(false)
   }, [
     filters,
     normalizedOptions.price.max,
     normalizedOptions.price.min,
-    onFiltersChange,
   ])
 
   useEffect(() => {
@@ -530,7 +578,6 @@ export function FilterBar({
       ram: false,
       brand: false,
     })
-    onFiltersChange?.(buildSelectedFiltersPayload(resetState))
   }
 
   const getVisibleItems = useCallback(
@@ -652,7 +699,6 @@ export function FilterBar({
       )
     }
 
-    onFiltersChange(nextSelected)
     setFilters(buildFiltersStateFromSelection(nextSelected, normalizedOptions))
   }
 
@@ -744,9 +790,9 @@ export function FilterBar({
               {/* Scrollable Content */}
               <ScrollArea className="h-[calc(60vh-72px)] w-full">
                 <div className="flex flex-col gap-4 px-4 pb-4">
-                  {/* Price Section */}
-                  <FilterSection
-                    title="Price"
+                 {/* Price Section */}
+                 <FilterSection
+                   title="Price"
                     isOpen={openSections.price}
                     onToggle={() => toggleSection('price')}
                   >
@@ -781,12 +827,52 @@ export function FilterBar({
                     </div>
                   </FilterSection>
 
-                  {/* Color Section */}
-                  <FilterSection
-                    title="Color"
-                    isOpen={openSections.color}
-                    onToggle={() => toggleSection('color')}
-                  >
+                  {/* Category Section */}
+                  {normalizedOptions.category.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.category}
+                      isOpen={openSections.category}
+                      onToggle={() => toggleSection('category')}
+                    >
+                      <div
+                        id="category-filters"
+                        className="flex flex-col items-start gap-3 self-stretch"
+                      >
+                        {getVisibleItems(
+                          normalizedOptions.category,
+                          'category',
+                        ).map((category) => (
+                          <FilterCheckboxItem
+                            key={category}
+                            label={category}
+                            checked={filters.category[category]}
+                            onChange={(checked) =>
+                              handleCheckboxToggle(
+                                'category',
+                                category,
+                                checked,
+                              )
+                            }
+                          />
+                        ))}
+                        <ShowMoreButton
+                          category="category"
+                          isExpanded={expandedCategories.category}
+                          totalCount={normalizedOptions.category.length}
+                          onToggle={() => toggleCategoryExpansion('category')}
+                        />
+                        <div className="h-px self-stretch bg-[#E8ECF4]" />
+                      </div>
+                    </FilterSection>
+                  )}
+
+                 {/* Color Section */}
+                  {normalizedOptions.color.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.color}
+                      isOpen={openSections.color}
+                      onToggle={() => toggleSection('color')}
+                    >
                     <div
                       id="color-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -811,14 +897,16 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
 
                   {/* Storage Section */}
-                  <FilterSection
-                    title="Storage Capacity"
-                    isOpen={openSections.storage}
-                    onToggle={() => toggleSection('storage')}
-                  >
+                  {normalizedOptions.storage.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.storage}
+                      isOpen={openSections.storage}
+                      onToggle={() => toggleSection('storage')}
+                    >
                     <div
                       id="storage-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -844,14 +932,16 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
 
                   {/* Camera Section */}
-                  <FilterSection
-                    title="Camera Megapixel"
-                    isOpen={openSections.camera}
-                    onToggle={() => toggleSection('camera')}
-                  >
+                  {normalizedOptions.camera.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.camera}
+                      isOpen={openSections.camera}
+                      onToggle={() => toggleSection('camera')}
+                    >
                     <div
                       id="camera-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -876,14 +966,16 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
 
                   {/* Display Section */}
-                  <FilterSection
-                    title="Display Size"
-                    isOpen={openSections.display}
-                    onToggle={() => toggleSection('display')}
-                  >
+                  {normalizedOptions.display.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.display}
+                      isOpen={openSections.display}
+                      onToggle={() => toggleSection('display')}
+                    >
                     <div
                       id="display-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -909,14 +1001,16 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
 
                   {/* RAM Section */}
-                  <FilterSection
-                    title="RAM"
-                    isOpen={openSections.ram}
-                    onToggle={() => toggleSection('ram')}
-                  >
+                  {normalizedOptions.ram.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.ram}
+                      isOpen={openSections.ram}
+                      onToggle={() => toggleSection('ram')}
+                    >
                     <div
                       id="ram-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -941,14 +1035,16 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
 
                   {/* Brand Section */}
-                  <FilterSection
-                    title="Brand"
-                    isOpen={openSections.brand}
-                    onToggle={() => toggleSection('brand')}
-                  >
+                  {normalizedOptions.brand.length > 0 && (
+                    <FilterSection
+                      title={CATEGORY_LABELS.brand}
+                      isOpen={openSections.brand}
+                      onToggle={() => toggleSection('brand')}
+                    >
                     <div
                       id="brand-filters"
                       className="flex flex-col items-start gap-3 self-stretch"
@@ -973,7 +1069,8 @@ export function FilterBar({
                       />
                       <div className="h-px self-stretch bg-[#E8ECF4]" />
                     </div>
-                  </FilterSection>
+                    </FilterSection>
+                  )}
                 </div>
                 <ScrollBar orientation="vertical" />
               </ScrollArea>

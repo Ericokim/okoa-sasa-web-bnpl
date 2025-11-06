@@ -1,22 +1,56 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { ProductGallery } from '@/components/shared/Products/ProductGallery'
 import { ProductInfo } from '@/components/shared/Products/ProductInfo'
 import { SpecificationsTable } from '@/components/shared/Products/SpecificationsTable'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import NotFound from '@/container/NotFound'
 import { useStateContext } from '@/context/state-context'
-import { productsQueryOptions, applyCartState } from '@/lib/queries/products'
+import { useProductList } from '@/lib/queries/products'
 
 function ProductDetailPage() {
   const { productId } = Route.useParams()
-  const { product: loadedProduct, products: loaderProducts = [] } =
-    Route.useLoaderData()
+  const { data: fetchedProducts = [], isLoading } = useProductList()
+  const products = useMemo(
+    () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
+    [fetchedProducts],
+  )
   const { cart, setProducts } = useStateContext()
 
+  const targetProduct = useMemo(() => {
+    const targetId = String(productId)
+
+    return (
+      products.find((item) => {
+        if (!item) return false
+        const matchesId =
+          item.id !== undefined && String(item.id) === targetId
+        const matchesSku =
+          item.sku !== undefined && String(item.sku) === targetId
+        return matchesId || matchesSku
+      }) ?? null
+    )
+  }, [products, productId])
+
   useEffect(() => {
+    if (isLoading) {
+      return
+    }
+
     setProducts((prevProducts = []) => {
-      const nextProducts = applyCartState(loaderProducts, cart)
+      const nextProducts = products.map((product) => {
+        const cartItem = cart.find(
+          (item) => String(item.productId) === String(product.id),
+        )
+        const quantity = cartItem?.quantity || 0
+        return {
+          ...product,
+          inCart: !!cartItem,
+          quantity,
+          cartQuantity: quantity,
+        }
+      })
+
       if (prevProducts.length !== nextProducts.length) {
         return nextProducts
       }
@@ -27,9 +61,17 @@ function ProductDetailPage() {
 
       return isSame ? prevProducts : nextProducts
     })
-  }, [loaderProducts, cart, setProducts])
+  }, [products, cart, setProducts, isLoading])
 
-  if (!loadedProduct) {
+  if (isLoading) {
+    return (
+      <div className="py-10 text-center text-sm text-[#676D75]">
+        Loading product...
+      </div>
+    )
+  }
+
+  if (!targetProduct) {
     return (
       <div className="py-10">
         <NotFound
@@ -43,13 +85,12 @@ function ProductDetailPage() {
   }
 
   const fallbackImage =
-    (typeof loadedProduct.image === 'string' &&
-    loadedProduct.image.trim().length > 0
-      ? loadedProduct.image.trim()
-      : '/product.png')
+    typeof targetProduct.image === 'string' && targetProduct.image.trim().length
+      ? targetProduct.image.trim()
+      : '/product.png'
   const sourceGallery =
-    Array.isArray(loadedProduct.gallery) && loadedProduct.gallery.length > 0
-      ? loadedProduct.gallery.filter(Boolean)
+    Array.isArray(targetProduct.gallery) && targetProduct.gallery.length > 0
+      ? targetProduct.gallery.filter(Boolean)
       : []
   const galleryImages =
     sourceGallery.length > 0 ? [...sourceGallery] : [fallbackImage]
@@ -61,23 +102,23 @@ function ProductDetailPage() {
   }
 
   const displayProduct = {
-    ...loadedProduct,
+    ...targetProduct,
     price:
-      loadedProduct.priceLabel ??
-      `KES ${Number(loadedProduct.price ?? 0).toLocaleString()}`,
-    stock: loadedProduct.stock ?? 'Available in store',
+      targetProduct.priceLabel ??
+      `KES ${Number(targetProduct.price ?? 0).toLocaleString()}`,
+    stock: targetProduct.stock ?? 'Available in store',
     images:
       galleryImages.length > 4 ? galleryImages.slice(0, 4) : galleryImages,
   }
 
   const specifications = {
-    ...(loadedProduct.specifications ?? {}),
+    ...(targetProduct.specifications ?? {}),
   }
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
     {
-      label: loadedProduct.name,
+      label: targetProduct.name,
       path: `/products/${productId}`,
       isCurrent: true,
     },
@@ -113,8 +154,9 @@ function ProductDetailPage() {
       <div className="px-4 pb-8 md:px-0 md:pb-12">
         <SpecificationsTable
           specifications={specifications}
-          descriptionText={loadedProduct.descriptionText}
-          benefits={loadedProduct.benefits}
+          descriptionHtml={targetProduct.descriptionHtml}
+          descriptionText={targetProduct.descriptionText}
+          benefits={targetProduct.benefits}
         />
       </div>
     </div>
@@ -122,23 +164,5 @@ function ProductDetailPage() {
 }
 
 export const Route = createFileRoute('/products/$productId')({
-  loader: async ({ params, context: { queryClient } }) => {
-    const listData = await queryClient.ensureQueryData(productsQueryOptions())
-    const targetId = String(params.productId)
-    const product =
-      listData.products.find((item) => {
-        if (!item) return false
-        const matchesId = item.id !== undefined && String(item.id) === targetId
-        const matchesSku =
-          item.sku !== undefined && String(item.sku) === targetId
-        return matchesId || matchesSku
-      }) ?? null
-
-    return {
-      product,
-      products: listData.products,
-      meta: listData.meta,
-    }
-  },
   component: ProductDetailPage,
 })

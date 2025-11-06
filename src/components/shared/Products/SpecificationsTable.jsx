@@ -3,21 +3,26 @@ import { Card } from '@/components/ui/card'
 
 export function SpecificationsTable({
   specifications = {},
+  descriptionHtml = '',
   descriptionText = '',
   benefits = [],
 }) {
   const specificationEntries = Object.entries(specifications ?? {})
   const hasSpecifications = specificationEntries.length > 0
+  const normalizedDescriptionHtml = descriptionHtml?.trim()
   const normalizedDescriptionText = descriptionText?.trim()
   const normalizedBenefits = Array.isArray(benefits)
-    ? benefits.filter((benefit) => typeof benefit === 'string' && benefit.trim().length > 0)
+    ? benefits.filter(
+        (benefit) => typeof benefit === 'string' && benefit.trim().length > 0,
+      )
     : []
-  const descriptionParagraphs = normalizedDescriptionText
-    ? normalizedDescriptionText
-        .split('\n')
-        .map((paragraph) => paragraph.trim())
-        .filter(Boolean)
-    : []
+  const descriptionParagraphs =
+    !normalizedDescriptionHtml && normalizedDescriptionText
+      ? normalizedDescriptionText
+          .split('\n')
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+      : []
 
   return (
     <Tabs
@@ -100,7 +105,12 @@ export function SpecificationsTable({
       {/* Description Content */}
       <TabsContent value="description" className="mt-0 w-full">
         <div className="self-stretch py-4 md:py-6">
-          {descriptionParagraphs.length > 0 ? (
+          {normalizedDescriptionHtml ? (
+            <div
+              className="prose prose-sm max-w-none text-[#676D75] md:prose-base"
+              dangerouslySetInnerHTML={{ __html: normalizedDescriptionHtml }}
+            />
+          ) : descriptionParagraphs.length > 0 ? (
             <div className="space-y-3">
               {descriptionParagraphs.map((paragraph, index) => (
                 <p

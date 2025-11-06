@@ -1,5 +1,12 @@
 import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router'
-import { useState, useEffect, useMemo, useCallback, useRef, useLayoutEffect } from 'react'
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+  useLayoutEffect,
+} from 'react'
 import { FilterBar } from '@/components/shared/Products/FilterBar'
 import { AuthDialog } from '@/components/shared/AuthDialog'
 import { LoanLimitCalculator } from '@/components/shared/LoanLimitCalculator'
@@ -8,7 +15,27 @@ import { PaginationComponent } from '@/components/shared/PaginationComponent'
 import NotFound from '@/container/NotFound'
 import { useStateContext } from '@/context/state-context'
 import { Button } from '@/components/ui/button'
-import { productsQueryOptions, applyCartState } from '@/lib/queries/products'
+import { useProductList } from '@/lib/queries/products'
+import { DEFAULT_FILTER_VALUES } from '@/constants/filterDefaults'
+import logo from '@/assets/images/primaryLogoVertical.png'
+
+const LogoLoader = () => (
+  <div className="flex flex-col items-center justify-center gap-4 py-16">
+    <div className="relative h-28 w-28 sm:h-32 sm:w-32">
+      <img
+        src={logo}
+        srcSet={`${logo} 1x, ${logo} 2x`}
+        alt="Okoa Sasa Logo"
+        loading="lazy"
+        decoding="async"
+        className="relative h-full w-full object-contain animate-pulse"
+      />
+    </div>
+    <p className="text-sm font-medium text-[#676D75] sm:text-base">
+      Fetching products...
+    </p>
+  </div>
+)
 
 const PRODUCTS_PER_PAGE = 8
 const DEFAULT_SORT = 'price-low-high'
@@ -19,6 +46,7 @@ const SORT_OPTIONS = new Set([
   'name-descending',
 ])
 const FILTER_CATEGORIES = [
+  'category',
   'brand',
   'color',
   'storage',
@@ -28,7 +56,6 @@ const FILTER_CATEGORIES = [
 ]
 
 const parseNumber = (value) => {
-  
   if (value === null || value === undefined) return undefined
   const num = Number(value)
   return Number.isFinite(num) ? num : undefined
@@ -36,7 +63,7 @@ const parseNumber = (value) => {
 
 const parseListParam = (value, allowedValues = []) => {
   if (typeof value !== 'string' || value.length === 0) return []
-  const parts = value 
+  const parts = value
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean)
@@ -63,6 +90,7 @@ const buildFiltersFromSearch = (searchParams, filterOptions) => {
 
   return {
     priceRange: [clampedMin, clampedMax],
+    category: parseListParam(searchParams?.category, filterOptions.category),
     brand: parseListParam(searchParams?.brand, filterOptions.brand),
     color: parseListParam(searchParams?.color, filterOptions.color),
     storage: parseListParam(searchParams?.storage, filterOptions.storage),
@@ -93,18 +121,37 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
-  const { searchTerm, setProducts, cart } = useStateContext()
-  const { products: loaderProducts = [] } = Route.useLoaderData()
+  const { debouncedSearchTerm, setProducts, cart } = useStateContext()
+  const { data: fetchedProducts = [], isLoading } = useProductList()
+  const products = useMemo(
+    () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
+    [fetchedProducts],
+  )
 
   const search = useSearch({ from: '/' })
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showLoanCalculator, setShowLoanCalculator] = useState(false)
-  const products = loaderProducts
 
   useEffect(() => {
+    if (isLoading) {
+      return
+    }
+
     setProducts((prevProducts = []) => {
-      const nextProducts = applyCartState(products, cart)
+      const nextProducts = products.map((product) => {
+        const cartItem = cart.find(
+          (item) => String(item.productId) === String(product.id),
+        )
+        const quantity = cartItem?.quantity || 0
+        return {
+          ...product,
+          inCart: !!cartItem,
+          quantity,
+          cartQuantity: quantity,
+        }
+      })
+
       if (prevProducts.length !== nextProducts.length) {
         return nextProducts
       }
@@ -115,38 +162,55 @@ function IndexPage() {
 
       return isSame ? prevProducts : nextProducts
     })
-  }, [products, cart, setProducts])
+  }, [products, cart, setProducts, isLoading])
 
   const filterOptions = useMemo(() => {
     if (products.length === 0) {
       return {
         price: { min: 0, max: 0 },
-        brand: [],
-        color: [],
-        storage: [],
-        camera: [],
-        display: [],
-        ram: [],
+        category: [...DEFAULT_FILTER_VALUES.category],
+        brand: [...DEFAULT_FILTER_VALUES.brand],
+        color: [...DEFAULT_FILTER_VALUES.color],
+        storage: [...DEFAULT_FILTER_VALUES.storage],
+        camera: [...DEFAULT_FILTER_VALUES.camera],
+        display: [...DEFAULT_FILTER_VALUES.display],
+        ram: [...DEFAULT_FILTER_VALUES.ram],
       }
     }
 
-    const priceValues = products.map((product) => product.price)
+    const priceValues = products.map((product) =>
+      Number.isFinite(product.price) ? product.price : 0,
+    )
     const minPrice = Math.min(...priceValues)
     const maxPrice = Math.max(...priceValues)
 
-    const uniqueForKey = (key) =>
+    const normalizeList = (items = []) =>
       Array.from(
-        new Set(products.map((product) => product[key]).filter(Boolean)),
-      )
+        new Set(
+          items
+            .map((value) => (typeof value === 'string' ? value.trim() : ''))
+            .filter(Boolean),
+        ),
+      ).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }))
+
+    const uniqueForKey = (key) =>
+      normalizeList(products.map((product) => product[key]))
+
+    const mergedValues = (key) =>
+      normalizeList([
+        ...(DEFAULT_FILTER_VALUES[key] ?? []),
+        ...uniqueForKey(key),
+      ])
 
     return {
       price: { min: minPrice, max: maxPrice },
-      brand: uniqueForKey('brand'),
-      color: uniqueForKey('color'),
-      storage: uniqueForKey('storage'),
-      camera: uniqueForKey('camera'),
-      display: uniqueForKey('display'),
-      ram: uniqueForKey('ram'),
+      category: mergedValues('category'),
+      brand: mergedValues('brand'),
+      color: mergedValues('color'),
+      storage: mergedValues('storage'),
+      camera: mergedValues('camera'),
+      display: mergedValues('display'),
+      ram: mergedValues('ram'),
     }
   }, [products])
 
@@ -209,7 +273,12 @@ function IndexPage() {
       setLoanLimit(loanAmount)
       handleFiltersChange(nextFilters)
     },
-    [activeFilters, filterOptions.price.max, filterOptions.price.min, handleFiltersChange],
+    [
+      activeFilters,
+      filterOptions.price.max,
+      filterOptions.price.min,
+      handleFiltersChange,
+    ],
   )
 
   const handleLoanLimitClear = useCallback(() => {
@@ -218,7 +287,12 @@ function IndexPage() {
       ...activeFilters,
       priceRange: [filterOptions.price.min, filterOptions.price.max],
     })
-  }, [activeFilters, filterOptions.price.max, filterOptions.price.min, handleFiltersChange])
+  }, [
+    activeFilters,
+    filterOptions.price.max,
+    filterOptions.price.min,
+    handleFiltersChange,
+  ])
 
   useEffect(() => {
     if (search?.auth === 'login') {
@@ -240,7 +314,7 @@ function IndexPage() {
       return !selections?.length || selections.includes(value)
     }
 
-    const normalizedSearch = searchTerm.trim().toLowerCase()
+    const normalizedSearch = debouncedSearchTerm.trim().toLowerCase()
 
     const filtered = products.filter((product) => {
       const withinPrice = product.price >= minPrice && product.price <= maxPrice
@@ -256,6 +330,7 @@ function IndexPage() {
       return (
         withinPrice &&
         withinLoanLimit &&
+        matchesSelection('category', product.category) &&
         matchesSelection('brand', product.brand) &&
         matchesSelection('color', product.color) &&
         matchesSelection('storage', product.storage) &&
@@ -287,7 +362,7 @@ function IndexPage() {
     filterOptions.price.max,
     filterOptions.price.min,
     products,
-    searchTerm,
+    debouncedSearchTerm,
     loanLimit,
   ])
 
@@ -386,6 +461,7 @@ function IndexPage() {
     if (priceMinParam !== undefined) nextSearch.priceMin = priceMinParam
     if (priceMaxParam !== undefined) nextSearch.priceMax = priceMaxParam
 
+    const categoryParam = formatListParam(activeFilters.category)
     const brandParam = formatListParam(activeFilters.brand)
     const colorParam = formatListParam(activeFilters.color)
     const storageParam = formatListParam(activeFilters.storage)
@@ -393,6 +469,7 @@ function IndexPage() {
     const displayParam = formatListParam(activeFilters.display)
     const ramParam = formatListParam(activeFilters.ram)
 
+    if (categoryParam !== undefined) nextSearch.category = categoryParam
     if (brandParam !== undefined) nextSearch.brand = brandParam
     if (colorParam !== undefined) nextSearch.color = colorParam
     if (storageParam !== undefined) nextSearch.storage = storageParam
@@ -407,6 +484,7 @@ function IndexPage() {
       'sort',
       'priceMin',
       'priceMax',
+      'category',
       'brand',
       'color',
       'storage',
@@ -466,7 +544,9 @@ function IndexPage() {
       />
 
       <div className="py-6 md:py-8 lg:py-[38px]">
-        {filteredProducts.length > 0 ? (
+        {isLoading ? (
+          <LogoLoader />
+        ) : filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-6 2xl:gap-[30px]">
               {paginatedProducts.map((product) => {
@@ -477,10 +557,10 @@ function IndexPage() {
                   Number(product.originalPrice ?? 0) >
                   Number(product.price ?? 0)
                 const oldPriceLabel = hasDiscount
-                  ? product.originalPriceLabel ??
+                  ? (product.originalPriceLabel ??
                     `KES ${Number(
                       product.originalPrice ?? product.price ?? 0,
-                    ).toLocaleString()}`
+                    ).toLocaleString()}`)
                   : priceLabel
 
                 return (
@@ -516,8 +596,8 @@ function IndexPage() {
                 </h3>
                 <p className="max-w-md text-sm text-[#676D75]">
                   We couldn&apos;t find any products priced at or below KES{' '}
-                  {loanLimit.toLocaleString()}. You can adjust your loan limit or
-                  reset the filters to explore more devices.
+                  {loanLimit.toLocaleString()}. You can adjust your loan limit
+                  or reset the filters to explore more devices.
                 </p>
                 <div className="flex flex-wrap items-center justify-center gap-3">
                   <Button
@@ -556,9 +636,6 @@ function IndexPage() {
 }
 
 export const Route = createFileRoute('/')({
-  loader: async ({ context: { queryClient } }) => {
-    return queryClient.ensureQueryData(productsQueryOptions())
-  },
   component: IndexPage,
   validateSearch: (search) => ({
     auth: search?.auth,
