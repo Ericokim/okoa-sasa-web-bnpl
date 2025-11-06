@@ -175,5 +175,7 @@ export const queryKeys = {
       organization,
       channel,
     ],
+    regions: () => ["masoko-regions"],
+    pickUpPoints: () => ["masoko-pick-up-points"],
   },
 };
