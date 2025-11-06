@@ -67,7 +67,7 @@ export function Header() {
 
         {/* Search Bar */}
         <div className="flex-1 mx-4 lg:mx-6 xl:mx-8 max-w-[500px] lg:max-w-[600px] xl:max-w-[690px]">
-          <div className="group relative flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border transition-all duration-200 focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/10 focus-within:bg-white">
+          <div className="group relative flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border transition-all duration-200 focus-within:border-[#F8971D] focus-within:ring-3 focus-within:ring-[#F8971D]/20 focus-within:bg-white">
             {/* Search Icon */}
             <Search className="h-6 w-6 transition-colors text-[#A0A4AC]  group-focus-within:text-primary" />
 
@@ -158,7 +158,7 @@ export function Header() {
 
       {/* === MOBILE SEARCH BAR === */}
       <div className="border-t border-[#E8ECF4] mx-auto px-4 sm:px-5 md:px-6 lg:px-8 xl:px-12 py-3 lg:hidden">
-        <div className="group relative flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border border transition-all duration-200 focus-within:border-primary/30 focus-within:ring-4 focus-within:ring-primary/10 focus-within:bg-white">
+        <div className="group relative flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border transition-all duration-200 focus-within:border-[#F8971D] focus-within:ring-3 focus-within:ring-[#F8971D]/20 focus-within:bg-white">
           {/* Search Icon */}
           <Search className="h-5 w-5 text-[#A0A4AC] transition-colors group-focus-within:text-primary" />
 
