@@ -12,18 +12,30 @@ export function ProductCard({
   image,
   hasCartButton = false,
 }) {
+  const fallbackImage = '/product.png'
+  const imageSrc =
+    typeof image === 'string' && image.trim().length > 0
+      ? image.trim()
+      : fallbackImage
+
   return (
     <Card className="border-none bg-transparent shadow-none p-0">
       <CardContent className="p-0">
         <Link to={`/products/${id}`} className="flex flex-col gap-4 group">
           <div className="relative flex items-center justify-center rounded-2xl bg-[#F9FAFB] p-7 h-[280px] group-hover:bg-gray-100 transition-colors">
             <img
-              src={image}
-              srcSet={`${image} 1x, ${image} 2x`}
+              src={imageSrc}
+              srcSet={`${imageSrc} 1x, ${imageSrc} 2x`}
               alt={title}
               loading="lazy"
               decoding="async"
               className="w-56 h-56 object-contain"
+              onError={(event) => {
+                if (event.currentTarget.src !== fallbackImage) {
+                  event.currentTarget.src = fallbackImage
+                  event.currentTarget.srcSet = `${fallbackImage} 1x, ${fallbackImage} 2x`
+                }
+              }}
             />
             {hasCartButton && (
               <Button

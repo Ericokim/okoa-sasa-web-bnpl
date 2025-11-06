@@ -10,11 +10,17 @@ export const getStorageData = (key) => {
 export const setStorageData = (key, value) => {
   try {
     sessionStorage.setItem(key, JSON.stringify(value));
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 };
 
 export const removeStorageKey = (key) => {
   try {
     sessionStorage.removeItem(key);
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 };
