@@ -143,7 +143,7 @@ export const queryKeys = {
     pickUpPoints: () => ['masoko-pick-up-points'],
   },
 }
-export const backendQueryKeys = {
+export const bnplQueryKeys = {
   // Orders
   orders: {
     // orders query keys

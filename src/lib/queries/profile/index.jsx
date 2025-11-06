@@ -1,11 +1,11 @@
-import { backendQueryKeys } from '@/lib/queryKeys'
+import { bnplQueryKeys } from '@/lib/queryKeys'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 
 // Get Profile Information of a User
 export const useGetProfile = (userId) => {
   return useQuery({
-    queryKey: backendQueryKeys.profile.PROFILE_GET_BY_ID(userId),
+    queryKey: bnplQueryKeys.profile.PROFILE_GET_BY_ID(userId),
     queryFn: () => api.get(`v1/user/${userId}`).then((res) => res.data),
     enabled: !!userId,
   })
@@ -33,7 +33,7 @@ export const useUpdateUserDetails = (options = {}) => {
       })
 
       queryClient.invalidateQueries({
-        queryKey: backendQueryKeys.profile.PROFILE_GET_BY_ID,
+        queryKey: bnplQueryKeys.profile.PROFILE_GET_BY_ID,
       })
     },
     onError: (error) => {
@@ -55,7 +55,7 @@ export function useUpdateUserAddress(options) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
   return useMutation({
-    mutationKey: [backendQueryKeys.profile.UPDATE_USER_ADDRESS],
+    mutationKey: [bnplQueryKeys.profile.UPDATE_USER_ADDRESS],
     mutationFn: async (payload) => {
       const formData = {
         userId: payload.userId,
@@ -95,7 +95,7 @@ export function useUpdateNotificationPreferences(options) {
   const { enqueueSnackbar } = useSnackbar()
   return useMutation({
     mutationKey: [
-      backendQueryKeys.profile.UPDATE_USER_NOTIFICATION_PREFERENCES,
+      bnplQueryKeys.profile.UPDATE_USER_NOTIFICATION_PREFERENCES,
     ],
     mutationFn: async (payload) => {
       const formData = {
@@ -120,7 +120,7 @@ export function useUpdateNotificationPreferences(options) {
       })
       setTimeout(() => {
         return queryClient.invalidateQueries({
-          queryKey: [backendQueryKeys.profile.PROFILE_GET_BY_ID],
+          queryKey: [bnplQueryKeys.profile.PROFILE_GET_BY_ID],
         })
       }, 2000)
     },

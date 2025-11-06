@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import masokoApi from '@/lib/api/api'
 import { queryKeys } from '@/lib/queryKeys'
 import { useSnackbar } from 'notistack'
-import { backendQueryKeys} from '@/lib/queryKeys'
+import { bnplQueryKeys} from '@/lib/queryKeys'
 
 
 export const useRegion = () => {
@@ -40,7 +40,7 @@ export function useGetAllOrders(params, options) {
 
   // Build query key memoized to prevent unnecessary re-fetch
   const queryKey = React.useMemo(
-    () => [backendQueryKeys.orders.ORDER_GET, params],
+    () => [bnplQueryKeys.orders.ORDER_GET, params],
     [params],
   )
 
