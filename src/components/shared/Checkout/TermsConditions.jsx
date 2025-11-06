@@ -11,11 +11,33 @@ export default function TermsConditionPage({
   isLastStep,
 }) {
   const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
-  
+
   // Use step 5 for Terms & Conditions
   const savedData = getCheckoutFormData(5)
-  
+
   const [isAccepted, setIsAccepted] = useState(savedData?.isAccepted || false)
+  const [ipAddress, setIpAddress] = useState('')
+
+  // Get client IP address on component mount
+  useEffect(() => {
+    const getClientIP = async () => {
+      try {
+        //  Try to get IP from a public API
+        const response = await fetch('https://api.ipify.org?format=json')
+        const data = await response.json()
+        setIpAddress(data.ip)
+      } catch (error) {
+        console.warn('Could not fetch public IP', error)
+      }
+    }
+
+    getClientIP()
+  }, [])
+
+  // Get proper user agent string
+  const getUserAgent = () => {
+    return navigator.userAgent
+  }
 
   // Save data when isAccepted changes
   useEffect(() => {
@@ -23,24 +45,24 @@ export default function TermsConditionPage({
       {
         consentType: 'TermsAndConditions',
         isConsentGiven: isAccepted,
-        ipAddress: 'unknown', // Placeholder since we removed getClientIP
-        userAgent: navigator.userAgent || 'unknown'
+        ip_address: ipAddress,
+        userAgent: getUserAgent(),
       },
       {
         consentType: 'PrivacyPolicy',
         isConsentGiven: isAccepted,
-        ipAddress: 'unknown', // Placeholder since we removed getClientIP
-        userAgent: navigator.userAgent || 'unknown'
-      }
+        ip_address: ipAddress,
+        userAgent: getUserAgent(),
+      },
     ]
 
-    saveCheckoutFormData(5, { 
+    saveCheckoutFormData(5, {
       isAccepted,
       apiPayload: {
-        userConsents
-      }
+        userConsents,
+      },
     })
-  }, [isAccepted, saveCheckoutFormData])
+  }, [isAccepted, ipAddress, saveCheckoutFormData])
 
   // Also load saved data on component mount
   useEffect(() => {
@@ -57,27 +79,34 @@ export default function TermsConditionPage({
   }
 
   const onSubmit = () => {
-    // Prepare the consent data
+    // Prepare the consent data matching the example format
     const userConsents = [
       {
         consentType: 'TermsAndConditions',
         isConsentGiven: isAccepted,
-        ipAddress: 'unknown',
-        userAgent: navigator.userAgent || 'unknown'
+        consentVersion: '1',
+        consentedAt: new Date().toISOString(),
+        ip_address: ipAddress,
+        userAgent: getUserAgent(),
       },
       {
         consentType: 'PrivacyPolicy',
         isConsentGiven: isAccepted,
-        ipAddress: 'unknown', 
-        userAgent: navigator.userAgent || 'unknown'
-      }
+        consentVersion: '1',
+        consentedAt: new Date().toISOString(),
+        ip_address: ipAddress,
+        userAgent: getUserAgent(),
+      },
     ]
+
+    console.log('User Consents:', userConsents)
+
     // Save to context
     saveCheckoutFormData(5, {
       isAccepted,
       apiPayload: {
-        userConsents
-      }
+        userConsents,
+      },
     })
 
     // Proceed to next step
@@ -140,7 +169,7 @@ export default function TermsConditionPage({
           </div>
 
           {/* Spacer for desktop to maintain height */}
-          <div className="hidden sm:block h-[16px]"></div>
+          <div className="hidden sm:block h-4"></div>
         </div>
       </div>
 

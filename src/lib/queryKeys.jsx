@@ -27,7 +27,7 @@ export const queryKeys = {
         userId,
       ],
       masokoProducts: ({ amount, organization, channel }) => [
-        "masoko-products",
+        'masoko-products',
         amount,
         organization,
         channel,
@@ -56,7 +56,11 @@ export const queryKeys = {
       detail: (id) => [...queryKeys.masoko.orders.all(), 'detail', id],
       byUser: (userId) => [...queryKeys.masoko.orders.all(), 'user', userId],
       status: (status) => [...queryKeys.masoko.orders.all(), 'status', status],
-      tracking: (orderId) => [...queryKeys.masoko.orders.all(), 'tracking', orderId],
+      tracking: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'tracking',
+        orderId,
+      ],
     },
 
     customers: {
@@ -72,7 +76,11 @@ export const queryKeys = {
       all: () => ['payments'],
       list: (filters) => [...queryKeys.masoko.payments.all(), 'list', filters],
       detail: (id) => [...queryKeys.masoko.payments.all(), 'detail', id],
-      byOrder: (orderId) => [...queryKeys.masoko.payments.all(), 'order', orderId],
+      byOrder: (orderId) => [
+        ...queryKeys.masoko.payments.all(),
+        'order',
+        orderId,
+      ],
       methods: () => [...queryKeys.masoko.payments.all(), 'methods'],
       process: () => [...queryKeys.masoko.payments.all(), 'process'],
     },
@@ -99,8 +107,16 @@ export const queryKeys = {
     reports: {
       all: () => ['reports'],
       sales: (params) => [...queryKeys.masoko.reports.all(), 'sales', params],
-      products: (params) => [...queryKeys.masoko.reports.all(), 'products', params],
-      customers: (params) => [...queryKeys.masoko.reports.all(), 'customers', params],
+      products: (params) => [
+        ...queryKeys.masoko.reports.all(),
+        'products',
+        params,
+      ],
+      customers: (params) => [
+        ...queryKeys.masoko.reports.all(),
+        'customers',
+        params,
+      ],
       analytics: () => [...queryKeys.masoko.reports.all(), 'analytics'],
     },
 
@@ -112,8 +128,19 @@ export const queryKeys = {
       taxes: () => [...queryKeys.masoko.settings.all(), 'taxes'],
     },
 
-    regions: () => ["masoko-regions"],
-    pickUpPoints: () => ["masoko-pick-up-points"],
+    oders: {
+      createOrder: () => ['bnpl-create-order'],
+      getAllOrders: () => ['bnpl-get-all-orders'],
+      getOrder: (orderId) => ['bnpl-get-order', orderId],
+      saveLoanLimit: () => ['bnpl-save-loan-limit'],
+      savePersonalInfo: () => ['bnpl-save-personal-info'],
+      saveDeliveryDetails: () => ['bnpl-save-delivery-details'],
+      saveOrderSummary: () => ['bnpl-save-order-summary'],
+      saveTermsConsents: () => ['bnpl-save-terms-consents'],
+    },
+
+    regions: () => ['masoko-regions'],
+    pickUpPoints: () => ['masoko-pick-up-points'],
   },
 }
 export const backendQueryKeys = {
