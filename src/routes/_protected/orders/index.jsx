@@ -215,7 +215,7 @@ function OrdersPage() {
   //   data: orderHistory,
   //   isLoading: isOrderHistoryLoading,
   //   error: orderHistoryError,
-  // } = useProducts();
+  // } = useGetAllOrders();
 
   // console.log(orderHistory)
 
