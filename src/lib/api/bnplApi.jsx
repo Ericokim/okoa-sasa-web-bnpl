@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getAccessToken } from './token'
+import { getAccessToken } from './tokens'
 import { BNPL } from './config'
 
 const bnplApi = axios.create({

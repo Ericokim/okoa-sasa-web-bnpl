@@ -1,4 +1,3 @@
-// src/api/authApi.js
 import axios from 'axios';
 import { AUTH_GATEWAY } from './config';
 

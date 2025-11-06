@@ -31,7 +31,7 @@
 
 //new masoko api immplementation
 import axios from 'axios';
-import { getAccessToken } from './token';
+import { getAccessToken } from './tokens';
 import { MASOKO } from './config';
 import { useApiAuthStore } from '@/lib/store/apiAuthStore';
 
