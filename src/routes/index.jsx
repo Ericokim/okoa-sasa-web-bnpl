@@ -32,7 +32,7 @@ const LogoLoader = () => (
       />
     </div>
     <p className="text-sm font-medium text-[#676D75] sm:text-base">
-      Fetching products...
+      Loading...
     </p>
   </div>
 )
