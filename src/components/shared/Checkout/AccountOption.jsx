@@ -3,27 +3,73 @@ import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AuthDialog } from '../AuthDialog'
+import { useStateContext } from '@/context/state-context'
 
 export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   const [isAccepted, setIsAccepted] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const { getCheckoutFormData } = useStateContext()
 
-  const handleGuestCheckout = () => {
-    if (onNext) {
-      onNext()
+  // Function to combine all form data into the final payload
+  const prepareFinalPayload = () => {
+    // Get all form data from each step
+    const step1Data = getCheckoutFormData(1) // Loan Limit
+    const step2Data = getCheckoutFormData(2) // Personal Info
+    const step3Data = getCheckoutFormData(3) // Delivery Details
+    const step4Data = getCheckoutFormData(4) // Order Summary
+    const step5Data = getCheckoutFormData(5) // Terms & Conditions
+
+    // Combine all API payloads into one final submission object
+    const finalPayload = {
+      customer: step2Data?.apiPayload?.customer || {},
+      orderLines: step4Data?.apiPayload?.orderLines || [],
+      shippingDetail: step3Data?.apiPayload?.shippingDetail || {},
+      creditData: step1Data?.apiPayload?.creditData || {},
+      userConsents: step5Data?.apiPayload?.userConsents || [],
+      documents: step1Data?.apiPayload?.documents || [],
+    }
+
+    console.log('Final Submission Payload:', finalPayload)
+    return finalPayload
+  }
+
+  const handleGuestCheckout = async () => {
+    try {
+      const payload = prepareFinalPayload()
+
+      console.log(' payload:', payload)
+      if (onNext) {
+        onNext()
+      }
+    } catch (error) {
+      console.error('Guest checkout failed:', error)
+      // Handle error (show error message to user)
     }
   }
 
-  const handleLoginSuccess = () => {
-    if (onNext) {
-      onNext()
+  const handleLoginSuccess = async () => {
+    try {
+      const payload = prepareFinalPayload()
+      console.log(' payload:', payload)
+      if (onNext) {
+        onNext()
+      }
+    } catch (error) {
+      console.error('Login success submission failed:', error)
+      // Handle error (show error message to user)
     }
   }
 
-  const handleSubmitOrder = () => {
-    // Submit order logic - for now, just move to next step
-    if (onNext) {
-      onNext()
+  const handleSubmitOrder = async () => {
+    try {
+      const payload = prepareFinalPayload()
+      console.log(' payload:', payload)
+      if (onNext) {
+        onNext()
+      }
+    } catch (error) {
+      console.error('Submit order failed:', error)
+      // Handle error (show error message to user)
     }
   }
 
@@ -119,7 +165,11 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
         </div>
       )}
 
-      <AuthDialog onLoginSuccess={handleLoginSuccess} open={showAuthDialog} onOpenChange={setShowAuthDialog} />
+      <AuthDialog
+        onLoginSuccess={handleLoginSuccess}
+        open={showAuthDialog}
+        onOpenChange={setShowAuthDialog}
+      />
     </div>
   )
 }
