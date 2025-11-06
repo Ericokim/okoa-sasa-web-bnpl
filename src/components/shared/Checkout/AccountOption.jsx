@@ -4,22 +4,25 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AuthDialog } from '../AuthDialog'
 import { useStateContext } from '@/context/state-context'
+import { useCreateOrder } from '@/lib/queries/orders'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   const [isAccepted, setIsAccepted] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
+  const [error, setError] = useState(null)
   const { getCheckoutFormData } = useStateContext()
+
+  const { mutateAsync: createOrder, isPending } = useCreateOrder()
 
   // Function to combine all form data into the final payload
   const prepareFinalPayload = () => {
-    // Get all form data from each step
     const step1Data = getCheckoutFormData(1) // Loan Limit
     const step2Data = getCheckoutFormData(2) // Personal Info
     const step3Data = getCheckoutFormData(3) // Delivery Details
     const step4Data = getCheckoutFormData(4) // Order Summary
     const step5Data = getCheckoutFormData(5) // Terms & Conditions
 
-    // Combine all API payloads into one final submission object
     const finalPayload = {
       customer: step2Data?.apiPayload?.customer || {},
       orderLines: step4Data?.apiPayload?.orderLines || [],
@@ -34,42 +37,60 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   }
 
   const handleGuestCheckout = async () => {
+    setError(null)
     try {
       const payload = prepareFinalPayload()
-
-      console.log(' payload:', payload)
+      console.log('Guest checkout payload:', payload)
+      
+      // const response = await createOrder(payload)
+      // console.log('Order created successfully:', response)
+      
+      // Only navigate on success
       if (onNext) {
         onNext()
       }
     } catch (error) {
       console.error('Guest checkout failed:', error)
-      // Handle error (show error message to user)
+      setError(error?.message || 'Failed to create order. Please try again.')
     }
   }
 
   const handleLoginSuccess = async () => {
+    setError(null)
     try {
       const payload = prepareFinalPayload()
-      console.log(' payload:', payload)
+      console.log('Login success payload:', payload)
+      
+      // const response = await createOrder(payload)
+      // console.log('Order created successfully:', response)
+      
+      // Close auth dialog and navigate on success
+      setShowAuthDialog(false)
       if (onNext) {
         onNext()
       }
     } catch (error) {
       console.error('Login success submission failed:', error)
-      // Handle error (show error message to user)
+      setError(error?.message || 'Failed to create order. Please try again.')
     }
   }
 
   const handleSubmitOrder = async () => {
+    setError(null)
     try {
       const payload = prepareFinalPayload()
-      console.log(' payload:', payload)
+      console.log('Submit order payload:', payload)
+      
+      // const response = await createOrder(payload)
+      // console.log('Order created successfully:', response)
+      
+      // Only navigate on success
       if (onNext) {
         onNext()
       }
     } catch (error) {
       console.error('Submit order failed:', error)
-      // Handle error (show error message to user)
+      setError(error?.message || 'Failed to create order. Please try again.')
     }
   }
 
@@ -96,6 +117,7 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
                 id="account-terms"
                 checked={isAccepted}
                 onCheckedChange={setIsAccepted}
+                disabled={isPending}
                 className="flex flex-col justify-center items-center w-6 h-6 sm:w-[34px] sm:h-[34px] border-2 border-[#E8ECF4] rounded-lg sm:rounded-xl p-0 gap-2.5 mt-1 sm:mt-0"
               />
               <label
@@ -115,6 +137,7 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
               <Button
                 onClick={() => setShowAuthDialog(true)}
+                disabled={isPending}
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
               >
                 Sign In
@@ -122,10 +145,11 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
 
               <Button
                 onClick={handleGuestCheckout}
+                disabled={isPending}
                 variant="outline"
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
               >
-                Continue As Guest
+                {isPending ? 'Processing...' : 'Continue As Guest'}
               </Button>
             </div>
           ) : (
@@ -133,13 +157,15 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
               <Button
                 onClick={handleSubmitOrder}
+                disabled={isPending}
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
               >
-                Submit Order
+                {isPending ? 'Submitting...' : 'Submit Order'}
               </Button>
 
               <Button
                 onClick={onPrevious}
+                disabled={isPending}
                 variant="outline"
                 className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
               >
@@ -155,7 +181,7 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
         <div className="flex justify-end w-full">
           <Button
             onClick={onPrevious}
-            disabled={isFirstStep}
+            disabled={isFirstStep || isPending}
             type="button"
             variant="outline"
             className="flex justify-center items-center px-4 py-3 w-full sm:w-[193px] h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
