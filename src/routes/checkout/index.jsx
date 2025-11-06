@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
 import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
@@ -10,6 +10,7 @@ import DeliveryDetailsForm from '@/components/shared/Checkout/Deliver'
 import OrderSummaryPage from '@/components/shared/Checkout/OrderSummary'
 import DonePage from '@/components/shared/Checkout/DoneScreen'
 import { useStateContext } from '@/context/state-context'
+import { useNavigate } from '@tanstack/react-router'
 
 const steps = [
   {
@@ -51,6 +52,7 @@ const steps = [
 ]
 
 export default function CheckoutPage() {
+  const navigate = useNavigate()
   const {
     checkoutStep: currentStep,
     setCheckoutStep: setCurrentStep,
@@ -58,9 +60,20 @@ export default function CheckoutPage() {
     setIsCheckoutCompleted: setIsCompleted,
     saveCheckoutFormData,
     getCheckoutFormData,
+    cartProducts,
+    resetCheckout,
   } = useStateContext()
 
   const { productId } = Route.useParams()
+  const cartItems = cartProducts ?? []
+
+  // Redirect to home if cart is empty
+  useEffect(() => {
+    if (cartItems.length === 0 && !isCompleted) {
+      resetCheckout()
+      navigate({ to: '/' })
+    }
+  }, [cartItems.length, isCompleted, navigate, resetCheckout])
 
   const handleNext = () => {
     if (currentStep < steps.length) {
