@@ -1,6 +1,6 @@
 import { bnplQueryKeys } from '@/lib/queryKeys'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useSnackbar } from 'notistack'
+import { enqueueSnackbar, useSnackbar } from 'notistack'
 
 // Get Profile Information of a User
 export const useGetProfile = (userId) => {
@@ -133,3 +133,26 @@ export function useUpdateNotificationPreferences(options) {
     ...options,
   })
 }
+
+//delete user
+
+// Mutation to delete invoice
+export const useDeleteUser = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (userId) =>
+          api.delete(`/v1/user/:${userId}/delete`).then((res) => res.data),
+       onSuccess: (payload) => {
+      let success = payload.message.includes('successfully')
+        ? payload.message
+        : payload.message
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+     
+    },
+  
+  });
+};
