@@ -121,11 +121,20 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
-  const { debouncedSearchTerm, setProducts, cart } = useStateContext()
+  const {
+    debouncedSearchTerm,
+    setProducts,
+    cart,
+    products: contextProducts,
+  } = useStateContext()
   const { data: fetchedProducts = [], isLoading } = useProductList()
-  const products = useMemo(
+  const apiProducts = useMemo(
     () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
     [fetchedProducts],
+  )
+  const products = useMemo(
+    () => (Array.isArray(contextProducts) ? contextProducts : []),
+    [contextProducts],
   )
 
   const search = useSearch({ from: '/' })
@@ -139,7 +148,7 @@ function IndexPage() {
     }
 
     setProducts((prevProducts = []) => {
-      const nextProducts = products.map((product) => {
+      const nextProducts = apiProducts.map((product) => {
         const cartItem = cart.find(
           (item) => String(item.productId) === String(product.id),
         )
@@ -162,7 +171,7 @@ function IndexPage() {
 
       return isSame ? prevProducts : nextProducts
     })
-  }, [products, cart, setProducts, isLoading])
+  }, [apiProducts, cart, setProducts, isLoading])
 
   const filterOptions = useMemo(() => {
     if (products.length === 0) {
