@@ -10,6 +10,8 @@
 //     changePassword: () => [...queryKeys.auth.all(), 'changePassword'],
 //   },
 
+import { get } from 'react-hook-form'
+
 //   // Products
 //   products: {
 //     all: () => ['products'],
@@ -163,19 +165,24 @@
 // };
 // // lib/queryKeys.js
 
-
-
-
 // src/lib/queryKeys.js
 export const queryKeys = {
   masoko: {
     products: ({ amount, organization, channel }) => [
-      "masoko-products",
+      'masoko-products',
       amount,
       organization,
       channel,
     ],
-    regions: () => ["masoko-regions"],
-    pickUpPoints: () => ["masoko-pick-up-points"],
+    regions: () => ['masoko-regions'],
+    pickUpPoints: () => ['masoko-pick-up-points'],
+    createOrder: () => ['bnpl-create-order'],
+    getAllOrders: () => ['bnpl-get-all-orders'],
+    getOrder: (orderId) => ['bnpl-get-order', orderId],
+    saveLoanLimit: () => ['bnpl-save-loan-limit'],
+    savePersonalInfo: () => ['bnpl-save-personal-info'],
+    saveDeliveryDetails: () => ['bnpl-save-delivery-details'],
+    saveOrderSummary: () => ['bnpl-save-order-summary'],
+    saveTermsConsents: () => ['bnpl-save-terms-consents'],
   },
-};
+}

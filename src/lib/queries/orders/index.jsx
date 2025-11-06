@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import masokoApi from '@/lib/api/api'
 import { queryKeys } from '@/lib/queryKeys'
+import { useSnackbar } from 'notistack'
 
 export const useRegion = () => {
   return useQuery({
@@ -29,5 +30,193 @@ export const usePickUpPoint = () => {
     keepPreviousData: true,
     staleTime: 1000 * 60 * 5,
     cacheTime: 1000 * 60 * 10,
+  })
+}
+
+// create order
+export function useCreateOrder(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+  return useMutation({
+    mutationKey: queryKeys.masoko.createOrder(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/orders`, payload) //change to point bnpl endpoint
+      return data
+    },
+    onSuccess: (payload) => {
+      const success = payload.message?.includes('Successfully')
+        ? payload.message
+        : 'Order created successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.getAllOrders(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to create order', {
+        variant: 'error',
+      })
+    },
+    ...options,
+  })
+}
+
+// Loan Limit
+export function useSaveLoanLimit(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.saveLoanLimit(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/loan-limit`, payload)
+      return data
+    },
+    onSuccess: (data) => {
+      const success = data.message || 'Loan limit saved successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+      // Optionally invalidate related queries
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.saveLoanLimit(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to save loan limit', {
+        variant: 'error',
+      })
+    },
+    ...options,
+  })
+}
+
+//Personal Info
+export function useSavePersonalInfo(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.savePersonalInfo(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/personal-info`, payload)
+      return data
+    },
+    onSuccess: (data) => {
+      const success = data.message || 'Personal information saved successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.savePersonalInfo(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to save personal information', {
+        variant: 'error',
+      })
+    },
+    ...options,
+  })
+}
+
+// Save Delivery Details
+export function useSaveDeliveryDetails(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.saveDeliveryDetails(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/delivery-details`, payload)
+      return data
+    },
+    onSuccess: (data) => {
+      const success = data.message || 'Delivery details saved successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.saveDeliveryDetails(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to save delivery details', {
+        variant: 'error',
+      })
+    },
+    ...options,
+  })
+}
+
+//  Save Order Summary
+export function useSaveOrderSummary(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.saveOrderSummary(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/order-summary`, payload)
+      return data
+    },
+    onSuccess: (data) => {
+      const success = data.message || 'Order summary saved successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.saveOrderSummary(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to save order summary', {
+        variant: 'error',
+      })
+    },
+    ...options,
+  })
+}
+
+// Save Terms & Conditions Consents
+export function useSaveTermsConsents(options) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.saveTermsConsents(),
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post(`/terms-consents`, payload)
+      return data
+    },
+    onSuccess: (data) => {
+      const success = data.message || 'Terms and consents saved successfully'
+      enqueueSnackbar(success, {
+        variant: 'success',
+        autoHideDuration: 3000,
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.saveTermsConsents(),
+      })
+    },
+    onError: (error) => {
+      const err = error.response ? error.response.data?.message : error.message
+      enqueueSnackbar(err || 'Failed to save terms and consents', {
+        variant: 'error',
+      })
+    },
+    ...options,
   })
 }
