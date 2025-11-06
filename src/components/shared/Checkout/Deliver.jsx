@@ -408,6 +408,7 @@ export default function DeliveryDetailsForm({
                       placeholder="Enter your region"
                       options={regionOptions}
                       icon={WorldIcon}
+                      isLoading={isLoading}
                     />
                   </div>
 
@@ -439,7 +440,8 @@ export default function DeliveryDetailsForm({
                       label="Region"
                       placeholder="Enter your region"
                       options={regionOptions}
-                      icon={WorldIcon}
+                        icon={WorldIcon}
+                        isLoading={pickupLoading}
                     />
                   </div>
 
@@ -450,7 +452,8 @@ export default function DeliveryDetailsForm({
                       label="Pick Up Store / Post"
                       placeholder="Location"
                       options={pickupStoreOptions}
-                      icon={PinIcon}
+                        icon={PinIcon}
+                        isLoading={pickupLoading}
                     />
                     <div className="hidden md:block"></div>
                   </div>
