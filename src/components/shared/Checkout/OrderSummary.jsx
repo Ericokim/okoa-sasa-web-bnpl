@@ -133,6 +133,7 @@ export default function OrderSummaryPage({
     
     saveCheckoutFormData(4, {
       orderPayload: orderPayload,
+      apiPayload:orderPayload,
       cartSummary: {
         subtotal,
         shippingFee,
