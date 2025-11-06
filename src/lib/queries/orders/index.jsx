@@ -38,7 +38,7 @@ export function useCreateOrder(options) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
   return useMutation({
-    mutationKey: queryKeys.masoko.createOrder(),
+    mutationKey: queryKeys.masoko.oders.createOrder(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/orders`, payload) //change to point bnpl endpoint
       return data
@@ -52,7 +52,7 @@ export function useCreateOrder(options) {
         autoHideDuration: 4000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.getAllOrders(),
+        queryKey: queryKeys.masoko.oders.getAllOrders(),
       })
     },
     onError: (error) => {
@@ -71,7 +71,7 @@ export function useSaveLoanLimit(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.saveLoanLimit(),
+    mutationKey: queryKeys.masoko.oders.saveLoanLimit(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/loan-limit`, payload)
       return data
@@ -103,7 +103,7 @@ export function useSavePersonalInfo(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.savePersonalInfo(),
+    mutationKey: queryKeys.masoko.oders.savePersonalInfo(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/personal-info`, payload)
       return data
@@ -115,7 +115,7 @@ export function useSavePersonalInfo(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.savePersonalInfo(),
+        queryKey: queryKeys.masoko.oders.savePersonalInfo(),
       })
     },
     onError: (error) => {
@@ -134,7 +134,7 @@ export function useSaveDeliveryDetails(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.saveDeliveryDetails(),
+    mutationKey: queryKeys.masoko.oders.saveDeliveryDetails(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/delivery-details`, payload)
       return data
@@ -146,7 +146,7 @@ export function useSaveDeliveryDetails(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.saveDeliveryDetails(),
+        queryKey: queryKeys.masoko.oders.saveDeliveryDetails(),
       })
     },
     onError: (error) => {
@@ -165,7 +165,7 @@ export function useSaveOrderSummary(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.saveOrderSummary(),
+    mutationKey: queryKeys.masoko.oders.saveOrderSummary(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/order-summary`, payload)
       return data
@@ -177,7 +177,7 @@ export function useSaveOrderSummary(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.saveOrderSummary(),
+        queryKey: queryKeys.masoko.oders.saveOrderSummary(),
       })
     },
     onError: (error) => {
@@ -196,7 +196,7 @@ export function useSaveTermsConsents(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.saveTermsConsents(),
+    mutationKey: queryKeys.masoko.oders.saveTermsConsents(),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/terms-consents`, payload)
       return data
@@ -208,7 +208,7 @@ export function useSaveTermsConsents(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.saveTermsConsents(),
+        queryKey: queryKeys.masoko.oders.saveTermsConsents(),
       })
     },
     onError: (error) => {
