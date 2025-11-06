@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useLocation } from '@tanstack/react-router'
 import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
@@ -53,6 +53,7 @@ const steps = [
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const {
     checkoutStep: currentStep,
     setCheckoutStep: setCurrentStep,
@@ -62,18 +63,30 @@ export default function CheckoutPage() {
     getCheckoutFormData,
     cartProducts,
     resetCheckout,
+    clearCart
   } = useStateContext()
 
   const { productId } = Route.useParams()
   const cartItems = cartProducts ?? []
 
-  // Redirect to home if cart is empty
+  // Redirect to home if cart is empty AND checkout is NOT completed
   useEffect(() => {
     if (cartItems.length === 0 && !isCompleted) {
       resetCheckout()
       navigate({ to: '/' })
     }
   }, [cartItems.length, isCompleted, navigate, resetCheckout])
+
+  // Clear cart and reset when navigating away from completed checkout
+  useEffect(() => {
+    return () => {
+      // If completed and navigating away, clear cart and reset
+      if (isCompleted) {
+        clearCart()
+        resetCheckout()
+      }
+    }
+  }, [isCompleted, resetCheckout, clearCart])
 
   const handleNext = () => {
     if (currentStep < steps.length) {
