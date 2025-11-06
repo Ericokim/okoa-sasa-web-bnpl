@@ -18,21 +18,6 @@ export default function ProfilePage() {
     { label: 'My Account', path: '/my-account', isCurrent: true },
   ]
 
-  
-
-  // const { data, isLoading, error } = useProducts({
-  //   amount: 20000,
-  //   organization: "liberty",
-  //   channel: "ussd",
-  // });
-
-  // if (isLoading) return <p>Loading products...</p>;
-  // if (error) return <p>Error: {error.message}</p>;
-
-  // const products = data?.data || [];
-  // const totalCount = data?.totalCount || 0;
-
-  // console.log('Fetched products:', products);
 
   return (
     <div className="min-h-screen">

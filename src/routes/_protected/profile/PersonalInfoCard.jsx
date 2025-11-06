@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useAccountStore } from '@/data/accountStore'
 import { Separator } from '@/components/ui/separator'
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { EmailIcon, PhoneIcon, SingleUserIcon, UserFileIcon, UserCardIcon, UserMsgIcon } from '@/assets/icons'
 import { PhoneInput } from '@/components/shared/Inputs/FormPhone'
 import { FormInput } from '@/components/shared/Inputs/FormInputs'
+import { useProducts } from '@/lib/queries/products'
 
 // Validation schema
 const personalInfoSchema = z.object({
@@ -41,6 +42,22 @@ const personalInfoSchema = z.object({
 export function RouteComponent() {
   const { personalInfo, updatePersonalInfo } = useAccountStore()
   const [editing, setEditing] = useState(false)
+
+
+  // // // Single useProducts call - no conditional hooks
+  // const { data, isLoading, error, refetch } = useProducts({
+  //   amount: 20000,
+  //   organization: "liberty",
+  //   channel: "ussd",
+  // });
+
+  // // Debug effect
+  // useEffect(() => {
+  //   console.log('📦 Products Data:', { data, isLoading, error });
+  // }, [data, isLoading, error]);
+
+  // if (isLoading) return <div>Loading.......</div>;
+  // if (error) return <ErrorMessage message={error.message} onRetry={refetch} />;
 
   // Initialize form with personalInfo
   const form = useForm({
