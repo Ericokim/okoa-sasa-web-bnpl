@@ -237,36 +237,11 @@ export default function DeliveryDetailsForm({
     };
   };
 
-  // Options arrays
-  const regionOptions = [
-    { value: 'nairobi', label: 'Nairobi', id: 'nairobi-001' },
-    { value: 'kisumu', label: 'Kisumu', id: 'kisumu-002' },
-    { value: 'coast', label: 'Coast', id: 'coast-003' },
-    { value: 'eastern', label: 'Eastern', id: 'eastern-004' },
-  ]
-
-  const pickupStoreOptions = [
+  const staticPickupStoreOptions = [
     { value: 'store1', label: 'Main Street Store', id: 'store-001' },
     { value: 'store2', label: 'City Center Post', id: 'store-002' },
     { value: 'store3', label: 'Westlands Station', id: 'store-003' },
   ]
-
-  // Helper function to get region and store details
-  const getRegionDetails = (regionValue) => {
-    const region = regionOptions.find(opt => opt.value === regionValue)
-    return {
-      region: region?.label || '',
-      regionId: region?.id || ''
-    }
-  }
-
-  const getStoreDetails = (storeValue) => {
-    const store = pickupStoreOptions.find(opt => opt.value === storeValue)
-    return {
-      store: store?.label || '',
-      storeId: store?.id || ''
-    }
-  }
 
   const onSubmit = (data) => {
     console.log('Form data:', data)
