@@ -386,7 +386,6 @@ export function FilterBar({
   isLoanCalculatorOpen = false,
 }) {
   const [isOpen, setIsOpen] = useState(false)
-  const syncingFiltersRef = useRef(false)
 
   const normalizedOptions = useMemo(() => {
     const priceMin = options?.price?.min ?? DEFAULT_OPTIONS.price.min
@@ -466,24 +465,12 @@ export function FilterBar({
       normalizedOptions,
     )
 
-    syncingFiltersRef.current = true
     setFilters((prev) =>
       areFilterStatesEqual(prev, nextFilters, FILTER_CATEGORIES)
         ? prev
         : nextFilters,
     )
   }, [normalizedOptions, selectedFilters])
-
-  useEffect(() => {
-    if (syncingFiltersRef.current) {
-      syncingFiltersRef.current = false
-      return
-    }
-
-    if (onFiltersChange) {
-      onFiltersChange(buildSelectedFiltersPayload(filters))
-    }
-  }, [filters, onFiltersChange])
 
   useEffect(() => {
     const nextSort =
@@ -518,11 +505,13 @@ export function FilterBar({
     }
 
     setFilters(nextFilters)
+    onFiltersChange?.(buildSelectedFiltersPayload(nextFilters))
     setIsFiltersOpen(false)
   }, [
     filters,
     normalizedOptions.price.max,
     normalizedOptions.price.min,
+    onFiltersChange,
   ])
 
   useEffect(() => {
@@ -571,6 +560,7 @@ export function FilterBar({
     setFilters(resetState)
     onLoanLimitClear?.()
     setExpandedCategories({
+      category: false,
       color: false,
       storage: false,
       camera: false,
@@ -578,6 +568,7 @@ export function FilterBar({
       ram: false,
       brand: false,
     })
+    onFiltersChange?.(buildSelectedFiltersPayload(resetState))
   }
 
   const getVisibleItems = useCallback(
