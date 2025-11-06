@@ -237,6 +237,12 @@ export default function DeliveryDetailsForm({
     };
   };
 
+  const staticPickupStoreOptions = [
+    { value: 'store1', label: 'Main Street Store', id: 'store-001' },
+    { value: 'store2', label: 'City Center Post', id: 'store-002' },
+    { value: 'store3', label: 'Westlands Station', id: 'store-003' },
+  ]
+
   const onSubmit = (data) => {
     console.log('Form data:', data)
 

@@ -134,7 +134,7 @@ export function useSaveLoanLimit(options) {
       })
       // Optionally invalidate related queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.saveLoanLimit(),
+        queryKey: queryKeys.masoko.oders.saveLoanLimit(),
       })
     },
     onError: (error) => {
