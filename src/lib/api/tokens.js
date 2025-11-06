@@ -1,8 +1,8 @@
 import authApi from './authApi'
-import { useAuthStore } from '@/lib/store/authStore'
+import { useApiAuthStore} from '@/lib/store/authStore'
 
 export const getAccessToken = async (service) => {
-  const store = useAuthStore.getState()
+  const store = useApiAuthStore.getState()
 
   // Reuse valid Masoko token
   if (service === 'masoko' && store.isValid()) {

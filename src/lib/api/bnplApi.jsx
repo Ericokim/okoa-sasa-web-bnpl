@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { getAccessToken } from './tokens'
 import { BNPL } from './config'
+import { useApiAuthStore } from '@/lib/store/authStore'
 
 const bnplApi = axios.create({
   baseURL: BNPL,

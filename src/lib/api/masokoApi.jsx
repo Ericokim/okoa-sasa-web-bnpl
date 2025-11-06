@@ -33,7 +33,7 @@
 import axios from 'axios';
 import { getAccessToken } from './tokens';
 import { MASOKO } from './config';
-import { useApiAuthStore } from '@/lib/store/apiAuthStore';
+import { useApiAuthStore } from '@/lib/store/authStore';
 
 const masokoApi = axios.create({
   baseURL: MASOKO,
