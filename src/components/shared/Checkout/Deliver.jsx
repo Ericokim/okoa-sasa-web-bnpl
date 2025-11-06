@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -21,6 +21,7 @@ import { FormSelect } from '../Inputs/FormSelect'
 import { FormTextarea } from '../Inputs/FormTextarea'
 import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
+import { usePickUpPoint, useRegion } from '@/lib/queries/orders'
 
 // Phone validation schema
 const kenyaPhoneSchema = z
@@ -85,6 +86,10 @@ export default function DeliveryDetailsForm({
     savedData?.deliveryType || 'door',
   )
 
+  // Track if this is the initial mount/restore
+  const isInitialMount = useRef(true);
+  const hasRestoredData = useRef(false);
+
   // Choose schema based on delivery type
   const currentSchema =
     deliveryType === 'door' ? doorDeliverySchema : pickupStationSchema
@@ -102,67 +107,135 @@ export default function DeliveryDetailsForm({
     },
   })
 
+  const { data, isLoading, error } = useRegion({});
+  const { data:pickUpData, isLoading:pickupLoading, error:pickupError } = usePickUpPoint({});
+
+  // console.log('Fetched pickup data:', pickUpData?.body);
+
+  const regions = data?.body?.regions || [];
+  const pickupRegionsData = pickUpData?.body || [];
+
+  // For door delivery, use the regions from the region API
+  const doorRegionOptions = regions.map(region => ({
+    value: region?.region_id,
+    label: region?.region,
+    id: region.id
+  }));
+
+  // For pickup, use regions from pickup API (so we only show regions with stores)
+  const pickupRegionOptions = pickupRegionsData.map(regionData => ({
+    value: regionData?.region,
+    label: regionData?.region,
+    id: regionData?.region
+  }));
+
+  // Get the currently selected region value
+  const selectedRegion = form.watch('region');
+
+  // Filter pickup stores based on selected region
+  const pickupStoreOptions = (() => {
+    if (!selectedRegion || deliveryType !== 'pickup') return [];
+    
+    const regionData = pickupRegionsData.find(
+      item => item.region === selectedRegion
+    );
+    
+    return regionData?.stores?.map(store => ({
+      value: store.storeid,
+      label: store.storename,
+      id: store.storeid,
+      storeDescription: store.store_description,
+      address: store.address
+    })) || [];
+  })();
+
+  // Determine which region options to use based on delivery type
+  const regionOptions = deliveryType === 'door' ? doorRegionOptions : pickupRegionOptions;
+
   // Update form when savedData changes (with proper dependency management)
   useEffect(() => {
-    if (savedData) {
-      // Only reset if there are actual changes to avoid unnecessary updates
-      const currentValues = form.getValues()
-      const hasChanges = Object.keys(savedData).some(
-        key => savedData[key] !== currentValues[key]
-      )
+    if (savedData && !hasRestoredData.current) {
       
-      if (hasChanges) {
-        form.reset({
-          firstName: savedData.firstName || '',
-          lastName: savedData.lastName || '',
-          recipientNumber: savedData.recipientNumber || '',
-          region: savedData.region || '',
-          pickupStore: savedData.pickupStore || '',
-          deliveryAddress: savedData.deliveryAddress || '',
-        })
-      }
+      // Reset form with saved data
+      form.reset({
+        firstName: savedData.firstName || '',
+        lastName: savedData.lastName || '',
+        recipientNumber: savedData.recipientNumber || '',
+        region: savedData.region || '',
+        pickupStore: savedData.pickupStore || '',
+        deliveryAddress: savedData.deliveryAddress || '',
+      });
       
       if (savedData.deliveryType) {
-        setDeliveryType(savedData.deliveryType)
+        setDeliveryType(savedData.deliveryType);
       }
+      
+      hasRestoredData.current = true;
     }
-  }, [savedData]) // Only depend on savedData, not form
+  }, [savedData, form]);
+
+  // Reset hasRestoredData when component unmounts
+  useEffect(() => {
+    return () => {
+      hasRestoredData.current = false;
+    };
+  }, []);
 
   // Reset validation when delivery type changes
   useEffect(() => {
     form.clearErrors()
-  }, [deliveryType]) // Remove form from dependencies
+  }, [deliveryType, form]);
 
-  // Options arrays
-  const regionOptions = [
-    { value: 'nairobi', label: 'Nairobi', id: 'nairobi-001' },
-    { value: 'kisumu', label: 'Kisumu', id: 'kisumu-002' },
-    { value: 'coast', label: 'Coast', id: 'coast-003' },
-    { value: 'eastern', label: 'Eastern', id: 'eastern-004' },
-  ]
-
-  const pickupStoreOptions = [
-    { value: 'store1', label: 'Main Street Store', id: 'store-001' },
-    { value: 'store2', label: 'City Center Post', id: 'store-002' },
-    { value: 'store3', label: 'Westlands Station', id: 'store-003' },
-  ]
+  // Clear pickup store when region changes (for pickup type only)
+  // But skip this on initial load when we're restoring saved data
+  useEffect(() => {
+    // Skip on first render (when restoring saved data)
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
+    if (deliveryType === 'pickup' && selectedRegion) {
+      // Only clear if the current pickup store is not in the new region's stores
+      const currentStore = form.getValues('pickupStore');
+      const isStoreInRegion = pickupStoreOptions.some(
+        store => store.value === currentStore
+      );
+      
+      if (!isStoreInRegion && currentStore) {
+        form.setValue('pickupStore', '');
+      }
+    }
+  }, [selectedRegion, deliveryType, pickupStoreOptions, form]);
 
   // Helper function to get region and store details
   const getRegionDetails = (regionValue) => {
-    const region = regionOptions.find(opt => opt.value === regionValue)
-    return {
-      region: region?.label || '',
-      regionId: region?.id || ''
+    if (deliveryType === 'door') {
+      // For door delivery, find from regions API
+      const region = doorRegionOptions.find(opt => opt.value === regionValue);
+      return {
+        region: region?.label || '',
+        regionId: region?.value || ''
+      };
+    } else {
+      // For pickup, find from pickup API
+      const regionData = pickupRegionsData.find(item => item.region === regionValue);
+      return {
+        region: regionData?.region || '',
+        regionId: regionData?.stores?.[0]?.regionId || '' // Get regionId from first store
+      };
     }
-  }
+  };
 
   const getStoreDetails = (storeValue) => {
-    const store = pickupStoreOptions.find(opt => opt.value === storeValue)
+    const store = pickupStoreOptions.find(opt => opt.value === storeValue);
     return {
       store: store?.label || '',
-      storeId: store?.id || ''
-    }
-  }
+      storeId: store?.value || '',
+      storeDescription: store?.storeDescription || '',
+      address: store?.address || ''
+    };
+  };
 
   const onSubmit = (data) => {
     console.log('Form data:', data)
@@ -205,12 +278,12 @@ export default function DeliveryDetailsForm({
 
   const handleDeliveryTypeChange = (type) => {
     setDeliveryType(type)
-    // Clear the field that's not needed for the selected type
-    if (type === 'door') {
-      form.setValue('pickupStore', '')
-    } else {
-      form.setValue('deliveryAddress', '')
-    }
+    // Clear both region and pickup store when switching delivery types
+    form.setValue('region', '')
+    form.setValue('pickupStore', '')
+    form.setValue('deliveryAddress', '')
+    // Reset the initial mount flag when delivery type changes manually
+    isInitialMount.current = true;
   }
 
   return (

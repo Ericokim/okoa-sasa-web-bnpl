@@ -26,6 +26,12 @@ export const queryKeys = {
         'recommendations',
         userId,
       ],
+      masokoProducts: ({ amount, organization, channel }) => [
+        "masoko-products",
+        amount,
+        organization,
+        channel,
+      ],
     },
 
     categories: {
@@ -105,5 +111,8 @@ export const queryKeys = {
       shipping: () => [...queryKeys.masoko.settings.all(), 'shipping'],
       taxes: () => [...queryKeys.masoko.settings.all(), 'taxes'],
     },
+
+    regions: () => ["masoko-regions"],
+    pickUpPoints: () => ["masoko-pick-up-points"],
   },
 }
