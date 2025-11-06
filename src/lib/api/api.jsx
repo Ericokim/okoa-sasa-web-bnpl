@@ -33,3 +33,6 @@ masokoApi.interceptors.response.use(
 );
 
 export default masokoApi;
+
+//Backend API instance
+

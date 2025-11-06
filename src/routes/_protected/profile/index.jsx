@@ -7,6 +7,7 @@ import { AddressInfoCard } from './AddressInfoCard'
 import { NotificationPreferencesCard } from './NotificationPreferencesCard'
 import { DangerZoneCard } from './DangerZoneCard'
 import { useProducts } from '@/lib/queries/products/index'
+import { useStateContext } from '@/context/state-context'
 
 export default function ProfilePage() {
   useEffect(() => {
@@ -17,6 +18,8 @@ export default function ProfilePage() {
     { label: 'Home', path: '/' },
     { label: 'My Account', path: '/my-account', isCurrent: true },
   ]
+
+
 
 
   return (
@@ -40,10 +43,10 @@ export default function ProfilePage() {
 
         {/* All cards – stacked vertically, no layout changes */}
         <div className="space-y-6">
-          <AccountProfileCard />
+          <AccountProfileCard  />
           <PersonalInfoCard />
-          <AddressInfoCard />
-          <NotificationPreferencesCard />
+          <AddressInfoCard  />
+          <NotificationPreferencesCard  />
           <DangerZoneCard />
         </div>
       </main>

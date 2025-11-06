@@ -24,7 +24,7 @@ export function useGetAllOrders(params, options) {
   }, [params])
 
   // Build full endpoint URL
-  let url = `/api/v1/order/list?${queryParams.toString()}`
+  let url = `/v1/order/list?${queryParams.toString()}`
   url = url.endsWith('?') ? url.slice(0, -1) : url
 
   return useQuery({

@@ -209,6 +209,16 @@ export const recentOrders = [
 function OrdersPage() {
   const navigate = useNavigate()
 
+  // Get all orders api call goes here
+
+  // const {
+  //   data: orderHistory,
+  //   isLoading: isOrderHistoryLoading,
+  //   error: orderHistoryError,
+  // } = useProducts();
+
+  // console.log(orderHistory)
+
   const orderHistory = [
     {
       orderId: '#REQ-20458',

@@ -44,20 +44,15 @@ export function RouteComponent() {
   const [editing, setEditing] = useState(false)
 
 
-  // // // Single useProducts call - no conditional hooks
-  // const { data, isLoading, error, refetch } = useProducts({
+  // // Single useProducts call - no conditional hooks
+  // const { data:masokoproducts, isLoading:isMasokoProductsLoading, error:masokoError } = useProducts({
   //   amount: 20000,
   //   organization: "liberty",
   //   channel: "ussd",
   // });
 
-  // // Debug effect
-  // useEffect(() => {
-  //   console.log('📦 Products Data:', { data, isLoading, error });
-  // }, [data, isLoading, error]);
+  // console.log(masokoproducts)
 
-  // if (isLoading) return <div>Loading.......</div>;
-  // if (error) return <ErrorMessage message={error.message} onRetry={refetch} />;
 
   // Initialize form with personalInfo
   const form = useForm({

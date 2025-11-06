@@ -17,4 +17,13 @@ export const backendQueryKeys = {
     ORDER_GET: 'getOrders',
     ORDER_GET_BY_ID: 'getOrderByID',
   },
+  //profile
+  profile: {
+    //profile query keys
+    PROFILE_GET_BY_ID: 'getProfileByID',
+    UPDATE_USER_DETAILS: 'updateUserDetails',
+    UPDATE_USER_ADDRESS: 'updateUserAddress',
+    UPDATE_USER_NOTIFICATION_PREFERENCES: 'updateUserNotificationPreferences',
+    UPDATE_PROFILE_PHOTO: 'updateProfilePhoto',
+  }
 }
