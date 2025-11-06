@@ -3,14 +3,38 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 export function ProductGallery({ images, name }) {
+  const fallbackImage = '/product.png'
+  const safeImages =
+    Array.isArray(images) && images.length > 0
+      ? images
+          .map((img) =>
+            typeof img === 'string' && img.trim().length > 0
+              ? img.trim()
+              : null,
+          )
+          .filter(Boolean)
+      : []
+  const galleryImages =
+    safeImages.length > 0 ? [...safeImages] : [fallbackImage]
+
+  while (galleryImages.length < 4) {
+    galleryImages.push(
+      galleryImages[galleryImages.length - 1] ?? fallbackImage,
+    )
+  }
+
   const [selectedImage, setSelectedImage] = useState(0)
 
   const handlePrevious = () => {
-    setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1))
+    setSelectedImage((prev) =>
+      prev === 0 ? galleryImages.length - 1 : prev - 1,
+    )
   }
 
   const handleNext = () => {
-    setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+    setSelectedImage((prev) =>
+      prev === galleryImages.length - 1 ? 0 : prev + 1,
+    )
   }
 
   return (
@@ -18,12 +42,18 @@ export function ProductGallery({ images, name }) {
       {/* Main Image - Order 1 on mobile, 2 on desktop */}
       <div className="relative order-1 flex h-[274px] flex-1 items-center justify-center rounded-3xl bg-[#F9FAFB] md:order-2 md:h-[580px]">
         <img
-          src={images[selectedImage]}
-          srcSet={`${images[selectedImage]} 1x, ${images[selectedImage]} 2x`}
+          src={galleryImages[selectedImage] || fallbackImage}
+          srcSet={`${galleryImages[selectedImage] || fallbackImage} 1x, ${galleryImages[selectedImage] || fallbackImage} 2x`}
           alt={name}
           loading="lazy"
           decoding="async"
           className="h-[217px] w-[217px] object-contain md:h-[479px] md:w-[479px]"
+          onError={(event) => {
+            if (event.currentTarget.src !== fallbackImage) {
+              event.currentTarget.src = fallbackImage
+              event.currentTarget.srcSet = `${fallbackImage} 1x, ${fallbackImage} 2x`
+            }
+          }}
         />
 
         {/* Left Arrow */}
@@ -78,7 +108,7 @@ export function ProductGallery({ images, name }) {
         className="order-2 flex w-full snap-x snap-mandatory flex-row gap-3 overflow-x-auto px-2 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:order-1 md:w-[168px] md:flex-col md:gap-3 md:overflow-visible md:snap-none md:p-0"
         aria-label="Product image thumbnails"
       >
-        {images.slice(0, 4).map((image, index) => (
+        {galleryImages.slice(0, 4).map((image, index) => (
           <button
             key={index}
             type="button"
@@ -101,6 +131,12 @@ export function ProductGallery({ images, name }) {
                 loading="lazy"
                 decoding="async"
                 className="h-[73px] w-[50px] object-contain md:h-[97px] md:w-[65px]"
+                onError={(event) => {
+                  if (event.currentTarget.src !== fallbackImage) {
+                    event.currentTarget.src = fallbackImage
+                    event.currentTarget.srcSet = `${fallbackImage} 1x, ${fallbackImage} 2x`
+                  }
+                }}
               />
             </div>
           </button>

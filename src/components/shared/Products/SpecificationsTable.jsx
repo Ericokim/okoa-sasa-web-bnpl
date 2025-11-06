@@ -1,7 +1,29 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card } from '@/components/ui/card'
 
-export function SpecificationsTable({ specifications }) {
+export function SpecificationsTable({
+  specifications = {},
+  descriptionHtml = '',
+  descriptionText = '',
+  benefits = [],
+}) {
+  const specificationEntries = Object.entries(specifications ?? {})
+  const hasSpecifications = specificationEntries.length > 0
+  const normalizedDescriptionHtml = descriptionHtml?.trim()
+  const normalizedDescriptionText = descriptionText?.trim()
+  const normalizedBenefits = Array.isArray(benefits)
+    ? benefits.filter(
+        (benefit) => typeof benefit === 'string' && benefit.trim().length > 0,
+      )
+    : []
+  const descriptionParagraphs =
+    !normalizedDescriptionHtml && normalizedDescriptionText
+      ? normalizedDescriptionText
+          .split('\n')
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+      : []
+
   return (
     <Tabs
       defaultValue="specifications"
@@ -43,66 +65,89 @@ export function SpecificationsTable({ specifications }) {
       {/* Specifications Content */}
       <TabsContent value="specifications" className="mt-0 w-full">
         <Card className="flex flex-col items-start self-stretch gap-0 border-none p-0 shadow-none">
-          {Object.entries(specifications).map(([key, value], index) => {
-            const isFirst = index === 0
-            const isLast = index === Object.entries(specifications).length - 1
+          {hasSpecifications ? (
+            specificationEntries.map(([key, value], index) => {
+              const isFirst = index === 0
+              const isLast = index === specificationEntries.length - 1
 
-            return (
-              <div key={key} className="flex items-center self-stretch">
-                <div
-                  className={`flex w-28 items-center gap-2.5 border border-[#E8ECF4] bg-[#F9FAFB] p-3 md:w-[277px] md:p-4 ${
-                    isFirst ? 'rounded-tl-xl md:rounded-tl-2xl' : ''
-                  } ${isLast ? 'rounded-bl-xl md:rounded-bl-2xl' : ''}`}
-                >
-                  <div className="text-sm font-bold capitalize leading-[140%] text-[#252525] md:text-xl">
-                    {key}
+              return (
+                <div key={key} className="flex items-center self-stretch">
+                  <div
+                    className={`flex w-28 items-center gap-2.5 border border-[#E8ECF4] bg-[#F9FAFB] p-3 md:w-[277px] md:p-4 ${
+                      isFirst ? 'rounded-tl-xl md:rounded-tl-2xl' : ''
+                    } ${isLast ? 'rounded-bl-xl md:rounded-bl-2xl' : ''}`}
+                  >
+                    <div className="text-sm font-bold capitalize leading-[140%] text-[#252525] md:text-xl">
+                      {key}
+                    </div>
+                  </div>
+
+                  <div
+                    className={`flex flex-1 items-center gap-2.5 self-stretch border border-[#E8ECF4] p-3 md:p-4 ${
+                      isFirst ? 'rounded-tr-xl md:rounded-tr-2xl' : ''
+                    } ${isLast ? 'rounded-br-xl md:rounded-br-2xl' : ''}`}
+                  >
+                    <div className="text-sm font-normal leading-[140%] text-[#252525] md:text-lg">
+                      {value}
+                    </div>
                   </div>
                 </div>
-
-                <div
-                  className={`flex flex-1 items-center gap-2.5 self-stretch border border-[#E8ECF4] p-3 md:p-4 ${
-                    isFirst ? 'rounded-tr-xl md:rounded-tr-2xl' : ''
-                  } ${isLast ? 'rounded-br-xl md:rounded-br-2xl' : ''}`}
-                >
-                  <div className="text-sm font-normal capitalize leading-[140%] text-[#252525] md:text-lg">
-                    {value}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+              )
+            })
+          ) : (
+            <div className="w-full rounded-2xl border border-dashed border-[#E8ECF4] bg-[#F9FAFB] px-4 py-6 text-center text-sm text-[#676D75] md:text-base">
+              Specifications will be shared soon.
+            </div>
+          )}
         </Card>
       </TabsContent>
 
       {/* Description Content */}
       <TabsContent value="description" className="mt-0 w-full">
-        <div className="self-stretch py-4 text-center md:py-6">
-          <p className="text-sm font-normal leading-[140%]  md:text-base">
-            The iPhone 14 features a stunning 6.1-inch Super Retina XDR display,
-            offering an immersive viewing experience with vibrant colors and
-            deep blacks. Powered by the A15 Bionic chip, it delivers exceptional
-            performance for all your tasks.
-          </p>
+        <div className="self-stretch py-4 md:py-6">
+          {normalizedDescriptionHtml ? (
+            <div
+              className="prose prose-sm max-w-none text-[#676D75] md:prose-base"
+              dangerouslySetInnerHTML={{ __html: normalizedDescriptionHtml }}
+            />
+          ) : descriptionParagraphs.length > 0 ? (
+            <div className="space-y-3">
+              {descriptionParagraphs.map((paragraph, index) => (
+                <p
+                  key={`${paragraph}-${index}`}
+                  className="text-sm font-normal leading-[140%] text-[#676D75] md:text-base md:font-medium"
+                >
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm font-normal leading-[140%] text-[#A0A4AC] md:text-base">
+              Detailed description will be updated soon.
+            </p>
+          )}
         </div>
       </TabsContent>
 
       {/* Benefits Content */}
       <TabsContent value="benefits" className="mt-0 w-full">
         <div className="self-stretch py-4 md:py-6">
-          <ul className="list-disc space-y-2 pl-5 md:pl-6">
-            <li className="text-sm font-normal leading-[140%]  md:text-base">
-              Advanced dual-camera system for stunning photos
-            </li>
-            <li className="text-sm font-normal leading-[140%]  md:text-base">
-              All-day battery life
-            </li>
-            <li className="text-sm font-normal leading-[140%]  md:text-base">
-              Durable design with Ceramic Shield
-            </li>
-            <li className="text-sm font-normal leading-[140%]  md:text-base">
-              5G capable for super-fast downloads
-            </li>
-          </ul>
+          {normalizedBenefits.length > 0 ? (
+            <ul className="list-disc space-y-2 pl-5 md:pl-6">
+              {normalizedBenefits.map((benefit, index) => (
+                <li
+                  key={`${benefit}-${index}`}
+                  className="text-sm font-normal leading-[140%] text-[#676D75] md:text-base"
+                >
+                  {benefit}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm font-normal leading-[140%] text-[#A0A4AC] md:text-base">
+              Benefit highlights are coming soon.
+            </p>
+          )}
         </div>
       </TabsContent>
     </Tabs>

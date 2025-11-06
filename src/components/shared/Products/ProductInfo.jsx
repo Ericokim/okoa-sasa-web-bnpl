@@ -16,12 +16,10 @@ import {
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
 import { useStateContext } from '@/context/state-context'
-import { useSnackbar } from 'notistack'
 
 export function ProductInfo({ product }) {
   const navigate = useNavigate()
-  const { addToCart, updateCartQuantity, removeFromCart, cart } =
-    useStateContext()
+  const { addToCart, updateCartQuantity, cart } = useStateContext()
 
   // Local quantity state (separate from cart)
   const [quantity, setQuantity] = useState(1)
@@ -33,8 +31,6 @@ export function ProductInfo({ product }) {
 
   const existingQuantity = cartItem?.quantity ?? 0
   const isInCart = existingQuantity > 0
-
-  const { enqueueSnackbar } = useSnackbar()
 
   // Reset local quantity when product changes
   useEffect(() => {
@@ -113,7 +109,9 @@ export function ProductInfo({ product }) {
 
       {/* Product Description */}
       <p className="text-sm font-normal leading-[140%] text-[#676D75] md:text-base md:font-medium">
-        {product.description}
+        {product?.description?.trim() ||
+          product?.descriptionText?.trim() ||
+          'Detailed product information will be available shortly.'}
       </p>
 
       {/* Divider */}
