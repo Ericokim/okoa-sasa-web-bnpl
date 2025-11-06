@@ -39,33 +39,6 @@ export function Header() {
         </Link>
 
         {/* Search Bar */}
-        {/* <div className="flex-1 mx-4 lg:mx-6 xl:mx-8 max-w-[500px] lg:max-w-[600px] xl:max-w-[690px] ">
-          <div className="flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border">
-            <Search className="h-6 w-6 text-[#A0A4AC]" />
-            <input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              type="text"
-              placeholder="Search for Devices"
-              className="flex-1 bg-transparent text-base text-[#111111] placeholder:text-[#95979b] outline-none"
-            />
-            <button
-              type="button"
-              onClick={clearSearch}
-              aria-label="Clear search"
-              className={cn(
-                'flex h-6 w-6 items-center justify-center rounded-full border border-transparent bg-transparent text-[#A0A4AC] transition-all duration-200 hover:text-white',
-                searchTerm
-                  ? 'bg-primary text-white hover:opacity-90 hover:scale-105'
-                  : 'pointer-events-none opacity-0',
-              )}
-            >
-              <X className="size-4" />
-            </button>
-          </div>
-        </div> */}
-
-        {/* Search Bar */}
         <div className="flex-1 mx-4 lg:mx-6 xl:mx-8 max-w-[500px] lg:max-w-[600px] xl:max-w-[690px]">
           <div className="group relative flex items-center gap-3 rounded-3xl bg-[#F9FAFB] px-4 py-3 border transition-all duration-200 focus-within:border-[#F8971D] focus-within:ring-3 focus-within:ring-[#F8971D]/20 focus-within:bg-white">
             {/* Search Icon */}
