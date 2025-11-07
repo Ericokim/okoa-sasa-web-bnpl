@@ -26,8 +26,8 @@ export default function TermsConditionPage({
         const response = await fetch('https://api.ipify.org?format=json')
         const data = await response.json()
         setIpAddress(data.ip)
-      } catch (error) {
-        console.warn('Could not fetch public IP', error)
+      } catch {
+        // Silently fail if IP lookup is blocked
       }
     }
 
@@ -41,17 +41,22 @@ export default function TermsConditionPage({
 
   // Save data when isAccepted changes
   useEffect(() => {
+    const consentedAt = new Date().toISOString()
     const userConsents = [
       {
         consentType: 'TermsAndConditions',
         isConsentGiven: isAccepted,
-        ip_address: ipAddress,
+        consentVersion: '1',
+        consentedAt,
+        ipAddress,
         userAgent: getUserAgent(),
       },
       {
         consentType: 'PrivacyPolicy',
         isConsentGiven: isAccepted,
-        ip_address: ipAddress,
+        consentVersion: '1',
+        consentedAt,
+        ipAddress,
         userAgent: getUserAgent(),
       },
     ]
@@ -80,26 +85,25 @@ export default function TermsConditionPage({
 
   const onSubmit = () => {
     // Prepare the consent data matching the example format
+    const consentedAt = new Date().toISOString()
     const userConsents = [
       {
         consentType: 'TermsAndConditions',
         isConsentGiven: isAccepted,
         consentVersion: '1',
-        consentedAt: new Date().toISOString(),
-        ip_address: ipAddress,
+        consentedAt,
+        ipAddress,
         userAgent: getUserAgent(),
       },
       {
         consentType: 'PrivacyPolicy',
         isConsentGiven: isAccepted,
         consentVersion: '1',
-        consentedAt: new Date().toISOString(),
-        ip_address: ipAddress,
+        consentedAt,
+        ipAddress,
         userAgent: getUserAgent(),
       },
     ]
-
-    console.log('User Consents:', userConsents)
 
     // Save to context
     saveCheckoutFormData(5, {

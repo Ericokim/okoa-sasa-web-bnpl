@@ -38,7 +38,37 @@ export const queryKeys = {
         ...queryKeys.masoko.users.all(),
         'upload-documents',
       ],
+      loanAbility: () => [...queryKeys.masoko.users.all(), 'loan-ability'],
       delete: () => [...queryKeys.masoko.users.all(), 'delete'],
+    },
+
+    orders: {
+      all: () => ['orders'],
+
+      list: (filters) => [...queryKeys.masoko.orders.all(), 'list', filters],
+      detail: (id) => [...queryKeys.masoko.orders.all(), 'detail', id],
+      byUser: (userId) => [...queryKeys.masoko.orders.all(), 'user', userId],
+      status: (status) => [...queryKeys.masoko.orders.all(), 'status', status],
+      tracking: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'tracking',
+        orderId,
+      ],
+      create: () => [...queryKeys.masoko.orders.all(), 'create'],
+      uploadDocuments: () => [
+        ...queryKeys.masoko.orders.all(),
+        'upload-documents',
+      ],
+      delete: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'delete',
+        orderId,
+      ],
+      update: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'update',
+        orderId,
+      ],
     },
 
     products: {
@@ -80,19 +110,6 @@ export const queryKeys = {
       update: () => [...queryKeys.masoko.cart.all(), 'update'],
       remove: () => [...queryKeys.masoko.cart.all(), 'remove'],
       clear: () => [...queryKeys.masoko.cart.all(), 'clear'],
-    },
-
-    orders: {
-      all: () => ['orders'],
-      list: (filters) => [...queryKeys.masoko.orders.all(), 'list', filters],
-      detail: (id) => [...queryKeys.masoko.orders.all(), 'detail', id],
-      byUser: (userId) => [...queryKeys.masoko.orders.all(), 'user', userId],
-      status: (status) => [...queryKeys.masoko.orders.all(), 'status', status],
-      tracking: (orderId) => [
-        ...queryKeys.masoko.orders.all(),
-        'tracking',
-        orderId,
-      ],
     },
 
     payments: {

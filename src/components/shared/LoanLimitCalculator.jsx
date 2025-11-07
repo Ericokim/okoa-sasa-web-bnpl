@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -17,6 +17,7 @@ import { Slider } from '@/components/ui/slider'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogPortal } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
+import { useCheckUserLoanAbility } from '@/lib/queries/user'
 
 const TENURE_MIN = 6
 const TENURE_MAX = 24
@@ -122,6 +123,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     },
   })
   const { reset } = form
+  const [errorMessage, setErrorMessage] = useState(null)
+  const loanAbilityMutation = useCheckUserLoanAbility()
   const watchedBasicPay = form.watch('basicPay')
   const watchedNetPay = form.watch('netPay')
   const watchedMonths = form.watch('months')
@@ -148,12 +151,43 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     onChange(formatCurrencyInputValue(value))
   }
 
-  const onSubmit = () => {
-    if (loanAmount > 0) {
-      onProceed?.(loanAmount)
+  const onSubmit = async () => {
+    setErrorMessage(null)
+    try {
+      const payload = {
+        basicPay: parseCurrencyValue(form.getValues('basicPay')),
+        netPay: parseCurrencyValue(form.getValues('netPay')),
+        term: currentTenure,
+      }
+
+      if (payload.basicPay <= 0 || payload.netPay <= 0) {
+        throw new Error('Enter valid pay details to calculate your loan limit.')
+      }
+
+      const response = await loanAbilityMutation.mutateAsync(payload)
+      const serverEntry = response?.data?.[0]
+      const serverLimit =
+        serverEntry?.loanLimit ?? serverEntry?.amount ?? serverEntry?.limit
+      const resolvedLoanAmount =
+        typeof serverLimit === 'number' && serverLimit > 0
+          ? serverLimit
+          : loanAmount
+
+      if (!resolvedLoanAmount || resolvedLoanAmount <= 0) {
+        throw new Error('We could not determine a loan amount. Please try again later.')
+      }
+
+      onProceed?.(resolvedLoanAmount, serverEntry)
+      onOpenChange?.(false)
+      reset()
+    } catch (error) {
+      setErrorMessage(
+        error?.response?.data?.status?.message ||
+          error?.response?.data?.message ||
+          error?.message ||
+          'Unable to calculate your loan limit. Please try again.',
+      )
     }
-    onOpenChange?.(false)
-    reset()
   }
 
   const handleSliderChange = (value, onChange) => {
@@ -162,6 +196,7 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   }
 
   const handleCancel = () => {
+    setErrorMessage(null)
     reset()
     onOpenChange?.(false)
   }
@@ -335,6 +370,12 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 KES {loanAmount.toLocaleString()})?
               </p>
 
+              {errorMessage && (
+                <p className="text-center text-sm font-medium text-red-500">
+                  {errorMessage}
+                </p>
+              )}
+
               <div className="flex items-start gap-6">
                 <Button
                   type="button"
@@ -347,10 +388,12 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
 
                 <Button
                   type="submit"
-                  disabled={loanAmount <= 0}
+                  disabled={loanAmount <= 0 || loanAbilityMutation.isPending}
                   className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Proceed to devices
+                  {loanAbilityMutation.isPending
+                    ? 'Checking loan limit...'
+                    : 'Apply limit to devices'}
                 </Button>
               </div>
             </form>
