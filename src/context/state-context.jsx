@@ -8,7 +8,12 @@ import React, {
   useRef,
 } from 'react'
 import { productCatalog } from '@/data/products'
-import { safeLocalStorage } from '@/lib/utils'
+import {
+  safeLocalStorage,
+  getStorageData as getEncryptedItem,
+  setStorageData as setEncryptedItem,
+  clearStorageData as clearEncryptedStorage,
+} from '@/lib/utils'
 
 const StateContext = createContext(null)
 
@@ -64,35 +69,86 @@ export function ContextProvider({ children }) {
     setSearchTermState(typeof value === 'string' ? value : String(value ?? ''))
   }, [])
 
+  const parseStoredJSON = useCallback((value) => {
+    if (!value) return null
+    try {
+      if (typeof value === 'string') {
+        return JSON.parse(value)
+      }
+      return value
+    } catch {
+      return null
+    }
+  }, [])
+
+  const persistUserSession = useCallback(
+    (userPayload) => {
+      if (!userPayload) return
+      try {
+        safeLocalStorage.setItem('isAuthenticated', 'true')
+        safeLocalStorage.setItem('user', JSON.stringify(userPayload))
+      } catch {
+        // Ignore persistence errors (e.g., private mode)
+      }
+
+      try {
+        setEncryptedItem('userInfo', userPayload)
+        const authRaw = getEncryptedItem('auth')
+        const authData = parseStoredJSON(authRaw)
+        if (authData) {
+          setEncryptedItem('auth', {
+            ...authData,
+            user: userPayload,
+          })
+        }
+      } catch {
+        // Ignore encrypted storage errors
+      }
+    },
+    [parseStoredJSON],
+  )
+
   // Check for stored auth on mount
   useEffect(() => {
     try {
-      const storedAuth = safeLocalStorage.getItem('isAuthenticated')
-      const storedUser = safeLocalStorage.getItem('user')
+      const storedAuthFlag = safeLocalStorage.getItem('isAuthenticated')
+      const storedUserRaw = safeLocalStorage.getItem('user')
+      let hydratedUser = parseStoredJSON(storedUserRaw)
+      let isSessionValid = storedAuthFlag === 'true'
 
-      if (storedAuth === 'true') {
+      if (!hydratedUser) {
+        hydratedUser = parseStoredJSON(getEncryptedItem('userInfo'))
+      }
+
+      const encryptedAuth = parseStoredJSON(getEncryptedItem('auth'))
+      if (!isSessionValid && encryptedAuth?.token) {
+        isSessionValid = true
+        hydratedUser = hydratedUser || encryptedAuth?.user || null
+      }
+
+      if (isSessionValid) {
         setIsAuthenticated(true)
-        if (storedUser) {
-          setUser(JSON.parse(storedUser))
+        if (hydratedUser) {
+          setUser(hydratedUser)
+          persistUserSession(hydratedUser)
         }
       }
     } catch {
       // Ignore storage read errors
     }
-  }, [])
+  }, [parseStoredJSON, persistUserSession])
 
-  const login = (userData) => {
-    setIsAuthenticated(true)
-    setUser(userData)
-    try {
-      safeLocalStorage.setItem('isAuthenticated', 'true')
-      safeLocalStorage.setItem('user', JSON.stringify(userData))
-    } catch {
-      // Ignore persistence errors (e.g., private mode)
-    }
-  }
+  const login = useCallback(
+    (userData = {}) => {
+      const sanitizedUser = { ...userData }
+      setIsAuthenticated(true)
+      setUser(sanitizedUser)
+      persistUserSession(sanitizedUser)
+    },
+    [persistUserSession],
+  )
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setIsAuthenticated(false)
     setUser(null)
     try {
@@ -101,7 +157,13 @@ export function ContextProvider({ children }) {
     } catch {
       // Ignore
     }
-  }
+
+    try {
+      clearEncryptedStorage()
+    } catch {
+      // Ignore
+    }
+  }, [])
 
   const syncProductCartState = useCallback((productId, changes) => {
     const normalizedId = normalizeProductId(productId)

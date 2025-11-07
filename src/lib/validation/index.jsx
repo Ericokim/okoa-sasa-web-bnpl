@@ -83,7 +83,7 @@ export const OTPVerificationSchema = zodResolver(
 // Export only the ready-to-use resolver
 export const LoginSchema = zodResolver(
   z.object({
-    phoneNumber: z
+    phoneNumberOrEmail: z
       .string()
       .min(1, { message: 'Phone number is required' })
       .refine(isValidKenyanPhoneNumber, {

@@ -1,120 +1,175 @@
-
-
 // lib/api/auth/mutations.jsx
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
-import { useSnackbar } from "notistack";
-import { useStateContext } from "@/context/state-context";
-import { queryKeys } from "@/lib/queryKeys";
-import { setStorageData, clearStorageData, getStorageData } from "@/lib/utils";
-import { backendFetch } from "../fetchers";
+import React from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from '@tanstack/react-router'
+import { useSnackbar } from 'notistack'
+import { useStateContext } from '@/context/state-context'
+import { queryKeys } from '@/lib/queryKeys'
+import { setStorageData, clearStorageData } from '@/lib/utils'
+import masokoApi from '@/lib/api/api'
 
 // Auth Storage
-const AUTH_STORAGE_KEYS = { user: "userInfo", token: "token", name: "name" };
+const AUTH_STORAGE_KEYS = { user: 'userInfo', token: 'token', name: 'name' }
 
 const setStoredAuthData = (payload) => {
-  if (!payload) return;
-  const user = payload.user ?? payload.userInfo ?? payload;
-  if (user) setStorageData(AUTH_STORAGE_KEYS.user, user);
-  if (payload.token) setStorageData(AUTH_STORAGE_KEYS.token, payload.token);
-  const name = payload.name ?? user?.name ?? user?.fullName;
-  if (name) setStorageData(AUTH_STORAGE_KEYS.name, name);
-};
+  if (!payload) return
+  const user = payload.user ?? payload.userInfo ?? payload
+  if (user) setStorageData(AUTH_STORAGE_KEYS.user, user)
+  if (payload.token) setStorageData(AUTH_STORAGE_KEYS.token, payload.token)
+  const name = payload.name ?? user?.name ?? user?.fullName
+  if (name) setStorageData(AUTH_STORAGE_KEYS.name, name)
+}
 
-// ====================== LOGIN ======================
-export const useLogin = () => {
-  const queryClient = useQueryClient();
-  const { dispatch } = useStateContext();
-  const { enqueueSnackbar } = useSnackbar();
-  const navigate = useNavigate();
+/**
+ * useLogin
+ * POST /v1/users/otp
+ * Requests an OTP for login using phone number or email.
+ */
+export function useLogin(options = {}) {
+  const queryClient = useQueryClient()
+  const { logout } = useStateContext()
+  const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: optionsOnSuccess,
+    onError: optionsOnError,
+    ...mutationOverrides
+  } = options
 
   return useMutation({
-    mutationKey: queryKeys.auth.login(),
-    mutationFn: (formData) => backendFetch("/api/v1.0/auth/login", { method: "POST", data: formData }),
-    onMutate: () => {
-      queryClient.setQueryData(queryKeys.auth.user(), (old) => ({ ...old, loading: true, error: null }));
+    mutationKey: queryKeys.masoko.auth.login(),
+
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post('/users/otp', payload)
+      return data
     },
-    onSuccess: (payload) => {
-      const data = payload?.data;
-      if (data?.validLogin) {
-        setStoredAuthData(data);
-        dispatch({ type: "SET_USER", payload: data });
-        queryClient.invalidateQueries({ queryKey: queryKeys.auth.all() });
-        navigate({ to: "/dashboard" });
+
+    onSuccess: (response, payload, context) => {
+      const message =
+        response?.status?.message || 'OTP sent successfully. Please verify.'
+      enqueueSnackbar(message, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.masoko.auth.all() })
+
+      setStorageData('pendingLogin', payload?.phoneNumberOrEmail)
+
+      optionsOnSuccess?.(response, payload, context)
+    },
+
+    onError: (error, payload, context) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to send OTP'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+
+      clearStorageData()
+      logout?.()
+
+      optionsOnError?.(error, payload, context)
+    },
+
+    ...mutationOverrides,
+  })
+}
+
+/**
+ * useOTP
+ * POST /v1/users/otp/verify
+ * Verifies OTP and sets user authentication state.
+ */
+export function useOTP(options = {}) {
+  const queryClient = useQueryClient()
+  const { login, logout } = useStateContext()
+  const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: optionsOnSuccess,
+    onError: optionsOnError,
+    ...mutationOverrides
+  } = options
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.auth.otp(),
+
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post('/users/otp/verify', payload)
+      return data
+    },
+
+    onSuccess: (response, payload, context) => {
+      const item =
+        response?.data?.find?.((x) => x?.accessToken) || response?.data?.[0]
+      const success = !!item?.accessToken && (item?.isSuccessful ?? true)
+
+      if (success) {
+        const authPayload = {
+          token: item.accessToken,
+          expires: item.expires,
+          user: item.user,
+        }
+
+        setStorageData('auth', authPayload)
+        setStoredAuthData(authPayload)
+
+        login?.({
+          ...item?.user,
+          accessToken: item?.accessToken,
+          expires: item?.expires,
+        })
+
+        enqueueSnackbar(
+          response?.status?.message || 'OTP verified successfully',
+          { variant: 'success', autoHideDuration: 4000 },
+        )
+
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.masoko.auth.all(),
+        })
+
+        optionsOnSuccess?.(response, payload, context)
       } else {
-        clearStorageData();
-        dispatch({ type: "SET_USER", payload: null });
-        navigate({ to: "/signin" });
+        enqueueSnackbar('Invalid OTP', { variant: 'error' })
+        clearStorageData()
+        logout?.()
       }
     },
-    onError: (error) => {
-      const message = error.response?.data?.message || error.message;
-      enqueueSnackbar(message, { variant: "error" });
-      queryClient.setQueryData(queryKeys.auth.user(), {
-        isAuthenticated: false,
-        userInfo: null,
-        token: null,
-        loading: false,
-        error: message,
-      });
-      clearStorageData();
-      dispatch({ type: "SET_USER", payload: null });
+
+    onError: (error, payload, context) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'OTP verification failed'
+
+      enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+      clearStorageData()
+      logout?.()
+
+      optionsOnError?.(error, payload, context)
     },
-  });
-};
+
+    ...mutationOverrides,
+  })
+}
 
 // ====================== LOGOUT ======================
 export const useLogout = () => {
-  const { dispatch } = useStateContext();
-  const navigate = useNavigate();
+  const { logout } = useStateContext()
+  const navigate = useNavigate()
 
-  return useMutation({
-    mutationKey: queryKeys.auth.logout(),
-    mutationFn: async () => {
-      clearStorageData();
-      try { await backendFetch("/api/v1.0/auth/logout", { method: "POST" }); }
-      catch (e) { console.warn("Logout API failed"); }
-      return true;
-    },
-    onSuccess: () => {
-      dispatch({ type: "SET_USER", payload: null });
-      navigate({ to: "/signin" });
-    },
-    onError: () => {
-      dispatch({ type: "SET_USER", payload: null });
-      navigate({ to: "/signin" });
-    },
-  });
-};
+  const onSignOut = React.useCallback(() => {
+    // Clear all data and redirect
+    clearStorageData()
+    logout?.()
+    navigate({ to: '/login' })
+  }, [navigate, logout])
 
-// ====================== RESET PASSWORD ======================
-export const useResetPassword = () => {
-  const { enqueueSnackbar } = useSnackbar();
-  return useMutation({
-    mutationKey: queryKeys.auth.resetPassword(),
-    mutationFn: (formData) => backendFetch("/api/v1.0/auth/resetPassword", { method: "POST", data: formData }),
-    onSuccess: (data) => {
-      if (data.success) enqueueSnackbar(data.message || "Reset link sent!", { variant: "success" });
-    },
-    onError: (error) => {
-      const msg = error.response?.data?.message || error.message;
-      enqueueSnackbar(msg || "Failed to reset password", { variant: "error" });
-    },
-  });
-};
-
-// ====================== CHANGE PASSWORD ======================
-export const useChangePassword = () => {
-  const { enqueueSnackbar } = useSnackbar();
-  return useMutation({
-    mutationKey: queryKeys.auth.changePassword(),
-    mutationFn: (formData) => backendFetch("/api/v1.0/auth/changePassword", { method: "POST", data: formData }),
-    onSuccess: (data) => {
-      if (data.success) enqueueSnackbar(data.message || "Password changed!", { variant: "success" });
-    },
-    onError: (error) => {
-      const msg = error.response?.data?.message || error.message;
-      enqueueSnackbar(msg || "Failed to change password", { variant: "error" });
-    },
-  });
-};
+  return onSignOut
+}

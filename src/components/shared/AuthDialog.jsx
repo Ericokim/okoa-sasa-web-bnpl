@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm } from 'react-hook-form'
 import { Dialog, DialogPortal } from '@/components/ui/dialog'
@@ -20,15 +20,15 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
-import { useStateContext } from '@/context/state-context'
 import { cn } from '@/lib/utils'
+import { useLogin, useOTP } from '@/lib/queries/auth'
 import {
   LoginSchema,
   OTPVerificationSchema,
   normalizeKenyanPhoneNumber,
   normalizeOtpValue,
 } from '@/lib/validation'
-import { PhoneIcon, XIcon } from 'lucide-react'
+import { CheckCircle2, Loader2, PhoneIcon, XIcon } from 'lucide-react'
 import logo from '@/assets/images/primaryLogoVertical.png'
 
 export function AuthDialog({
@@ -41,19 +41,66 @@ export function AuthDialog({
   const [loginPhoneNumber, setLoginPhoneNumber] = useState('')
   const [countdown, setCountdown] = useState(41)
   const [isResending, setIsResending] = useState(false)
-  const { login } = useStateContext()
+  const successTimerRef = useRef(null)
   const navigate = useNavigate()
+
   const form = useForm({
     resolver: LoginSchema,
     defaultValues: {
-      phoneNumber: '',
+      phoneNumberOrEmail: '',
       rememberMe: false,
     },
   })
+
   const otpForm = useForm({
     resolver: OTPVerificationSchema,
     defaultValues: {
       otp: '',
+      phoneNumberOrEmail: '',
+    },
+  })
+
+  const finalizeAuth = React.useCallback(() => {
+    if (successTimerRef.current) {
+      clearTimeout(successTimerRef.current)
+      successTimerRef.current = null
+    }
+
+    onOpenChange(false)
+
+    if (typeof onLoginSuccess === 'function') {
+      onLoginSuccess()
+    } else {
+      navigate({ to: '/' })
+    }
+  }, [navigate, onLoginSuccess, onOpenChange])
+
+  const loginMutation = useLogin({
+    onSuccess: (_response, variables) => {
+      const normalizedPhone = variables?.phoneNumberOrEmail || ''
+
+      setLoginPhoneNumber(normalizedPhone)
+      otpForm.reset({ otp: '', phoneNumberOrEmail: normalizedPhone })
+      setStep('otp')
+      setCountdown(41)
+    },
+  })
+
+  const otpMutation = useOTP({
+    onSuccess: () => {
+      setStep('success')
+      otpForm.reset({ otp: '', phoneNumberOrEmail: '' })
+
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current)
+      }
+
+      successTimerRef.current = setTimeout(() => {
+        finalizeAuth()
+      }, 1200)
+    },
+    onError: () => {
+      otpForm.reset({ otp: '', phoneNumberOrEmail: loginPhoneNumber })
     },
   })
 
@@ -70,44 +117,77 @@ export function AuthDialog({
   }, [step, countdown])
 
   useEffect(() => {
+    return () => {
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current)
+      }
+    }
+  }, [])
+
+  useEffect(() => {
     if (!open) {
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current)
+        successTimerRef.current = null
+      }
       setTimeout(() => {
         setStep('login')
         setLoginPhoneNumber('')
         setCountdown(41)
-        form.reset({ phoneNumber: '', rememberMe: false })
-        otpForm.reset({ otp: '' })
+        setIsResending(false)
+        form.reset({ phoneNumberOrEmail: '', rememberMe: false })
+        otpForm.reset({ otp: '', phoneNumberOrEmail: '' })
       }, 200)
     }
   }, [open, form, otpForm])
 
   const handleLogin = form.handleSubmit((data) => {
-    const normalizedPhone = normalizeKenyanPhoneNumber(data.phoneNumber)
-    setLoginPhoneNumber(normalizedPhone)
-    otpForm.reset({ otp: '' })
-    setStep('otp')
-    setCountdown(41)
+    const normalizedPhone = normalizeKenyanPhoneNumber(
+      data.phoneNumberOrEmail,
+    )
+
+    if (!normalizedPhone) {
+      return
+    }
+
+    loginMutation.mutate({ phoneNumberOrEmail: normalizedPhone })
   })
 
   const handleVerifyOTP = otpForm.handleSubmit(({ otp }) => {
-    login({
-      phoneNumber: loginPhoneNumber,
-      name: 'User',
-    })
-    onOpenChange(false)
+    const phoneIdentifier =
+      loginPhoneNumber || otpForm.getValues('phoneNumberOrEmail')
 
-    if (onLoginSuccess) {
-      onLoginSuccess()
-    } else {
-      navigate({ to: '/' })
+    if (!phoneIdentifier) {
+      otpForm.setError('otp', {
+        type: 'manual',
+        message: 'Request a verification code to continue.',
+      })
+      setStep('login')
+      return
     }
+
+    otpMutation.mutate({
+      otp,
+      phoneNumberOrEmail: phoneIdentifier,
+    })
   })
 
   const handleResendOTP = () => {
+    if (!loginPhoneNumber || loginMutation.isPending) {
+      return
+    }
+
     setIsResending(true)
-    setCountdown(41)
-    otpForm.reset({ otp: '' })
-    setTimeout(() => setIsResending(false), 1000)
+    otpForm.reset({ otp: '', phoneNumberOrEmail: loginPhoneNumber })
+
+    loginMutation.mutate(
+      { phoneNumberOrEmail: loginPhoneNumber },
+      {
+        onSettled: () => {
+          setIsResending(false)
+        },
+      },
+    )
   }
 
   return (
@@ -147,19 +227,28 @@ export function AuthDialog({
                 className="w-[150px] h-[136px] sm:w-[180px] sm:h-[164px] md:w-[202px] md:h-[184px] object-contain"
               />
 
-              {step === 'login' ? (
-                <LoginStep form={form} handleLogin={handleLogin} />
-              ) : (
+              {step === 'login' && (
+                <LoginStep
+                  form={form}
+                  handleLogin={handleLogin}
+                  isSubmitting={loginMutation.isPending}
+                />
+              )}
+
+              {step === 'otp' && (
                 <OTPStep
                   form={otpForm}
                   otpValue={otpValue}
                   maskedPhone={maskedPhone}
                   countdown={countdown}
                   isResending={isResending}
+                  isVerifying={otpMutation.isPending}
                   handleVerifyOTP={handleVerifyOTP}
                   handleResendOTP={handleResendOTP}
                 />
               )}
+
+              {step === 'success' && <SuccessStep />}
             </div>
           </div>
         </DialogPrimitive.Content>
@@ -198,8 +287,9 @@ const formatPhoneInputValue = (value = '') => {
   return result.slice(0, 13)
 }
 
-function LoginStep({ form, handleLogin }) {
+function LoginStep({ form, handleLogin, isSubmitting }) {
   const { control, formState } = form
+  const pending = isSubmitting || formState.isSubmitting
 
   return (
     <>
@@ -216,7 +306,7 @@ function LoginStep({ form, handleLogin }) {
         <form onSubmit={handleLogin} className="flex flex-col gap-6 w-full">
           <FormField
             control={control}
-            name="phoneNumber"
+            name="phoneNumberOrEmail"
             render={({ field }) => (
               <FormItem className="flex flex-col gap-[9px] w-full">
                 <FormFieldLabel className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']">
@@ -254,7 +344,9 @@ function LoginStep({ form, handleLogin }) {
                   <Checkbox
                     id="remember"
                     checked={!!field.value}
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked === true)
+                    }
                     className="w-5 h-5 rounded border-[#A0A4AC]"
                   />
                 </FormControl>
@@ -272,9 +364,16 @@ function LoginStep({ form, handleLogin }) {
             size="lg"
             type="submit"
             variant="gradient"
-            disabled={formState.isSubmitting}
+            disabled={pending}
           >
-            Login
+            {pending ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Sending OTP...
+              </>
+            ) : (
+              'Login'
+            )}
           </Button>
         </form>
       </Form>
@@ -288,10 +387,12 @@ function OTPStep({
   maskedPhone,
   countdown,
   isResending,
+  isVerifying,
   handleVerifyOTP,
   handleResendOTP,
 }) {
   const { control, formState } = form
+  const pending = isVerifying || formState.isSubmitting
 
   return (
     <>
@@ -303,7 +404,7 @@ function OTPStep({
 
       <div className="w-full py-4 px-3 rounded-2xl bg-[rgba(244,113,32,0.12)] flex items-center justify-center">
         <p className="text-[#F47120] text-sm font-medium leading-[140%] font-['Public_Sans'] text-center">
-          We've sent a 6-digit code to {maskedPhone} and xx@gmail.com
+          We&apos;ve sent a 6-digit code to {maskedPhone}
         </p>
       </div>
 
@@ -352,16 +453,23 @@ function OTPStep({
           />
 
           <p className="text-[#676D75] text-sm font-normal leading-[140%] text-center font-['Public_Sans']">
-            Enter the 6-digit code we sent to your email
+            Enter the 6-digit code we sent to your phone
           </p>
 
           <Button
             size="lg"
             type="submit"
             variant="gradient"
-            disabled={otpValue.length !== 6 || formState.isSubmitting}
+            disabled={otpValue.length !== 6 || pending}
           >
-            Login
+            {pending ? (
+              <>
+                <Loader2 className="h-5 w-5 animate-spin" />
+                Verifying...
+              </>
+            ) : (
+              'Login'
+            )}
           </Button>
 
           <div className="flex items-center justify-center gap-3 w-full flex-wrap">
@@ -377,15 +485,39 @@ function OTPStep({
               <button
                 type="button"
                 onClick={handleResendOTP}
-                disabled={isResending || formState.isSubmitting}
+                disabled={isResending || pending}
                 className="text-sm font-semibold leading-[140%] capitalize font-['Public_Sans'] bg-gradient-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent hover:opacity-80 transition-opacity disabled:opacity-50"
               >
-                Resend Code
+                {isResending ? (
+                  <span className="flex items-center gap-1">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Resending...
+                  </span>
+                ) : (
+                  'Resend Code'
+                )}
               </button>
             )}
           </div>
         </form>
       </Form>
     </>
+  )
+}
+
+function SuccessStep() {
+  return (
+    <div className="flex flex-col items-center gap-5 w-full text-center py-6">
+      <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[rgba(244,113,32,0.12)] text-[#F47120]">
+        <CheckCircle2 className="h-10 w-10" />
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-[#252525] text-2xl md:text-[28px] font-semibold leading-[140%] capitalize font-['Public_Sans']">
+          You&apos;re all set!
+        </h2>
+        <p className="text-[#676D75] text-sm md:text-base font-normal leading-[140%] font-['Public_Sans']">
+          Redirecting you to your account...
+        </p>
+      </div>
+    </div>
   )
 }
