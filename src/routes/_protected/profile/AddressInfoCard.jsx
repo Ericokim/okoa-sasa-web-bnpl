@@ -4,11 +4,12 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
-import { useAccountStore } from '@/data/accountStore'
 import { EditIcon } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
 import { FormTextarea } from '@/components/shared/Inputs/FormTextarea'
 import { Separator } from '@/components/ui/separator' // Added for your snippet
+import { useStateContext } from '@/context/state-context'
+import { useUpdateUserAddress } from '@/lib/queries/user'
 
 const addressSchema = z.object({
   street: z
@@ -18,19 +19,66 @@ const addressSchema = z.object({
     .max(500, 'Address is too long'),
 })
 
+const normalizeType = (type = '') => {
+  const lowered = type.toLowerCase()
+  if (lowered === 'office') return 'Office'
+  if (lowered === 'shipping' || lowered === 'home') return 'Shipping'
+  return type
+}
+
 export function RouteComponent() {
-  const { addresses, updateAddress } = useAccountStore()
+  const { user, login } = useStateContext()
   const [editing, setEditing] = useState(null)
+  const addresses = Array.isArray(user?.addresses) ? user.addresses : []
+  const office = addresses.find(
+    (a) => normalizeType(a?.type) === 'Office',
+  )
+  const home = addresses.find(
+    (a) => normalizeType(a?.type) === 'Shipping',
+  )
+
+  const userId =
+    user?.id || user?.userId || user?.userID || user?.idNumber || undefined
+
+  const updateAddressMutation = useUpdateUserAddress({
+    onSuccess: (_response, variables) => {
+      const updatedType = variables?.type || 'Office'
+      const normalizedType = normalizeType(updatedType).toLowerCase()
+      const nextAddresses = [
+        ...addresses.filter(
+          (addr) => normalizeType(addr?.type).toLowerCase() !== normalizedType,
+        ),
+        {
+          ...variables,
+          type: updatedType,
+          street: variables?.address,
+          address: variables?.address,
+        },
+      ]
+
+      login?.({
+        ...(user || {}),
+        addresses: nextAddresses,
+      })
+      setEditing(null)
+    },
+  })
 
   const startEdit = (type) => setEditing(type)
-  const saveAddress = (type, data) => {
-    updateAddress(type, data)
-    setEditing(null)
-  }
-  const cancelEdit = () => setEditing(null)
 
-  const office = addresses.find((a) => a.type === 'office')
-  const home = addresses.find((a) => a.type === 'home')
+  const saveAddress = (type, data) => {
+    if (!userId) return
+
+    const payload = {
+      userId,
+      address: data.street.trim(),
+      type: type === 'office' ? 'Office' : 'Shipping',
+    }
+
+    updateAddressMutation.mutate(payload)
+  }
+
+  const cancelEdit = () => setEditing(null)
 
   return (
     <div className="border rounded-xl p-6 bg-white">
@@ -40,86 +88,64 @@ export function RouteComponent() {
 
       <hr className="my-4 border-gray-200" />
 
-      {/* Office Address */}
-      {office && (
-        <div className="mb-6 rounded-xl border p-4">
-          <div className="flex justify-between items-start gap-4 mb-2">
-            <p className="font-sans text-base font-normal leading-snug text-gray-600">
-              Office Address
-            </p>
+      {['office', 'home'].map((type, index) => {
+        const isOffice = type === 'office'
+        const label = isOffice ? 'Office Address' : 'Home Address'
+        const addressData = isOffice ? office : home
+        const hasAddress = Boolean(addressData?.street)
+        const isEditing = editing === type
 
-            {editing !== 'office' && (
-              <button
-                onClick={() => startEdit('office')}
-                className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
-              >
-                <EditIcon />
-                Edit
-              </button>
-            )}
+        return (
+          <div key={type}>
+            <div className="rounded-xl border p-4">
+              <div className="flex justify-between items-start gap-4 mb-2">
+                <p className="font-sans text-base font-normal leading-snug text-gray-600">
+                  {label}
+                </p>
+
+                {!isEditing && (
+                  <button
+                    onClick={() => startEdit(type)}
+                    className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
+                  >
+                    <EditIcon />
+                    {hasAddress ? 'Edit' : 'Add'}
+                  </button>
+                )}
+              </div>
+
+              {isEditing ? (
+                <AddressEditForm
+                  type={type}
+                  initialData={addressData}
+                  onSave={saveAddress}
+                  onCancel={cancelEdit}
+                  isSubmitting={updateAddressMutation.isPending}
+                />
+              ) : (
+                <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line text-muted-foreground">
+                  {hasAddress ? addressData.street : 'No address on file yet.'}
+                </p>
+              )}
+            </div>
+
+            {index === 0 && <Separator className="my-6" />}
           </div>
-
-          {editing === 'office' ? (
-            <AddressEditForm
-              type="office"
-              initialData={office}
-              onSave={saveAddress}
-              onCancel={cancelEdit}
-            />
-          ) : (
-            <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
-              {office.street}
-            </p>
-          )}
-        </div>
-      )}
-
-      <Separator className="mb-6" />
-
-      {/* Home Address */}
-      {home && (
-        <div className="rounded-xl border p-4">
-          <div className="flex justify-between items-start gap-4 mb-2">
-            <p className="font-sans text-base font-normal leading-snug text-gray-600">
-              Home Address
-            </p>
-
-            {editing !== 'home' && (
-              <button
-                onClick={() => startEdit('home')}
-                className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
-              >
-                <EditIcon />
-                Edit
-              </button>
-            )}
-          </div>
-
-          {editing === 'home' ? (
-            <AddressEditForm
-              type="home"
-              initialData={home}
-              onSave={saveAddress}
-              onCancel={cancelEdit}
-            />
-          ) : (
-            <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line">
-              {home.street}
-            </p>
-          )}
-        </div>
-      )}
+        )
+      })}
     </div>
   )
 }
 
-function AddressEditForm({ type, initialData, onSave, onCancel }) {
+function AddressEditForm({ type, initialData, onSave, onCancel, isSubmitting }) {
   const form = useForm({
     resolver: zodResolver(addressSchema),
     defaultValues: { street: initialData?.street || '' },
   })
 
   const handleSave = (data) => onSave(type, data)
+
+  
   const handleCancel = () => {
     form.reset()
     onCancel()
@@ -147,9 +173,9 @@ function AddressEditForm({ type, initialData, onSave, onCancel }) {
           <Button
             type="submit"
             className="w-full sm:flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 font-medium transition-colors text-sm sm:text-base"
-            disabled={form.formState.isSubmitting}
+            disabled={form.formState.isSubmitting || isSubmitting}
           >
-            {form.formState.isSubmitting ? 'Saving...' : 'Save'}
+            {form.formState.isSubmitting || isSubmitting ? 'Saving...' : 'Save'}
           </Button>
           <Button
             type="button"

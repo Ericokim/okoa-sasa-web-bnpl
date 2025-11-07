@@ -4,9 +4,41 @@ export const queryKeys = {
       all: () => ['auth'],
       user: () => [...queryKeys.masoko.auth.all(), 'user'],
       login: () => [...queryKeys.masoko.auth.all(), 'login'],
+      otp: () => [...queryKeys.masoko.auth.all(), 'otp'],
       logout: () => [...queryKeys.masoko.auth.all(), 'logout'],
       resetPassword: () => [...queryKeys.masoko.auth.all(), 'resetPassword'],
       changePassword: () => [...queryKeys.masoko.auth.all(), 'changePassword'],
+    },
+
+    users: {
+      all: () => ['users'],
+      list: (filters) => [...queryKeys.masoko.users.all(), 'list', filters],
+      detail: (id) => [...queryKeys.masoko.users.all(), 'detail', id],
+      search: (query) => [...queryKeys.masoko.users.all(), 'search', query],
+      addresses: (id) => [...queryKeys.masoko.users.all(), 'addresses', id],
+      wishlist: (id) => [...queryKeys.masoko.users.all(), 'wishlist', id],
+      me: () => [...queryKeys.masoko.users.all(), 'me'],
+      update: () => [...queryKeys.masoko.users.all(), 'update'],
+      addressUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'address',
+        'update',
+      ],
+      notificationPreferenceUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'notification-preference',
+        'update',
+      ],
+      profilePhotoUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'profile-photo',
+        'update',
+      ],
+      uploadDocuments: () => [
+        ...queryKeys.masoko.users.all(),
+        'upload-documents',
+      ],
+      delete: () => [...queryKeys.masoko.users.all(), 'delete'],
     },
 
     products: {
@@ -61,15 +93,6 @@ export const queryKeys = {
         'tracking',
         orderId,
       ],
-    },
-
-    customers: {
-      all: () => ['customers'],
-      list: (filters) => [...queryKeys.masoko.customers.all(), 'list', filters],
-      detail: (id) => [...queryKeys.masoko.customers.all(), 'detail', id],
-      search: (query) => [...queryKeys.masoko.customers.all(), 'search', query],
-      addresses: (id) => [...queryKeys.masoko.customers.all(), 'addresses', id],
-      wishlist: (id) => [...queryKeys.masoko.customers.all(), 'wishlist', id],
     },
 
     payments: {
