@@ -33,34 +33,233 @@ export const usePickUpPoint = () => {
   })
 }
 
-// create order
-export function useCreateOrder(options) {
+/**
+ * useCreateOrder
+ * POST /v1/orders
+ * Creates a new BNPL order with all relevant customer, shipping, and credit data.
+ */
+export function useCreateOrder(options = {}) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.createOrder(),
+    mutationKey: queryKeys.masoko.orders.create(),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/orders`, payload) //change to point bnpl endpoint
+      const { data } = await masokoApi.post('/orders', payload)
       return data
     },
-    onSuccess: (payload) => {
-      const success = payload.message?.includes('Successfully')
-        ? payload.message
-        : 'Order created successfully'
-      enqueueSnackbar(success, {
+
+    onSuccess: (response) => {
+      const message = response?.status?.message || 'Order created successfully'
+      enqueueSnackbar(message, {
         variant: 'success',
         autoHideDuration: 4000,
       })
+
+      // Invalidate relevant order caches
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.getAllOrders(),
+        queryKey: queryKeys.masoko.orders.list(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.all(),
       })
     },
+
     onError: (error) => {
-      const err = error.response ? error.response.data?.message : error.message
-      enqueueSnackbar(err || 'Failed to create order', {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to create order'
+
+      enqueueSnackbar(errMsg, {
         variant: 'error',
+        autoHideDuration: 4000,
       })
     },
+    ...options,
+  })
+}
+
+/**
+ * useUploadOrderDocuments
+ * PATCH /v1/orders/:id/upload-document
+ * Uploads or updates documents attached to a specific order.
+ */
+export function useUploadOrderDocuments(options = {}) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.orders.uploadDocuments(),
+    mutationFn: async ({ orderId, documents }) => {
+      const { data } = await masokoApi.patch(
+        `/orders/${orderId}/upload-document`,
+        documents,
+      )
+      return data
+    },
+
+    onSuccess: (response, { orderId }) => {
+      const message =
+        response?.status?.message || 'Documents uploaded successfully'
+
+      enqueueSnackbar(message, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+
+      // Refresh related order data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.detail(orderId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.list(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.all(),
+      })
+    },
+
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to upload documents'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+    },
+
+    ...options,
+  })
+}
+
+/**
+ * useGetOrdersList
+ * GET /v1/orders
+ * Fetches all orders with optional filters.
+ */
+export function useGetOrdersList(filters = {}, options = {}) {
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useQuery({
+    queryKey: queryKeys.masoko.orders.list(filters),
+
+    queryFn: async () => {
+      const { data } = await masokoApi.get('/orders', { params: filters })
+      return data
+    },
+
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to load orders list'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+    },
+
+    staleTime: 1000 * 60 * 2, // cache for 2 minutes
+    retry: 1,
+    ...options,
+  })
+}
+
+/**
+ * useGetOrderDetail
+ * GET /v1/orders/:id
+ * Fetches detailed information about a specific order.
+ */
+export function useGetOrderDetail(orderId, options = {}) {
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useQuery({
+    queryKey: queryKeys.masoko.orders.detail(orderId),
+
+    queryFn: async () => {
+      const { data } = await masokoApi.get(`/orders/${orderId}`)
+      return data
+    },
+
+    enabled: !!orderId, // only run if orderId is provided
+    retry: 1,
+    staleTime: 1000 * 60 * 3, // 3 minutes cache
+
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to load order details'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+    },
+
+    ...options,
+  })
+}
+
+/**
+ * useUpdateOrder
+ * PUT /v1/orders
+ * Updates an existing order (shipping detail, credit data, documents, etc.).
+ */
+export function useUpdateOrder(options = {}) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.orders.update('order'),
+
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.put('/orders', payload)
+      return data
+    },
+
+    onSuccess: (response, payload) => {
+      const message = response?.status?.message || 'Order updated successfully'
+
+      enqueueSnackbar(message, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+
+      // Invalidate related queries to refresh data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.detail(payload?.orderId),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.list(),
+      })
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.orders.all(),
+      })
+    },
+
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to update order'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+    },
+
     ...options,
   })
 }
@@ -71,7 +270,7 @@ export function useSaveLoanLimit(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.saveLoanLimit(),
+    mutationKey: queryKeys.masoko.orders.update('loan-limit'),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/loan-limit`, payload)
       return data
@@ -84,7 +283,7 @@ export function useSaveLoanLimit(options) {
       })
       // Optionally invalidate related queries
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.saveLoanLimit(),
+        queryKey: queryKeys.masoko.orders.update('loan-limit'),
       })
     },
     onError: (error) => {
@@ -103,7 +302,7 @@ export function useSavePersonalInfo(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.savePersonalInfo(),
+    mutationKey: queryKeys.masoko.orders.update('personal-info'),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/personal-info`, payload)
       return data
@@ -115,7 +314,7 @@ export function useSavePersonalInfo(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.savePersonalInfo(),
+        queryKey: queryKeys.masoko.orders.update('personal-info'),
       })
     },
     onError: (error) => {
@@ -134,7 +333,7 @@ export function useSaveDeliveryDetails(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.saveDeliveryDetails(),
+    mutationKey: queryKeys.masoko.orders.update('delivery-details'),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/delivery-details`, payload)
       return data
@@ -146,7 +345,7 @@ export function useSaveDeliveryDetails(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.saveDeliveryDetails(),
+        queryKey: queryKeys.masoko.orders.update('delivery-details'),
       })
     },
     onError: (error) => {
@@ -165,7 +364,7 @@ export function useSaveOrderSummary(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.saveOrderSummary(),
+    mutationKey: queryKeys.masoko.orders.update('order-summary'),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/order-summary`, payload)
       return data
@@ -177,7 +376,7 @@ export function useSaveOrderSummary(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.saveOrderSummary(),
+        queryKey: queryKeys.masoko.orders.update('order-summary'),
       })
     },
     onError: (error) => {
@@ -196,7 +395,7 @@ export function useSaveTermsConsents(options) {
   const { enqueueSnackbar } = useSnackbar()
 
   return useMutation({
-    mutationKey: queryKeys.masoko.oders.saveTermsConsents(),
+    mutationKey: queryKeys.masoko.orders.update('terms-consents'),
     mutationFn: async (payload) => {
       const { data } = await masokoApi.post(`/terms-consents`, payload)
       return data
@@ -208,7 +407,7 @@ export function useSaveTermsConsents(options) {
         autoHideDuration: 3000,
       })
       queryClient.invalidateQueries({
-        queryKey: queryKeys.masoko.oders.saveTermsConsents(),
+        queryKey: queryKeys.masoko.orders.update('terms-consents'),
       })
     },
     onError: (error) => {

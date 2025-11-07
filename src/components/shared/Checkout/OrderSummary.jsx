@@ -129,8 +129,6 @@ export default function OrderSummaryPage({
       cartItems: cartItems,
     }
 
-    console.log('Order payload:', orderPayload)
-
     saveCheckoutFormData(4, {
       orderPayload: orderPayload,
       apiPayload: orderPayload,

@@ -9,6 +9,7 @@ import { useStateContext } from '@/context/state-context'
 import { AmountInput, parseCurrencyValue } from '../Inputs/FormAmount'
 import { RepaymentPeriodSlider } from '../Inputs/FormSlider'
 import { FileUpload } from '../Inputs/FormUpload'
+import { useCheckUserLoanAbility } from '@/lib/queries/user'
 
 const DEFAULT_TENURE = 13
 
@@ -59,6 +60,7 @@ export default function CheckLoanLimitPage({
     useStateContext()
 
   const savedData = getCheckoutFormData(1)
+  const loanAbilityMutation = useCheckUserLoanAbility()
 
   const [open, setOpen] = useState(false)
   const [errorModalOpen, setErrorModalOpen] = useState(false)
@@ -130,87 +132,105 @@ export default function CheckLoanLimitPage({
     return Math.max(0, roundedToNearestThousand)
   }, [watchedBasicPay, watchedNetPay, currentRepaymentPeriod])
 
-  // Helper function to get file information
-  const getFileInfo = (file) => {
+  const fileToBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+  // Helper function to get file information in API format
+  const getFileInfo = async (file) => {
     if (!file) return null
-    
-    // If file is already an object with the required structure, return it
+
     if (file.name && file.type && file.format && file.url) {
       return file
     }
-    
-    // If it's a File object, extract information
+
     if (file instanceof File) {
       const fileExtension = file.name.split('.').pop()?.toLowerCase() || ''
       const formatMap = {
-        'pdf': 'pdf',
-        'jpg': 'image',
-        'jpeg': 'image',
-        'png': 'image',
-        'doc': 'document',
-        'docx': 'document'
+        pdf: 'pdf',
+        jpg: 'image',
+        jpeg: 'image',
+        png: 'image',
+        doc: 'document',
+        docx: 'document',
       }
-      
+
+      const dataUrl = await fileToBase64(file)
+
       return {
         name: file.name,
-        type: 'payslip', // or you can make this dynamic based on your needs
-        format: formatMap[fileExtension] || 'document',
-        url: URL.createObjectURL(file) // This creates a temporary blob URL
+        type: 'Payslip',
+        format: formatMap[fileExtension] || file.type || 'document',
+        url: dataUrl,
       }
     }
-    
+
     return null
   }
 
   const onSubmit = async (data) => {
-    // console.log('Form data:', data)
-
     try {
-      // Prepare the document payload
+      const payload = {
+        basicPay: parseCurrencyValue(data.basicPay),
+        netPay: parseCurrencyValue(data.netPay),
+        term: data.tenure,
+      }
+
+      const response = await loanAbilityMutation.mutateAsync(payload)
+      const serverResult = response?.data?.[0]
+      const calculatedAmountFromApi = serverResult?.loanLimit ?? serverResult?.amount
+      const effectiveLoanAmount =
+        typeof calculatedAmountFromApi === 'number' && calculatedAmountFromApi > 0
+          ? calculatedAmountFromApi
+          : loanAmount
+
       const documentPayload = []
-      const payslipDocument = getFileInfo(data.payslip)
-      
+      const payslipDocument = await getFileInfo(data.payslip)
+
       if (payslipDocument) {
         documentPayload.push(payslipDocument)
       }
 
-      // Prepare credit data
       const creditData = {
-        basicSalary: parseCurrencyValue(data.basicPay),
-        netSalary: parseCurrencyValue(data.netPay),
-        tenure: data.tenure
+        basicSalary: payload.basicPay,
+        netSalary: payload.netPay,
+        tenure: data.tenure,
+        ...(serverResult?.creditData || {}),
       }
 
-      // Prepare the complete payload
       const completePayload = {
         documents: documentPayload,
-        creditData: creditData,
-        calculatedLoanAmount: loanAmount,
-        formData: data // Keep the original form data if needed
+        creditData,
+        calculatedLoanAmount: effectiveLoanAmount,
+        formData: data,
       }
 
-      // Save form data with the complete payload
       saveCheckoutFormData(1, {
         ...data,
-        calculatedLoanAmount: loanAmount,
-        apiPayload: completePayload 
+        calculatedLoanAmount: effectiveLoanAmount,
+        documents: documentPayload,
+        apiPayload: completePayload,
       })
 
-      // Check if cart total exceeds loan limit
-      if (grandTotal > loanAmount) {
+      if (grandTotal > effectiveLoanAmount) {
         setErrorMessage(
-          `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${loanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
+          `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${effectiveLoanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
         )
         setErrorModalOpen(true)
         return
       }
 
-      // Proceed to next step
       onNext()
-
     } catch (error) {
-      console.error('Error processing form submission:', error)
-      setErrorMessage('An error occurred while processing your request. Please try again.')
+      setErrorMessage(
+        error?.response?.data?.status?.message ||
+          error?.message ||
+          'An error occurred while checking your loan limit. Please try again.',
+      )
       setErrorModalOpen(true)
     }
   }

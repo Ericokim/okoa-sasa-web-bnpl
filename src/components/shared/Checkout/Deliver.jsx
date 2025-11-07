@@ -244,23 +244,27 @@ export default function DeliveryDetailsForm({
   ]
 
   const onSubmit = (data) => {
-    console.log('Form data:', data)
 
     // Prepare the shipping detail payload
     const regionDetails = getRegionDetails(data.region)
     const storeDetails = deliveryType === 'pickup' ? getStoreDetails(data.pickupStore) : {}
 
+    const fallbackAddress =
+      deliveryType === 'pickup'
+        ? storeDetails.address || storeDetails.storeDescription || ''
+        : data.deliveryAddress || ''
+
     const shippingDetailPayload = {
       shippingDetail: {
-        recipientName: `${data.firstName} ${data.lastName}`,
+        recipientName: `${data.firstName} ${data.lastName}`.trim(),
         recipientPhoneNumber: data.recipientNumber,
-        type: deliveryType === 'door' ? 'Delivery' : 'Pickup',
-        recipientEmail: '', 
-        recipientAddress: data.deliveryAddress || '',
+        type: deliveryType === 'door' ? 'Delivery' : 'PickUp',
+        recipientEmail: '',
+        recipientAddress: fallbackAddress,
         region: regionDetails.region,
         regionId: regionDetails.regionId,
         storeId: storeDetails.storeId || '',
-        store: storeDetails.store || ''
+        store: storeDetails.store || '',
       },
       // Keep original form data for internal use
       formData: {
@@ -269,7 +273,6 @@ export default function DeliveryDetailsForm({
       }
     }
 
-    console.log('Shipping detail payload:', shippingDetailPayload)
 
     // Save both the original form data and the structured payload
     const dataWithType = { 

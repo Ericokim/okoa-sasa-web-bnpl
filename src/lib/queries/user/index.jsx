@@ -1,7 +1,37 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
 import masokoApi from '@/lib/api/api'
 import { queryKeys } from '@/lib/queryKeys'
+
+/**
+ * useFetchUserDetail
+ * GET /v1/users/:id
+ * Fetches a user's detailed information by ID.
+ */
+export function useFetchUserDetail(userId, options = {}) {
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useQuery({
+    queryKey: queryKeys.masoko.users.detail(userId),
+    queryFn: async () => {
+      const { data } = await masokoApi.get(`/users/${userId}`)
+      return data
+    },
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to fetch user details'
+      enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+    },
+    enabled: !!userId, // only runs if ID is provided
+    cacheTime: 1000 * 60 * 30, // Cache data for 30 minutes
+    retry: 1,
+
+    ...options,
+  })
+}
 
 /**
  * useUpdateUser
@@ -227,6 +257,62 @@ export function useUploadUserDocuments(options = {}) {
         'Failed to upload documents'
 
       enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+    },
+
+    ...options,
+  })
+}
+
+/**
+ * useCheckUserLoanAbility
+ * POST /v1/users/loan-ability
+ * Calculates or retrieves the user's loan eligibility based on pay details.
+ */
+export function useCheckUserLoanAbility(options = {}) {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+
+  return useMutation({
+    mutationKey: queryKeys.masoko.users.loanAbility(),
+
+    // Expected payload:
+    // { basicPay: number, netPay: number, term: number }
+    mutationFn: async (payload) => {
+      const { data } = await masokoApi.post('/users/loan-ability', payload)
+      return data
+    },
+
+    onSuccess: (response) => {
+      const message =
+        response?.status?.message || 'Loan ability calculated successfully'
+
+      enqueueSnackbar(message, {
+        variant: 'success',
+        autoHideDuration: 4000,
+      })
+
+      // Optional: revalidate related user or finance data
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.users.detail(),
+      })
+      // Invalidate related caches
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.users.all(),
+        type: 'all',
+      })
+    },
+
+    onError: (error) => {
+      const errMsg =
+        error?.response?.data?.status?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
+        'Failed to calculate loan ability'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
     },
 
     ...options,
