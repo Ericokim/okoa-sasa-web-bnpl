@@ -1,7 +1,7 @@
 // src/hooks/useProducts.js
 import React from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import masokoApi from '@/lib/api/api'
+import masokoApi from 'lib/api/masokoApi'
 import { queryKeys } from '@/lib/queryKeys'
 import {
   cleanProductDescription,
@@ -22,13 +22,11 @@ const SPEC_LABEL_MAP = [
   { key: 'color', label: 'Color' },
 ]
 
-const safeString = (value) =>
-  typeof value === 'string' ? value.trim() : ''
+const safeString = (value) => (typeof value === 'string' ? value.trim() : '')
 
 const safeNumber = (value) => {
   if (value === null || value === undefined) return 0
-  const normalised =
-    typeof value === 'string' ? value.replace(/,/g, '') : value
+  const normalised = typeof value === 'string' ? value.replace(/,/g, '') : value
   const num = Number.parseFloat(normalised)
   return Number.isFinite(num) ? num : 0
 }
@@ -144,15 +142,10 @@ const buildSpecifications = (product) => {
 }
 
 const matchFromDefaults = (textFragments = [], candidates = []) => {
-  const text = textFragments
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase()
+  const text = textFragments.filter(Boolean).join(' ').toLowerCase()
   if (!text) return ''
 
-  const sortedCandidates = [...candidates].sort(
-    (a, b) => b.length - a.length,
-  )
+  const sortedCandidates = [...candidates].sort((a, b) => b.length - a.length)
 
   for (const candidate of sortedCandidates) {
     const normalizedCandidate = candidate.toLowerCase()
@@ -230,7 +223,10 @@ export function useProductList(params, options) {
 
         const gallery = mediaEntries
           .map(normalizeMediaEntry)
-          .filter((value, position, self) => value && self.indexOf(value) === position)
+          .filter(
+            (value, position, self) =>
+              value && self.indexOf(value) === position,
+          )
 
         const thumbnail = normalizeMediaEntry(item?.thumbnail_url)
         const primaryImage = thumbnail || gallery[0] || '/product.png'

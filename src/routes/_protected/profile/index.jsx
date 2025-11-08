@@ -7,6 +7,7 @@ import { AddressInfoCard } from './AddressInfoCard'
 import { NotificationPreferencesCard } from './NotificationPreferencesCard'
 import { DangerZoneCard } from './DangerZoneCard'
 import { useProducts } from '@/lib/queries/products/index'
+import { useStateContext } from '@/context/state-context'
 
 export default function ProfilePage() {
   useEffect(() => {
@@ -18,21 +19,8 @@ export default function ProfilePage() {
     { label: 'My Account', path: '/my-account', isCurrent: true },
   ]
 
-  
 
-  // const { data, isLoading, error } = useProducts({
-  //   amount: 20000,
-  //   organization: "liberty",
-  //   channel: "ussd",
-  // });
 
-  // if (isLoading) return <p>Loading products...</p>;
-  // if (error) return <p>Error: {error.message}</p>;
-
-  // const products = data?.data || [];
-  // const totalCount = data?.totalCount || 0;
-
-  // console.log('Fetched products:', products);
 
   return (
     <div className="min-h-screen">
@@ -55,10 +43,10 @@ export default function ProfilePage() {
 
         {/* All cards – stacked vertically, no layout changes */}
         <div className="space-y-6">
-          <AccountProfileCard />
+          <AccountProfileCard  />
           <PersonalInfoCard />
-          <AddressInfoCard />
-          <NotificationPreferencesCard />
+          <AddressInfoCard  />
+          <NotificationPreferencesCard  />
           <DangerZoneCard />
         </div>
       </main>

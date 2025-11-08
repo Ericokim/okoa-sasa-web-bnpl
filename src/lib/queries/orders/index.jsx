@@ -1,7 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import masokoApi from '@/lib/api/api'
+import masokoApi from 'lib/api/masokoApi'
 import { queryKeys } from '@/lib/queryKeys'
 import { useSnackbar } from 'notistack'
+import { bnplQueryKeys } from '@/lib/queryKeys'
 
 export const useRegion = () => {
   return useQuery({

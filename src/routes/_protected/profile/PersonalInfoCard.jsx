@@ -86,6 +86,17 @@ export function RouteComponent() {
   const [editing, setEditing] = useState(false)
   const initialValues = useMemo(() => buildInitialValues(user), [user])
 
+
+  // // Single useProducts call - no conditional hooks
+  // const { data:masokoproducts, isLoading:isMasokoProductsLoading, error:masokoError } = useProducts({
+  //   amount: 20000,
+  //   organization: "liberty",
+  //   channel: "ussd",
+  // });
+
+  // console.log(masokoproducts)
+
+
   // Initialize form with personalInfo
   const form = useForm({
     resolver: zodResolver(personalInfoSchema),

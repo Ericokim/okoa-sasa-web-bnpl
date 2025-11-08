@@ -183,3 +183,20 @@ export const queryKeys = {
     pickUpPoints: () => ['masoko-pick-up-points'],
   },
 }
+export const bnplQueryKeys = {
+  // Orders
+  orders: {
+    // orders query keys
+    ORDER_GET: 'getOrders',
+    ORDER_GET_BY_ID: 'getOrderByID',
+  },
+  //profile
+  profile: {
+    //profile query keys
+    PROFILE_GET_BY_ID: 'getProfileByID',
+    UPDATE_USER_DETAILS: 'updateUserDetails',
+    UPDATE_USER_ADDRESS: 'updateUserAddress',
+    UPDATE_USER_NOTIFICATION_PREFERENCES: 'updateUserNotificationPreferences',
+    UPDATE_PROFILE_PHOTO: 'updateProfilePhoto',
+  }
+}
