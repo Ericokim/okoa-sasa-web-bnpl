@@ -98,7 +98,7 @@ function OrdersTableHistory() {
                 {orderHistory.map((order, idx) => {
                   const matched = recentOrders.find(
                     (ro) => ro.orderId === order.orderId.replace('#', ''),
-                  ) || { image: '/phone.png', title: order.device }
+                ) || { image: '/product.png', title: order.device }
 
                   return (
                     <div key={order.orderId}>
@@ -188,7 +188,7 @@ function OrdersTableHistory() {
             {orderHistory.map((order) => {
               const matched = recentOrders.find(
                 (ro) => ro.orderId === order.orderId.replace('#', ''),
-              ) || { image: '/phone.png' }
+              ) || { image: '/product.png' }
 
               return (
                 <Card

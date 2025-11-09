@@ -10,205 +10,7 @@ import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import { Progress } from '@/components/ui/progress'
 import { useGetOrdersList } from '@/lib/queries/orders'
 
-export const recentOrders = [
-  {
-    id: '1',
-    orderId: 'REQ-20458',
-    title: 'Samsung Galaxy A35',
-    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
-    price: 38500,
-    status: 'Pending', // From orderHistory
-    statusColor: 'yellow',
-    statusVariant: 'secondary', // From orderHistory
-    image: '/phone.png',
-    date: '12/10/2025 14:30:00',
-    invoice: 'S-INV+0942801',
-    amount: 38500,
-    dispatchTo: 'Jane Mwangi, Westlands, Nairobi, 00100',
-    statusText: 'PENDING',
-    items: [
-      {
-        name: 'Samsung Galaxy A35 - Navy',
-        qty: 1,
-        price: 38500,
-        total: 38500,
-      },
-    ],
-    delivery: {
-      type: 'door',
-      recipient: {
-        firstName: 'Jane',
-        lastName: 'Mwangi',
-        phone: '+254712345678',
-      },
-      region: 'nairobi',
-      address: 'Westlands Road, Nairobi, 00100, Kenya',
-      pickupStore: null,
-    },
-    shippingAddress: {
-      name: 'Jane Mwangi',
-      street: 'Westlands Road',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 38500,
-      shipping: 0,
-      total: 38500,
-    },
-    statusStep: 0, // Pending → first step
-  },
-
-  {
-    id: '2',
-    orderId: 'REQ-20459',
-    title: 'Samsung Galaxy A35',
-    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
-    price: 38500,
-    status: 'Approved', // From orderHistory
-    statusColor: 'blue',
-    statusVariant: 'default', // From orderHistory
-    image: '/phone.png',
-    date: '12/10/2025 09:15:00',
-    invoice: 'S-INV+0942802',
-    amount: 38500,
-    dispatchTo: 'Jane Mwangi, Kilimani, Nairobi',
-    statusText: 'APPROVED',
-    items: [
-      {
-        name: 'Samsung Galaxy A35 - Navy',
-        qty: 1,
-        price: 38500,
-        total: 38500,
-      },
-    ],
-    delivery: {
-      type: 'pickup',
-      recipient: {
-        firstName: 'Jane',
-        lastName: 'Mwangi',
-        phone: '+254798765432',
-      },
-      region: 'nairobi',
-      address: null,
-      pickupStore: 'City Center Post',
-    },
-    shippingAddress: {
-      name: 'Jane Mwangi',
-      street: 'Argwings Kodhek Rd',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 38500,
-      shipping: 0,
-      total: 38500,
-    },
-    statusStep: 1, // Approved → "On the way"
-  },
-
-  {
-    id: '3',
-    orderId: 'REQ-20460',
-    title: 'Samsung Galaxy A35',
-    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
-    price: 38500,
-    status: 'Fulfilled', // From orderHistory
-    statusColor: 'green',
-    statusVariant: 'success', // From orderHistory
-    image: '/phone.png',
-    date: '12/10/2025 11:45:00',
-    invoice: 'S-INV+0942803',
-    amount: 38500,
-    dispatchTo: 'Jane Mwangi, Lavington, Nairobi',
-    statusText: 'FULFILLED',
-    items: [
-      {
-        name: 'Samsung Galaxy A35 - Navy',
-        qty: 1,
-        price: 38500,
-        total: 38500,
-      },
-    ],
-    delivery: {
-      type: 'door',
-      recipient: {
-        firstName: 'Jane',
-        lastName: 'Mwangi',
-        phone: '+254711223344',
-      },
-      region: 'nairobi',
-      address: 'James Gichuru Rd, Lavington, Nairobi, 00100',
-      pickupStore: null,
-    },
-    shippingAddress: {
-      name: 'Jane Mwangi',
-      street: 'James Gichuru Rd',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 38500,
-      shipping: 0,
-      total: 38500,
-    },
-    statusStep: 2, // Fulfilled → final step "Delivered"
-  },
-
-  {
-    id: '4',
-    orderId: 'REQ-20461',
-    title: 'Samsung Galaxy A35',
-    specs: 'Samsung Galaxy A35 - 6.4" - 8GB RAM - 128GB ROM - Awesome Navy',
-    price: 38500,
-    status: 'Declined', // From orderHistory
-    statusColor: 'red',
-    statusVariant: 'destructive', // From orderHistory
-    image: '/phone.png',
-    date: '12/10/2025 16:20:00',
-    invoice: 'S-INV+0942804',
-    amount: 38500,
-    dispatchTo: 'Jane Mwangi, Karen, Nairobi',
-    statusText: 'DECLINED',
-    items: [
-      {
-        name: 'Samsung Galaxy A35 - Navy',
-        qty: 1,
-        price: 38500,
-        total: 38500,
-      },
-    ],
-    delivery: {
-      type: 'pickup',
-      recipient: {
-        firstName: 'Jane',
-        lastName: 'Mwangi',
-        phone: '+254722334455',
-      },
-      region: 'nairobi',
-      address: null,
-      pickupStore: 'Westlands Station',
-    },
-    shippingAddress: {
-      name: 'Jane Mwangi',
-      street: 'Ngong Road',
-      city: 'Nairobi',
-      zip: '00100',
-      country: 'Kenya',
-    },
-    summary: {
-      subtotal: 38500,
-      shipping: 0,
-      total: 38500,
-    },
-    statusStep: -1, // Declined → rejected
-  },
-]
-
-const DEFAULT_ORDER_IMAGE = '/phone.png'
+const DEFAULT_ORDER_IMAGE = '/product.png'
 
 const sanitizeOrderReference = (value = '') =>
   String(value).replace(/^#/, '')
@@ -233,10 +35,53 @@ const calculateOrderLineTotals = (orderLines = []) => {
   if (!Array.isArray(orderLines)) return { subtotal: 0 }
   const subtotal = orderLines.reduce((sum, line) => {
     const qty = Number(line?.quantity) || 0
-    const price = Number(line?.unitPrice) || 0
+    const price = Number(line?.unitPrice) || Number(line?.price) || 0
     return sum + qty * price
   }, 0)
   return { subtotal }
+}
+
+const ORDER_LINE_COLLECTION_KEYS = [
+  'orderLines',
+  'items',
+  'orderLine',
+  'order_lines',
+  'lineItems',
+  'line_items',
+  'products',
+]
+
+const getLineItemsFromOrder = (order) => {
+  if (!order) return []
+  for (const key of ORDER_LINE_COLLECTION_KEYS) {
+    const collection = order?.[key]
+    if (Array.isArray(collection)) {
+      if (collection.length) return collection
+      continue
+    }
+    if (collection && typeof collection === 'object') {
+      return [collection]
+    }
+  }
+  return []
+}
+
+const pickDisplayText = (...candidates) => {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim()
+    }
+  }
+  return ''
+}
+
+const pickImage = (...candidates) => {
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim()
+    }
+  }
+  return DEFAULT_ORDER_IMAGE
 }
 
 const mapStatusVariant = (status = '') => {
@@ -279,7 +124,8 @@ const normalizeApiOrderForList = (order, index = 0) => {
   if (!order) return null
   const reference =
     order.quoteReference || order.orderId || order.id || `ORD-${index + 1}`
-  const orderLines = Array.isArray(order.orderLines) ? order.orderLines : []
+  const orderLines = getLineItemsFromOrder(order)
+  const primaryLine = orderLines[0]
   const { subtotal } = calculateOrderLineTotals(orderLines)
   const totalAmount =
     Number(order.totalAmount) ||
@@ -295,51 +141,47 @@ const normalizeApiOrderForList = (order, index = 0) => {
     createdDate: formatOrderDate(order.orderDate || order.createdDate || order.date),
     name: order.customer?.fullName || order.customer?.name || order.name || '',
     device:
-      orderLines[0]?.name || order.title || order.device || 'BNPL Order',
+      pickDisplayText(
+        primaryLine?.name,
+        primaryLine?.title,
+        primaryLine?.description,
+        primaryLine?.productName,
+        primaryLine?.product_name,
+        order.productName,
+        order.product_name,
+        order.product,
+        order.loanName,
+        order.title,
+        order.device,
+        order.name,
+      ) || 'BNPL Order',
     loanAmount: totalAmount,
     status: order.status || order.statusText || 'Pending',
     statusVariant: mapStatusVariant(order.status || order.statusText || 'Pending'),
     badgeClass: getStatusBadgeClasses(order.status || order.statusText || 'Pending'),
-    image: orderLines[0]?.image || order.image || DEFAULT_ORDER_IMAGE,
+    image: pickImage(
+      primaryLine?.image,
+      primaryLine?.thumbnail,
+      primaryLine?.photo,
+      order.image,
+      DEFAULT_ORDER_IMAGE,
+    ),
     raw: order,
   }
 }
-
-const normalizeMockOrderForList = (order, index = 0) => {
-  const ref = order.orderId || `ORD-${index + 1}`
-  return {
-    key: sanitizeOrderReference(ref),
-    linkId: sanitizeOrderReference(ref) || `${index}`,
-    orderId: ensureDisplayOrderId(ref),
-    displayId: ensureDisplayOrderId(ref),
-    createdDate: formatOrderDate(order.date || order.createdDate),
-    name: order.dispatchTo?.split(',')?.[0] || 'Customer',
-    device: order.title || order.name || 'BNPL Order',
-    loanAmount: order.amount || order.price || order.loanAmount || 0,
-    status: order.statusText || order.status || 'Pending',
-    statusVariant: mapStatusVariant(order.statusText || order.status || 'Pending'),
-    badgeClass: getStatusBadgeClasses(order.statusText || order.status || 'Pending'),
-    image: order.image || DEFAULT_ORDER_IMAGE,
-    raw: order,
-  }
-}
-
 function OrdersPage() {
   const navigate = useNavigate()
   const { data, isPending, isError, refetch } = useGetOrdersList()
 
-  const hasApiOrders = Array.isArray(data?.data) && data.data.length > 0
+  const apiOrders = Array.isArray(data?.data) ? data.data : []
 
-  const orderHistory = useMemo(() => {
-    const source = hasApiOrders ? data.data : recentOrders
-    return source
-      .map((order, index) =>
-        hasApiOrders
-          ? normalizeApiOrderForList(order, index)
-          : normalizeMockOrderForList(order, index),
-      )
-      .filter(Boolean)
-  }, [data, hasApiOrders])
+  const orderHistory = useMemo(
+    () =>
+      apiOrders
+        .map((order, index) => normalizeApiOrderForList(order, index))
+        .filter(Boolean),
+    [apiOrders],
+  )
 
   const breadcrumbItems = [
     { label: 'Home', path: '/' },
@@ -383,7 +225,7 @@ function OrdersPage() {
           </div>
         )}
 
-        {isPending && !hasApiOrders && (
+        {isPending && orderHistory.length === 0 && (
           <div className="mb-6 flex items-center gap-2 rounded-3xl border border-dashed border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
             <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
             <span>Fetching your latest orders...</span>
@@ -519,56 +361,36 @@ function OrdersPage() {
 
                     <Separator className="my-3" />
 
-                    {/* Device + Image */}
-                    <div className="flex gap-3 mb-4">
-                      <div className="flex-shrink-0 rounded-xl bg-brand-bg-2 p-2">
-                        <img
-                          src={order.image}
-                          alt={order.device}
-                          className="h-12 w-12 object-contain"
-                        />
-                      </div>
-
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                    {/* Body – Product info, price in gradient */}
+                    <div className="flex gap-4 mb-4">
+                      <img
+                        src={order.image}
+                        alt={order.device}
+                        className="h-16 w-16 rounded-2xl bg-[#F9FAFB] object-contain"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-base font-semibold text-gray-900">
                           {order.device}
                         </p>
-                        {order.name && (
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {order.name}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* ----------  Loan Amount + View Details (same line) ---------- */}
-                    <div className="flex items-center justify-between">
-                      {/* Loan Amount */}
-                      <div className="flex items-start">
-                        <DollarSign className="w-4 h-4 mr-2 mt-0.5 text-gray-500" />
-                        <div>
-                          <p className="text-xs text-gray-500">Loan Amount</p>
-                          <p className="text-sm font-semibold text-gray-900">
-                            KES {order.loanAmount.toLocaleString()}
-                          </p>
+                        <div className="text-sm text-gray-600 mt-1 flex items-center gap-2">
+                          <Package className="w-4 h-4" />
+                          {order.name || 'Customer'}
                         </div>
+                        <p
+                          className={`font-semibold text-lg bg-linear-to-b from-[#F8971D] to-[#EE3124] bg-clip-text text-transparent mt-2`}
+                        >
+                          KES {order.loanAmount.toLocaleString()}
+                        </p>
                       </div>
-
-                      {/* View Details Button */}
-                      <Button
-                        variant="gradient"
-                        size="sm"
-                        className="h-11 px-5 rounded-3xl bg-gradient-to-b from-[#F8971D] to-[#EE3124]
-                         text-white font-medium text-base shadow-sm hover:opacity-90
-                         transition-all whitespace-nowrap"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleViewDetails(order)
-                        }}
-                      >
-                        View Details
-                      </Button>
                     </div>
+
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-3xl border-[#F8971D] text-[#F8971D]"
+                      onClick={() => handleViewDetails(order)}
+                    >
+                      View Details
+                    </Button>
                   </CardContent>
                 </Card>
               )
@@ -576,6 +398,19 @@ function OrdersPage() {
           </div>
         </div>
       </main>
+    </div>
+  )
+}
+
+function orderProgress(step) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2">
+        <div className="h-3 w-3 rounded-full bg-[#F8971D]"></div>
+        <div className="h-3 w-3 rounded-full bg-[#F8971D]"></div>
+        <div className="h-3 w-3 rounded-full bg-[#F8971D]"></div>
+      </div>
+      <Progress value={step} className="w-32" />
     </div>
   )
 }

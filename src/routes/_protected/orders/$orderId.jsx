@@ -14,7 +14,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
-import { recentOrders } from './index'
 import {
   Table,
   TableHeader,
@@ -30,7 +29,7 @@ import {
   useCreateOrder,
 } from '@/lib/queries/orders'
 
-const DEFAULT_ORDER_IMAGE = '/phone.png'
+const DEFAULT_ORDER_IMAGE = '/product.png'
 
 const sanitizeOrderReference = (value = '') =>
   String(value).replace(/^#/, '')
@@ -309,23 +308,13 @@ function OrderDetailsPage() {
   const { orderId } = useParams({ from: '/_protected/orders/$orderId' })
   const navigate = useNavigate()
   const { data, isPending, isError, refetch } = useGetOrderDetail(orderId)
-  const fallbackOrder = useMemo(
-    () =>
-      recentOrders.find(
-        (o) => sanitizeOrderReference(o.orderId) === sanitizeOrderReference(orderId),
-      ),
-    [orderId],
-  )
 
   const order = useMemo(() => {
     if (Array.isArray(data?.data) && data.data.length) {
       return normalizeApiOrderDetail(data.data[0])
     }
-    if (fallbackOrder) {
-      return normalizeMockOrderDetail(fallbackOrder)
-    }
     return null
-  }, [data, fallbackOrder])
+  }, [data])
 
   const updateOrderMutation = useUpdateOrder()
   const createOrderMutation = useCreateOrder()
