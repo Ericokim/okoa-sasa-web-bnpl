@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import masokoApi from 'lib/api/masokoApi'
+import masokoApi from '@/lib/api/masokoApi'
+import bnplApi from '@/lib/api/bnplApi'
 import { queryKeys } from '@/lib/queryKeys'
 import { useSnackbar } from 'notistack'
 import { bnplQueryKeys } from '@/lib/queryKeys'
@@ -46,7 +47,7 @@ export function useCreateOrder(options = {}) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.create(),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post('/orders', payload)
+      const { data } = await bnplApi.post('/orders', payload)
       return data
     },
 
@@ -94,7 +95,7 @@ export function useUploadOrderDocuments(options = {}) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.uploadDocuments(),
     mutationFn: async ({ orderId, documents }) => {
-      const { data } = await masokoApi.patch(
+      const { data } = await bnplApi.patch(
         `/orders/${orderId}/upload-document`,
         documents,
       )
@@ -151,7 +152,7 @@ export function useGetOrdersList(filters = {}, options = {}) {
     queryKey: queryKeys.masoko.orders.list(filters),
 
     queryFn: async () => {
-      const { data } = await masokoApi.get('/orders', { params: filters })
+      const { data } = await bnplApi.get('/orders', { params: filters })
       return data
     },
 
@@ -186,7 +187,7 @@ export function useGetOrderDetail(orderId, options = {}) {
     queryKey: queryKeys.masoko.orders.detail(orderId),
 
     queryFn: async () => {
-      const { data } = await masokoApi.get(`/orders/${orderId}`)
+      const { data } = await bnplApi.get(`/orders/${orderId}`)
       return data
     },
 
@@ -224,7 +225,7 @@ export function useUpdateOrder(options = {}) {
     mutationKey: queryKeys.masoko.orders.update('order'),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.put('/orders', payload)
+      const { data } = await bnplApi.put('/orders', payload)
       return data
     },
 
@@ -273,7 +274,7 @@ export function useSaveLoanLimit(options) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.update('loan-limit'),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/loan-limit`, payload)
+      const { data } = await bnplApi.post(`/loan-limit`, payload)
       return data
     },
     onSuccess: (data) => {
@@ -305,7 +306,7 @@ export function useSavePersonalInfo(options) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.update('personal-info'),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/personal-info`, payload)
+      const { data } = await bnplApi.post(`/personal-info`, payload)
       return data
     },
     onSuccess: (data) => {
@@ -336,7 +337,7 @@ export function useSaveDeliveryDetails(options) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.update('delivery-details'),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/delivery-details`, payload)
+      const { data } = await bnplApi.post(`/delivery-details`, payload)
       return data
     },
     onSuccess: (data) => {
@@ -367,7 +368,7 @@ export function useSaveOrderSummary(options) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.update('order-summary'),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/order-summary`, payload)
+      const { data } = await bnplApi.post(`/order-summary`, payload)
       return data
     },
     onSuccess: (data) => {
@@ -398,7 +399,7 @@ export function useSaveTermsConsents(options) {
   return useMutation({
     mutationKey: queryKeys.masoko.orders.update('terms-consents'),
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post(`/terms-consents`, payload)
+      const { data } = await bnplApi.post(`/terms-consents`, payload)
       return data
     },
     onSuccess: (data) => {

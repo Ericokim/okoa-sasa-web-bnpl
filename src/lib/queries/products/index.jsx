@@ -1,7 +1,7 @@
 // src/hooks/useProducts.js
 import React from 'react'
 import { useQuery, keepPreviousData } from '@tanstack/react-query'
-import masokoApi from 'lib/api/masokoApi'
+import masokoApi from '@/lib/api/masokoApi'
 import { queryKeys } from '@/lib/queryKeys'
 import {
   cleanProductDescription,

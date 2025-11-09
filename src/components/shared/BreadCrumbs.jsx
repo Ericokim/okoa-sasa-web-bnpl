@@ -24,7 +24,6 @@ const PATH_LABELS = {
   '/account': 'My Account',
   '/account/orders': 'Orders',
   '/account/order_table': 'All Orders',
-
   '/account/settings': 'Settings',
   '/support': 'Support',
 }
@@ -136,7 +135,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
               <React.Fragment key={crumb.id}>
                 <BreadcrumbItem>
                   {isLast ? (
-                    <BreadcrumbPage className="inline-flex max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-black sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base">
+                    <BreadcrumbPage className="inline-flex cursor-pointer max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-black sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base">
                       {Icon && <Icon className="size-5 sm:size-6" aria-hidden="true" />}
                       <span className="truncate">{crumb.label}</span>
                     </BreadcrumbPage>
@@ -145,7 +144,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
                       <button
                         type="button"
                         onClick={() => handleNavigate(crumb)}
-                        className="inline-flex max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:text-brand-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base"
+                        className="inline-flex cursor-pointer max-w-[200px] items-center gap-2 rounded-2xl px-2 py-1 text-xs font-medium capitalize text-brand-mid-gray transition-colors hover:bg-brand-bg-2 hover:text-brand-black focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-primary-start sm:max-w-none sm:px-3 sm:py-1.5 sm:text-sm md:text-base"
                       >
                         {Icon && (
                           <Icon className="size-5 md:size-6" aria-hidden="true" />

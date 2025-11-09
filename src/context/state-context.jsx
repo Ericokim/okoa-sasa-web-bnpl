@@ -7,7 +7,6 @@ import React, {
   useCallback,
   useRef,
 } from 'react'
-import { productCatalog } from '@/data/products'
 import {
   safeLocalStorage,
   getStorageData as getEncryptedItem,
@@ -22,26 +21,12 @@ const buildInitialCart = () => []
 const normalizeProductId = (value) =>
   value === undefined || value === null ? '' : String(value)
 
-const buildInitialProducts = (initialCart) =>
-  productCatalog.map((product) => {
-    const cartItem = initialCart.find((item) => item.productId === product.id)
-    return {
-      ...product,
-      inCart: Boolean(cartItem),
-      cartQuantity: cartItem?.quantity ?? 0,
-    }
-  })
-
 export function ContextProvider({ children }) {
   const initialCart = useMemo(() => buildInitialCart(), [])
-  const initialProducts = useMemo(
-    () => buildInitialProducts(initialCart),
-    [initialCart],
-  )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState(initialCart)
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState([])
   const [searchTerm, setSearchTermState] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const searchDebounceRef = useRef()

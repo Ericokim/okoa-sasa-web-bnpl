@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSnackbar } from 'notistack'
-import masokoApi from '@/lib/api/api'
+import bnplApi from '@/lib/api/bnplApi'
 import { queryKeys } from '@/lib/queryKeys'
 
 /**
@@ -14,7 +14,7 @@ export function useFetchUserDetail(userId, options = {}) {
   return useQuery({
     queryKey: queryKeys.masoko.users.detail(userId),
     queryFn: async () => {
-      const { data } = await masokoApi.get(`/users/${userId}`)
+      const { data } = await bnplApi.get(`/users/${userId}`)
       return data
     },
     onError: (error) => {
@@ -46,7 +46,7 @@ export function useUpdateUser(options = {}) {
     mutationKey: queryKeys.masoko.users.update(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.put('/users', payload)
+      const { data } = await bnplApi.put('/users', payload)
       return data
     },
 
@@ -88,7 +88,7 @@ export function useUpdateUserAddress(options = {}) {
     mutationKey: queryKeys.masoko.users.addressUpdate(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.put('/users/address', payload)
+      const { data } = await bnplApi.put('/users/address', payload)
       return data
     },
 
@@ -135,7 +135,7 @@ export function useUpdateUserNotificationPreference(options = {}) {
     mutationKey: queryKeys.masoko.users.notificationPreferenceUpdate(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.put(
+      const { data } = await bnplApi.put(
         '/users/notification-preference',
         payload,
       )
@@ -183,7 +183,7 @@ export function useUpdateUserProfilePhoto(options = {}) {
     mutationKey: queryKeys.masoko.users.profilePhotoUpdate(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.put('/users/profile-photo', payload)
+      const { data } = await bnplApi.put('/users/profile-photo', payload)
       return data
     },
 
@@ -226,7 +226,7 @@ export function useUploadUserDocuments(options = {}) {
     mutationKey: queryKeys.masoko.users.uploadDocuments(),
 
     mutationFn: async ({ userId, documents }) => {
-      const { data } = await masokoApi.patch(
+      const { data } = await bnplApi.patch(
         `/users/${userId}/upload-document`,
         documents,
       )
@@ -278,7 +278,7 @@ export function useCheckUserLoanAbility(options = {}) {
     // Expected payload:
     // { basicPay: number, netPay: number, term: number }
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post('/users/loan-ability', payload)
+      const { data } = await bnplApi.post('/users/loan-ability', payload)
       return data
     },
 
@@ -332,7 +332,7 @@ export function useDeleteUser(options = {}) {
     mutationKey: queryKeys.masoko.users.delete(),
 
     mutationFn: async (userId) => {
-      const { data } = await masokoApi.delete(`/users/${userId}`)
+      const { data } = await bnplApi.delete(`/users/${userId}`)
       return data
     },
 

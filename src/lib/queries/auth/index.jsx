@@ -6,7 +6,7 @@ import { useSnackbar } from 'notistack'
 import { useStateContext } from '@/context/state-context'
 import { queryKeys } from '@/lib/queryKeys'
 import { setStorageData, clearStorageData } from '@/lib/utils'
-import masokoApi from '@/lib/api/api'
+import bnplApi from '@/lib/api/bnplApi'
 
 // Auth Storage
 const AUTH_STORAGE_KEYS = { user: 'userInfo', token: 'token', name: 'name' }
@@ -39,7 +39,7 @@ export function useLogin(options = {}) {
     mutationKey: queryKeys.masoko.auth.login(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post('/users/otp', payload)
+      const { data } = await bnplApi.post('/users/otp', payload)
       return data
     },
 
@@ -99,7 +99,7 @@ export function useOTP(options = {}) {
     mutationKey: queryKeys.masoko.auth.otp(),
 
     mutationFn: async (payload) => {
-      const { data } = await masokoApi.post('/users/otp/verify', payload)
+      const { data } = await bnplApi.post('/users/otp/verify', payload)
       return data
     },
 
