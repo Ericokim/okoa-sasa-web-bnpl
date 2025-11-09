@@ -1,8 +1,8 @@
-import { ShoppingCart } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ShoppingCartIcon } from '@/assets/icons'
+import { useStateContext } from '@/context/state-context'
 
 export function ProductCard({
   id = '1',
@@ -12,11 +12,20 @@ export function ProductCard({
   image,
   hasCartButton = false,
 }) {
+  const { removeFromCart } = useStateContext()
+
   const fallbackImage = '/product.png'
   const imageSrc =
     typeof image === 'string' && image.trim().length > 0
       ? image.trim()
       : fallbackImage
+
+  const handleCartBadgeClick = (event) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!hasCartButton) return
+    removeFromCart?.(id)
+  }
 
   return (
     <Card className="border-none bg-transparent shadow-none p-0">
@@ -40,7 +49,9 @@ export function ProductCard({
             {hasCartButton && (
               <Button
                 size="icon"
+                onClick={handleCartBadgeClick}
                 className="absolute right-4 top-4 h-12 w-12 rounded-full bg-gradient-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 transition-opacity"
+                aria-label="Remove from cart"
               >
                 <ShoppingCartIcon className="w-6 h-6 text-white" />
               </Button>
