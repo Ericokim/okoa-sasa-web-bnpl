@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -15,67 +15,130 @@ const addressSchema = z.object({
   street: z
     .string()
     .min(1, 'Address is required')
-    .min(10, 'Address must be at least 10 characters')
+    .min(2, 'Address must be at least 10 characters')
     .max(500, 'Address is too long'),
 })
 
+const ADDRESS_SECTIONS = [
+  {
+    key: 'office',
+    type: 'Office',
+    label: 'Office Address',
+  },
+  {
+    key: 'home',
+    type: 'Home',
+    label: 'Home Address',
+    aliasTypes: ['Shipping'],
+  },
+]
+
+const TYPE_ALIAS_LOOKUP = {
+  office: 'Office',
+  home: 'Home',
+  shipping: 'Shipping',
+}
+
+const SECTION_TYPE_BY_KEY = ADDRESS_SECTIONS.reduce((acc, section) => {
+  acc[section.key] = section.type
+  return acc
+}, {})
+
+const SECTION_KEY_BY_TYPE = ADDRESS_SECTIONS.reduce((acc, section) => {
+  acc[section.type] = section.key
+  section.aliasTypes?.forEach((alias) => {
+    acc[alias] = section.key
+  })
+  return acc
+}, {})
+
 const normalizeType = (type = '') => {
-  const lowered = type.toLowerCase()
-  if (lowered === 'office') return 'Office'
-  if (lowered === 'shipping' || lowered === 'home') return 'Shipping'
-  return type
+  if (typeof type !== 'string') {
+    type = `${type ?? ''}`
+  }
+  const trimmed = type.trim()
+  if (!trimmed) return ''
+  const alias = TYPE_ALIAS_LOOKUP[trimmed.toLowerCase()]
+  return alias || trimmed
+}
+
+const resolveSectionKeyFromType = (type) => {
+  const normalized = normalizeType(type)
+  return normalized ? SECTION_KEY_BY_TYPE[normalized] : undefined
 }
 
 export function RouteComponent() {
   const { user, login } = useStateContext()
   const [editing, setEditing] = useState(null)
   const addresses = Array.isArray(user?.addresses) ? user.addresses : []
-  const office = addresses.find(
-    (a) => normalizeType(a?.type) === 'Office',
-  )
-  const home = addresses.find(
-    (a) => normalizeType(a?.type) === 'Shipping',
-  )
+
+  const addressesBySection = useMemo(() => {
+    return addresses.reduce((acc, address) => {
+      const sectionKey = resolveSectionKeyFromType(address?.type)
+      if (!sectionKey) return acc
+
+      const formatted =
+        address?.address || address?.street || address?.description || ''
+
+      acc[sectionKey] = {
+        ...address,
+        address: formatted,
+        street: formatted,
+      }
+      return acc
+    }, {})
+  }, [addresses])
 
   const userId =
     user?.id || user?.userId || user?.userID || user?.idNumber || undefined
 
   const updateAddressMutation = useUpdateUserAddress({
     onSuccess: (_response, variables) => {
-      const updatedType = variables?.type || 'Office'
-      const normalizedType = normalizeType(updatedType).toLowerCase()
-      const nextAddresses = [
-        ...addresses.filter(
-          (addr) => normalizeType(addr?.type).toLowerCase() !== normalizedType,
-        ),
-        {
-          ...variables,
-          type: updatedType,
-          street: variables?.address,
-          address: variables?.address,
-        },
-      ]
+      const resolvedSectionKey =
+        resolveSectionKeyFromType(variables?.type) || editing
+
+      const canonicalType = SECTION_TYPE_BY_KEY[resolvedSectionKey]
+      if (!canonicalType) return
+      const nextAddressValue = variables?.address?.trim?.() || ''
+
+      const filtered = addresses.filter((addr) => {
+        const addrSectionKey = resolveSectionKeyFromType(addr?.type)
+        if (!addrSectionKey) return true
+        return addrSectionKey !== resolvedSectionKey
+      })
+
+      const updatedEntry = {
+        ...(addressesBySection[resolvedSectionKey] || {}),
+        type: canonicalType,
+        address: nextAddressValue,
+        street: nextAddressValue,
+      }
 
       login?.({
         ...(user || {}),
-        addresses: nextAddresses,
+        addresses: [...filtered, updatedEntry],
       })
+
       setEditing(null)
     },
   })
 
-  const startEdit = (type) => setEditing(type)
+  const startEdit = (sectionKey) => {
+    if (SECTION_TYPE_BY_KEY[sectionKey]) {
+      setEditing(sectionKey)
+    }
+  }
 
-  const saveAddress = (type, data) => {
+  const saveAddress = (sectionKey, data) => {
     if (!userId) return
+    const canonicalType = SECTION_TYPE_BY_KEY[sectionKey]
+    if (!canonicalType) return
 
-    const payload = {
+    updateAddressMutation.mutate({
       userId,
       address: data.street.trim(),
-      type: type === 'office' ? 'Office' : 'Shipping',
-    }
-
-    updateAddressMutation.mutate(payload)
+      type: canonicalType,
+    })
   }
 
   const cancelEdit = () => setEditing(null)
@@ -88,24 +151,22 @@ export function RouteComponent() {
 
       <hr className="my-4 border-gray-200" />
 
-      {['office', 'home'].map((type, index) => {
-        const isOffice = type === 'office'
-        const label = isOffice ? 'Office Address' : 'Home Address'
-        const addressData = isOffice ? office : home
-        const hasAddress = Boolean(addressData?.street)
-        const isEditing = editing === type
+      {ADDRESS_SECTIONS.map((section, index) => {
+        const addressData = addressesBySection[section.key]
+        const hasAddress = Boolean(addressData?.address || addressData?.street)
+        const isEditing = editing === section.key
 
         return (
-          <div key={type}>
+          <div key={section.key}>
             <div className="rounded-xl border p-4">
               <div className="flex justify-between items-start gap-4 mb-2">
                 <p className="font-sans text-base font-normal leading-snug text-gray-600">
-                  {label}
+                  {section.label}
                 </p>
 
                 {!isEditing && (
                   <button
-                    onClick={() => startEdit(type)}
+                    onClick={() => startEdit(section.key)}
                     className="cursor-pointer flex items-center gap-1 rounded-full border border-orange-500 px-3 py-1 text-sm text-orange-600 hover:bg-orange-50"
                   >
                     <EditIcon />
@@ -116,7 +177,7 @@ export function RouteComponent() {
 
               {isEditing ? (
                 <AddressEditForm
-                  type={type}
+                  sectionKey={section.key}
                   initialData={addressData}
                   onSave={saveAddress}
                   onCancel={cancelEdit}
@@ -124,12 +185,16 @@ export function RouteComponent() {
                 />
               ) : (
                 <p className="font-sans font-medium text-lg capitalize text-[#252525] whitespace-pre-line text-muted-foreground">
-                  {hasAddress ? addressData.street : 'No address on file yet.'}
+                  {hasAddress
+                    ? addressData.address || addressData.street
+                    : 'No address on file yet.'}
                 </p>
               )}
             </div>
 
-            {index === 0 && <Separator className="my-6" />}
+            {index < ADDRESS_SECTIONS.length - 1 && (
+              <Separator className="my-6" />
+            )}
           </div>
         )
       })}
@@ -137,15 +202,16 @@ export function RouteComponent() {
   )
 }
 
-function AddressEditForm({ type, initialData, onSave, onCancel, isSubmitting }) {
+function AddressEditForm({ sectionKey, initialData, onSave, onCancel, isSubmitting }) {
   const form = useForm({
     resolver: zodResolver(addressSchema),
-    defaultValues: { street: initialData?.street || '' },
+    defaultValues: {
+      street: initialData?.address || initialData?.street || '',
+    },
   })
 
-  const handleSave = (data) => onSave(type, data)
+  const handleSave = (data) => onSave(sectionKey, data)
 
-  
   const handleCancel = () => {
     form.reset()
     onCancel()
