@@ -358,9 +358,14 @@ function OrderDetailsPage() {
     { label: `Order ${order.orderId}`, path: `#`, isCurrent: true },
   ]
 
+  const isFinalStatus = ['fulfilled', 'delivered', 'completed'].includes(
+    (order.status || '').toLowerCase(),
+  )
+
   const canAcknowledge =
     order.statusStep >= 0 &&
-    order.statusStep < steps.length &&
+    !isFinalStatus &&
+    order.statusStep < steps.length - 1 &&
     Boolean(order.rawReference)
 
   const canReorder = Boolean(
@@ -373,7 +378,7 @@ function OrderDetailsPage() {
     if (!order.rawReference) return
     updateOrderMutation.mutate({
       orderId: order.rawReference,
-      status: 'Fulfilled',
+      status: 'Delivered',
     })
   }
 
