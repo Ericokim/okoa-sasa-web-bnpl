@@ -28,6 +28,7 @@ import {
   useUpdateOrder,
   useCreateOrder,
 } from '@/lib/queries/orders'
+import { useStateContext } from '@/context/state-context'
 
 const DEFAULT_ORDER_IMAGE = '/product.png'
 
@@ -307,6 +308,7 @@ function OrderStepper({ steps, currentStep, isRejected }) {
 function OrderDetailsPage() {
   const { orderId } = useParams({ from: '/_protected/orders/$orderId' })
   const navigate = useNavigate()
+  const { user } = useStateContext()
   const { data, isPending, isError, refetch } = useGetOrderDetail(orderId)
 
   const order = useMemo(() => {
@@ -368,6 +370,29 @@ function OrderDetailsPage() {
     order.statusStep < steps.length - 1 &&
     Boolean(order.rawReference)
 
+  const buildActorPayload = () => {
+    const nameFromParts = [user?.firstName, user?.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim()
+
+    const name =
+      user?.fullName ||
+      nameFromParts ||
+      user?.name ||
+      user?.username ||
+      'Portal User'
+
+    const email =
+      user?.email ||
+      user?.contactEmail ||
+      user?.username ||
+      user?.userEmail ||
+      ''
+
+    return { name, email }
+  }
+
   const canReorder = Boolean(
     order.rawCustomer &&
       Array.isArray(order.rawOrderLines) &&
@@ -376,9 +401,18 @@ function OrderDetailsPage() {
 
   const handleMarkAsReceived = () => {
     if (!order.rawReference) return
+
+    const actor = buildActorPayload()
+    const noteMessage = `Order ${order.orderId} marked as received via customer portal by ${actor.name}`
+
     updateOrderMutation.mutate({
       orderId: order.rawReference,
       status: 'Delivered',
+      actor,
+      note: {
+        notes: noteMessage,
+        createdBy: { ...actor },
+      },
     })
   }
 
