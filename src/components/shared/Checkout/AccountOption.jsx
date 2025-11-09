@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from 'react'
-import { Link } from '@tanstack/react-router'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AuthDialog } from '../AuthDialog'
@@ -12,13 +11,25 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   const [isAccepted, setIsAccepted] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [error, setError] = useState(null)
-  const { getCheckoutFormData, saveCheckoutFormData } = useStateContext()
+  const {
+    getCheckoutFormData,
+    saveCheckoutFormData,
+    isAuthenticated,
+    user,
+    clearCart,
+    resetCheckout,
+    setIsCheckoutCompleted,
+  } = useStateContext()
 
   const { mutateAsync: createOrder, isPending } = useCreateOrder({
     onSuccess: (response) => {
+      const payload = response?.data?.[0] || response?.data
       saveCheckoutFormData(6, {
-        orderResponse: response?.data?.[0] || response?.data,
+        orderResponse: payload,
       })
+      clearCart?.()
+      setIsCheckoutCompleted?.(true)
+      resetCheckout?.()
     },
   })
 
@@ -156,6 +167,19 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
     }
   }
 
+  const userDisplayName = useMemo(() => {
+    if (!user) return ''
+    return (
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+      user.email ||
+      user.phoneNumber ||
+      ''
+    )
+  }, [user])
+
+  const showAccountPrompt = !isAuthenticated
+
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-0 sm:p-0 gap-6">
       <div className="bg-white w-full border h-auto rounded-4xl p-4 sm:p-6">
@@ -178,74 +202,104 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
             </Alert>
           )}
 
-          {/* Checkbox Section */}
-          <div className="mb-6">
-            <div className="flex flex-row items-start sm:items-left p-0 gap-3 w-full h-auto sm:h-[34px]">
-              <Checkbox
-                id="account-terms"
-                checked={isAccepted}
-                onCheckedChange={setIsAccepted}
-                disabled={isPending}
-                className="flex flex-col justify-center items-center w-6 h-6 sm:w-[34px] sm:h-[34px] border-2 border-[#E8ECF4] rounded-lg sm:rounded-xl p-0 gap-2.5 mt-1 sm:mt-0"
-              />
-              <label
-                htmlFor="account-terms"
-                className="w-full flex flex-wrap items-left lg:mt-1 md:mt-1 text-left text-base sm:text-lg font-medium leading-[1.4] capitalize text-[#0D0B26] cursor-pointer select-none"
-              >
-                <span className="mr-1">
-                  No Account? Create Okoa Sasa shopping account
-                </span>
-              </label>
-            </div>
-          </div>
+          {showAccountPrompt ? (
+            <>
+              <div className="mb-6">
+                <div className="flex flex-row items-start sm:items-left p-0 gap-3 w-full h-auto sm:h-[34px]">
+                  <Checkbox
+                    id="account-terms"
+                    checked={isAccepted}
+                    onCheckedChange={setIsAccepted}
+                    disabled={isPending}
+                    className="flex flex-col justify-center items-center w-6 h-6 sm:w-[34px] sm:h-[34px] border-2 border-[#E8ECF4] rounded-lg sm:rounded-xl p-0 gap-2.5 mt-1 sm:mt-0"
+                  />
+                  <label
+                    htmlFor="account-terms"
+                    className="w-full flex flex-wrap items-left lg:mt-1 md:mt-1 text-left text-base sm:text-lg font-medium leading-[1.4] capitalize text-[#0D0B26] cursor-pointer select-none"
+                  >
+                    <span className="mr-1">
+                      No Account? Create Okoa Sasa shopping account
+                    </span>
+                  </label>
+                </div>
+              </div>
 
-          {/* Action Buttons - Conditionally rendered based on checkbox state */}
-          {!isAccepted ? (
-            // Original buttons when checkbox is unchecked
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-              <Button
-                onClick={() => setShowAuthDialog(true)}
-                disabled={isPending}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-              >
-                Sign In
-              </Button>
+              {!isAccepted ? (
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                  <Button
+                    onClick={() => setShowAuthDialog(true)}
+                    disabled={isPending}
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                  >
+                    Sign In
+                  </Button>
 
-              <Button
-                onClick={handleGuestCheckout}
-                disabled={isPending}
-                variant="outline"
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-              >
-                {isPending ? 'Processing...' : 'Continue As Guest'}
-              </Button>
-            </div>
+                  <Button
+                    onClick={handleGuestCheckout}
+                    disabled={isPending}
+                    variant="outline"
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                  >
+                    {isPending ? 'Processing...' : 'Continue As Guest'}
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                  <Button
+                    onClick={handleSubmitOrder}
+                    disabled={isPending}
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                  >
+                    {isPending ? 'Submitting...' : 'Submit Order'}
+                  </Button>
+
+                  <Button
+                    onClick={onPrevious}
+                    disabled={isPending}
+                    variant="outline"
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                  >
+                    Back
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
-            // New buttons when checkbox is checked
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-              <Button
-                onClick={handleSubmitOrder}
-                disabled={isPending}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-              >
-                {isPending ? 'Submitting...' : 'Submit Order'}
-              </Button>
+            <>
+              {/* <div className="mb-6 rounded-2xl border border-[#FEE6D5] bg-[#FFF8F1] p-4 text-sm text-[#7A4E1D]">
+                <p className="font-medium">
+                  {userDisplayName ? `Signed in as ${userDisplayName}.` : 'You are signed in.'}
+                </p>
+                <p>
+                  We&apos;ll use your account details to complete this order. Review and submit when ready.
+                </p>
+              </div> */}
 
-              <Button
-                onClick={onPrevious}
-                disabled={isPending}
-                variant="outline"
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-              >
-                Back
-              </Button>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                <Button
+                  onClick={handleSubmitOrder}
+                  disabled={isPending}
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                >
+                  {isPending ? 'Submitting...' : 'Submit Order'}
+                </Button>
+
+                <Button
+                  onClick={onPrevious}
+                  disabled={isPending}
+                  variant="outline"
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                >
+                  Back
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Back Button - Hidden when checkbox is checked */}
-      {!isAccepted && (
+      {!isAccepted && showAccountPrompt && (
         <div className="flex justify-end w-full">
           <Button
             onClick={onPrevious}

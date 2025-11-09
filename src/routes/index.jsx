@@ -578,7 +578,7 @@ function IndexPage() {
                     id={product.id}
                     title={product.name}
                     price={priceLabel}
-                    oldPrice={oldPriceLabel}
+                    oldPrice={""}
                     image={product.image}
                     hasCartButton={product.inCart}
                   />

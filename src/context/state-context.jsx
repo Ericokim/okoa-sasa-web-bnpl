@@ -21,6 +21,63 @@ const buildInitialCart = () => []
 const normalizeProductId = (value) =>
   value === undefined || value === null ? '' : String(value)
 
+const CHECKOUT_FORM_STORAGE_KEY = 'checkout-form-data'
+const CHECKOUT_STEP_STORAGE_KEY = 'checkout-active-step'
+
+const sanitizeForStorage = (value, seen = new WeakSet()) => {
+  if (value === null || typeof value !== 'object') {
+    return value
+  }
+
+  const FileCtor = typeof File !== 'undefined' ? File : null
+  const BlobCtor = typeof Blob !== 'undefined' ? Blob : null
+
+  if (FileCtor && value instanceof FileCtor) {
+    return null
+  }
+  if (BlobCtor && value instanceof BlobCtor) {
+    return null
+  }
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  if (seen.has(value)) {
+    return null
+  }
+  seen.add(value)
+
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeForStorage(item, seen))
+  }
+
+  return Object.entries(value).reduce((acc, [key, val]) => {
+    acc[key] = sanitizeForStorage(val, seen)
+    return acc
+  }, {})
+}
+
+const loadCheckoutFormData = () => {
+  try {
+    const raw = safeLocalStorage.getItem(CHECKOUT_FORM_STORAGE_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+const loadCheckoutStep = () => {
+  try {
+    const raw = safeLocalStorage.getItem(CHECKOUT_STEP_STORAGE_KEY)
+    const parsed = Number(raw)
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+  } catch {
+    return 1
+  }
+}
+
 export function ContextProvider({ children }) {
   const initialCart = useMemo(() => buildInitialCart(), [])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -30,8 +87,12 @@ export function ContextProvider({ children }) {
   const [searchTerm, setSearchTermState] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const searchDebounceRef = useRef()
-  const [checkoutStep, setCheckoutStep] = useState(1)
-  const [checkoutFormData, setCheckoutFormData] = useState({})
+  const [checkoutStep, setCheckoutStepState] = useState(() =>
+    loadCheckoutStep(),
+  )
+  const [checkoutFormData, setCheckoutFormDataState] = useState(() =>
+    loadCheckoutFormData(),
+  )
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
 
   useEffect(() => {
@@ -385,12 +446,52 @@ export function ContextProvider({ children }) {
     [products],
   )
 
-  const saveCheckoutFormData = useCallback((stepId, data) => {
-    setCheckoutFormData((prev) => ({
-      ...prev,
-      [stepId]: data,
-    }))
+  const persistCheckoutFormData = useCallback((data) => {
+    try {
+      const sanitized = sanitizeForStorage(data)
+      safeLocalStorage.setItem(
+        CHECKOUT_FORM_STORAGE_KEY,
+        JSON.stringify(sanitized),
+      )
+    } catch {
+      // ignore persistence errors
+    }
   }, [])
+
+  const persistCheckoutStep = useCallback((step) => {
+    try {
+      safeLocalStorage.setItem(CHECKOUT_STEP_STORAGE_KEY, String(step))
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  const setCheckoutStep = useCallback(
+    (value) => {
+      setCheckoutStepState((prev) => {
+        const nextValue = typeof value === 'function' ? value(prev) : value
+        const normalized =
+          Number.isFinite(nextValue) && nextValue > 0 ? nextValue : 1
+        persistCheckoutStep(normalized)
+        return normalized
+      })
+    },
+    [persistCheckoutStep],
+  )
+
+  const saveCheckoutFormData = useCallback(
+    (stepId, data) => {
+      setCheckoutFormDataState((prev) => {
+        const next = {
+          ...prev,
+          [stepId]: data,
+        }
+        persistCheckoutFormData(next)
+        return next
+      })
+    },
+    [persistCheckoutFormData],
+  )
 
   const getCheckoutFormData = useCallback(
     (stepId) => {
@@ -399,11 +500,21 @@ export function ContextProvider({ children }) {
     [checkoutFormData],
   )
 
+  const clearCheckoutPersistence = useCallback(() => {
+    try {
+      safeLocalStorage.removeItem(CHECKOUT_FORM_STORAGE_KEY)
+      safeLocalStorage.removeItem(CHECKOUT_STEP_STORAGE_KEY)
+    } catch {
+      // ignore
+    }
+  }, [])
+
   const resetCheckout = useCallback(() => {
     setCheckoutStep(1)
-    setCheckoutFormData({})
+    setCheckoutFormDataState({})
     setIsCheckoutCompleted(false)
-  }, [])
+    clearCheckoutPersistence()
+  }, [setCheckoutStep, clearCheckoutPersistence])
 
   const goToCheckoutStep = useCallback((step) => {
     setCheckoutStep(step)
