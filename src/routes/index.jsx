@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { useProductList } from '@/lib/queries/products'
 import { DEFAULT_FILTER_VALUES } from '@/constants/filterDefaults'
 import logo from '@/assets/images/primaryLogoVertical.png'
+import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 const LogoLoader = () => (
   <div className="flex flex-col items-center justify-center gap-4 py-16">
@@ -121,17 +122,9 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
-  const {
-    debouncedSearchTerm,
-    setProducts,
-    cart,
-    products: contextProducts,
-  } = useStateContext()
+  const { debouncedSearchTerm, products: contextProducts } = useStateContext()
   const { data: fetchedProducts = [], isLoading } = useProductList()
-  const apiProducts = useMemo(
-    () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
-    [fetchedProducts],
-  )
+  useSyncProductsWithCart(fetchedProducts, { isLoading })
   const products = useMemo(
     () => (Array.isArray(contextProducts) ? contextProducts : []),
     [contextProducts],
@@ -141,37 +134,6 @@ function IndexPage() {
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showLoanCalculator, setShowLoanCalculator] = useState(false)
-
-  useEffect(() => {
-    if (isLoading) {
-      return
-    }
-
-    setProducts((prevProducts = []) => {
-      const nextProducts = apiProducts.map((product) => {
-        const cartItem = cart.find(
-          (item) => String(item.productId) === String(product.id),
-        )
-        const quantity = cartItem?.quantity || 0
-        return {
-          ...product,
-          inCart: !!cartItem,
-          quantity,
-          cartQuantity: quantity,
-        }
-      })
-
-      if (prevProducts.length !== nextProducts.length) {
-        return nextProducts
-      }
-
-      const isSame = prevProducts.every(
-        (prevItem, index) => prevItem === nextProducts[index],
-      )
-
-      return isSame ? prevProducts : nextProducts
-    })
-  }, [apiProducts, cart, setProducts, isLoading])
 
   const filterOptions = useMemo(() => {
     if (products.length === 0) {

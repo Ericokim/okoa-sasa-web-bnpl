@@ -16,10 +16,40 @@ import {
 
 const StateContext = createContext(null)
 
-const buildInitialCart = () => []
-
 const normalizeProductId = (value) =>
   value === undefined || value === null ? '' : String(value)
+
+const CART_STORAGE_KEY = 'okoa-sasa-cart'
+
+const readStoredCart = () => {
+  try {
+    const rawValue = safeLocalStorage.getItem(CART_STORAGE_KEY)
+    if (!rawValue) return []
+    const parsed = JSON.parse(rawValue)
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .map((item) => {
+        const productId = normalizeProductId(
+          item?.productId ?? item?.id ?? item?.sku,
+        )
+        const quantity = Math.max(1, Number(item?.quantity) || 1)
+        return productId ? { productId, quantity } : null
+      })
+      .filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+const writeStoredCart = (items) => {
+  try {
+    safeLocalStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+  } catch {
+    // ignore persistence errors
+  }
+}
+
+const buildInitialCart = () => readStoredCart()
 
 const CHECKOUT_FORM_STORAGE_KEY = 'checkout-form-data'
 const CHECKOUT_STEP_STORAGE_KEY = 'checkout-active-step'
@@ -94,6 +124,10 @@ export function ContextProvider({ children }) {
     loadCheckoutFormData(),
   )
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
+
+  useEffect(() => {
+    writeStoredCart(cart)
+  }, [cart])
 
   useEffect(() => {
     if (searchDebounceRef.current) {
