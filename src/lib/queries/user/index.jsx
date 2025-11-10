@@ -3,6 +3,15 @@ import { useSnackbar } from 'notistack'
 import bnplApi from '@/lib/api/bnplApi'
 import { queryKeys } from '@/lib/queryKeys'
 
+const resolveUserIdentifier = (...candidates) => {
+  for (const value of candidates) {
+    if (value !== undefined && value !== null && value !== '') {
+      return value
+    }
+  }
+  return undefined
+}
+
 /**
  * useFetchUserDetail
  * GET /v1/users/:id
@@ -41,6 +50,11 @@ export function useFetchUserDetail(userId, options = {}) {
 export function useUpdateUser(options = {}) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOverrides
+  } = options
 
   return useMutation({
     mutationKey: queryKeys.masoko.users.update(),
@@ -50,18 +64,40 @@ export function useUpdateUser(options = {}) {
       return data
     },
 
-    onSuccess: (response) => {
+    onSuccess: (response, payload, context) => {
       const message = response?.status?.message || 'User updated successfully'
       enqueueSnackbar(message, { variant: 'success', autoHideDuration: 4000 })
 
-      // Invalidate every possible list cache
+      const resolvedUserId = resolveUserIdentifier(
+        payload?.userId,
+        payload?.id,
+        payload?.idNumber,
+        response?.data?.userId,
+        response?.data?.id,
+      )
+
+      if (resolvedUserId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.masoko.users.detail(resolvedUserId),
+        })
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.masoko.users.addresses(resolvedUserId),
+        })
+      }
+
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.masoko.users.me(),
+      })
+
       queryClient.invalidateQueries({
         queryKey: queryKeys.masoko.users.all(),
         type: 'all',
       })
+
+      onSuccessOverride?.(response, payload, context)
     },
 
-    onError: (error) => {
+    onError: (error, payload, context) => {
       const errMsg =
         error?.response?.data?.status?.message ||
         error?.response?.data?.message ||
@@ -69,9 +105,11 @@ export function useUpdateUser(options = {}) {
         'Failed to update user'
 
       enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+
+      onErrorOverride?.(error, payload, context)
     },
 
-    ...options,
+    ...mutationOverrides,
   })
 }
 
@@ -83,6 +121,11 @@ export function useUpdateUser(options = {}) {
 export function useUpdateUserAddress(options = {}) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOverrides
+  } = options
 
   return useMutation({
     mutationKey: queryKeys.masoko.users.addressUpdate(),
@@ -92,7 +135,7 @@ export function useUpdateUserAddress(options = {}) {
       return data
     },
 
-    onSuccess: (response, payload) => {
+    onSuccess: (response, payload, context) => {
       const message =
         response?.status?.message || 'Address updated successfully'
       enqueueSnackbar(message, { variant: 'success', autoHideDuration: 4000 })
@@ -106,9 +149,11 @@ export function useUpdateUserAddress(options = {}) {
       queryClient.invalidateQueries({
         queryKey: queryKeys.masoko.users.detail(payload?.userId),
       })
+
+      onSuccessOverride?.(response, payload, context)
     },
 
-    onError: (error) => {
+    onError: (error, payload, context) => {
       const errMsg =
         error?.response?.data?.status?.message ||
         error?.response?.data?.message ||
@@ -116,9 +161,11 @@ export function useUpdateUserAddress(options = {}) {
         'Failed to update address'
 
       enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+
+      onErrorOverride?.(error, payload, context)
     },
 
-    ...options,
+    ...mutationOverrides,
   })
 }
 
@@ -130,6 +177,11 @@ export function useUpdateUserAddress(options = {}) {
 export function useUpdateUserNotificationPreference(options = {}) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOverrides
+  } = options
 
   return useMutation({
     mutationKey: queryKeys.masoko.users.notificationPreferenceUpdate(),
@@ -142,7 +194,7 @@ export function useUpdateUserNotificationPreference(options = {}) {
       return data
     },
 
-    onSuccess: (response, payload) => {
+    onSuccess: (response, payload, context) => {
       const message =
         response?.status?.message ||
         'Notification preferences updated successfully'
@@ -154,9 +206,11 @@ export function useUpdateUserNotificationPreference(options = {}) {
       })
       queryClient.invalidateQueries({ queryKey: queryKeys.masoko.users.all() })
       queryClient.invalidateQueries({ queryKey: queryKeys.masoko.users.me() })
+
+      onSuccessOverride?.(response, payload, context)
     },
 
-    onError: (error) => {
+    onError: (error, payload, context) => {
       const errMsg =
         error?.response?.data?.status?.message ||
         error?.response?.data?.message ||
@@ -164,9 +218,11 @@ export function useUpdateUserNotificationPreference(options = {}) {
         'Failed to update notification preferences'
 
       enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+
+      onErrorOverride?.(error, payload, context)
     },
 
-    ...options,
+    ...mutationOverrides,
   })
 }
 
@@ -178,6 +234,11 @@ export function useUpdateUserNotificationPreference(options = {}) {
 export function useUpdateUserProfilePhoto(options = {}) {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOverrides
+  } = options
 
   return useMutation({
     mutationKey: queryKeys.masoko.users.profilePhotoUpdate(),
@@ -187,19 +248,33 @@ export function useUpdateUserProfilePhoto(options = {}) {
       return data
     },
 
-    onSuccess: (response, payload) => {
+    onSuccess: (response, payload, context) => {
       const message =
         response?.status?.message || 'Profile photo updated successfully'
       enqueueSnackbar(message, { variant: 'success', autoHideDuration: 4000 })
+
+      const resolvedUserId = resolveUserIdentifier(
+        payload?.userId,
+        payload?.id,
+        response?.data?.userId,
+        response?.data?.id,
+      )
 
       queryClient.invalidateQueries({
         queryKey: queryKeys.masoko.users.all(),
         type: 'all',
       })
       queryClient.invalidateQueries({ queryKey: queryKeys.masoko.users.me() })
+      if (resolvedUserId) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.masoko.users.detail(resolvedUserId),
+        })
+      }
+
+      onSuccessOverride?.(response, payload, context)
     },
 
-    onError: (error) => {
+    onError: (error, payload, context) => {
       const errMsg =
         error?.response?.data?.status?.message ||
         error?.response?.data?.message ||
@@ -207,9 +282,11 @@ export function useUpdateUserProfilePhoto(options = {}) {
         'Failed to update profile photo'
 
       enqueueSnackbar(errMsg, { variant: 'error', autoHideDuration: 4000 })
+
+      onErrorOverride?.(error, payload, context)
     },
 
-    ...options,
+    ...mutationOverrides,
   })
 }
 
