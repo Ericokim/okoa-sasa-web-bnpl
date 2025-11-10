@@ -12,17 +12,29 @@ const DoneScreen = () => {
   const orderResponse = finalStepData?.orderResponse || {}
   const orderSummary = getCheckoutFormData?.(4)?.cartSummary || {}
   const orderLines = getCheckoutFormData?.(4)?.orderPayload?.orderLines || []
+  const orderStatus =
+    finalStepData?.orderStatus || finalStepData?.rawResponse?.status || {}
 
-  const orderNumber =
+  const orderIdentifier =
     orderResponse?.quoteReference ||
     orderResponse?.orderReference ||
     orderResponse?.orderId ||
     orderResponse?.id ||
-    (orderLines?.[0]?.sku ? `#${orderLines[0].sku}` : null)
+    null
 
-  const headline = orderNumber
-    ? `Your Order #${orderNumber} has been received`
+  const fallbackOrderLabel =
+    orderIdentifier || (orderLines?.[0]?.sku ? orderLines[0].sku : null)
+
+  const headline = fallbackOrderLabel
+    ? `Your Order #${fallbackOrderLabel} has been received`
     : 'Your order has been received'
+
+  const statusMessage =
+    orderStatus?.message ||
+    finalStepData?.rawResponse?.status?.message ||
+    ''
+  const statusCode =
+    orderStatus?.code || finalStepData?.rawResponse?.status?.code || ''
 
   const primaryItem = useMemo(() => {
     if (Array.isArray(orderLines) && orderLines.length) {
@@ -46,35 +58,48 @@ const DoneScreen = () => {
         </p>
       </div>
 
-      {/* <div className="mt-6 w-full max-w-xl rounded-2xl border border-[#F4E7D8] bg-[#FFF9F3] p-4 text-left">
+      <div className="mt-6 w-full max-w-xl rounded-2xl border border-[#F4E7D8] bg-[#FFF9F3] p-4 text-left space-y-3">
+        <p className="text-sm font-medium text-[#7A4E1D] uppercase tracking-wide">
+          Order details
+        </p>
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-[#7A4E1D] tracking-wide uppercase">
+            Order ID
+          </span>
+          <span className="text-base font-semibold text-[#1C1917]">
+            {fallbackOrderLabel || 'Pending assignment'}
+          </span>
+        </div>
+        {statusMessage && (
+          <div className="text-sm text-[#4B5563]">
+            <span className="font-semibold text-[#1C1917] mr-1">Status:</span>
+            {statusMessage}
+            {statusCode && (
+              <span className="ml-1 text-xs text-[#7A4E1D]">({statusCode})</span>
+            )}
+          </div>
+        )}
         {primaryItem ? (
-          <>
-            <p className="text-sm font-medium text-[#7A4E1D] uppercase tracking-wide mb-2">
-              Order summary
+          <div className="text-sm text-[#4B5563]">
+            <p className="font-semibold text-[#1C1917]">{primaryItem.name}</p>
+            <p>
+              Qty {primaryItem.quantity} · SKU {primaryItem.sku}
             </p>
-            <div className="flex flex-col gap-1">
-              <p className="text-base font-semibold text-[#1C1917]">
-                {primaryItem.name}
-              </p>
-              <p className="text-sm text-[#4B5563]">
-                Qty {primaryItem.quantity} · SKU {primaryItem.sku}
-              </p>
-            </div>
-          </>
+          </div>
         ) : (
-          <p className="text-sm font-medium text-[#7A4E1D]">
+          <p className="text-sm text-[#4B5563]">
             We&apos;ll email you a detailed order summary shortly.
           </p>
         )}
         {orderSummary?.grandTotal !== undefined && (
-          <p className="mt-3 text-sm text-[#4B5563]">
-            Total paid:{' '}
+          <p className="text-sm text-[#4B5563]">
+            Total amount:{' '}
             <span className="font-semibold text-[#1C1917]">
               {formatCurrency(orderSummary.grandTotal)}
             </span>
           </p>
         )}
-      </div> */}
+      </div>
 
       <div className="h-[46px] w-[344px] mt-6 flex justify-center">
         <Button

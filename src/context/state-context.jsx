@@ -12,12 +12,80 @@ import {
   getStorageData as getEncryptedItem,
   setStorageData as setEncryptedItem,
   clearStorageData as clearEncryptedStorage,
+  formatCurrency,
 } from '@/lib/utils'
 
 const StateContext = createContext(null)
 
 const normalizeProductId = (value) =>
   value === undefined || value === null ? '' : String(value)
+
+const FALLBACK_PRODUCT_IMAGE = '/product.png'
+
+const toNumber = (value) => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const buildProductSnapshot = (product) => {
+  if (!product || typeof product !== 'object') return null
+  const id = normalizeProductId(product.id ?? product.productId ?? product.sku)
+  const priceValue =
+    product.price ?? product.amount ?? product.priceValue ?? product.priceLabel
+  const price = toNumber(priceValue)
+  const primaryImage = (() => {
+    if (typeof product.image === 'string' && product.image.trim()) {
+      return product.image.trim()
+    }
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      const candidate = product.images[0]
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim()
+      }
+    }
+    if (typeof product.thumbnail === 'string' && product.thumbnail.trim()) {
+      return product.thumbnail.trim()
+    }
+    return FALLBACK_PRODUCT_IMAGE
+  })()
+
+  const title = product.title ?? product.name ?? product.productName ?? ''
+
+  return {
+    id,
+    sku: product.sku ? String(product.sku) : undefined,
+    title,
+    name: product.name ?? title,
+    brand: product.brand ?? '',
+    category: product.category ?? '',
+    description:
+      product.description ?? product.descriptionText ?? product.summary ?? '',
+    image: primaryImage,
+    price,
+    priceLabel:
+      product.priceLabel ?? (price > 0 ? formatCurrency(price) : undefined),
+  }
+}
+
+const sanitizeCartProductSnapshot = (value) => {
+  if (!value || typeof value !== 'object') return null
+  const price = toNumber(value.price)
+  return {
+    id: normalizeProductId(value.id ?? value.productId ?? value.sku),
+    sku: value.sku ? String(value.sku) : undefined,
+    title: value.title ?? value.name ?? '',
+    name: value.name ?? value.title ?? '',
+    brand: value.brand ?? '',
+    category: value.category ?? '',
+    description: value.description ?? '',
+    image:
+      typeof value.image === 'string' && value.image.trim()
+        ? value.image.trim()
+        : FALLBACK_PRODUCT_IMAGE,
+    price,
+    priceLabel: value.priceLabel ?? (price > 0 ? formatCurrency(price) : undefined),
+  }
+}
 
 const CART_STORAGE_KEY = 'okoa-sasa-cart'
 
@@ -33,7 +101,10 @@ const readStoredCart = () => {
           item?.productId ?? item?.id ?? item?.sku,
         )
         const quantity = Math.max(1, Number(item?.quantity) || 1)
-        return productId ? { productId, quantity } : null
+        const productSnapshot = sanitizeCartProductSnapshot(
+          item?.productSnapshot ?? item?.snapshot ?? null,
+        )
+        return productId ? { productId, quantity, productSnapshot } : null
       })
       .filter(Boolean)
   } catch {
@@ -266,10 +337,20 @@ export function ContextProvider({ children }) {
   }, [])
 
   const addToCart = useCallback(
-    (productId, quantity = 1) => {
+    (productId, quantity = 1, productDetails = null) => {
       if (!quantity || quantity <= 0) return
       const normalizedQuantity = Math.max(1, Number(quantity) || 0)
       const normalizedId = normalizeProductId(productId)
+      const resolvedProductDetails =
+        productDetails ??
+        products.find((product) => {
+          if (!product) return false
+          return (
+            normalizeProductId(product.id) === normalizedId ||
+            normalizeProductId(product.sku) === normalizedId
+          )
+        })
+      const snapshot = buildProductSnapshot(resolvedProductDetails)
       setCart((prevCart) => {
         const existing = prevCart.find(
           (item) => normalizeProductId(item.productId) === normalizedId,
@@ -284,7 +365,11 @@ export function ContextProvider({ children }) {
 
           const nextCart = prevCart.map((item) =>
             normalizeProductId(item.productId) === normalizedId
-              ? { ...item, quantity: updatedQuantity }
+              ? {
+                  ...item,
+                  quantity: updatedQuantity,
+                  productSnapshot: snapshot ?? item.productSnapshot,
+                }
               : item,
           )
 
@@ -303,11 +388,15 @@ export function ContextProvider({ children }) {
 
         return [
           ...prevCart,
-          { productId: normalizedId, quantity: normalizedQuantity },
+          {
+            productId: normalizedId,
+            quantity: normalizedQuantity,
+            productSnapshot: snapshot,
+          },
         ]
       })
     },
-    [syncProductCartState],
+    [products, syncProductCartState],
   )
 
   const updateCartQuantity = useCallback(
@@ -344,7 +433,22 @@ export function ContextProvider({ children }) {
                 ? { ...item, quantity: clampedQuantity }
                 : item,
             )
-          : [...prevCart, { productId: normalizedId, quantity: clampedQuantity }]
+          : [
+              ...prevCart,
+              {
+                productId: normalizedId,
+                quantity: clampedQuantity,
+                productSnapshot: buildProductSnapshot(
+                  products.find((product) => {
+                    if (!product) return false
+                    return (
+                      normalizeProductId(product.id) === normalizedId ||
+                      normalizeProductId(product.sku) === normalizedId
+                    )
+                  }),
+                ),
+              },
+            ]
 
         syncProductCartState(normalizedId, {
           inCart: true,
@@ -354,7 +458,7 @@ export function ContextProvider({ children }) {
         return nextCart
       })
     },
-    [syncProductCartState],
+    [products, syncProductCartState],
   )
 
   const removeFromCart = useCallback(
@@ -391,15 +495,22 @@ export function ContextProvider({ children }) {
       ) {
         removeFromCart(productId)
       } else {
-        addToCart(productId, 1)
+        const productDetails = products.find((product) => {
+          if (!product) return false
+          return (
+            normalizeProductId(product.id) === normalizedId ||
+            normalizeProductId(product.sku) === normalizedId
+          )
+        })
+        addToCart(productId, 1, productDetails)
       }
     },
-    [cart, addToCart, removeFromCart],
+    [cart, addToCart, products, removeFromCart],
   )
 
   const addProductToCart = useCallback(
-    (productId, quantity = 1) => {
-      addToCart(productId, quantity)
+    (productId, quantity = 1, productDetails = null) => {
+      addToCart(productId, quantity, productDetails)
     },
     [addToCart],
   )
@@ -443,11 +554,51 @@ export function ContextProvider({ children }) {
           return idMatch || skuMatch
         })
 
-        if (!product) return null
+        const snapshot = item.productSnapshot
+        const fallback = snapshot
+          ? {
+              ...snapshot,
+              price: snapshot.price ?? 0,
+              priceLabel:
+                snapshot.priceLabel ??
+                (snapshot.price ? formatCurrency(snapshot.price) : undefined),
+            }
+          : null
+
+        const resolvedProduct = product ?? fallback
+
+        if (!resolvedProduct) {
+          return {
+            id: item.productId,
+            title: `Product ${item.productId}`,
+            name: 'Product details unavailable',
+            price: 0,
+            priceLabel: formatCurrency(0),
+            image: FALLBACK_PRODUCT_IMAGE,
+            quantity: item.quantity,
+          }
+        }
+
+        const priceValue = toNumber(resolvedProduct.price)
 
         return {
-          ...product,
+          ...resolvedProduct,
+          id: resolvedProduct.id ?? item.productId,
+          price: priceValue,
+          priceLabel:
+            resolvedProduct.priceLabel ?? formatCurrency(priceValue ?? 0),
+          image:
+            resolvedProduct.image && resolvedProduct.image.trim()
+              ? resolvedProduct.image
+              : FALLBACK_PRODUCT_IMAGE,
+          title: resolvedProduct.title ?? resolvedProduct.name ?? 'Product',
+          name:
+            resolvedProduct.name ??
+            resolvedProduct.description ??
+            resolvedProduct.title ??
+            '',
           quantity: item.quantity,
+          cartQuantity: item.quantity,
         }
       })
       .filter(Boolean)
@@ -550,9 +701,12 @@ export function ContextProvider({ children }) {
     clearCheckoutPersistence()
   }, [setCheckoutStep, clearCheckoutPersistence])
 
-  const goToCheckoutStep = useCallback((step) => {
-    setCheckoutStep(step)
-  }, [])
+  const goToCheckoutStep = useCallback(
+    (step) => {
+      setCheckoutStep(step)
+    },
+    [setCheckoutStep],
+  )
 
   const value = {
     isAuthenticated,

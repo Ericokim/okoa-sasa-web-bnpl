@@ -346,6 +346,7 @@ export function useUploadUserDocuments(options = {}) {
  * Calculates or retrieves the user's loan eligibility based on pay details.
  */
 export function useCheckUserLoanAbility(options = {}) {
+  const { showToast = true, ...mutationOptions } = options
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
 
@@ -360,13 +361,15 @@ export function useCheckUserLoanAbility(options = {}) {
     },
 
     onSuccess: (response) => {
-      const message =
-        response?.status?.message || 'Loan ability calculated successfully'
+      if (showToast) {
+        const message =
+          response?.status?.message || 'Loan ability calculated successfully'
 
-      enqueueSnackbar(message, {
-        variant: 'success',
-        autoHideDuration: 4000,
-      })
+        enqueueSnackbar(message, {
+          variant: 'success',
+          autoHideDuration: 4000,
+        })
+      }
 
       // Optional: revalidate related user or finance data
       queryClient.invalidateQueries({
@@ -380,19 +383,21 @@ export function useCheckUserLoanAbility(options = {}) {
     },
 
     onError: (error) => {
-      const errMsg =
-        error?.response?.data?.status?.message ||
-        error?.response?.data?.message ||
-        error?.message ||
-        'Failed to calculate loan ability'
+      if (showToast) {
+        const errMsg =
+          error?.response?.data?.status?.message ||
+          error?.response?.data?.message ||
+          error?.message ||
+          'Failed to calculate loan ability'
 
-      enqueueSnackbar(errMsg, {
-        variant: 'error',
-        autoHideDuration: 4000,
-      })
+        enqueueSnackbar(errMsg, {
+          variant: 'error',
+          autoHideDuration: 4000,
+        })
+      }
     },
 
-    ...options,
+    ...mutationOptions,
   })
 }
 

@@ -31,12 +31,39 @@ const safeNumber = (value) => {
   return Number.isFinite(num) ? num : 0
 }
 
+const SUCCESS_CODES = new Set(['0', '00', '200', '201', '202', 'SUCCESS'])
+
 const resolveProductArray = (payload) => {
   if (Array.isArray(payload)) return payload
   if (Array.isArray(payload?.body)) return payload.body
   if (Array.isArray(payload?.data)) return payload.data
   if (Array.isArray(payload?.body?.items)) return payload.body.items
   return []
+}
+
+const shouldTreatHeaderAsError = (header) => {
+  if (!header) return false
+  const rawCode =
+    header.responseCode ?? header.code ?? header.statusCode ?? header.status
+  if (rawCode === undefined || rawCode === null || rawCode === '') {
+    return false
+  }
+  const normalized = String(rawCode).trim().toUpperCase()
+  if (!normalized) return false
+  if (SUCCESS_CODES.has(normalized)) return false
+  if (normalized.startsWith('2')) return false
+  return true
+}
+
+const buildHeaderError = (header) => {
+  const message =
+    header?.customErrorMessage ||
+    header?.responseMessage ||
+    header?.message ||
+    'Unable to load products. Please try again.'
+  const error = new Error(message)
+  error.code = header?.responseCode ?? header?.code ?? null
+  return error
 }
 
 const normalizeMediaEntry = (entry) => {
@@ -184,6 +211,10 @@ export function useProductList(params, options) {
     queryKey,
     queryFn: async () => {
       const { data } = await masokoApi.get(url)
+      const header = data?.header
+      if (shouldTreatHeaderAsError(header)) {
+        throw buildHeaderError(header)
+      }
       const items = resolveProductArray(data)
 
       return items.map((item, index) => {

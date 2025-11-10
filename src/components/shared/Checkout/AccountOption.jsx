@@ -6,6 +6,7 @@ import { useStateContext } from '@/context/state-context'
 import { useCreateOrder } from '@/lib/queries/orders'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   const [isAccepted, setIsAccepted] = useState(false)
@@ -17,7 +18,6 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
     isAuthenticated,
     user,
     clearCart,
-    resetCheckout,
     setIsCheckoutCompleted,
   } = useStateContext()
 
@@ -26,10 +26,11 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
       const payload = response?.data?.[0] || response?.data
       saveCheckoutFormData(6, {
         orderResponse: payload,
+        orderStatus: response?.status,
+        rawResponse: response,
       })
       clearCart?.()
       setIsCheckoutCompleted?.(true)
-      resetCheckout?.()
     },
   })
 
@@ -234,24 +235,30 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
                     Sign In
                   </Button>
 
-                  <Button
-                    onClick={handleGuestCheckout}
-                    disabled={isPending}
-                    variant="outline"
-                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-                  >
-                    {isPending ? 'Processing...' : 'Continue As Guest'}
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-                  <Button
-                    onClick={handleSubmitOrder}
-                    disabled={isPending}
-                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-                  >
-                    {isPending ? 'Submitting...' : 'Submit Order'}
-                  </Button>
+                    <Button
+                      onClick={handleGuestCheckout}
+                      disabled={isPending}
+                      variant="outline"
+                      className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                    >
+                      {isPending && (
+                        <Spinner className="mr-2 h-4 w-4 text-orange-500" />
+                      )}
+                      {isPending ? 'Processing...' : 'Continue As Guest'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                    <Button
+                      onClick={handleSubmitOrder}
+                      disabled={isPending}
+                      className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                    >
+                      {isPending && (
+                        <Spinner className="mr-2 h-4 w-4 text-white" />
+                      )}
+                      {isPending ? 'Submitting...' : 'Submit Order'}
+                    </Button>
 
                   <Button
                     onClick={onPrevious}
@@ -281,6 +288,9 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
                   disabled={isPending}
                   className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
                 >
+                  {isPending && (
+                    <Spinner className="mr-2 h-4 w-4 text-white" />
+                  )}
                   {isPending ? 'Submitting...' : 'Submit Order'}
                 </Button>
 

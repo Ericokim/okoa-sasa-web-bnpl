@@ -123,7 +123,13 @@ const areFiltersEqual = (a, b) => {
 
 function IndexPage() {
   const { debouncedSearchTerm, products: contextProducts } = useStateContext()
-  const { data: fetchedProducts = [], isLoading } = useProductList()
+  const {
+    data: fetchedProducts,
+    isLoading,
+    isError,
+    error: productsError,
+    refetch: refetchProducts,
+  } = useProductList()
   useSyncProductsWithCart(fetchedProducts, { isLoading })
   const products = useMemo(
     () => (Array.isArray(contextProducts) ? contextProducts : []),
@@ -517,6 +523,17 @@ function IndexPage() {
       <div className="py-6 md:py-8 lg:py-[38px]">
         {isLoading ? (
           <LogoLoader />
+        ) : isError ? (
+          <div className="py-10">
+            <NotFound
+              title="We can't load devices right now"
+              description={
+                'Please try again in a few moments or refresh the page.'
+              }
+              actionLabel="Try Again"
+              onAction={() => refetchProducts?.()}
+            />
+          </div>
         ) : filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-6 2xl:gap-[30px]">
@@ -540,7 +557,7 @@ function IndexPage() {
                     id={product.id}
                     title={product.name}
                     price={priceLabel}
-                    oldPrice={""}
+                    oldPrice={''}
                     image={product.image}
                     hasCartButton={product.inCart}
                   />

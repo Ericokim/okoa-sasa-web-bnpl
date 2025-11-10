@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,6 +18,10 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogPortal } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useCheckUserLoanAbility } from '@/lib/queries/user'
+import {
+  extractLoanAbilityEntry,
+  resolveLoanAmountFromEntry,
+} from '@/lib/utils/loan-ability'
 
 const TENURE_MIN = 6
 const TENURE_MAX = 24
@@ -124,17 +128,26 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   })
   const { reset } = form
   const [errorMessage, setErrorMessage] = useState(null)
-  const loanAbilityMutation = useCheckUserLoanAbility()
+  const loanAbilityMutation = useCheckUserLoanAbility({ showToast: false })
   const watchedBasicPay = form.watch('basicPay')
   const watchedNetPay = form.watch('netPay')
   const watchedMonths = form.watch('months')
+  const [loanQuote, setLoanQuote] = useState(null)
+  const [quoteError, setQuoteError] = useState(null)
+  const sanitizedBasicPay = useMemo(
+    () => parseCurrencyValue(watchedBasicPay),
+    [watchedBasicPay],
+  )
+  const sanitizedNetPay = useMemo(
+    () => parseCurrencyValue(watchedNetPay),
+    [watchedNetPay],
+  )
+
   const loanAmount = useMemo(() => {
     const tenure = watchedMonths ?? 0
     if (tenure <= 0) return 0
 
-    const parsedBasicPay = parseCurrencyValue(watchedBasicPay)
-    const parsedNetPay = parseCurrencyValue(watchedNetPay)
-    const eligibleIncome = Math.min(parsedBasicPay, parsedNetPay)
+    const eligibleIncome = Math.min(sanitizedBasicPay, sanitizedNetPay)
 
     if (eligibleIncome <= 0) return 0
 
@@ -143,20 +156,83 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
 
     const roundedToNearestThousand = Math.round(calculatedAmount / 1000) * 1000
     return Math.max(0, roundedToNearestThousand)
-  }, [watchedBasicPay, watchedNetPay, watchedMonths])
+  }, [sanitizedBasicPay, sanitizedNetPay, watchedMonths])
 
   const currentTenure = watchedMonths ?? DEFAULT_TENURE
+  const currentPayload = useMemo(
+    () => ({
+      basicPay: sanitizedBasicPay,
+      netPay: sanitizedNetPay,
+      term: currentTenure,
+    }),
+    [sanitizedBasicPay, sanitizedNetPay, currentTenure],
+  )
+  const displayLoanAmount = loanQuote?.amount ?? null
 
   const handleInputChange = (value, onChange) => {
     onChange(formatCurrencyInputValue(value))
   }
 
+  const requestLoanQuote = useCallback(
+    async (payload, { fallbackAmount = 0 } = {}) => {
+      const response = await loanAbilityMutation.mutateAsync(payload)
+      const entry = extractLoanAbilityEntry(response)
+      const resolvedAmount = resolveLoanAmountFromEntry(entry)
+      const fallbackValue = Math.max(0, Math.round(fallbackAmount))
+      const amount =
+        typeof resolvedAmount === 'number' && resolvedAmount > 0
+          ? Math.round(resolvedAmount)
+          : fallbackValue
+
+      if (!amount) {
+        throw new Error('Unable to determine your loan eligibility right now.')
+      }
+
+      const quote = {
+        amount,
+        payload,
+        serverEntry: entry,
+      }
+
+      setLoanQuote(quote)
+      setQuoteError(null)
+      return quote
+    },
+    [loanAbilityMutation],
+  )
+
+  const handleCheckLoanLimit = useCallback(async () => {
+    setQuoteError(null)
+    setErrorMessage(null)
+    if (sanitizedBasicPay <= 0 || sanitizedNetPay <= 0) {
+      setQuoteError('Enter valid pay details to check your loan limit.')
+      return
+    }
+
+    try {
+      await requestLoanQuote(currentPayload, { fallbackAmount: loanAmount })
+    } catch (error) {
+      setQuoteError(
+        error?.response?.data?.status?.message ||
+          error?.response?.data?.message ||
+          error?.message ||
+          'Unable to calculate your loan limit. Please try again.',
+      )
+    }
+  }, [
+    currentPayload,
+    loanAmount,
+    requestLoanQuote,
+    sanitizedBasicPay,
+    sanitizedNetPay,
+  ])
+
   const onSubmit = async () => {
     setErrorMessage(null)
     try {
       const payload = {
-        basicPay: parseCurrencyValue(form.getValues('basicPay')),
-        netPay: parseCurrencyValue(form.getValues('netPay')),
+        basicPay: sanitizedBasicPay,
+        netPay: sanitizedNetPay,
         term: currentTenure,
       }
 
@@ -164,20 +240,21 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
         throw new Error('Enter valid pay details to calculate your loan limit.')
       }
 
-      const response = await loanAbilityMutation.mutateAsync(payload)
-      const serverEntry = response?.data?.[0]
-      const serverLimit =
-        serverEntry?.loanLimit ?? serverEntry?.amount ?? serverEntry?.limit
-      const resolvedLoanAmount =
-        typeof serverLimit === 'number' && serverLimit > 0
-          ? serverLimit
-          : loanAmount
+      let quote = loanQuote
 
-      if (!resolvedLoanAmount || resolvedLoanAmount <= 0) {
-        throw new Error('We could not determine a loan amount. Please try again later.')
+      if (!quote) {
+        quote = await requestLoanQuote(payload, {
+          fallbackAmount: loanAmount,
+        })
       }
 
-      onProceed?.(resolvedLoanAmount, serverEntry)
+      if (!quote || !quote.amount) {
+        throw new Error(
+          'We could not determine a loan amount. Please try again later.',
+        )
+      }
+
+      onProceed?.(quote.amount, quote.serverEntry)
       onOpenChange?.(false)
       reset()
     } catch (error) {
@@ -197,14 +274,21 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
 
   const handleCancel = () => {
     setErrorMessage(null)
+    setQuoteError(null)
+    setLoanQuote(null)
     reset()
     onOpenChange?.(false)
   }
 
+  const wasOpenRef = useRef(open)
+
   useEffect(() => {
-    if (!open) {
+    if (!open && wasOpenRef.current) {
       reset()
+      setQuoteError(null)
+      setLoanQuote(null)
     }
+    wasOpenRef.current = open
   }, [open, reset])
 
   return (
@@ -356,19 +440,42 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 )}
               />
 
-              <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
-                <div className="flex flex-col items-start justify-center gap-1">
-                  <p className="text-center text-sm font-normal leading-[140%] text-[#0D0B26]">
-                    You qualify for a loan of KES {loanAmount.toLocaleString()},
-                    payable within {currentTenure} months.
-                  </p>
+              {displayLoanAmount > 0 && (
+                <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
+                  <div className="flex flex-col items-start justify-center gap-1">
+                    <p className="text-center text-sm font-normal leading-[140%] text-[#0D0B26]">
+                      You qualify for a loan of KES{' '}
+                      {displayLoanAmount.toLocaleString()}, payable within{' '}
+                      {currentTenure} months.
+                    </p>
+                  </div>
                 </div>
+              )}
+
+              <div className="flex justify-center">
+                <Button
+                  type="button"
+                  variant="outlineGradient"
+                  onClick={handleCheckLoanLimit}
+                  disabled={loanAbilityMutation.isPending}
+                  className="rounded-3xl px-4 py-2 text-sm font-medium"
+                >
+                  {loanAbilityMutation.isPending
+                    ? 'Checking loan limit...'
+                    : 'Check Loan Limit'}
+                </Button>
               </div>
 
-              <p className="text-center text-base font-medium leading-[140%] text-[#676D75]">
+              {quoteError && (
+                <p className="text-center text-sm font-medium text-red-500">
+                  {quoteError}
+                </p>
+              )}
+
+              {/* <p className="text-center text-base font-medium leading-[140%] text-[#676D75]">
                 Would you like to see devices within your loan limit range (Max.
-                KES {loanAmount.toLocaleString()})?
-              </p>
+                KES {(displayLoanAmount || loanAmount).toLocaleString()})?
+              </p> */}
 
               {errorMessage && (
                 <p className="text-center text-sm font-medium text-red-500">

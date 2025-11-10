@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -22,6 +22,19 @@ import { FormTextarea } from '../Inputs/FormTextarea'
 import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
 import { usePickUpPoint, useRegion } from '@/lib/queries/orders'
+import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+
+const splitUserName = (fullName = '') => {
+  if (!fullName) return { firstName: '', lastName: '' }
+  const parts = fullName.trim().split(/\s+/)
+  if (parts.length === 1) {
+    return { firstName: parts[0], lastName: '' }
+  }
+  return {
+    firstName: parts[0],
+    lastName: parts.slice(1).join(' '),
+  }
+}
 
 // Phone validation schema
 const kenyaPhoneSchema = z
@@ -78,7 +91,12 @@ export default function DeliveryDetailsForm({
   isFirstStep,
   isLastStep,
 }) {
-  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+  const {
+    saveCheckoutFormData,
+    getCheckoutFormData,
+    user,
+    isAuthenticated,
+  } = useStateContext()
 
   const savedData = getCheckoutFormData(3)
 
@@ -152,6 +170,17 @@ export default function DeliveryDetailsForm({
   // Determine which region options to use based on delivery type
   const regionOptions = deliveryType === 'door' ? doorRegionOptions : pickupRegionOptions;
 
+  const userPrefill = useMemo(() => {
+    if (!isAuthenticated || !user) return null
+    const derivedNames = splitUserName(user.fullName)
+    const normalizedPhone = normalizeKenyanPhoneNumber(user.phoneNumber || '')
+    return {
+      firstName: user.firstName || derivedNames.firstName || '',
+      lastName: user.lastName || derivedNames.lastName || '',
+      recipientNumber: normalizedPhone || user.phoneNumber || '',
+    }
+  }, [isAuthenticated, user])
+
   // Update form when savedData changes (with proper dependency management)
   useEffect(() => {
     if (savedData && !hasRestoredData.current) {
@@ -173,6 +202,31 @@ export default function DeliveryDetailsForm({
       hasRestoredData.current = true;
     }
   }, [savedData, form]);
+
+  useEffect(() => {
+    if (!userPrefill) return
+
+    const fieldsToPrefill = ['firstName', 'lastName', 'recipientNumber']
+    let hasUpdates = false
+
+    fieldsToPrefill.forEach((field) => {
+      const value = userPrefill[field]
+      if (!value) return
+
+      const currentValue = form.getValues(field)
+      if (!currentValue) {
+        form.setValue(field, value, {
+          shouldDirty: false,
+          shouldTouch: false,
+        })
+        hasUpdates = true
+      }
+    })
+
+    if (hasUpdates) {
+      form.clearErrors(fieldsToPrefill)
+    }
+  }, [userPrefill, form])
 
   // Reset hasRestoredData when component unmounts
   useEffect(() => {

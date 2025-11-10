@@ -3,15 +3,41 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react'
 import { ErrorAlertDialog } from '../Dialog'
 import { useStateContext } from '@/context/state-context'
 import { AmountInput, parseCurrencyValue } from '../Inputs/FormAmount'
 import { RepaymentPeriodSlider } from '../Inputs/FormSlider'
 import { FileUpload } from '../Inputs/FormUpload'
 import { useCheckUserLoanAbility } from '@/lib/queries/user'
+import {
+  buildLoanPayloadKey,
+  extractLoanAbilityEntry,
+  resolveLoanAmountFromEntry,
+} from '@/lib/utils/loan-ability'
 
 const DEFAULT_TENURE = 13
+const MIN_TENURE = 6
+const MAX_TENURE = 24
+const AUTO_CHECK_DEBOUNCE_MS = 600
+
+const deriveLoanQuoteFromSavedData = (savedData) => {
+  if (!savedData?.calculatedLoanAmount) return null
+
+  const payload = {
+    basicPay: parseCurrencyValue(savedData.basicPay),
+    netPay: parseCurrencyValue(savedData.netPay),
+    term: savedData.tenure ?? DEFAULT_TENURE,
+  }
+
+  return {
+    amount: savedData.calculatedLoanAmount,
+    payload,
+    payloadKey: buildLoanPayloadKey(payload),
+    serverEntry: savedData?.apiPayload?.loanAbilityResponse ?? null,
+    source: 'saved',
+  }
+}
 
 const loanLimitSchema = z
   .object({
@@ -31,8 +57,8 @@ const loanLimitSchema = z
       (val) => val ?? DEFAULT_TENURE,
       z
         .number()
-        .min(6, 'Minimum repayment period is 6 months')
-        .max(24, 'Maximum repayment period is 24 months'),
+        .min(MIN_TENURE, `Minimum repayment period is ${MIN_TENURE} months`)
+        .max(MAX_TENURE, `Maximum repayment period is ${MAX_TENURE} months`),
     ),
     payslip: z.any().refine((file) => file !== null && file !== undefined, {
       message: 'Please upload your latest payslip',
@@ -60,14 +86,19 @@ export default function CheckLoanLimitPage({
     useStateContext()
 
   const savedData = getCheckoutFormData(1)
-  const loanAbilityMutation = useCheckUserLoanAbility()
+  const loanAbilityMutation = useCheckUserLoanAbility({ showToast: false })
 
-  const [open, setOpen] = useState(false)
+  const [loanQuote, setLoanQuote] = useState(() =>
+    deriveLoanQuoteFromSavedData(savedData),
+  )
+  const [quoteError, setQuoteError] = useState(null)
+  const quoteRequestRef = useRef(null)
+  const pendingPayloadKeyRef = useRef(null)
   const [errorModalOpen, setErrorModalOpen] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
 
   // Calculate cart grand total
-  const cartItems = cartProducts ?? []
+  const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
   const grandTotal = useMemo(() => {
     return cartItems.reduce((total, item) => {
       const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
@@ -98,6 +129,12 @@ export default function CheckLoanLimitPage({
     defaultValues,
   })
 
+  useEffect(() => {
+    if (savedData?.calculatedLoanAmount) {
+      setLoanQuote(deriveLoanQuoteFromSavedData(savedData))
+    }
+  }, [savedData])
+
   // Reset form with saved data when component mounts
   React.useEffect(() => {
     if (savedData && Object.keys(savedData).length > 0) {
@@ -115,13 +152,20 @@ export default function CheckLoanLimitPage({
   const watchedBasicPay = form.watch('basicPay')
   const watchedNetPay = form.watch('netPay')
 
+  const sanitizedBasicPay = useMemo(
+    () => parseCurrencyValue(watchedBasicPay),
+    [watchedBasicPay],
+  )
+  const sanitizedNetPay = useMemo(
+    () => parseCurrencyValue(watchedNetPay),
+    [watchedNetPay],
+  )
+
   const loanAmount = useMemo(() => {
     const tenure = currentRepaymentPeriod
     if (tenure <= 0) return 0
 
-    const parsedBasicPay = parseCurrencyValue(watchedBasicPay)
-    const parsedNetPay = parseCurrencyValue(watchedNetPay)
-    const eligibleIncome = Math.min(parsedBasicPay, parsedNetPay)
+    const eligibleIncome = Math.min(sanitizedBasicPay, sanitizedNetPay)
 
     if (eligibleIncome <= 0) return 0
 
@@ -130,7 +174,134 @@ export default function CheckLoanLimitPage({
 
     const roundedToNearestThousand = Math.round(calculatedAmount / 1000) * 1000
     return Math.max(0, roundedToNearestThousand)
-  }, [watchedBasicPay, watchedNetPay, currentRepaymentPeriod])
+  }, [sanitizedBasicPay, sanitizedNetPay, currentRepaymentPeriod])
+
+  const currentPayload = useMemo(
+    () => ({
+      basicPay: sanitizedBasicPay,
+      netPay: sanitizedNetPay,
+      term: currentRepaymentPeriod,
+    }),
+    [sanitizedBasicPay, sanitizedNetPay, currentRepaymentPeriod],
+  )
+
+  const currentPayloadKey = buildLoanPayloadKey(currentPayload)
+  const hasQuoteForCurrentValues = Boolean(
+    loanQuote?.payloadKey === currentPayloadKey && loanQuote?.amount > 0,
+  )
+  const canAutoCheckLoan =
+    sanitizedBasicPay > 0 &&
+    sanitizedNetPay > 0 &&
+    currentRepaymentPeriod >= MIN_TENURE &&
+    currentRepaymentPeriod <= MAX_TENURE
+  const displayLoanAmount = hasQuoteForCurrentValues ? loanQuote?.amount : null
+  const isCartWithinLoanLimit =
+    typeof displayLoanAmount === 'number'
+      ? grandTotal <= displayLoanAmount
+      : false
+
+  const requestLoanQuote = useCallback(
+    async (payload, { silent = false, fallbackAmount = 0 } = {}) => {
+      const payloadKey = buildLoanPayloadKey(payload)
+
+      if (
+        quoteRequestRef.current &&
+        pendingPayloadKeyRef.current === payloadKey
+      ) {
+        return quoteRequestRef.current
+      }
+
+      if (quoteRequestRef.current) {
+        try {
+          await quoteRequestRef.current
+        } catch {
+          // ignore previous error; we'll surface the next one
+        }
+      }
+
+      const promise = (async () => {
+        try {
+          const responseData = await loanAbilityMutation.mutateAsync(payload)
+          const entry = extractLoanAbilityEntry(responseData)
+          const amountFromApi = resolveLoanAmountFromEntry(entry)
+          const fallbackValue = Math.max(0, Math.round(fallbackAmount))
+          const resolvedAmount =
+            typeof amountFromApi === 'number' && amountFromApi > 0
+              ? Math.round(amountFromApi)
+              : fallbackValue
+
+          if (!resolvedAmount) {
+            throw new Error(
+              'We could not determine a loan amount. Please try again later.',
+            )
+          }
+
+          const quote = {
+            amount: resolvedAmount,
+            payload,
+            payloadKey,
+            serverEntry: entry,
+            source: 'api',
+          }
+
+          setLoanQuote(quote)
+          setQuoteError(null)
+          return quote
+        } catch (error) {
+          if (silent) {
+            setQuoteError(
+              error?.response?.data?.status?.message ||
+                error?.response?.data?.message ||
+                error?.message ||
+                'Unable to calculate loan eligibility right now.',
+            )
+            return null
+          }
+          throw error
+        } finally {
+          quoteRequestRef.current = null
+          pendingPayloadKeyRef.current = null
+        }
+      })()
+
+      quoteRequestRef.current = promise
+      pendingPayloadKeyRef.current = payloadKey
+      return promise
+    },
+    [loanAbilityMutation],
+  )
+
+  useEffect(() => {
+    if (!canAutoCheckLoan) {
+      setQuoteError(null)
+      return
+    }
+
+    if (hasQuoteForCurrentValues) {
+      return
+    }
+
+    if (loanAbilityMutation.isPending || quoteRequestRef.current) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setQuoteError(null)
+      requestLoanQuote(currentPayload, {
+        silent: true,
+        fallbackAmount: loanAmount,
+      })
+    }, AUTO_CHECK_DEBOUNCE_MS)
+
+    return () => clearTimeout(timer)
+  }, [
+    canAutoCheckLoan,
+    currentPayload,
+    hasQuoteForCurrentValues,
+    loanAbilityMutation.isPending,
+    loanAmount,
+    requestLoanQuote,
+  ])
 
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
@@ -180,13 +351,33 @@ export default function CheckLoanLimitPage({
         term: data.tenure,
       }
 
-      const response = await loanAbilityMutation.mutateAsync(payload)
-      const serverResult = response?.data?.[0]
-      const calculatedAmountFromApi = serverResult?.loanLimit ?? serverResult?.amount
-      const effectiveLoanAmount =
-        typeof calculatedAmountFromApi === 'number' && calculatedAmountFromApi > 0
-          ? calculatedAmountFromApi
-          : loanAmount
+      const payloadKey = buildLoanPayloadKey(payload)
+      let quote =
+        loanQuote && loanQuote.payloadKey === payloadKey
+          ? loanQuote
+          : null
+
+      if (!quote) {
+        quote = await requestLoanQuote(payload, {
+          fallbackAmount: loanAmount,
+        })
+      }
+
+      if (!quote || !quote.amount) {
+        throw new Error(
+          'Unable to determine your loan limit. Please try again.',
+        )
+      }
+
+      const effectiveLoanAmount = quote.amount
+
+      if (grandTotal > effectiveLoanAmount) {
+        setErrorMessage(
+          `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${effectiveLoanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
+        )
+        setErrorModalOpen(true)
+        return
+      }
 
       const documentPayload = []
       const payslipDocument = await getFileInfo(data.payslip)
@@ -199,7 +390,7 @@ export default function CheckLoanLimitPage({
         basicSalary: payload.basicPay,
         netSalary: payload.netPay,
         tenure: data.tenure,
-        ...(serverResult?.creditData || {}),
+        ...(quote.serverEntry?.creditData || {}),
       }
 
       const completePayload = {
@@ -207,6 +398,7 @@ export default function CheckLoanLimitPage({
         creditData,
         calculatedLoanAmount: effectiveLoanAmount,
         formData: data,
+        loanAbilityResponse: quote.serverEntry || null,
       }
 
       saveCheckoutFormData(1, {
@@ -216,14 +408,7 @@ export default function CheckLoanLimitPage({
         apiPayload: completePayload,
       })
 
-      if (grandTotal > effectiveLoanAmount) {
-        setErrorMessage(
-          `Your cart total (KES ${grandTotal.toLocaleString()}) exceeds your loan limit (KES ${effectiveLoanAmount.toLocaleString()}). Please adjust your cart or loan tenure.`,
-        )
-        setErrorModalOpen(true)
-        return
-      }
-
+      setQuoteError(null)
       onNext()
     } catch (error) {
       setErrorMessage(
@@ -277,33 +462,44 @@ export default function CheckLoanLimitPage({
               control={form.control}
               name="tenure"
               label="Loan Tenure"
-              min={6}
-              max={24}
+              min={MIN_TENURE}
+              max={MAX_TENURE}
               defaultValue={DEFAULT_TENURE}
             />
 
             {/* Loan Qualification Info */}
-            {loanAmount > 0 && (
-              <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
+            {displayLoanAmount > 0 && (
+              <div className="flex flex-col gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">
                 <div className="flex flex-col items-start justify-center gap-1">
                   <p className="text-center text-sm font-normal leading-[140%] text-[#0D0B26]">
-                    You qualify for a loan of KES {loanAmount.toLocaleString()},
-                    payable within {currentRepaymentPeriod} months.
+                    Based on your details, you qualify for a loan of KES{' '}
+                    {displayLoanAmount.toLocaleString()}, payable within{' '}
+                    {currentRepaymentPeriod} months.
                   </p>
                   <p className="text-center text-xs font-normal leading-[140%] text-[#676D75]">
                     Cart Total:{' '}
                     <span
                       className={
-                        grandTotal <= loanAmount
-                          ? 'text-green-600'
-                          : 'text-orange-500'
+                        isCartWithinLoanLimit ? 'text-green-600' : 'text-orange-500'
                       }
                     >
                       KES {grandTotal.toLocaleString()}
                     </span>
                   </p>
                 </div>
+                {!isCartWithinLoanLimit && (
+                  <p className="text-center text-xs font-medium text-orange-500">
+                    Your cart exceeds the eligible amount. Reduce your cart total or
+                    adjust the loan tenure to proceed.
+                  </p>
+                )}
               </div>
+            )}
+
+            {quoteError && (
+              <p className="text-center text-sm font-medium text-red-500">
+                {quoteError}
+              </p>
             )}
 
             {/* Upload Payslip */}
@@ -332,9 +528,12 @@ export default function CheckLoanLimitPage({
         <Button
           onClick={form.handleSubmit(onSubmit)}
           type="button"
+          disabled={loanAbilityMutation.isPending}
           className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[193px] h-[46px] bg-linear-to-b from-[#F8971D] to-[#EE3124] hover:opacity-90 text-white rounded-3xl font-medium disabled:opacity-50"
         >
-          Next: Personal Info
+          {loanAbilityMutation.isPending
+            ? 'Checking eligibility...'
+            : 'Next: Personal Info'}
         </Button>
       </div>
       <ErrorAlertDialog

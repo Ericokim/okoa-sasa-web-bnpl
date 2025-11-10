@@ -41,6 +41,8 @@ export function AuthDialog({
   const [countdown, setCountdown] = useState(41)
   const [isResending, setIsResending] = useState(false)
   const successTimerRef = useRef(null)
+  const resetTimerRef = useRef(null)
+  const wasOpenRef = useRef(open)
   const navigate = useNavigate()
 
   const form = useForm({
@@ -118,16 +120,22 @@ export function AuthDialog({
       if (successTimerRef.current) {
         clearTimeout(successTimerRef.current)
       }
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current)
+      }
     }
   }, [])
 
   useEffect(() => {
-    if (!open) {
+    if (!open && wasOpenRef.current) {
       if (successTimerRef.current) {
         clearTimeout(successTimerRef.current)
         successTimerRef.current = null
       }
-      setTimeout(() => {
+      if (resetTimerRef.current) {
+        clearTimeout(resetTimerRef.current)
+      }
+      resetTimerRef.current = setTimeout(() => {
         setStep('login')
         setLoginIdentifier('')
         setCountdown(41)
@@ -135,6 +143,20 @@ export function AuthDialog({
         form.reset({ phoneNumberOrEmail: '', rememberMe: false })
         otpForm.reset({ otp: '', phoneNumberOrEmail: '' })
       }, 200)
+    }
+
+    if (open && resetTimerRef.current) {
+      clearTimeout(resetTimerRef.current)
+      resetTimerRef.current = null
+    }
+
+    wasOpenRef.current = open
+
+    return () => {
+      if (resetTimerRef.current && !open) {
+        clearTimeout(resetTimerRef.current)
+        resetTimerRef.current = null
+      }
     }
   }, [open, form, otpForm])
 

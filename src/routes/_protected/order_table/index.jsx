@@ -135,7 +135,7 @@ const normalizeOrderForTable = (order, index = 0) => {
         order.title,
         order.device,
         order.name,
-      ) || 'BNPL Order',
+      ) || '#Order',
     loanAmount:
       Number(order.totalAmount) ||
       Number(order.amount) ||

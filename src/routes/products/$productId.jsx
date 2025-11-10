@@ -10,7 +10,7 @@ import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 function ProductDetailPage() {
   const { productId } = Route.useParams()
-  const { data: fetchedProducts = [], isLoading } = useProductList()
+  const { data: fetchedProducts, isLoading } = useProductList()
   const products = useMemo(
     () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
     [fetchedProducts],

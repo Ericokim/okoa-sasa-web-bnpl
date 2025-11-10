@@ -10,7 +10,7 @@ function CartPage() {
   const navigate = useNavigate()
   const { isAuthenticated } = useStateContext()
   const [showAuthDialog, setShowAuthDialog] = React.useState(false)
-  const { data: fetchedProducts = [], isLoading } = useProductList()
+  const { data: fetchedProducts, isLoading } = useProductList()
 
   useSyncProductsWithCart(fetchedProducts, { isLoading })
 

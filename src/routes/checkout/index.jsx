@@ -68,7 +68,7 @@ export default function CheckoutPage() {
     clearCart,
     cart,
   } = useStateContext()
-  const { data: fetchedProducts = [], isLoading: isProductListLoading } =
+  const { data: fetchedProducts, isLoading: isProductListLoading } =
     useProductList()
 
   useSyncProductsWithCart(fetchedProducts, { isLoading: isProductListLoading })
