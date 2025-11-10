@@ -30,6 +30,33 @@ import {
 import { CheckCircle2, Loader2, PhoneIcon, XIcon } from 'lucide-react'
 import logo from '@/assets/images/primaryLogoVertical.png'
 
+const extractOtpFromResponse = (response) => {
+  if (!response) return ''
+  const payload = response?.data
+
+  if (Array.isArray(payload)) {
+    const candidate = payload.find(
+      (entry) => typeof entry === 'string' && entry.trim(),
+    )
+    return candidate?.trim() || ''
+  }
+
+  if (typeof payload === 'string') {
+    return payload.trim()
+  }
+
+  if (payload && typeof payload === 'object') {
+    for (const key of ['otp', 'code', 'otpCode', 'verificationCode']) {
+      const value = payload[key]
+      if (typeof value === 'string' && value.trim()) {
+        return value.trim()
+      }
+    }
+  }
+
+  return ''
+}
+
 export function AuthDialog({
   open,
   onOpenChange,
@@ -77,13 +104,21 @@ export function AuthDialog({
   }, [navigate, onLoginSuccess, onOpenChange])
 
   const loginMutation = useLogin({
-    onSuccess: (_response, variables) => {
+    onSuccess: (response, variables) => {
       const identifier = variables?.phoneNumberOrEmail || ''
+      const resolvedOtp = extractOtpFromResponse(response)
 
       setLoginIdentifier(identifier)
-      otpForm.reset({ otp: '', phoneNumberOrEmail: identifier })
+      otpForm.reset({
+        otp: resolvedOtp || '',
+        phoneNumberOrEmail: identifier,
+      })
       setStep('otp')
       setCountdown(41)
+
+      if (resolvedOtp) {
+        otpForm.clearErrors('otp')
+      }
     },
   })
 
