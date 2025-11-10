@@ -11,6 +11,8 @@ import OrderSummaryPage from '@/components/shared/Checkout/OrderSummary'
 import DonePage from '@/components/shared/Checkout/DoneScreen'
 import { useStateContext } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
+import { useProductList } from '@/lib/queries/products'
+import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 const steps = [
   {
@@ -63,19 +65,25 @@ export default function CheckoutPage() {
     getCheckoutFormData,
     cartProducts,
     resetCheckout,
-    clearCart
+    clearCart,
+    cart,
   } = useStateContext()
+  const { data: fetchedProducts = [], isLoading: isProductListLoading } =
+    useProductList()
+
+  useSyncProductsWithCart(fetchedProducts, { isLoading: isProductListLoading })
 
   const { productId } = Route.useParams()
   const cartItems = cartProducts ?? []
+  const cartIsEmpty = cart.length === 0
 
   // Redirect to home if cart is empty AND checkout is NOT completed
   useEffect(() => {
-    if (cartItems.length === 0 && !isCompleted) {
+    if (cartIsEmpty && !isCompleted) {
       resetCheckout()
       navigate({ to: '/' })
     }
-  }, [cartItems.length, isCompleted, navigate, resetCheckout])
+  }, [cartIsEmpty, isCompleted, navigate, resetCheckout])
 
   // Clear cart and reset when navigating away from completed checkout
   useEffect(() => {

@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { ProductGallery } from '@/components/shared/Products/ProductGallery'
 import { ProductInfo } from '@/components/shared/Products/ProductInfo'
 import { SpecificationsTable } from '@/components/shared/Products/SpecificationsTable'
 import { BreadCrumbs } from '@/components/shared/BreadCrumbs'
 import NotFound from '@/container/NotFound'
-import { useStateContext } from '@/context/state-context'
 import { useProductList } from '@/lib/queries/products'
+import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 function ProductDetailPage() {
   const { productId } = Route.useParams()
@@ -15,7 +15,7 @@ function ProductDetailPage() {
     () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
     [fetchedProducts],
   )
-  const { cart, setProducts } = useStateContext()
+  useSyncProductsWithCart(products, { isLoading })
 
   const targetProduct = useMemo(() => {
     const targetId = String(productId)
@@ -31,37 +31,6 @@ function ProductDetailPage() {
       }) ?? null
     )
   }, [products, productId])
-
-  useEffect(() => {
-    if (isLoading) {
-      return
-    }
-
-    setProducts((prevProducts = []) => {
-      const nextProducts = products.map((product) => {
-        const cartItem = cart.find(
-          (item) => String(item.productId) === String(product.id),
-        )
-        const quantity = cartItem?.quantity || 0
-        return {
-          ...product,
-          inCart: !!cartItem,
-          quantity,
-          cartQuantity: quantity,
-        }
-      })
-
-      if (prevProducts.length !== nextProducts.length) {
-        return nextProducts
-      }
-
-      const isSame = prevProducts.every(
-        (prevItem, index) => prevItem === nextProducts[index],
-      )
-
-      return isSame ? prevProducts : nextProducts
-    })
-  }, [products, cart, setProducts, isLoading])
 
   if (isLoading) {
     return (
