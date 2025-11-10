@@ -638,8 +638,8 @@ function OrderDetailsPage() {
               </span>
             </div>
 
-            <div className="flex flex-col gap-3 pt-4 md:flex-row">
-              <Button
+            <div className="flex flex-col gap-3 pt-4 md:flex-row justify-center">
+              {/* <Button
                 variant="gradient"
                 disabled={!canAcknowledge || updateOrderMutation.isPending}
                 onClick={handleMarkAsReceived}
@@ -648,7 +648,7 @@ function OrderDetailsPage() {
                 {updateOrderMutation.isPending
                   ? 'Updating...'
                   : 'Mark as received'}
-              </Button>
+              </Button> */}
 
               <Button
                 variant="outline"

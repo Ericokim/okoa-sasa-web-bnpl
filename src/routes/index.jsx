@@ -526,7 +526,7 @@ function IndexPage() {
         ) : isError ? (
           <div className="py-10">
             <NotFound
-              title="We can't load devices right now"
+              title="We can't load devices right now."
               description={
                 'Please try again in a few moments or refresh the page.'
               }
