@@ -10,6 +10,9 @@ const phoneValidation = (value) => {
   return isValidPhoneNumber(value, 'KE')
 }
 
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const isValidEmail = (value = '') => emailRegex.test(value.trim())
+
 const sanitizeKenyanPhoneNumber = (value = '') => {
   if (!value) return ''
 
@@ -83,14 +86,23 @@ export const OTPVerificationSchema = zodResolver(
 // Export only the ready-to-use resolver
 export const LoginSchema = zodResolver(
   z.object({
-    phoneNumber: z
+    phoneNumberOrEmail: z
       .string()
-      .min(1, { message: 'Phone number is required' })
-      .refine(isValidKenyanPhoneNumber, {
-        message:
-          'Please enter a valid Kenyan phone number (e.g., +254XX... or 07XX... or 01XX...)',
-      })
-      .transform((value) => normalizeKenyanPhoneNumber(value)),
+      .trim()
+      .min(1, { message: 'Phone number or email is required' })
+      .refine(
+        (value) => isValidKenyanPhoneNumber(value) || isValidEmail(value),
+        {
+          message:
+            'Please enter a valid Kenyan phone number or email address.',
+        },
+      )
+      .transform((value) => {
+        if (isValidKenyanPhoneNumber(value)) {
+          return normalizeKenyanPhoneNumber(value)
+        }
+        return value.trim()
+      }),
 
     rememberMe: z.boolean().optional(),
   }),

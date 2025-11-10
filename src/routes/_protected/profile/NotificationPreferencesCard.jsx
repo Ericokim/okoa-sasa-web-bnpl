@@ -1,27 +1,141 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useAccountStore } from '@/data/accountStore'
+import { useEffect, useMemo, useState } from 'react'
 import { Separator } from '@/components/ui/separator'
+import { useStateContext } from '@/context/state-context'
+import { useUpdateUserNotificationPreference } from '@/lib/queries/user'
+
+const NOTIFICATION_ITEMS = [
+  {
+    key: 'transactions',
+    type: 'Transactions',
+    title: 'Transactions',
+    desc: 'Get instant alerts for your purchases and payments.',
+  },
+  {
+    key: 'promotions',
+    type: 'PromotionalOffers',
+    title: 'Promotional Offers',
+    desc: 'Receive exclusive discounts and special deals.',
+  },
+  {
+    key: 'applicationUpdates',
+    type: 'ApplicationUpdates',
+    title: 'System Update',
+    desc: 'Stay informed about new features and app improvements.',
+  },
+]
+
+const legacyTypeAliases = {
+  PromotionalOffer: 'promotions',
+  SystemUpdates: 'applicationUpdates',
+}
+
+const typeKeyMap = NOTIFICATION_ITEMS.reduce((acc, { type, key }) => {
+  acc[type] = key
+  return acc
+}, { ...legacyTypeAliases })
+
+const normalizedTypeKeyMap = Object.entries(typeKeyMap).reduce(
+  (acc, [type, key]) => {
+    if (typeof type === 'string') {
+      acc[type.toLowerCase()] = key
+    }
+    return acc
+  },
+  {},
+)
+
+const keyTypeMap = NOTIFICATION_ITEMS.reduce((acc, { key, type }) => {
+  acc[key] = type
+  return acc
+}, {})
+
+const defaultPrefs = NOTIFICATION_ITEMS.reduce((acc, { key }) => {
+  acc[key] = false
+  return acc
+}, {})
+
+const buildPreferences = (user) => {
+  if (!Array.isArray(user?.notificationPreferences)) {
+    return { ...defaultPrefs }
+  }
+  return user.notificationPreferences.reduce((acc, pref) => {
+    const rawType = pref?.type
+    const resolvedKey =
+      typeKeyMap[rawType] ||
+      (typeof rawType === 'string'
+        ? normalizedTypeKeyMap[rawType.toLowerCase()]
+        : null)
+
+    if (resolvedKey && resolvedKey in acc) {
+      acc[resolvedKey] = Boolean(pref?.isActive)
+    }
+    return acc
+  }, { ...defaultPrefs })
+}
 
 export function RouteComponent() {
-  const { notifications, toggleNotification } = useAccountStore()
+  const { user, login } = useStateContext()
+  const [pendingKey, setPendingKey] = useState(null)
+  const [notificationState, setNotificationState] = useState(
+    buildPreferences(user),
+  )
+  const userId =
+    user?.id || user?.userId || user?.userID || user?.idNumber || undefined
 
-  const items = [
-    {
-      key: 'transactions',
-      title: 'Transactions',
-      desc: 'Get instant alerts for your purchases and payments.',
-    },
-    {
-      key: 'promotions',
-      title: 'Promotional Offers',
-      desc: 'Receive exclusive discounts and special deals.',
-    },
-    {
-      key: 'systemUpdates',
-      title: 'System Update',
-      desc: 'Stay informed about new features and app improvements.',
-    },
-  ]
+  const mutation = useUpdateUserNotificationPreference()
+
+  useEffect(() => {
+    setNotificationState(buildPreferences(user))
+  }, [user])
+
+  const items = useMemo(() => NOTIFICATION_ITEMS, [])
+
+  const handleToggle = (key) => {
+    if (!userId || !(key in notificationState)) return
+
+    const nextValue = !notificationState[key]
+    const previousState = notificationState[key]
+
+    setNotificationState((prev) => ({
+      ...prev,
+      [key]: nextValue,
+    }))
+    setPendingKey(key)
+
+    mutation.mutate(
+      {
+        userId,
+        type: keyTypeMap[key],
+        isActive: nextValue,
+      },
+      {
+        onError: () => {
+          setNotificationState((prev) => ({
+            ...prev,
+            [key]: previousState,
+          }))
+        },
+        onSuccess: () => {
+          const merged = Object.entries({
+            ...notificationState,
+            [key]: nextValue,
+          }).map(([stateKey, isActive]) => ({
+            type: keyTypeMap[stateKey],
+            isActive,
+          }))
+
+          login?.({
+            ...(user || {}),
+            notificationPreferences: merged,
+          })
+        },
+        onSettled: () => {
+          setPendingKey(null)
+        },
+      },
+    )
+  }
 
   return (
     <div className="border rounded-xl p-6 bg-white">
@@ -54,9 +168,10 @@ export function RouteComponent() {
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={notifications[item.key]}
-                onChange={() => toggleNotification(item.key)}
+                checked={notificationState[item.key]}
+                onChange={() => handleToggle(item.key)}
                 className="sr-only peer"
+                disabled={pendingKey === item.key && mutation.isPending}
               />
               <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-orange-500 peer-checked:after:translate-x-full after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
             </label>

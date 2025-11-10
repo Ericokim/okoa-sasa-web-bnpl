@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { useProductList } from '@/lib/queries/products'
 import { DEFAULT_FILTER_VALUES } from '@/constants/filterDefaults'
 import logo from '@/assets/images/primaryLogoVertical.png'
+import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 const LogoLoader = () => (
   <div className="flex flex-col items-center justify-center gap-4 py-16">
@@ -121,17 +122,15 @@ const areFiltersEqual = (a, b) => {
 }
 
 function IndexPage() {
+  const { debouncedSearchTerm, products: contextProducts } = useStateContext()
   const {
-    debouncedSearchTerm,
-    setProducts,
-    cart,
-    products: contextProducts,
-  } = useStateContext()
-  const { data: fetchedProducts = [], isLoading } = useProductList()
-  const apiProducts = useMemo(
-    () => (Array.isArray(fetchedProducts) ? fetchedProducts : []),
-    [fetchedProducts],
-  )
+    data: fetchedProducts,
+    isLoading,
+    isError,
+    error: productsError,
+    refetch: refetchProducts,
+  } = useProductList()
+  useSyncProductsWithCart(fetchedProducts, { isLoading })
   const products = useMemo(
     () => (Array.isArray(contextProducts) ? contextProducts : []),
     [contextProducts],
@@ -141,37 +140,6 @@ function IndexPage() {
   const navigate = useNavigate({ from: '/' })
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [showLoanCalculator, setShowLoanCalculator] = useState(false)
-
-  useEffect(() => {
-    if (isLoading) {
-      return
-    }
-
-    setProducts((prevProducts = []) => {
-      const nextProducts = apiProducts.map((product) => {
-        const cartItem = cart.find(
-          (item) => String(item.productId) === String(product.id),
-        )
-        const quantity = cartItem?.quantity || 0
-        return {
-          ...product,
-          inCart: !!cartItem,
-          quantity,
-          cartQuantity: quantity,
-        }
-      })
-
-      if (prevProducts.length !== nextProducts.length) {
-        return nextProducts
-      }
-
-      const isSame = prevProducts.every(
-        (prevItem, index) => prevItem === nextProducts[index],
-      )
-
-      return isSame ? prevProducts : nextProducts
-    })
-  }, [apiProducts, cart, setProducts, isLoading])
 
   const filterOptions = useMemo(() => {
     if (products.length === 0) {
@@ -555,6 +523,17 @@ function IndexPage() {
       <div className="py-6 md:py-8 lg:py-[38px]">
         {isLoading ? (
           <LogoLoader />
+        ) : isError ? (
+          <div className="py-10">
+            <NotFound
+              title="We can't load devices right now"
+              description={
+                'Please try again in a few moments or refresh the page.'
+              }
+              actionLabel="Try Again"
+              onAction={() => refetchProducts?.()}
+            />
+          </div>
         ) : filteredProducts.length > 0 ? (
           <>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-4 xl:grid-cols-4 xl:gap-6 2xl:gap-[30px]">
@@ -578,7 +557,7 @@ function IndexPage() {
                     id={product.id}
                     title={product.name}
                     price={priceLabel}
-                    oldPrice={oldPriceLabel}
+                    oldPrice={''}
                     image={product.image}
                     hasCartButton={product.inCart}
                   />

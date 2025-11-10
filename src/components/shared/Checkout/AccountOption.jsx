@@ -1,98 +1,185 @@
-import React, { useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { AuthDialog } from '../AuthDialog'
 import { useStateContext } from '@/context/state-context'
 import { useCreateOrder } from '@/lib/queries/orders'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import { Spinner } from '@/components/ui/spinner'
 
 export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
   const [isAccepted, setIsAccepted] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
   const [error, setError] = useState(null)
-  const { getCheckoutFormData } = useStateContext()
+  const {
+    getCheckoutFormData,
+    saveCheckoutFormData,
+    isAuthenticated,
+    user,
+    clearCart,
+    setIsCheckoutCompleted,
+  } = useStateContext()
 
-  const { mutateAsync: createOrder, isPending } = useCreateOrder()
+  const { mutateAsync: createOrder, isPending } = useCreateOrder({
+    onSuccess: (response) => {
+      const payload = response?.data?.[0] || response?.data
+      saveCheckoutFormData(6, {
+        orderResponse: payload,
+        orderStatus: response?.status,
+        rawResponse: response,
+      })
+      clearCart?.()
+      setIsCheckoutCompleted?.(true)
+    },
+  })
 
   // Function to combine all form data into the final payload
-  const prepareFinalPayload = () => {
+  const prepareFinalPayload = useCallback(() => {
     const step1Data = getCheckoutFormData(1) // Loan Limit
     const step2Data = getCheckoutFormData(2) // Personal Info
     const step3Data = getCheckoutFormData(3) // Delivery Details
     const step4Data = getCheckoutFormData(4) // Order Summary
     const step5Data = getCheckoutFormData(5) // Terms & Conditions
 
-    const finalPayload = {
-      customer: step2Data?.apiPayload?.customer || {},
-      orderLines: step4Data?.apiPayload?.orderLines || [],
-      shippingDetail: step3Data?.apiPayload?.shippingDetail || {},
-      creditData: step1Data?.apiPayload?.creditData || {},
-      userConsents: step5Data?.apiPayload?.userConsents || [],
-      documents: step1Data?.apiPayload?.documents || [],
+    if (!step1Data || !step2Data || !step3Data || !step4Data || !step5Data) {
+      throw new Error('Please complete all checkout steps before submitting your order.')
     }
 
-    console.log('Final Submission Payload:', finalPayload)
+    if (!step5Data?.isAccepted) {
+      throw new Error('Please accept the terms and conditions before continuing.')
+    }
+
+    const customer = {
+      fullName: step2Data?.apiPayload?.customer?.fullName || step2Data?.fullName,
+      phoneNumber: normalizeKenyanPhoneNumber(
+        step2Data?.apiPayload?.customer?.phoneNumber || step2Data?.phoneNumber || '',
+      ),
+      email: step2Data?.apiPayload?.customer?.email || step2Data?.email,
+      employer: step2Data?.apiPayload?.customer?.employer || step2Data?.employer,
+      employeeNumber:
+        step2Data?.apiPayload?.customer?.employeeNumber || step2Data?.employeeNumber,
+    }
+
+    const orderLines = (step4Data?.apiPayload?.orderLines || []).map((line) => ({
+      name: line.name,
+      sku: line.sku,
+      quantity: Number(line.quantity) || 0,
+      unitPrice: Number(line.unitPrice) || 0,
+    }))
+
+    if (!orderLines.length) {
+      throw new Error('Your cart is empty. Please add at least one product to proceed.')
+    }
+
+    const shippingDetail = { ...(step3Data?.apiPayload?.shippingDetail || {}) }
+    const fallbackEmail = customer.email
+    shippingDetail.recipientEmail = shippingDetail.recipientEmail || fallbackEmail || ''
+    shippingDetail.recipientPhoneNumber = normalizeKenyanPhoneNumber(
+      shippingDetail.recipientPhoneNumber || customer.phoneNumber || '',
+    )
+    if (shippingDetail.type?.toLowerCase() === 'pickup' || shippingDetail.type === 'PickUp') {
+      shippingDetail.type = 'PickUp'
+    } else {
+      shippingDetail.type = 'Delivery'
+    }
+
+    const creditData = step1Data?.apiPayload?.creditData || {}
+    const formattedCreditData = {
+      basicSalary: Number(creditData.basicSalary) || 0,
+      netSalary: Number(creditData.netSalary) || 0,
+      tenure: Number(creditData.tenure) || 0,
+    }
+
+    const userConsents = (step5Data?.apiPayload?.userConsents || []).map((consent) => ({
+      ...consent,
+      consentedAt: consent.consentedAt || new Date().toISOString(),
+    }))
+
+    if (!userConsents.length) {
+      throw new Error('We were unable to capture your consents. Please accept the terms and try again.')
+    }
+
+    const documents = step1Data?.apiPayload?.documents || []
+
+    const finalPayload = {
+      customer,
+      orderLines,
+      shippingDetail,
+      creditData: formattedCreditData,
+      userConsents,
+      documents,
+    }
+
     return finalPayload
-  }
+  }, [getCheckoutFormData])
+
+  const submitOrder = useCallback(
+    async ({ onSuccess } = {}) => {
+      setError(null)
+      try {
+        const payload = prepareFinalPayload()
+        await createOrder(payload)
+        onSuccess?.()
+      } catch (err) {
+        setError(
+          err?.message || 'We could not submit your order. Please review your details and try again.',
+        )
+        throw err
+      }
+    },
+    [createOrder, prepareFinalPayload],
+  )
 
   const handleGuestCheckout = async () => {
-    setError(null)
     try {
-      const payload = prepareFinalPayload()
-      console.log('Guest checkout payload:', payload)
-      
-      // const response = await createOrder(payload)
-      // console.log('Order created successfully:', response)
-      
-      // Only navigate on success
-      if (onNext) {
-        onNext()
-      }
-    } catch (error) {
-      console.error('Guest checkout failed:', error)
-      setError(error?.message || 'Failed to create order. Please try again.')
+      await submitOrder({
+        onSuccess: () => {
+          onNext?.()
+        },
+      })
+    } catch {
+      /* handled in submitOrder */
     }
   }
 
   const handleLoginSuccess = async () => {
-    setError(null)
     try {
-      const payload = prepareFinalPayload()
-      console.log('Login success payload:', payload)
-      
-      // const response = await createOrder(payload)
-      // console.log('Order created successfully:', response)
-      
-      // Close auth dialog and navigate on success
-      setShowAuthDialog(false)
-      if (onNext) {
-        onNext()
-      }
-    } catch (error) {
-      console.error('Login success submission failed:', error)
-      setError(error?.message || 'Failed to create order. Please try again.')
+      await submitOrder({
+        onSuccess: () => {
+          setShowAuthDialog(false)
+          onNext?.()
+        },
+      })
+    } catch {
+      /* handled */
     }
   }
 
   const handleSubmitOrder = async () => {
-    setError(null)
     try {
-      const payload = prepareFinalPayload()
-      console.log('Submit order payload:', payload)
-      
-      // const response = await createOrder(payload)
-      // console.log('Order created successfully:', response)
-      
-      // Only navigate on success
-      if (onNext) {
-        onNext()
-      }
-    } catch (error) {
-      console.error('Submit order failed:', error)
-      setError(error?.message || 'Failed to create order. Please try again.')
+      await submitOrder({
+        onSuccess: () => {
+          onNext?.()
+        },
+      })
+    } catch {
+      /* handled */
     }
   }
+
+  const userDisplayName = useMemo(() => {
+    if (!user) return ''
+    return (
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(' ') ||
+      user.email ||
+      user.phoneNumber ||
+      ''
+    )
+  }, [user])
+
+  const showAccountPrompt = !isAuthenticated
 
   return (
     <div className="flex flex-col items-center justify-center mb-[50px] p-0 sm:p-0 gap-6">
@@ -110,74 +197,119 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
 
           <div className="w-full h-px bg-[#E8ECF4] my-4 sm:my-6"></div>
 
-          {/* Checkbox Section */}
-          <div className="mb-6">
-            <div className="flex flex-row items-start sm:items-left p-0 gap-3 w-full h-auto sm:h-[34px]">
-              <Checkbox
-                id="account-terms"
-                checked={isAccepted}
-                onCheckedChange={setIsAccepted}
-                disabled={isPending}
-                className="flex flex-col justify-center items-center w-6 h-6 sm:w-[34px] sm:h-[34px] border-2 border-[#E8ECF4] rounded-lg sm:rounded-xl p-0 gap-2.5 mt-1 sm:mt-0"
-              />
-              <label
-                htmlFor="account-terms"
-                className="w-full flex flex-wrap items-left lg:mt-1 md:mt-1 text-left text-base sm:text-lg font-medium leading-[1.4] capitalize text-[#0D0B26] cursor-pointer select-none"
-              >
-                <span className="mr-1">
-                  No Account? Create Okoa Sasa shopping account
-                </span>
-              </label>
-            </div>
-          </div>
+          {error && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-          {/* Action Buttons - Conditionally rendered based on checkbox state */}
-          {!isAccepted ? (
-            // Original buttons when checkbox is unchecked
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-              <Button
-                onClick={() => setShowAuthDialog(true)}
-                disabled={isPending}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-              >
-                Sign In
-              </Button>
+          {showAccountPrompt ? (
+            <>
+              <div className="mb-6">
+                <div className="flex flex-row items-start sm:items-left p-0 gap-3 w-full h-auto sm:h-[34px]">
+                  <Checkbox
+                    id="account-terms"
+                    checked={isAccepted}
+                    onCheckedChange={setIsAccepted}
+                    disabled={isPending}
+                    className="flex flex-col justify-center items-center w-6 h-6 sm:w-[34px] sm:h-[34px] border-2 border-[#E8ECF4] rounded-lg sm:rounded-xl p-0 gap-2.5 mt-1 sm:mt-0"
+                  />
+                  <label
+                    htmlFor="account-terms"
+                    className="w-full flex flex-wrap items-left lg:mt-1 md:mt-1 text-left text-base sm:text-lg font-medium leading-[1.4] capitalize text-[#0D0B26] cursor-pointer select-none"
+                  >
+                    <span className="mr-1">
+                      No Account? Create Okoa Sasa shopping account
+                    </span>
+                  </label>
+                </div>
+              </div>
 
-              <Button
-                onClick={handleGuestCheckout}
-                disabled={isPending}
-                variant="outline"
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-              >
-                {isPending ? 'Processing...' : 'Continue As Guest'}
-              </Button>
-            </div>
+              {!isAccepted ? (
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                  <Button
+                    onClick={() => setShowAuthDialog(true)}
+                    disabled={isPending}
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                  >
+                    Sign In
+                  </Button>
+
+                    <Button
+                      onClick={handleGuestCheckout}
+                      disabled={isPending}
+                      variant="outline"
+                      className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                    >
+                      {isPending && (
+                        <Spinner className="mr-2 h-4 w-4 text-orange-500" />
+                      )}
+                      {isPending ? 'Processing...' : 'Continue As Guest'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                    <Button
+                      onClick={handleSubmitOrder}
+                      disabled={isPending}
+                      className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                    >
+                      {isPending && (
+                        <Spinner className="mr-2 h-4 w-4 text-white" />
+                      )}
+                      {isPending ? 'Submitting...' : 'Submit Order'}
+                    </Button>
+
+                  <Button
+                    onClick={onPrevious}
+                    disabled={isPending}
+                    variant="outline"
+                    className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                  >
+                    Back
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
-            // New buttons when checkbox is checked
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
-              <Button
-                onClick={handleSubmitOrder}
-                disabled={isPending}
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
-              >
-                {isPending ? 'Submitting...' : 'Submit Order'}
-              </Button>
+            <>
+              {/* <div className="mb-6 rounded-2xl border border-[#FEE6D5] bg-[#FFF8F1] p-4 text-sm text-[#7A4E1D]">
+                <p className="font-medium">
+                  {userDisplayName ? `Signed in as ${userDisplayName}.` : 'You are signed in.'}
+                </p>
+                <p>
+                  We&apos;ll use your account details to complete this order. Review and submit when ready.
+                </p>
+              </div> */}
 
-              <Button
-                onClick={onPrevious}
-                disabled={isPending}
-                variant="outline"
-                className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
-              >
-                Back
-              </Button>
-            </div>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 sm:mt-6">
+                <Button
+                  onClick={handleSubmitOrder}
+                  disabled={isPending}
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 bg-linear-to-b from-[#F8971D] to-[#EE3124] text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium shadow-md"
+                >
+                  {isPending && (
+                    <Spinner className="mr-2 h-4 w-4 text-white" />
+                  )}
+                  {isPending ? 'Submitting...' : 'Submit Order'}
+                </Button>
+
+                <Button
+                  onClick={onPrevious}
+                  disabled={isPending}
+                  variant="outline"
+                  className="flex flex-row justify-center items-center px-4 py-3 gap-2.5 w-full sm:w-[474px] h-[46px] flex-1 border-2 border-orange-500 text-orange-500 hover:bg-orange-50 disabled:opacity-50 disabled:cursor-not-allowed rounded-3xl text-base font-medium"
+                >
+                  Back
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Back Button - Hidden when checkbox is checked */}
-      {!isAccepted && (
+      {!isAccepted && showAccountPrompt && (
         <div className="flex justify-end w-full">
           <Button
             onClick={onPrevious}

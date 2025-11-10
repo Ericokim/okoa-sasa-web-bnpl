@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useAccountStore } from '@/data/accountStore'
 import { Separator } from '@/components/ui/separator'
 import { EditIcon } from '@/assets/icons'
 import { useForm } from 'react-hook-form'
@@ -8,82 +7,162 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import { EmailIcon, PhoneIcon, SingleUserIcon, UserFileIcon, UserCardIcon, UserMsgIcon } from '@/assets/icons'
+import {
+  EmailIcon,
+  PhoneIcon,
+  SingleUserIcon,
+  UserFileIcon,
+  UserCardIcon,
+  UserMsgIcon,
+} from '@/assets/icons'
 import { PhoneInput } from '@/components/shared/Inputs/FormPhone'
 import { FormInput } from '@/components/shared/Inputs/FormInputs'
+import { useStateContext } from '@/context/state-context'
+import { useUpdateUser } from '@/lib/queries/user'
+import { normalizeKenyanPhoneNumber } from '@/lib/validation'
 
 // Validation schema
 const personalInfoSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
-  phone: z.string().min(1, 'Phone number is required').refine(
-    (value) => {
-      if (!value || value.trim() === '') return false
-      const cleaned = value.replace(/\s/g, '')
-      if (cleaned.startsWith('+254')) {
-        return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
-      }
-      if (cleaned.startsWith('0')) {
-        return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
-      }
-      return false
-    },
-    {
-      message: 'Please enter a valid Kenyan phone number',
-    },
-  ),
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address'),
+  phoneNumber: z
+    .string()
+    .min(1, 'Phone number is required')
+    .refine(
+      (value) => {
+        if (!value || value.trim() === '') return false
+        const cleaned = value.replace(/\s/g, '')
+        if (cleaned.startsWith('+254')) {
+          return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
+        }
+        if (cleaned.startsWith('0')) {
+          return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
+        }
+        return false
+      },
+      {
+        message: 'Please enter a valid Kenyan phone number',
+      },
+    ),
   company: z.string().min(1, 'Company is required'),
-  ID: z.string().min(1, 'ID number is required').min(6, 'ID number must be at least 6 digits'),
-  employeeId: z.string().min(1, 'Employee number is required'),
+  idNumber: z
+    .string()
+    .min(1, 'ID number is required')
+    .min(6, 'ID number must be at least 6 digits'),
+  employeeNumber: z.string().min(1, 'Employee number is required'),
 })
 
+const splitName = (fullName = '') => {
+  if (!fullName) return { firstName: '', lastName: '' }
+  const parts = fullName.trim().split(/\s+/)
+  if (parts.length === 1) {
+    return { firstName: parts[0], lastName: '' }
+  }
+  return {
+    firstName: parts[0],
+    lastName: parts.slice(1).join(' '),
+  }
+}
+
+const buildInitialValues = (user) => {
+  const names = splitName(user?.fullName)
+  return {
+    firstName: user?.firstName || names.firstName || '',
+    lastName: user?.lastName || names.lastName || '',
+    email: user?.email || '',
+    phoneNumber: user?.phoneNumber || '',
+    company: user?.employer || user?.company || '',
+    idNumber: user?.idNumber || '',
+    employeeNumber: user?.employeeNumber || user?.employeeId || '',
+  }
+}
+
 export function RouteComponent() {
-  const { personalInfo, updatePersonalInfo } = useAccountStore()
+  const { user, login } = useStateContext()
   const [editing, setEditing] = useState(false)
+  const initialValues = useMemo(() => buildInitialValues(user), [user])
+
+
+  // // Single useProducts call - no conditional hooks
+  // const { data:masokoproducts, isLoading:isMasokoProductsLoading, error:masokoError } = useProducts({
+  //   amount: 20000,
+  //   organization: "liberty",
+  //   channel: "ussd",
+  // });
+
+  // console.log(masokoproducts)
+
 
   // Initialize form with personalInfo
   const form = useForm({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues: {
-      firstName: personalInfo.firstName || '',
-      lastName: personalInfo.lastName || '',
-      email: personalInfo.email || '',
-      phone: personalInfo.phone || '',
-      company: personalInfo.company || '',
-      ID: personalInfo.ID || '',
-      employeeId: personalInfo.employeeId || '',
+    defaultValues: initialValues,
+  })
+
+  useEffect(() => {
+    form.reset(initialValues)
+  }, [form, initialValues])
+
+  const updateUserMutation = useUpdateUser({
+    onSuccess: (_response, variables) => {
+      const formattedFullName =
+        variables?.fullName ||
+        `${form.getValues('firstName')} ${form.getValues('lastName')}`.trim()
+      login?.({
+        ...(user || {}),
+        fullName: formattedFullName,
+        lastName: variables?.lastName ?? form.getValues('lastName'),
+        email: variables?.email,
+        phoneNumber: variables?.phoneNumber,
+        employer: variables?.employer,
+        company: variables?.employer,
+        idNumber: variables?.idNumber,
+        employeeNumber: variables?.employeeNumber,
+      })
+      setEditing(false)
     },
   })
 
+  const userId =
+    user?.id || user?.userId || user?.userID || user?.idNumber || undefined
+
   const handleSave = (data) => {
-    updatePersonalInfo(data)
-    setEditing(false)
+    if (!userId) return
+
+    const normalizedPhone = normalizeKenyanPhoneNumber(data.phoneNumber)
+    const payload = {
+      userId,
+      idNumber: data.idNumber.trim(),
+      phoneNumber: normalizedPhone,
+      fullName: `${data.firstName} ${data.lastName}`
+        .replace(/\s+/g, ' ')
+        .trim(),
+      lastName: data.lastName.trim(),
+      email: data.email.trim(),
+      employer: data.company.trim(),
+      employeeNumber: data.employeeNumber.trim(),
+      isStaff: Boolean(user?.isStaff),
+      roles: Array.isArray(user?.roles)
+        ? user.roles.map((role) => role?.roleId || role?.name).filter(Boolean)
+        : [],
+    }
+
+    console.log('profile', payload)
+
+    updateUserMutation.mutate(payload)
   }
 
   const handleCancel = () => {
-    form.reset({
-      firstName: personalInfo.firstName || '',
-      lastName: personalInfo.lastName || '',
-      email: personalInfo.email || '',
-      phone: personalInfo.phone || '',
-      company: personalInfo.company || '',
-      ID: personalInfo.ID || '',
-      employeeId: personalInfo.employeeId || '',
-    })
+    form.reset(initialValues)
     setEditing(false)
   }
 
   const handleEdit = () => {
-    form.reset({
-      firstName: personalInfo.firstName || '',
-      lastName: personalInfo.lastName || '',
-      email: personalInfo.email || '',
-      phone: personalInfo.phone || '',
-      company: personalInfo.company || '',
-      ID: personalInfo.ID || '',
-      employeeId: personalInfo.employeeId || '',
-    })
+    form.reset(initialValues)
     setEditing(true)
   }
 
@@ -116,7 +195,7 @@ export function RouteComponent() {
               First Name
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.firstName}
+              {initialValues.firstName || '—'}
             </p>
           </div>
 
@@ -126,7 +205,7 @@ export function RouteComponent() {
               Last Name
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.lastName}
+              {initialValues.lastName || '—'}
             </p>
           </div>
 
@@ -136,7 +215,7 @@ export function RouteComponent() {
               Email Address
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.email}
+              {initialValues.email || '—'}
             </p>
           </div>
 
@@ -146,7 +225,7 @@ export function RouteComponent() {
               Phone Number
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.phone}
+              {initialValues.phoneNumber || '—'}
             </p>
           </div>
 
@@ -156,7 +235,7 @@ export function RouteComponent() {
               Employee No
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.employeeId || '—'}
+              {initialValues.employeeNumber || '—'}
             </p>
           </div>
 
@@ -166,17 +245,17 @@ export function RouteComponent() {
               Company
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.company}
+              {initialValues.company || '—'}
             </p>
           </div>
 
-          {/* ID No */}
+          {/* idNumber No */}
           <div>
             <p className="font-sans text-base font-normal leading-[22px] text-gray-600">
-              ID No
+              idNumber No
             </p>
             <p className="font-sans font-medium text-[18px] leading-[25px] text-[#252525]">
-              {personalInfo.ID || '—'}
+              {initialValues.idNumber || '—'}
             </p>
           </div>
         </div>
@@ -221,18 +300,18 @@ export function RouteComponent() {
               />
             </div>
 
-            {/* Row 3: Phone + ID No */}
+            {/* Row 3: Phone + idNumber No */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <PhoneInput
                 control={form.control}
-                name="phone"
+                name="phoneNumber"
                 label="Phone Number"
                 placeholder="+254712345678 or 0712345678"
                 icon={PhoneIcon}
               />
               <FormInput
                 control={form.control}
-                name="ID"
+                name="idNumber"
                 label="ID Number"
                 placeholder="Enter ID number (6+ digits)"
                 icon={UserFileIcon}
@@ -245,7 +324,7 @@ export function RouteComponent() {
               <div className="sm:col-span-2">
                 <FormInput
                   control={form.control}
-                  name="employeeId"
+                  name="employeeNumber"
                   label="Employee Number"
                   placeholder="Enter employee number"
                   icon={UserMsgIcon}
@@ -258,8 +337,9 @@ export function RouteComponent() {
               <Button
                 type="submit"
                 className="flex-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full py-2 font-medium transition-colors"
+                disabled={updateUserMutation.isPending}
               >
-                Save
+                {updateUserMutation.isPending ? 'Saving...' : 'Save'}
               </Button>
               <Button
                 type="button"

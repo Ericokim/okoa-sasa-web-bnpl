@@ -1,22 +1,46 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Camera, IdCard, MapPin, UserCheck } from 'lucide-react'
 import { ProfilePhotoDialog } from './ProfileDialog'
-import { useAccountStore } from '@/data/accountStore'
 import { Badge } from '@/components/ui/badge'
+import { useStateContext } from '@/context/state-context'
 
 export function RouteComponent() {
-  const { personalInfo, updateAvatar } = useAccountStore()
+  const { user, login } = useStateContext()
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  const avatarUrl = personalInfo.avatar || '/avator.png'
+  const profilePhoto = user?.profilePhoto?.url || user?.avatar
+  const avatarUrl = profilePhoto || '/avator.png'
+  const locationLabel = user?.location || user?.addresses?.[0]?.description
+  const employeeNumber = user?.employeeNumber || user?.employeeId || '—'
+  const nationalId = user?.idNumber || user?.ID
+  const company = user?.employer || user?.company || '—'
+  const nameParts = useMemo(() => {
+    if (user?.firstName || user?.lastName) {
+      return {
+        firstName: user?.firstName || '',
+        lastName: user?.lastName || '',
+      }
+    }
+    if (!user?.fullName) return { firstName: '', lastName: '' }
+    const tokens = user.fullName.trim().split(/\s+/)
+    return {
+      firstName: tokens[0] || '',
+      lastName: tokens.slice(1).join(' '),
+    }
+  }, [user])
 
   const openDialog = () => setDialogOpen(true)
   const closeDialog = () => setDialogOpen(false)
 
   const handlePhotoChange = (url) => {
-    updateAvatar(url)
+    login?.({
+      ...(user || {}),
+      avatar: url,
+      profilePhoto: url
+        ? { ...(user?.profilePhoto || {}), url }
+        : null,
+    })
     closeDialog()
   }
 
@@ -34,8 +58,8 @@ export function RouteComponent() {
               <Avatar className="h-28 w-28 ring-1 ring-white">
                 <AvatarImage src={avatarUrl} alt="Profile" />
                 <AvatarFallback className="text-2xl font-medium">
-                  {personalInfo.firstName[0]}
-                  {personalInfo.lastName[0]}
+                  {(nameParts.firstName || 'U').charAt(0)}
+                  {(nameParts.lastName || 'N').charAt(0)}
                 </AvatarFallback>
               </Avatar>
 
@@ -56,14 +80,14 @@ export function RouteComponent() {
         <div className="text-center space-y-3">
           <div>
             <h1 className="font-sans text-2xl font-semibold text-[#252525] capitalize">
-              {personalInfo.firstName} {personalInfo.lastName}
+              {nameParts.firstName} {nameParts.lastName}
             </h1>
             <p className="font-sans text-base text-[#252525] mt-1">
-              {personalInfo.company}
+              {company}
             </p>
             <p className="font-sans text-sm text-[#6B7280] flex items-center justify-center gap-1 mt-1">
               <MapPin className="h-3.5 w-3.5" />
-              {personalInfo.location}
+              {locationLabel || '—'}
             </p>
           </div>
 
@@ -78,18 +102,18 @@ export function RouteComponent() {
                 Employee No.
               </Badge>
               <span className="font-mono text-sm font-medium text-foreground">
-                {personalInfo.employeeId || '—'}
+                {employeeNumber || '—'}
               </span>
             </div>
 
-            {personalInfo.ID && (
+            {nationalId && (
               <div className="flex items-center justify-center gap-2">
                 <Badge variant="outline" className="border-gray-300 text-xs">
                   <IdCard className="h-3 w-3 mr-1" />
                   National ID
                 </Badge>
                 <span className="font-mono text-sm font-medium text-foreground">
-                  {personalInfo.ID}
+                  {nationalId}
                 </span>
               </div>
             )}
@@ -109,8 +133,8 @@ export function RouteComponent() {
               <Avatar className="h-24 w-24 ring-1 ring-white">
                 <AvatarImage src={avatarUrl} alt="Profile" />
                 <AvatarFallback className="font-medium text-xl">
-                  {personalInfo.firstName[0]}
-                  {personalInfo.lastName[0]}
+                  {(nameParts.firstName || 'U').charAt(0)}
+                  {(nameParts.lastName || 'N').charAt(0)}
                 </AvatarFallback>
               </Avatar>
 
@@ -128,16 +152,16 @@ export function RouteComponent() {
           <div className="flex-1 space-y-4">
             <div>
               <h1 className="font-sans text-[28px] font-semibold leading-[39px] capitalize text-[#252525]">
-                {personalInfo.firstName} {personalInfo.lastName}
-              </h1>
-              <p className="font-sans text-base font-normal leading-[22px] text-[#252525]">
-                {personalInfo.company}
-              </p>
-              <p className="font-sans text-base font-normal leading-[22px] text-[#252525] flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {personalInfo.location}
-              </p>
-            </div>
+              {nameParts.firstName} {nameParts.lastName}
+            </h1>
+            <p className="font-sans text-base font-normal leading-[22px] text-[#252525]">
+              {company}
+            </p>
+            <p className="font-sans text-base font-normal leading-[22px] text-[#252525] flex items-center gap-1">
+              <MapPin className="h-4 w-4" />
+              {locationLabel || '—'}
+            </p>
+          </div>
 
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
@@ -145,25 +169,25 @@ export function RouteComponent() {
                   variant="secondary"
                   className="bg-orange-50 text-orange-700 border-orange-200"
                 >
-                  <UserCheck className="h-3 w-3 mr-1" />
-                  Employee No.
+                <UserCheck className="h-3 w-3 mr-1" />
+                Employee No.
+              </Badge>
+              <span className="font-mono text-sm font-medium text-foreground">
+                {employeeNumber || '—'}
+              </span>
+            </div>
+
+            {nationalId && (
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="border-gray-300">
+                  <IdCard className="h-3 w-3 mr-1" />
+                  National ID
                 </Badge>
                 <span className="font-mono text-sm font-medium text-foreground">
-                  {personalInfo.employeeId}
+                  {nationalId}
                 </span>
               </div>
-
-              {personalInfo.ID && (
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="border-gray-300">
-                    <IdCard className="h-3 w-3 mr-1" />
-                    National ID
-                  </Badge>
-                  <span className="font-mono text-sm font-medium text-foreground">
-                    {personalInfo.ID}
-                  </span>
-                </div>
-              )}
+            )}
             </div>
           </div>
         </div>
@@ -175,6 +199,7 @@ export function RouteComponent() {
         onClose={closeDialog}
         currentPhoto={avatarUrl}
         onPhotoChange={handlePhotoChange}
+        userId={user?.id || user?.userId || user?.idNumber}
       />
     </>
   )

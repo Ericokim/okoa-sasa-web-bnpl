@@ -38,7 +38,6 @@ export const Dialog = React.forwardRef(
         ref={ref}
         modal={true}
         open={open}
-        defaultOpen={open}
         onOpenChange={onOpenChange}
         {...props}
       >
@@ -133,7 +132,6 @@ export const AlertDialog = React.forwardRef(({ ...props }, ref) => {
     <At.AlertDialog
       modal={true}
       open={alert.open}
-      defaultOpen={alert.open}
       onOpenChange={alert.closeConfirmation}
       {...props}
     >

@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Dialog, DialogPortal } from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { Button } from '@/components/ui/button'
@@ -19,17 +19,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { useUpdateUserProfilePhoto } from '@/lib/queries/user'
 
 export function RouteComponent({
   isOpen,
   onClose,
   currentPhoto,
   onPhotoChange,
+  userId,
 }) {
   const [preview, setPreview] = useState(currentPhoto)
   const [uploadMode, setUploadMode] = useState(false)
   const [tempFile, setTempFile] = useState(null)
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
+  const updatePhotoMutation = useUpdateUserProfilePhoto()
+
+  useEffect(() => {
+    if (isOpen) {
+      setPreview(currentPhoto)
+      setUploadMode(false)
+      setTempFile(null)
+    }
+  }, [currentPhoto, isOpen])
 
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0]
@@ -48,15 +59,30 @@ export function RouteComponent({
   })
 
   const handleSave = async () => {
-    if (!tempFile) return
+    if (!tempFile || !userId) return
 
     try {
-      const uploadedUrl = await uploadAvatarToServer(tempFile)
-      onPhotoChange(uploadedUrl)
-      enqueueSnackbar('Profile photo updated successfully!', {
-        variant: 'success',
-      })
-      onClose()
+      const fileUrl = await fileToDataUrl(tempFile)
+      updatePhotoMutation.mutate(
+        {
+          userId,
+          format: tempFile.type,
+          url: fileUrl,
+          name: tempFile.name || 'profile-photo',
+          type: tempFile.type?.split('/')?.[0] || 'profile',
+        },
+        {
+          onSuccess: () => {
+            onPhotoChange?.(fileUrl)
+            enqueueSnackbar('Profile photo updated successfully!', {
+              variant: 'success',
+            })
+            setTempFile(null)
+            setUploadMode(false)
+            onClose()
+          },
+        },
+      )
     } catch (err) {
       enqueueSnackbar('Upload failed. Please try again.', { variant: 'error' })
     }
@@ -73,10 +99,30 @@ export function RouteComponent({
   }
 
   const handleDeleteConfirm = () => {
-    onPhotoChange(null)
-    enqueueSnackbar('Profile photo removed.', { variant: 'success' })
-    setShowDeleteAlert(false)
-    onClose()
+    if (!userId) {
+      onPhotoChange?.(null)
+      setShowDeleteAlert(false)
+      onClose()
+      return
+    }
+
+    updatePhotoMutation.mutate(
+      {
+        userId,
+        format: null,
+        url: '',
+        name: 'remove',
+        type: 'remove',
+      },
+      {
+        onSuccess: () => {
+          onPhotoChange?.(null)
+          enqueueSnackbar('Profile photo removed.', { variant: 'success' })
+          setShowDeleteAlert(false)
+          onClose()
+        },
+      },
+    )
   }
 
   const handleUpdatePhoto = () => {
@@ -151,8 +197,9 @@ export function RouteComponent({
                     onClick={handleSave}
                     variant="gradient"
                     className="h-12 w-full rounded-3xl text-base font-medium"
+                    disabled={updatePhotoMutation.isPending}
                   >
-                    Save
+                    {updatePhotoMutation.isPending ? 'Saving...' : 'Save'}
                   </Button>
                   <Button
                     onClick={handleCancel}
@@ -206,8 +253,9 @@ export function RouteComponent({
               onClick={handleDeleteConfirm}
               className="h-11 flex-1 rounded-3xl   bg-gradient-to-b from-[#F8971D] to-[#EE3124] 
                   text-white font-medium text-base shadow-sm hover:opacity-90 transition-all  hover:bg-red-700"
+              disabled={updatePhotoMutation.isPending}
             >
-              Delete
+              {updatePhotoMutation.isPending ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -216,20 +264,13 @@ export function RouteComponent({
   )
 }
 
-/* --------------------------------------------------------------
-   Mock Upload (remove in prod)
-   -------------------------------------------------------------- */
-async function uploadAvatarToServer(file) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      if (Math.random() > 0.3) {
-        resolve(URL.createObjectURL(file))
-      } else {
-        reject(new Error('Upload failed'))
-      }
-    }, 1200)
+const fileToDataUrl = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
   })
-}
 
 export const Route = createFileRoute('/_protected/profile/ProfileDialog')({
   component: RouteComponent,

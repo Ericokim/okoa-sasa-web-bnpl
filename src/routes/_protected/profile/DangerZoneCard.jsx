@@ -1,13 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { TrashSolidWhiteIcon, TrashIconWhite } from '@/assets/icons'
+import { useDeleteUser } from '@/lib/queries/user'
+import { useStateContext } from '@/context/state-context'
 
 export function RouteComponent() {
   const [open, setOpen] = useState(false)
+  const navigate = useNavigate()
+  const { user, logout } = useStateContext()
+  const userId =
+    user?.id || user?.userId || user?.userID || user?.idNumber || undefined
+  const deleteMutation = useDeleteUser({
+    onSuccess: () => {
+      logout?.()
+      setOpen(false)
+      navigate({ to: '/' })
+    },
+  })
 
   const confirmDelete = () => {
-    setOpen(false)
+    if (!userId || deleteMutation.isPending) return
+    deleteMutation.mutate(userId)
   }
 
   return (
@@ -37,6 +51,7 @@ export function RouteComponent() {
             onClick={() => setOpen(true)}
             className="w-full sm:w-auto rounded-3xl px-6 py-3 text-base font-medium whitespace-nowrap  bg-red-400 hover:bg-red-600 "
             size="lg"
+            disabled={!userId}
           >
             <TrashIconWhite />
             Delete Account
@@ -63,8 +78,9 @@ export function RouteComponent() {
                 className="flex items-center justify-center gap-2 w-full h-[46px] px-4 py-3 
              bg-linear-to-b from-[#F8971D] to-[#EE3124] rounded-3xl 
              text-white font-medium text-base shadow-sm hover:opacity-90 transition-all"
+                disabled={deleteMutation.isPending}
               >
-                Delete
+                {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
               </Button>
               <Button
                 onClick={() => setOpen(false)}

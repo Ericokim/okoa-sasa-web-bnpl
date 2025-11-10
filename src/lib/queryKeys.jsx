@@ -4,9 +4,71 @@ export const queryKeys = {
       all: () => ['auth'],
       user: () => [...queryKeys.masoko.auth.all(), 'user'],
       login: () => [...queryKeys.masoko.auth.all(), 'login'],
+      otp: () => [...queryKeys.masoko.auth.all(), 'otp'],
       logout: () => [...queryKeys.masoko.auth.all(), 'logout'],
       resetPassword: () => [...queryKeys.masoko.auth.all(), 'resetPassword'],
       changePassword: () => [...queryKeys.masoko.auth.all(), 'changePassword'],
+    },
+
+    users: {
+      all: () => ['users'],
+      list: (filters) => [...queryKeys.masoko.users.all(), 'list', filters],
+      detail: (id) => [...queryKeys.masoko.users.all(), 'detail', id],
+      search: (query) => [...queryKeys.masoko.users.all(), 'search', query],
+      addresses: (id) => [...queryKeys.masoko.users.all(), 'addresses', id],
+      wishlist: (id) => [...queryKeys.masoko.users.all(), 'wishlist', id],
+      me: () => [...queryKeys.masoko.users.all(), 'me'],
+      update: () => [...queryKeys.masoko.users.all(), 'update'],
+      addressUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'address',
+        'update',
+      ],
+      notificationPreferenceUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'notification-preference',
+        'update',
+      ],
+      profilePhotoUpdate: () => [
+        ...queryKeys.masoko.users.all(),
+        'profile-photo',
+        'update',
+      ],
+      uploadDocuments: () => [
+        ...queryKeys.masoko.users.all(),
+        'upload-documents',
+      ],
+      loanAbility: () => [...queryKeys.masoko.users.all(), 'loan-ability'],
+      delete: () => [...queryKeys.masoko.users.all(), 'delete'],
+    },
+
+    orders: {
+      all: () => ['orders'],
+
+      list: (filters) => [...queryKeys.masoko.orders.all(), 'list', filters],
+      detail: (id) => [...queryKeys.masoko.orders.all(), 'detail', id],
+      byUser: (userId) => [...queryKeys.masoko.orders.all(), 'user', userId],
+      status: (status) => [...queryKeys.masoko.orders.all(), 'status', status],
+      tracking: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'tracking',
+        orderId,
+      ],
+      create: () => [...queryKeys.masoko.orders.all(), 'create'],
+      uploadDocuments: () => [
+        ...queryKeys.masoko.orders.all(),
+        'upload-documents',
+      ],
+      delete: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'delete',
+        orderId,
+      ],
+      update: (orderId) => [
+        ...queryKeys.masoko.orders.all(),
+        'update',
+        orderId,
+      ],
     },
 
     products: {
@@ -48,28 +110,6 @@ export const queryKeys = {
       update: () => [...queryKeys.masoko.cart.all(), 'update'],
       remove: () => [...queryKeys.masoko.cart.all(), 'remove'],
       clear: () => [...queryKeys.masoko.cart.all(), 'clear'],
-    },
-
-    orders: {
-      all: () => ['orders'],
-      list: (filters) => [...queryKeys.masoko.orders.all(), 'list', filters],
-      detail: (id) => [...queryKeys.masoko.orders.all(), 'detail', id],
-      byUser: (userId) => [...queryKeys.masoko.orders.all(), 'user', userId],
-      status: (status) => [...queryKeys.masoko.orders.all(), 'status', status],
-      tracking: (orderId) => [
-        ...queryKeys.masoko.orders.all(),
-        'tracking',
-        orderId,
-      ],
-    },
-
-    customers: {
-      all: () => ['customers'],
-      list: (filters) => [...queryKeys.masoko.customers.all(), 'list', filters],
-      detail: (id) => [...queryKeys.masoko.customers.all(), 'detail', id],
-      search: (query) => [...queryKeys.masoko.customers.all(), 'search', query],
-      addresses: (id) => [...queryKeys.masoko.customers.all(), 'addresses', id],
-      wishlist: (id) => [...queryKeys.masoko.customers.all(), 'wishlist', id],
     },
 
     payments: {
@@ -142,4 +182,21 @@ export const queryKeys = {
     regions: () => ['masoko-regions'],
     pickUpPoints: () => ['masoko-pick-up-points'],
   },
+}
+export const bnplQueryKeys = {
+  // Orders
+  orders: {
+    // orders query keys
+    ORDER_GET: 'getOrders',
+    ORDER_GET_BY_ID: 'getOrderByID',
+  },
+  //profile
+  profile: {
+    //profile query keys
+    PROFILE_GET_BY_ID: 'getProfileByID',
+    UPDATE_USER_DETAILS: 'updateUserDetails',
+    UPDATE_USER_ADDRESS: 'updateUserAddress',
+    UPDATE_USER_NOTIFICATION_PREFERENCES: 'updateUserNotificationPreferences',
+    UPDATE_PROFILE_PHOTO: 'updateProfilePhoto',
+  }
 }

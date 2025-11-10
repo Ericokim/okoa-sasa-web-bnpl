@@ -60,13 +60,13 @@ export default function OrderSummaryPage({
   const exceedsLoanLimit = grandTotal > loanLimit
 
   // Prepare orderLines payload
-  const orderLines = cartItems.map(item => {
+  const orderLines = cartItems.map((item) => {
     const quantity = Math.max(1, item.quantity || item.cartQuantity || 1)
     return {
       name: item.title || item.name || 'Product',
       sku: item.id.toString(),
       quantity: quantity,
-      unitPrice: item.price
+      unitPrice: item.price,
     }
   })
 
@@ -124,22 +124,20 @@ export default function OrderSummaryPage({
       totals: {
         subtotal: subtotal,
         shippingFee: shippingFee,
-        grandTotal: grandTotal
+        grandTotal: grandTotal,
       },
-      cartItems: cartItems 
+      cartItems: cartItems,
     }
 
-    console.log('Order payload:', orderPayload)
-    
     saveCheckoutFormData(4, {
       orderPayload: orderPayload,
-      apiPayload:orderPayload,
+      apiPayload: orderPayload,
       cartSummary: {
         subtotal,
         shippingFee,
         grandTotal,
-        itemCount: cartItems.length
-      }
+        itemCount: cartItems.length,
+      },
     })
 
     onNext()
@@ -181,11 +179,14 @@ export default function OrderSummaryPage({
             <div className="flex items-center gap-1 lg:gap-2 xl:gap-3 h-[40px] sm:h-[44px]">
               <button
                 onClick={() => handleDecrement(product.id, quantity)}
-                className="flex h-7 w-7 lg:h-8 lg:w-8 xl:h-10 xl:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                className="flex cursor-pointer h-7 w-7 lg:h-8 lg:w-8 xl:h-10 xl:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                 aria-label="Decrease quantity"
                 type="button"
               >
-                <Minus className="h-3 w-3 lg:h-3 lg:w-3 xl:h-4 xl:w-4 text-[#252525]" strokeWidth={1.75} />
+                <Minus
+                  className="h-3 w-3 lg:h-3 lg:w-3 xl:h-4 xl:w-4 text-[#252525]"
+                  strokeWidth={1.75}
+                />
               </button>
 
               <span className="flex w-6 lg:w-6 xl:w-8 justify-center text-sm lg:text-sm xl:text-base 2xl:text-lg font-semibold text-[#252525]">
@@ -194,11 +195,14 @@ export default function OrderSummaryPage({
 
               <button
                 onClick={() => handleIncrement(product.id, quantity)}
-                className="flex h-7 w-7 lg:h-8 lg:w-8 xl:h-10 xl:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                className="flex cursor-pointer h-7 w-7 lg:h-8 lg:w-8 xl:h-10 xl:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
                 aria-label="Increase quantity"
                 type="button"
               >
-                <Plus className="h-3 w-3 lg:h-3 lg:w-3 xl:h-4 xl:w-4 text-[#292D32]" strokeWidth={1.75} />
+                <Plus
+                  className="h-3 w-3 lg:h-3 lg:w-3 xl:h-4 xl:w-4 text-[#292D32]"
+                  strokeWidth={1.75}
+                />
               </button>
             </div>
           </div>
@@ -217,7 +221,10 @@ export default function OrderSummaryPage({
               className="flex h-[30px] w-[30px] items-center justify-center hover:opacity-80 transition-opacity"
               aria-label="Remove item"
             >
-              <TrashIcon className="h-[30px] w-[30px] text-[#F25E5E]" fill="#F25E5E" />
+              <TrashIcon
+                className="h-[30px] w-[30px] text-[#F25E5E]"
+                fill="#F25E5E"
+              />
             </button>
           </div>
         </div>
@@ -307,9 +314,12 @@ export default function OrderSummaryPage({
             <div className="flex items-center gap-3 sm:gap-4">
               <button
                 onClick={() => handleIncrement(product.id, quantity)}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                className="flex cursor-pointer h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
               >
-                <Plus className="h-3 w-3 sm:h-4 sm:w-4 text-[#292D32]" strokeWidth={1.75} />
+                <Plus
+                  className="h-3 w-3 sm:h-4 sm:w-4 text-[#292D32]"
+                  strokeWidth={1.75}
+                />
               </button>
 
               <span className="flex w-8 sm:w-10 justify-center text-base sm:text-lg font-semibold text-[#252525]">
@@ -318,9 +328,12 @@ export default function OrderSummaryPage({
 
               <button
                 onClick={() => handleDecrement(product.id, quantity)}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
+                className="flex cursor-pointer h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full border border-[#E8ECF4] bg-white transition-colors hover:bg-gray-50"
               >
-                <Minus className="h-3 w-3 sm:h-4 sm:w-4 text-[#252525]" strokeWidth={1.75} />
+                <Minus
+                  className="h-3 w-3 sm:h-4 sm:w-4 text-[#252525]"
+                  strokeWidth={1.75}
+                />
               </button>
             </div>
           </div>
@@ -337,7 +350,10 @@ export default function OrderSummaryPage({
                 onClick={() => handleDeleteClick(product)}
                 className="flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center hover:opacity-80 transition-opacity"
               >
-                <TrashIcon className="h-5 w-5 sm:h-6 sm:w-6 text-[#F25E5E]" fill="#F25E5E" />
+                <TrashIcon
+                  className="h-5 w-5 sm:h-6 sm:w-6 text-[#F25E5E]"
+                  fill="#F25E5E"
+                />
               </button>
             </div>
           </div>
@@ -349,7 +365,7 @@ export default function OrderSummaryPage({
   return (
     <div className="flex flex-col items-start mb-[50px] p-0 sm:p-0 gap-6 w-full">
       {/* Two Separate Cards Layout */}
-     <div className="flex flex-col lg:flex-row lg:items-start gap-6 w-full">
+      <div className="flex flex-col lg:flex-row lg:items-start gap-6 w-full">
         {/* First Card - Order Items */}
         <div className="flex-1">
           <div className="bg-white w-full h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
@@ -363,7 +379,7 @@ export default function OrderSummaryPage({
                   Confirm your order details
                 </p>
               </div>
-              
+
               {/* Clear Cart Button */}
               {cartItems.length > 0 && (
                 <AlertDialog>
@@ -373,20 +389,23 @@ export default function OrderSummaryPage({
                       variant="outline"
                       className="flex h-[40px] items-center justify-center gap-2 rounded-3xl border border-[#F25E5E] text-[#F25E5E] font-medium text-sm transition-all hover:bg-[#FFF5F5]"
                     >
-                      Clear Cart
+                      Remove All
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-[28px] border-none px-8 py-8 text-center shadow-[0_24px_60px_rgba(9,36,75,0.16)]">
                     <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#F8971D] to-[#EE3124]">
-                      <TrashIconWhite className="h-8 w-8 text-white" fill="white" />
+                      <TrashIconWhite
+                        className="h-8 w-8 text-white"
+                        fill="white"
+                      />
                     </div>
                     <AlertDialogHeader className="gap-2 text-center items-center justify-center">
                       <AlertDialogTitle className="text-xl font-bold text-[#252525]">
                         Clear Cart?
                       </AlertDialogTitle>
                       <AlertDialogDescription className="text-sm leading-relaxed text-[#676D75] items-center justify-center">
-                        This will remove all items from your cart. You won't be able
-                        to undo this action.
+                        This will remove all items from your cart. You won't be
+                        able to undo this action.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter className="mt-6 flex w-full flex-col gap-3 sm:flex-col sm:items-stretch">
@@ -411,7 +430,9 @@ export default function OrderSummaryPage({
             <div className="w-full flex flex-1 flex-col items-start gap-6">
               {/* Table Header - Desktop Only */}
               <div className="hidden w-full lg:grid lg:grid-cols-[minmax(260px,1fr)_minmax(110px,140px)_minmax(90px,120px)_auto] lg:items-start lg:gap-3 xl:grid-cols-[minmax(320px,1fr)_minmax(140px,180px)_minmax(120px,150px)_auto] xl:gap-4 2xl:grid-cols-[minmax(380px,1fr)_minmax(160px,200px)_minmax(140px,180px)_auto] 2xl:gap-6">
-                <div className="text-sm lg:text-base xl:text-lg font-semibold leading-[1.4] text-black">Item</div>
+                <div className="text-sm lg:text-base xl:text-lg font-semibold leading-[1.4] text-black">
+                  Item
+                </div>
                 <div className="text-center text-sm lg:text-base xl:text-lg font-semibold leading-[1.4] text-black">
                   Quantity
                 </div>
@@ -425,8 +446,12 @@ export default function OrderSummaryPage({
 
               {/* Mobile & Tablet Header */}
               <div className="flex items-center justify-between self-stretch lg:hidden">
-                <h3 className="text-base sm:text-lg font-semibold text-black">Items</h3>
-                <span className="text-xs sm:text-sm text-[#676D75]">{cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}</span>
+                <h3 className="text-base sm:text-lg font-semibold text-black">
+                  Items
+                </h3>
+                <span className="text-xs sm:text-sm text-[#676D75]">
+                  {cartItems.length} {cartItems.length === 1 ? 'item' : 'items'}
+                </span>
               </div>
 
               <div className="h-px self-stretch bg-[#E8ECF4] lg:hidden"></div>
@@ -466,9 +491,11 @@ export default function OrderSummaryPage({
                     <span className="text-xs sm:text-sm lg:text-base font-medium capitalize leading-[140%] text-[#676D75]">
                       Loan Limit
                     </span>
-                    <span className={`text-xs sm:text-sm lg:text-base font-medium capitalize leading-[140%] ${
-                      exceedsLoanLimit ? 'text-orange-500' : 'text-green-600'
-                    }`}>
+                    <span
+                      className={`text-xs sm:text-sm lg:text-base font-medium capitalize leading-[140%] ${
+                        exceedsLoanLimit ? 'text-orange-500' : 'text-green-600'
+                      }`}
+                    >
                       {formatCurrency(loanLimit)}
                     </span>
                   </div>
@@ -479,7 +506,12 @@ export default function OrderSummaryPage({
                     Total Items
                   </span>
                   <span className="text-xs sm:text-sm lg:text-base font-medium capitalize leading-[140%] text-black">
-                    {cartItems.reduce((total, item) => total + Math.max(1, item.quantity || item.cartQuantity || 1), 0)}
+                    {cartItems.reduce(
+                      (total, item) =>
+                        total +
+                        Math.max(1, item.quantity || item.cartQuantity || 1),
+                      0,
+                    )}
                   </span>
                 </div>
 
@@ -527,13 +559,13 @@ export default function OrderSummaryPage({
                 >
                   Next: Terms & Condition
                 </Button>
-                
+
                 {/* Back Button - Comes Second in DOM */}
                 <Button
                   onClick={onPrevious}
                   disabled={isFirstStep}
                   type="button"
-                  variant={"outline"}
+                  variant={'outline'}
                   className="flex justify-center items-center px-4 py-3 w-full sm:w-1/2 md:w-1/2 lg:w-full xl:w-full h-[46px] rounded-3xl border-2 border-orange-500 text-orange-500 hover:bg-orange-50 font-medium disabled:opacity-50"
                 >
                   Back
