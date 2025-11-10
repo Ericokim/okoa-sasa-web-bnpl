@@ -25,7 +25,6 @@ import { useLogin, useOTP } from '@/lib/queries/auth'
 import {
   LoginSchema,
   OTPVerificationSchema,
-  normalizeKenyanPhoneNumber,
   normalizeOtpValue,
 } from '@/lib/validation'
 import { CheckCircle2, Loader2, PhoneIcon, XIcon } from 'lucide-react'
@@ -38,7 +37,7 @@ export function AuthDialog({
   onLoginSuccess,
 }) {
   const [step, setStep] = useState(initialStep)
-  const [loginPhoneNumber, setLoginPhoneNumber] = useState('')
+  const [loginIdentifier, setLoginIdentifier] = useState('')
   const [countdown, setCountdown] = useState(41)
   const [isResending, setIsResending] = useState(false)
   const successTimerRef = useRef(null)
@@ -77,10 +76,10 @@ export function AuthDialog({
 
   const loginMutation = useLogin({
     onSuccess: (_response, variables) => {
-      const normalizedPhone = variables?.phoneNumberOrEmail || ''
+      const identifier = variables?.phoneNumberOrEmail || ''
 
-      setLoginPhoneNumber(normalizedPhone)
-      otpForm.reset({ otp: '', phoneNumberOrEmail: normalizedPhone })
+      setLoginIdentifier(identifier)
+      otpForm.reset({ otp: '', phoneNumberOrEmail: identifier })
       setStep('otp')
       setCountdown(41)
     },
@@ -100,13 +99,11 @@ export function AuthDialog({
       }, 1200)
     },
     onError: () => {
-      otpForm.reset({ otp: '', phoneNumberOrEmail: loginPhoneNumber })
+      otpForm.reset({ otp: '', phoneNumberOrEmail: loginIdentifier })
     },
   })
 
-  const maskedPhone = loginPhoneNumber
-    ? `${loginPhoneNumber.slice(0, 4)}****${loginPhoneNumber.slice(-2)}`
-    : '0712****'
+  const maskedIdentifier = maskLoginIdentifier(loginIdentifier)
   const otpValue = otpForm.watch('otp')
 
   useEffect(() => {
@@ -132,7 +129,7 @@ export function AuthDialog({
       }
       setTimeout(() => {
         setStep('login')
-        setLoginPhoneNumber('')
+        setLoginIdentifier('')
         setCountdown(41)
         setIsResending(false)
         form.reset({ phoneNumberOrEmail: '', rememberMe: false })
@@ -142,22 +139,20 @@ export function AuthDialog({
   }, [open, form, otpForm])
 
   const handleLogin = form.handleSubmit((data) => {
-    const normalizedPhone = normalizeKenyanPhoneNumber(
-      data.phoneNumberOrEmail,
-    )
+    const identifier = data.phoneNumberOrEmail?.trim()
 
-    if (!normalizedPhone) {
+    if (!identifier) {
       return
     }
 
-    loginMutation.mutate({ phoneNumberOrEmail: normalizedPhone })
+    loginMutation.mutate({ phoneNumberOrEmail: identifier })
   })
 
   const handleVerifyOTP = otpForm.handleSubmit(({ otp }) => {
-    const phoneIdentifier =
-      loginPhoneNumber || otpForm.getValues('phoneNumberOrEmail')
+    const contactIdentifier =
+      loginIdentifier || otpForm.getValues('phoneNumberOrEmail')
 
-    if (!phoneIdentifier) {
+    if (!contactIdentifier) {
       otpForm.setError('otp', {
         type: 'manual',
         message: 'Request a verification code to continue.',
@@ -168,20 +163,20 @@ export function AuthDialog({
 
     otpMutation.mutate({
       otp,
-      phoneNumberOrEmail: phoneIdentifier,
+      phoneNumberOrEmail: contactIdentifier,
     })
   })
 
   const handleResendOTP = () => {
-    if (!loginPhoneNumber || loginMutation.isPending) {
+    if (!loginIdentifier || loginMutation.isPending) {
       return
     }
 
     setIsResending(true)
-    otpForm.reset({ otp: '', phoneNumberOrEmail: loginPhoneNumber })
+    otpForm.reset({ otp: '', phoneNumberOrEmail: loginIdentifier })
 
     loginMutation.mutate(
-      { phoneNumberOrEmail: loginPhoneNumber },
+      { phoneNumberOrEmail: loginIdentifier },
       {
         onSettled: () => {
           setIsResending(false)
@@ -239,7 +234,7 @@ export function AuthDialog({
                 <OTPStep
                   form={otpForm}
                   otpValue={otpValue}
-                  maskedPhone={maskedPhone}
+                  maskedContact={maskedIdentifier}
                   countdown={countdown}
                   isResending={isResending}
                   isVerifying={otpMutation.isPending}
@@ -257,7 +252,7 @@ export function AuthDialog({
   )
 }
 
-const formatPhoneInputValue = (value = '') => {
+const formatPhoneValue = (value = '') => {
   if (!value) return ''
 
   const characters = value.split('')
@@ -287,6 +282,30 @@ const formatPhoneInputValue = (value = '') => {
   return result.slice(0, 13)
 }
 
+const formatLoginInputValue = (value = '') => {
+  if (!value) return ''
+  if (/[a-zA-Z@]/.test(value)) {
+    return value.trim()
+  }
+  return formatPhoneValue(value)
+}
+
+const maskLoginIdentifier = (value = '') => {
+  if (!value) return 'your contact info'
+  if (value.includes('@')) {
+    const [localPart = '', domain = ''] = value.split('@')
+    if (!domain) return value
+    const prefix = localPart.slice(0, Math.min(2, localPart.length))
+    const mask = localPart.length > 2 ? '***' : '*'
+    return `${prefix || '*'}${mask}@${domain}`
+  }
+  const compact = value.replace(/\s+/g, '')
+  if (compact.length <= 4) {
+    return `${compact.slice(0, Math.max(1, compact.length))}****`
+  }
+  return `${compact.slice(0, 4)}****${compact.slice(-2)}`
+}
+
 function LoginStep({ form, handleLogin, isSubmitting }) {
   const { control, formState } = form
   const pending = isSubmitting || formState.isSubmitting
@@ -310,7 +329,7 @@ function LoginStep({ form, handleLogin, isSubmitting }) {
             render={({ field }) => (
               <FormItem className="flex flex-col gap-[9px] w-full">
                 <FormFieldLabel className="text-[#252525] text-sm font-normal leading-[140%] font-['Public_Sans']">
-                  Phone Number
+                  Phone Number or Email
                 </FormFieldLabel>
                 <FormControl>
                   <div className="relative">
@@ -318,13 +337,14 @@ function LoginStep({ form, handleLogin, isSubmitting }) {
                       <PhoneIcon className="w-5 h-5 text-[#676D75]" />
                     </div>
                     <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+254"
-                      autoComplete="tel"
+                      id="login-identifier"
+                      type="text"
+                      inputMode="text"
+                      placeholder="Enter phone number or email"
+                      autoComplete="username"
                       value={field.value}
                       onChange={(e) =>
-                        field.onChange(formatPhoneInputValue(e.target.value))
+                        field.onChange(formatLoginInputValue(e.target.value))
                       }
                       className="w-full h-auto py-3 pl-14 pr-4 rounded-xl border border-[#E8ECF4] bg-[#F9FAFB] text-[#4d4d4e] text-base font-medium leading-[140%] font-['Public_Sans'] placeholder:text-[#A0A4AC] focus:outline-none focus:ring-2 focus:ring-[#F47120]/20 focus:border-[#F47120]"
                     />
@@ -384,7 +404,7 @@ function LoginStep({ form, handleLogin, isSubmitting }) {
 function OTPStep({
   form,
   otpValue,
-  maskedPhone,
+  maskedContact,
   countdown,
   isResending,
   isVerifying,
@@ -404,7 +424,7 @@ function OTPStep({
 
       <div className="w-full py-4 px-3 rounded-2xl bg-[rgba(244,113,32,0.12)] flex items-center justify-center">
         <p className="text-[#F47120] text-sm font-medium leading-[140%] font-['Public_Sans'] text-center">
-          We&apos;ve sent a 6-digit code to {maskedPhone}
+          We&apos;ve sent a 6-digit code to {maskedContact}
         </p>
       </div>
 
@@ -453,7 +473,7 @@ function OTPStep({
           />
 
           <p className="text-[#676D75] text-sm font-normal leading-[140%] text-center font-['Public_Sans']">
-            Enter the 6-digit code we sent to your phone
+            Enter the 6-digit code sent to your phone or email
           </p>
 
           <Button
