@@ -102,7 +102,7 @@ export const LoginSchema = zodResolver(
           return normalizeKenyanPhoneNumber(value)
         }
         return value.trim()
-      })
+      }),
 
     rememberMe: z.boolean().optional(),
   }),
