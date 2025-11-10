@@ -55,7 +55,7 @@ export function ProductInfo({ product }) {
       updateCartQuantity(product.id, existingQuantity + quantity)
     } else {
       // Add to cart with selected quantity
-      addToCart(product.id, quantity)
+      addToCart(product.id, quantity, product)
     }
 
     // Reset quantity to 1 after adding
@@ -69,7 +69,7 @@ export function ProductInfo({ product }) {
     if (isInCart) {
       updateCartQuantity(product.id, existingQuantity + quantity)
     } else {
-      addToCart(product.id, quantity)
+      addToCart(product.id, quantity, product)
     }
 
     navigate({ to: '/checkout/' })

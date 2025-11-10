@@ -7,42 +7,198 @@ import React, {
   useCallback,
   useRef,
 } from 'react'
-import { productCatalog } from '@/data/products'
-import { safeLocalStorage } from '@/lib/utils'
+import {
+  safeLocalStorage,
+  getStorageData as getEncryptedItem,
+  setStorageData as setEncryptedItem,
+  clearStorageData as clearEncryptedStorage,
+  formatCurrency,
+} from '@/lib/utils'
 
 const StateContext = createContext(null)
-
-const buildInitialCart = () => []
 
 const normalizeProductId = (value) =>
   value === undefined || value === null ? '' : String(value)
 
-const buildInitialProducts = (initialCart) =>
-  productCatalog.map((product) => {
-    const cartItem = initialCart.find((item) => item.productId === product.id)
-    return {
-      ...product,
-      inCart: Boolean(cartItem),
-      cartQuantity: cartItem?.quantity ?? 0,
+const FALLBACK_PRODUCT_IMAGE = '/product.png'
+
+const toNumber = (value) => {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+const buildProductSnapshot = (product) => {
+  if (!product || typeof product !== 'object') return null
+  const id = normalizeProductId(product.id ?? product.productId ?? product.sku)
+  const priceValue =
+    product.price ?? product.amount ?? product.priceValue ?? product.priceLabel
+  const price = toNumber(priceValue)
+  const primaryImage = (() => {
+    if (typeof product.image === 'string' && product.image.trim()) {
+      return product.image.trim()
     }
-  })
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      const candidate = product.images[0]
+      if (typeof candidate === 'string' && candidate.trim()) {
+        return candidate.trim()
+      }
+    }
+    if (typeof product.thumbnail === 'string' && product.thumbnail.trim()) {
+      return product.thumbnail.trim()
+    }
+    return FALLBACK_PRODUCT_IMAGE
+  })()
+
+  const title = product.title ?? product.name ?? product.productName ?? ''
+
+  return {
+    id,
+    sku: product.sku ? String(product.sku) : undefined,
+    title,
+    name: product.name ?? title,
+    brand: product.brand ?? '',
+    category: product.category ?? '',
+    description:
+      product.description ?? product.descriptionText ?? product.summary ?? '',
+    image: primaryImage,
+    price,
+    priceLabel:
+      product.priceLabel ?? (price > 0 ? formatCurrency(price) : undefined),
+  }
+}
+
+const sanitizeCartProductSnapshot = (value) => {
+  if (!value || typeof value !== 'object') return null
+  const price = toNumber(value.price)
+  return {
+    id: normalizeProductId(value.id ?? value.productId ?? value.sku),
+    sku: value.sku ? String(value.sku) : undefined,
+    title: value.title ?? value.name ?? '',
+    name: value.name ?? value.title ?? '',
+    brand: value.brand ?? '',
+    category: value.category ?? '',
+    description: value.description ?? '',
+    image:
+      typeof value.image === 'string' && value.image.trim()
+        ? value.image.trim()
+        : FALLBACK_PRODUCT_IMAGE,
+    price,
+    priceLabel: value.priceLabel ?? (price > 0 ? formatCurrency(price) : undefined),
+  }
+}
+
+const CART_STORAGE_KEY = 'okoa-sasa-cart'
+
+const readStoredCart = () => {
+  try {
+    const rawValue = safeLocalStorage.getItem(CART_STORAGE_KEY)
+    if (!rawValue) return []
+    const parsed = JSON.parse(rawValue)
+    if (!Array.isArray(parsed)) return []
+    return parsed
+      .map((item) => {
+        const productId = normalizeProductId(
+          item?.productId ?? item?.id ?? item?.sku,
+        )
+        const quantity = Math.max(1, Number(item?.quantity) || 1)
+        const productSnapshot = sanitizeCartProductSnapshot(
+          item?.productSnapshot ?? item?.snapshot ?? null,
+        )
+        return productId ? { productId, quantity, productSnapshot } : null
+      })
+      .filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+const writeStoredCart = (items) => {
+  try {
+    safeLocalStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+  } catch {
+    // ignore persistence errors
+  }
+}
+
+const buildInitialCart = () => readStoredCart()
+
+const CHECKOUT_FORM_STORAGE_KEY = 'checkout-form-data'
+const CHECKOUT_STEP_STORAGE_KEY = 'checkout-active-step'
+
+const sanitizeForStorage = (value, seen = new WeakSet()) => {
+  if (value === null || typeof value !== 'object') {
+    return value
+  }
+
+  const FileCtor = typeof File !== 'undefined' ? File : null
+  const BlobCtor = typeof Blob !== 'undefined' ? Blob : null
+
+  if (FileCtor && value instanceof FileCtor) {
+    return null
+  }
+  if (BlobCtor && value instanceof BlobCtor) {
+    return null
+  }
+  if (value instanceof Date) {
+    return value.toISOString()
+  }
+
+  if (seen.has(value)) {
+    return null
+  }
+  seen.add(value)
+
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeForStorage(item, seen))
+  }
+
+  return Object.entries(value).reduce((acc, [key, val]) => {
+    acc[key] = sanitizeForStorage(val, seen)
+    return acc
+  }, {})
+}
+
+const loadCheckoutFormData = () => {
+  try {
+    const raw = safeLocalStorage.getItem(CHECKOUT_FORM_STORAGE_KEY)
+    if (!raw) return {}
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === 'object' ? parsed : {}
+  } catch {
+    return {}
+  }
+}
+
+const loadCheckoutStep = () => {
+  try {
+    const raw = safeLocalStorage.getItem(CHECKOUT_STEP_STORAGE_KEY)
+    const parsed = Number(raw)
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 1
+  } catch {
+    return 1
+  }
+}
 
 export function ContextProvider({ children }) {
   const initialCart = useMemo(() => buildInitialCart(), [])
-  const initialProducts = useMemo(
-    () => buildInitialProducts(initialCart),
-    [initialCart],
-  )
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
   const [cart, setCart] = useState(initialCart)
-  const [products, setProducts] = useState(initialProducts)
+  const [products, setProducts] = useState([])
   const [searchTerm, setSearchTermState] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const searchDebounceRef = useRef()
-  const [checkoutStep, setCheckoutStep] = useState(1)
-  const [checkoutFormData, setCheckoutFormData] = useState({})
+  const [checkoutStep, setCheckoutStepState] = useState(() =>
+    loadCheckoutStep(),
+  )
+  const [checkoutFormData, setCheckoutFormDataState] = useState(() =>
+    loadCheckoutFormData(),
+  )
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
+
+  useEffect(() => {
+    writeStoredCart(cart)
+  }, [cart])
 
   useEffect(() => {
     if (searchDebounceRef.current) {
@@ -64,35 +220,86 @@ export function ContextProvider({ children }) {
     setSearchTermState(typeof value === 'string' ? value : String(value ?? ''))
   }, [])
 
+  const parseStoredJSON = useCallback((value) => {
+    if (!value) return null
+    try {
+      if (typeof value === 'string') {
+        return JSON.parse(value)
+      }
+      return value
+    } catch {
+      return null
+    }
+  }, [])
+
+  const persistUserSession = useCallback(
+    (userPayload) => {
+      if (!userPayload) return
+      try {
+        safeLocalStorage.setItem('isAuthenticated', 'true')
+        safeLocalStorage.setItem('user', JSON.stringify(userPayload))
+      } catch {
+        // Ignore persistence errors (e.g., private mode)
+      }
+
+      try {
+        setEncryptedItem('userInfo', userPayload)
+        const authRaw = getEncryptedItem('auth')
+        const authData = parseStoredJSON(authRaw)
+        if (authData) {
+          setEncryptedItem('auth', {
+            ...authData,
+            user: userPayload,
+          })
+        }
+      } catch {
+        // Ignore encrypted storage errors
+      }
+    },
+    [parseStoredJSON],
+  )
+
   // Check for stored auth on mount
   useEffect(() => {
     try {
-      const storedAuth = safeLocalStorage.getItem('isAuthenticated')
-      const storedUser = safeLocalStorage.getItem('user')
+      const storedAuthFlag = safeLocalStorage.getItem('isAuthenticated')
+      const storedUserRaw = safeLocalStorage.getItem('user')
+      let hydratedUser = parseStoredJSON(storedUserRaw)
+      let isSessionValid = storedAuthFlag === 'true'
 
-      if (storedAuth === 'true') {
+      if (!hydratedUser) {
+        hydratedUser = parseStoredJSON(getEncryptedItem('userInfo'))
+      }
+
+      const encryptedAuth = parseStoredJSON(getEncryptedItem('auth'))
+      if (!isSessionValid && encryptedAuth?.token) {
+        isSessionValid = true
+        hydratedUser = hydratedUser || encryptedAuth?.user || null
+      }
+
+      if (isSessionValid) {
         setIsAuthenticated(true)
-        if (storedUser) {
-          setUser(JSON.parse(storedUser))
+        if (hydratedUser) {
+          setUser(hydratedUser)
+          persistUserSession(hydratedUser)
         }
       }
     } catch {
       // Ignore storage read errors
     }
-  }, [])
+  }, [parseStoredJSON, persistUserSession])
 
-  const login = (userData) => {
-    setIsAuthenticated(true)
-    setUser(userData)
-    try {
-      safeLocalStorage.setItem('isAuthenticated', 'true')
-      safeLocalStorage.setItem('user', JSON.stringify(userData))
-    } catch {
-      // Ignore persistence errors (e.g., private mode)
-    }
-  }
+  const login = useCallback(
+    (userData = {}) => {
+      const sanitizedUser = { ...userData }
+      setIsAuthenticated(true)
+      setUser(sanitizedUser)
+      persistUserSession(sanitizedUser)
+    },
+    [persistUserSession],
+  )
 
-  const logout = () => {
+  const logout = useCallback(() => {
     setIsAuthenticated(false)
     setUser(null)
     try {
@@ -101,7 +308,13 @@ export function ContextProvider({ children }) {
     } catch {
       // Ignore
     }
-  }
+
+    try {
+      clearEncryptedStorage()
+    } catch {
+      // Ignore
+    }
+  }, [])
 
   const syncProductCartState = useCallback((productId, changes) => {
     const normalizedId = normalizeProductId(productId)
@@ -124,10 +337,20 @@ export function ContextProvider({ children }) {
   }, [])
 
   const addToCart = useCallback(
-    (productId, quantity = 1) => {
+    (productId, quantity = 1, productDetails = null) => {
       if (!quantity || quantity <= 0) return
       const normalizedQuantity = Math.max(1, Number(quantity) || 0)
       const normalizedId = normalizeProductId(productId)
+      const resolvedProductDetails =
+        productDetails ??
+        products.find((product) => {
+          if (!product) return false
+          return (
+            normalizeProductId(product.id) === normalizedId ||
+            normalizeProductId(product.sku) === normalizedId
+          )
+        })
+      const snapshot = buildProductSnapshot(resolvedProductDetails)
       setCart((prevCart) => {
         const existing = prevCart.find(
           (item) => normalizeProductId(item.productId) === normalizedId,
@@ -142,7 +365,11 @@ export function ContextProvider({ children }) {
 
           const nextCart = prevCart.map((item) =>
             normalizeProductId(item.productId) === normalizedId
-              ? { ...item, quantity: updatedQuantity }
+              ? {
+                  ...item,
+                  quantity: updatedQuantity,
+                  productSnapshot: snapshot ?? item.productSnapshot,
+                }
               : item,
           )
 
@@ -161,11 +388,15 @@ export function ContextProvider({ children }) {
 
         return [
           ...prevCart,
-          { productId: normalizedId, quantity: normalizedQuantity },
+          {
+            productId: normalizedId,
+            quantity: normalizedQuantity,
+            productSnapshot: snapshot,
+          },
         ]
       })
     },
-    [syncProductCartState],
+    [products, syncProductCartState],
   )
 
   const updateCartQuantity = useCallback(
@@ -202,7 +433,22 @@ export function ContextProvider({ children }) {
                 ? { ...item, quantity: clampedQuantity }
                 : item,
             )
-          : [...prevCart, { productId: normalizedId, quantity: clampedQuantity }]
+          : [
+              ...prevCart,
+              {
+                productId: normalizedId,
+                quantity: clampedQuantity,
+                productSnapshot: buildProductSnapshot(
+                  products.find((product) => {
+                    if (!product) return false
+                    return (
+                      normalizeProductId(product.id) === normalizedId ||
+                      normalizeProductId(product.sku) === normalizedId
+                    )
+                  }),
+                ),
+              },
+            ]
 
         syncProductCartState(normalizedId, {
           inCart: true,
@@ -212,7 +458,7 @@ export function ContextProvider({ children }) {
         return nextCart
       })
     },
-    [syncProductCartState],
+    [products, syncProductCartState],
   )
 
   const removeFromCart = useCallback(
@@ -249,15 +495,22 @@ export function ContextProvider({ children }) {
       ) {
         removeFromCart(productId)
       } else {
-        addToCart(productId, 1)
+        const productDetails = products.find((product) => {
+          if (!product) return false
+          return (
+            normalizeProductId(product.id) === normalizedId ||
+            normalizeProductId(product.sku) === normalizedId
+          )
+        })
+        addToCart(productId, 1, productDetails)
       }
     },
-    [cart, addToCart, removeFromCart],
+    [cart, addToCart, products, removeFromCart],
   )
 
   const addProductToCart = useCallback(
-    (productId, quantity = 1) => {
-      addToCart(productId, quantity)
+    (productId, quantity = 1, productDetails = null) => {
+      addToCart(productId, quantity, productDetails)
     },
     [addToCart],
   )
@@ -301,11 +554,51 @@ export function ContextProvider({ children }) {
           return idMatch || skuMatch
         })
 
-        if (!product) return null
+        const snapshot = item.productSnapshot
+        const fallback = snapshot
+          ? {
+              ...snapshot,
+              price: snapshot.price ?? 0,
+              priceLabel:
+                snapshot.priceLabel ??
+                (snapshot.price ? formatCurrency(snapshot.price) : undefined),
+            }
+          : null
+
+        const resolvedProduct = product ?? fallback
+
+        if (!resolvedProduct) {
+          return {
+            id: item.productId,
+            title: `Product ${item.productId}`,
+            name: 'Product details unavailable',
+            price: 0,
+            priceLabel: formatCurrency(0),
+            image: FALLBACK_PRODUCT_IMAGE,
+            quantity: item.quantity,
+          }
+        }
+
+        const priceValue = toNumber(resolvedProduct.price)
 
         return {
-          ...product,
+          ...resolvedProduct,
+          id: resolvedProduct.id ?? item.productId,
+          price: priceValue,
+          priceLabel:
+            resolvedProduct.priceLabel ?? formatCurrency(priceValue ?? 0),
+          image:
+            resolvedProduct.image && resolvedProduct.image.trim()
+              ? resolvedProduct.image
+              : FALLBACK_PRODUCT_IMAGE,
+          title: resolvedProduct.title ?? resolvedProduct.name ?? 'Product',
+          name:
+            resolvedProduct.name ??
+            resolvedProduct.description ??
+            resolvedProduct.title ??
+            '',
           quantity: item.quantity,
+          cartQuantity: item.quantity,
         }
       })
       .filter(Boolean)
@@ -338,12 +631,52 @@ export function ContextProvider({ children }) {
     [products],
   )
 
-  const saveCheckoutFormData = useCallback((stepId, data) => {
-    setCheckoutFormData((prev) => ({
-      ...prev,
-      [stepId]: data,
-    }))
+  const persistCheckoutFormData = useCallback((data) => {
+    try {
+      const sanitized = sanitizeForStorage(data)
+      safeLocalStorage.setItem(
+        CHECKOUT_FORM_STORAGE_KEY,
+        JSON.stringify(sanitized),
+      )
+    } catch {
+      // ignore persistence errors
+    }
   }, [])
+
+  const persistCheckoutStep = useCallback((step) => {
+    try {
+      safeLocalStorage.setItem(CHECKOUT_STEP_STORAGE_KEY, String(step))
+    } catch {
+      // ignore
+    }
+  }, [])
+
+  const setCheckoutStep = useCallback(
+    (value) => {
+      setCheckoutStepState((prev) => {
+        const nextValue = typeof value === 'function' ? value(prev) : value
+        const normalized =
+          Number.isFinite(nextValue) && nextValue > 0 ? nextValue : 1
+        persistCheckoutStep(normalized)
+        return normalized
+      })
+    },
+    [persistCheckoutStep],
+  )
+
+  const saveCheckoutFormData = useCallback(
+    (stepId, data) => {
+      setCheckoutFormDataState((prev) => {
+        const next = {
+          ...prev,
+          [stepId]: data,
+        }
+        persistCheckoutFormData(next)
+        return next
+      })
+    },
+    [persistCheckoutFormData],
+  )
 
   const getCheckoutFormData = useCallback(
     (stepId) => {
@@ -352,15 +685,28 @@ export function ContextProvider({ children }) {
     [checkoutFormData],
   )
 
-  const resetCheckout = useCallback(() => {
-    setCheckoutStep(1)
-    setCheckoutFormData({})
-    setIsCheckoutCompleted(false)
+  const clearCheckoutPersistence = useCallback(() => {
+    try {
+      safeLocalStorage.removeItem(CHECKOUT_FORM_STORAGE_KEY)
+      safeLocalStorage.removeItem(CHECKOUT_STEP_STORAGE_KEY)
+    } catch {
+      // ignore
+    }
   }, [])
 
-  const goToCheckoutStep = useCallback((step) => {
-    setCheckoutStep(step)
-  }, [])
+  const resetCheckout = useCallback(() => {
+    setCheckoutStep(1)
+    setCheckoutFormDataState({})
+    setIsCheckoutCompleted(false)
+    clearCheckoutPersistence()
+  }, [setCheckoutStep, clearCheckoutPersistence])
+
+  const goToCheckoutStep = useCallback(
+    (step) => {
+      setCheckoutStep(step)
+    },
+    [setCheckoutStep],
+  )
 
   const value = {
     isAuthenticated,

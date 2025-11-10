@@ -23,6 +23,7 @@ import { FormSelect } from '../Inputs/FormSelect'
 import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
 import React from 'react'
+import { normalizeKenyanPhoneNumber } from '@/lib/validation'
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -63,61 +64,97 @@ const personalInfoSchema = z.object({
     ),
 })
 
+const DEFAULT_COMPANY_OPTIONS = [
+  { value: 'company1', label: 'Company One' },
+  { value: 'company2', label: 'Company Two' },
+  { value: 'company3', label: 'Company Three' },
+  { value: 'company4', label: 'Company Four' },
+]
+
 export default function PersonalInfoForm({
   onNext,
   onPrevious,
   isFirstStep,
   isLastStep,
 }) {
-  const { saveCheckoutFormData, getCheckoutFormData } = useStateContext()
+  const {
+    saveCheckoutFormData,
+    getCheckoutFormData,
+    user,
+    isAuthenticated,
+  } = useStateContext()
 
   const savedData = getCheckoutFormData(2)
 
-  // Initialize form with savedData directly in defaultValues
+  const userPrefillValues = React.useMemo(() => {
+    if (!isAuthenticated || !user) return {}
+    const fullName =
+      user.fullName ||
+      [user.firstName, user.lastName].filter(Boolean).join(' ').trim()
+    const normalizedPhone = normalizeKenyanPhoneNumber(user.phoneNumber || '')
+    const employer = (user.employer || user.company || '').trim()
+    return {
+      fullName: fullName || '',
+      nationalId: user.idNumber || user.nationalId || user.ID || '',
+      employer,
+      employeeNumber: user.employeeNumber || user.employeeId || '',
+      email: user.email || '',
+      phoneNumber: normalizedPhone || user.phoneNumber || '',
+    }
+  }, [isAuthenticated, user])
+
+  const resolvedDefaults = React.useMemo(
+    () => ({
+      fullName: savedData?.fullName || userPrefillValues.fullName || '',
+      nationalId: savedData?.nationalId || userPrefillValues.nationalId || '',
+      employer: savedData?.employer || userPrefillValues.employer || '',
+      employeeNumber:
+        savedData?.employeeNumber || userPrefillValues.employeeNumber || '',
+      email: savedData?.email || userPrefillValues.email || '',
+      phoneNumber:
+        savedData?.phoneNumber || userPrefillValues.phoneNumber || '',
+    }),
+    [savedData, userPrefillValues],
+  )
+
   const form = useForm({
     resolver: zodResolver(personalInfoSchema),
-    defaultValues: React.useMemo(
-      () => ({
-        fullName: savedData?.fullName || '',
-        nationalId: savedData?.nationalId || '',
-        employer: savedData?.employer || '',
-        employeeNumber: savedData?.employeeNumber || '',
-        email: savedData?.email || '',
-        phoneNumber: savedData?.phoneNumber || '',
-      }),
-      [],
-    ), // Empty dependency array - only run once on mount
+    defaultValues: resolvedDefaults,
   })
 
-  const companyOptions = [
-    { value: 'company1', label: 'Company One' },
-    { value: 'company2', label: 'Company Two' },
-    { value: 'company3', label: 'Company Three' },
-    { value: 'company4', label: 'Company Four' },
-  ]
-
-  // Remove the useEffect that was causing the infinite loop
-  // If you need to update form when savedData changes, use this instead:
-  React.useEffect(() => {
-    if (savedData) {
-      // Only reset if there are actual changes to avoid unnecessary updates
-      const currentValues = form.getValues()
-      const hasChanges = Object.keys(savedData).some(
-        (key) => savedData[key] !== currentValues[key],
-      )
-
-      if (hasChanges) {
-        form.reset({
-          fullName: savedData.fullName || '',
-          nationalId: savedData.nationalId || '',
-          employer: savedData.employer || '',
-          employeeNumber: savedData.employeeNumber || '',
-          email: savedData.email || '',
-          phoneNumber: savedData.phoneNumber || '',
-        })
-      }
+  const companyOptions = React.useMemo(() => {
+    const employerLabel = userPrefillValues.employer?.trim()
+    if (!employerLabel) {
+      return DEFAULT_COMPANY_OPTIONS
     }
-  }, [savedData, form])
+
+    const normalizedEmployer = employerLabel.toLowerCase()
+    const existingOption = DEFAULT_COMPANY_OPTIONS.find(
+      (option) =>
+        option.value.toLowerCase() === normalizedEmployer ||
+        option.label.toLowerCase() === normalizedEmployer,
+    )
+
+    return existingOption
+      ? DEFAULT_COMPANY_OPTIONS
+      : [
+          { value: employerLabel, label: employerLabel },
+          ...DEFAULT_COMPANY_OPTIONS,
+        ]
+  }, [userPrefillValues.employer])
+
+  React.useEffect(() => {
+    const currentValues = form.getValues()
+    const hasChanges = Object.keys(resolvedDefaults).some((key) => {
+      const current = currentValues[key] ?? ''
+      const nextValue = resolvedDefaults[key] ?? ''
+      return current !== nextValue
+    })
+
+    if (hasChanges) {
+      form.reset(resolvedDefaults)
+    }
+  }, [resolvedDefaults, form])
 
   const onSubmit = (data) => {
     // console.log('Form data:', data)

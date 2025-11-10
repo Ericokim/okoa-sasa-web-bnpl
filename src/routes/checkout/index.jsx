@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
-import React, { useState } from 'react'
+import { createFileRoute, useLocation } from '@tanstack/react-router'
+import React, { useState, useEffect } from 'react'
 import { ChevronLeft, ChevronRight, Check } from 'lucide-react'
 import PersonalInfoForm from '@/components/shared/Checkout/PersonalInfo'
 import TermsConditionPage from '@/components/shared/Checkout/TermsConditions'
@@ -10,6 +10,9 @@ import DeliveryDetailsForm from '@/components/shared/Checkout/Deliver'
 import OrderSummaryPage from '@/components/shared/Checkout/OrderSummary'
 import DonePage from '@/components/shared/Checkout/DoneScreen'
 import { useStateContext } from '@/context/state-context'
+import { useNavigate } from '@tanstack/react-router'
+import { useProductList } from '@/lib/queries/products'
+import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
 
 const steps = [
   {
@@ -51,6 +54,8 @@ const steps = [
 ]
 
 export default function CheckoutPage() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const {
     checkoutStep: currentStep,
     setCheckoutStep: setCurrentStep,
@@ -58,9 +63,38 @@ export default function CheckoutPage() {
     setIsCheckoutCompleted: setIsCompleted,
     saveCheckoutFormData,
     getCheckoutFormData,
+    cartProducts,
+    resetCheckout,
+    clearCart,
+    cart,
   } = useStateContext()
+  const { data: fetchedProducts, isLoading: isProductListLoading } =
+    useProductList()
+
+  useSyncProductsWithCart(fetchedProducts, { isLoading: isProductListLoading })
 
   const { productId } = Route.useParams()
+  const cartItems = cartProducts ?? []
+  const cartIsEmpty = cart.length === 0
+
+  // Redirect to home if cart is empty AND checkout is NOT completed
+  useEffect(() => {
+    if (cartIsEmpty && !isCompleted) {
+      resetCheckout()
+      navigate({ to: '/' })
+    }
+  }, [cartIsEmpty, isCompleted, navigate, resetCheckout])
+
+  // Clear cart and reset when navigating away from completed checkout
+  useEffect(() => {
+    return () => {
+      // If completed and navigating away, clear cart and reset
+      if (isCompleted) {
+        clearCart()
+        resetCheckout()
+      }
+    }
+  }, [isCompleted, resetCheckout, clearCart])
 
   const handleNext = () => {
     if (currentStep < steps.length) {

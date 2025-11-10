@@ -35,7 +35,14 @@ export default function NotFound({
     }
 
     return (
-      <Link to={actionHref} className={isMobile ? 'w-full' : undefined}>
+      <Link
+        to={actionHref}
+        className={isMobile ? 'w-full' : undefined}
+        onClick={() => {
+          // navigate via Link, then force reload
+          window.location.href = actionHref
+        }}
+      >
         <button
           className={`${buttonClass} ${className} ${isMobile ? 'w-full' : ''}`}
           style={{

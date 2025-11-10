@@ -1,55 +1,51 @@
-// src/store/authStore.js
-import { create } from "zustand";
-import { EncryptStorage } from "encrypt-storage";
+// src/lib/store/authStore.js
+import { create } from 'zustand'
+import { EncryptStorage } from 'encrypt-storage'
 
-// -----------------------------------------------------------
-// 1. YOUR SECRET – NEVER commit this file!
-//     Put this in .env → VITE_ENCRYPT_KEY=64-random-chars
-// -----------------------------------------------------------
-const SECRET_KEY = import.meta.env.VITE_ENCRYPT_KEY || "DEV-CHANGE-ME-NOW-64-CHARS";
-
-// -----------------------------------------------------------
-// 2. Encrypted localStorage wrapper
-// -----------------------------------------------------------
+const SECRET_KEY = import.meta.env.VITE_ENCRYPT_KEY || 'DEV-CHANGE-ME-64CHARS'
 const encrypted = new EncryptStorage(SECRET_KEY, {
-  prefix: "@masoko",
-  encAlgorithm: "Rabbit",     
-  storageType: "localStorage",
-});
+  prefix: '@okoa-api',
+  storageType: 'localStorage',
+})
 
+const STORAGE_KEY = 'api_tokens'
 
-export const useAuthStore = create((set, get) => ({
-  // Load encrypted data (or empty)
-  token: null,
-  expiresAt: null,
+export const useApiAuthStore = create((set, get) => ({
+  masoko: { token: null, expiresAt: null },
+  bnpl: { token: null, expiresAt: null },
 
-  // Initialise from storage on first run
   __init: () => {
-    const raw = encrypted.getItem("auth");
-    if (raw && raw.token && raw.expiresAt) {
-      set({ token: raw.token, expiresAt: raw.expiresAt });
-    }
+    const saved = encrypted.getItem(STORAGE_KEY)
+    if (saved) set(saved)
   },
 
-  // Save fresh token (encrypted)
-  setToken: (access_token, expires_in) => {
-    const expiresAt = Date.now() + expires_in * 1000 - 30_000; // 30 sec early
-    const payload = { token: access_token, expiresAt };
-    encrypted.setItem("auth", payload);
-    set(payload);
+  setToken: (service, token, expires_in) => {
+    const expiresAt = Date.now() + expires_in * 1000 - 30_000
+    const update = { [service]: { token, expiresAt } }
+    set(update)
+    encrypted.setItem(STORAGE_KEY, { ...get(), ...update })
   },
 
-  // Wipe everything
+  getToken: (service) => {
+    const data = get()[service]
+    return data?.token && Date.now() < data.expiresAt ? data.token : null
+  },
+
+  isValid: (service) => !!get().getToken(service),
+
+  clearService: (service) => {
+    const update = { [service]: { token: null, expiresAt: null } }
+    set(update)
+    encrypted.setItem(STORAGE_KEY, { ...get(), ...update })
+  },
+
   clear: () => {
-    encrypted.removeItem("auth");
-    set({ token: null, expiresAt: null });
+    encrypted.removeItem(STORAGE_KEY)
+    set({
+      masoko: { token: null, expiresAt: null },
+      bnpl: { token: null, expiresAt: null },
+    })
   },
+}))
 
-  // Is token still valid?
-  isValid: () => {
-    const { token, expiresAt } = get();
-    return !!token && !!expiresAt && Date.now() < expiresAt;
-  },
-}));
-
-useAuthStore.getState().__init();
+useApiAuthStore.getState().__init()
