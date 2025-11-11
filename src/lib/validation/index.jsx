@@ -33,13 +33,17 @@ const sanitizeKenyanPhoneNumber = (value = '') => {
   return sanitized.join('')
 }
 
-const isValidKenyanPhoneNumber = (value) => {
+export const isValidKenyanPhoneNumber = (value) => {
   const sanitized = sanitizeKenyanPhoneNumber(value)
 
   if (!sanitized) return false
 
   if (sanitized.startsWith('+254')) {
     return /^\+254\d{9}$/.test(sanitized)
+  }
+
+  if (sanitized.startsWith('254')) {
+    return /^254\d{9}$/.test(sanitized)
   }
 
   if (sanitized.startsWith('0')) {
@@ -56,6 +60,10 @@ export const normalizeKenyanPhoneNumber = (value = '') => {
 
   if (sanitized.startsWith('+254')) {
     return `+254${sanitized.slice(4, 13)}`
+  }
+
+  if (sanitized.startsWith('254')) {
+    return `+254${sanitized.slice(3, 12)}`
   }
 
   if (sanitized.startsWith('0')) {

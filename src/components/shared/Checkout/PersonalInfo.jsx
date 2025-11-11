@@ -23,7 +23,10 @@ import { FormSelect } from '../Inputs/FormSelect'
 import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
 import React from 'react'
-import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import {
+  normalizeKenyanPhoneNumber,
+  isValidKenyanPhoneNumber,
+} from '@/lib/validation'
 
 const personalInfoSchema = z.object({
   fullName: z.string().min(1, 'Full name is required'),
@@ -42,26 +45,9 @@ const personalInfoSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, 'Phone number is required')
-    .refine(
-      (value) => {
-        if (!value || value.trim() === '') return false
-
-        const cleaned = value.replace(/\s/g, '')
-
-        if (cleaned.startsWith('+254')) {
-          return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
-        }
-
-        if (cleaned.startsWith('0')) {
-          return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
-        }
-
-        return false
-      },
-      {
-        message: 'Please enter a valid kenyan phone number',
-      },
-    ),
+    .refine(isValidKenyanPhoneNumber, {
+      message: 'Please enter a valid kenyan phone number',
+    }),
 })
 
 const DEFAULT_COMPANY_OPTIONS = [
