@@ -6,6 +6,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { ErrorAlertDialog } from '../Dialog'
 import { Button } from '@/components/ui/button'
 import { formatCurrency } from '@/lib/utils'
+import { useStickyAffix } from '@/hooks/use-sticky-affix'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,6 +59,20 @@ export default function OrderSummaryPage({
 
   // Check if cart exceeds loan limit
   const exceedsLoanLimit = grandTotal > loanLimit
+
+  const {
+    layoutRef,
+    columnRef,
+    cardRef,
+    cardStyles,
+    placeholderHeight,
+    columnMinHeight,
+    isDesktop,
+  } = useStickyAffix({
+    deps: [cartItems.length, subtotal, grandTotal],
+    topOffset: 32,
+    bottomOffset: 64,
+  })
 
   // Prepare orderLines payload
   const orderLines = cartItems.map((item) => {
@@ -365,7 +380,10 @@ export default function OrderSummaryPage({
   return (
     <div className="flex flex-col items-start mb-[50px] p-0 sm:p-0 gap-6 w-full">
       {/* Two Separate Cards Layout */}
-      <div className="flex flex-col lg:flex-row lg:items-start gap-6 w-full">
+      <div
+        ref={layoutRef}
+        className="flex flex-col lg:flex-row lg:items-start gap-6 w-full"
+      >
         {/* First Card - Order Items */}
         <div className="flex-1">
           <div className="bg-white w-full h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
@@ -472,8 +490,23 @@ export default function OrderSummaryPage({
         </div>
 
         {/* Second Card - Payment Summary (Sticky) */}
-        <div className="lg:w-[400px] xl:w-[450px] 2xl:w-[500px] lg:sticky lg:top-8 lg:self-start">
-          <div className="bg-white w-full h-auto rounded-4xl border border-gray-200 p-6 sm:p-8">
+        <div
+          ref={columnRef}
+          className="relative w-full lg:w-[400px] xl:w-[450px] 2xl:w-[500px] lg:self-stretch lg:shrink-0"
+          style={
+            isDesktop && columnMinHeight
+              ? { minHeight: columnMinHeight }
+              : undefined
+          }
+        >
+          {placeholderHeight ? (
+            <div aria-hidden="true" style={{ height: placeholderHeight }} />
+          ) : null}
+          <div
+            ref={cardRef}
+            className="bg-white w-full h-auto rounded-4xl border border-gray-200 p-6 sm:p-8"
+            style={cardStyles}
+          >
             <div className="flex w-full flex-col items-start gap-6">
               <div className="flex flex-col items-start gap-2 sm:gap-3 self-stretch">
                 <h2 className="self-stretch text-base sm:text-lg lg:text-xl font-semibold capitalize leading-[140%] text-black">
