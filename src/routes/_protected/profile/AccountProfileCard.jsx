@@ -10,7 +10,7 @@ export function RouteComponent() {
   const { user, login } = useStateContext()
   const [dialogOpen, setDialogOpen] = useState(false)
   const profilePhoto = user?.profilePhoto?.url || user?.avatar
-  const avatarUrl = profilePhoto || '/avator.png'
+  const avatarUrl = profilePhoto || '/profile.png'
   const locationLabel = user?.location || user?.addresses?.[0]?.description
   const employeeNumber = user?.employeeNumber || user?.employeeId || '—'
   const nationalId = user?.idNumber || user?.ID
