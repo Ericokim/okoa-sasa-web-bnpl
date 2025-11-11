@@ -1,24 +1,28 @@
 import { Link } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Home, RefreshCw, Copy, Check } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import { logger } from '@/lib/logger'
 
 export default function ErrorPage({ error }) {
   const [copied, setCopied] = useState(false)
   const [errorId] = useState(() => Math.random().toString(36).substr(2, 9))
 
-  const errorInfo = {
-    id: errorId,
-    message: error?.message || 'An unexpected error occurred',
-    stack: error?.stack,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent,
-    url: window.location.href,
-  }
+  const errorInfo = useMemo(
+    () => ({
+      id: errorId,
+      message: error?.message || 'An unexpected error occurred',
+      stack: error?.stack,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    }),
+    [error, errorId],
+  )
 
   useEffect(() => {
-    console.error('Error Page Rendered:', errorInfo)
-  }, [error, errorInfo])
+    logger.error('Error Page Rendered:', errorInfo)
+  }, [errorInfo])
 
   const handleCopyError = async () => {
     try {
@@ -28,7 +32,7 @@ export default function ErrorPage({ error }) {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
-      console.warn('Failed to copy to clipboard:', err)
+      logger.warn('Failed to copy to clipboard:', err)
     }
   }
 

@@ -23,6 +23,7 @@ import {
   normalizeKenyanPhoneNumber,
   isValidKenyanPhoneNumber,
 } from '@/lib/validation'
+import { logger } from '@/lib/logger'
 
 // Validation schema
 const personalInfoSchema = z.object({
@@ -141,7 +142,7 @@ export function RouteComponent() {
         : [],
     }
 
-    console.log('profile', payload)
+    logger.info('profile', payload)
 
     updateUserMutation.mutate(payload)
   }

@@ -196,6 +196,7 @@ export const formatNoteContent = (content) => {
 }
 
 // Function to disable any accidental use of console logs
+/* eslint-disable no-console */
 export const GlobalDebug = (() => {
   const saved = {
     log: console.log?.bind(console),
@@ -232,6 +233,7 @@ export const GlobalDebug = (() => {
     }
   }
 })()
+/* eslint-enable no-console */
 
 export const formatPhoneNumber = (msisdn) => {
   if (!msisdn) return

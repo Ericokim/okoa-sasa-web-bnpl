@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import AsyncSelect from "react-select/async";
 import { components } from "react-select";

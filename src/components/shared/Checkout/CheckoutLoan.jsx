@@ -15,6 +15,7 @@ import {
   extractLoanAbilityEntry,
   resolveLoanAmountFromEntry,
 } from '@/lib/utils/loan-ability'
+import { LoanCalculationIndicator } from '@/components/shared/LoanCalculationIndicator'
 
 const DEFAULT_TENURE = 13
 const MIN_TENURE = 6
@@ -466,6 +467,8 @@ export default function CheckLoanLimitPage({
               max={MAX_TENURE}
               defaultValue={DEFAULT_TENURE}
             />
+
+            {loanAbilityMutation.isPending && <LoanCalculationIndicator />}
 
             {/* Loan Qualification Info */}
             {displayLoanAmount > 0 && (

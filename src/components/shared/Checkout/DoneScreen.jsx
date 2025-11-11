@@ -11,7 +11,10 @@ const DoneScreen = () => {
   const finalStepData = getCheckoutFormData?.(6) || {}
   const orderResponse = finalStepData?.orderResponse || {}
   const orderSummary = getCheckoutFormData?.(4)?.cartSummary || {}
-  const orderLines = getCheckoutFormData?.(4)?.orderPayload?.orderLines || []
+  const orderLines = useMemo(() => {
+    const lines = getCheckoutFormData?.(4)?.orderPayload?.orderLines
+    return Array.isArray(lines) ? lines : []
+  }, [getCheckoutFormData])
   const orderStatus =
     finalStepData?.orderStatus || finalStepData?.rawResponse?.status || {}
 
