@@ -19,6 +19,7 @@ import { Dialog, DialogPortal } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useCheckUserLoanAbility } from '@/lib/queries/user'
 import {
+  buildLoanPayloadKey,
   extractLoanAbilityEntry,
   resolveLoanAmountFromEntry,
 } from '@/lib/utils/loan-ability'
@@ -26,6 +27,7 @@ import {
 const TENURE_MIN = 6
 const TENURE_MAX = 24
 const DEFAULT_TENURE = 13
+const AUTO_CHECK_DEBOUNCE_MS = 1000
 const MIN_PAY_AMOUNT = 1000
 const MAX_PAY_AMOUNT = 10000000
 
@@ -134,6 +136,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   const watchedMonths = form.watch('months')
   const [loanQuote, setLoanQuote] = useState(null)
   const [quoteError, setQuoteError] = useState(null)
+  const quoteRequestRef = useRef(null)
+  const pendingPayloadKeyRef = useRef(null)
   const sanitizedBasicPay = useMemo(
     () => parseCurrencyValue(watchedBasicPay),
     [watchedBasicPay],
@@ -167,83 +171,158 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     }),
     [sanitizedBasicPay, sanitizedNetPay, currentTenure],
   )
-  const displayLoanAmount = loanQuote?.amount ?? null
+  const currentPayloadKey = useMemo(
+    () => buildLoanPayloadKey(currentPayload, currentTenure),
+    [currentPayload, currentTenure],
+  )
+  const hasQuoteForCurrentValues = Boolean(
+    loanQuote?.payloadKey === currentPayloadKey && loanQuote?.amount > 0,
+  )
+  const hasMismatchedPayValues =
+    sanitizedBasicPay > 0 && sanitizedNetPay > sanitizedBasicPay
+  const canAutoCheckLoan =
+    sanitizedBasicPay > 0 &&
+    sanitizedNetPay > 0 &&
+    !hasMismatchedPayValues &&
+    currentTenure >= TENURE_MIN &&
+    currentTenure <= TENURE_MAX
+  const displayLoanAmount = hasQuoteForCurrentValues
+    ? loanQuote?.amount ?? null
+    : null
 
   const handleInputChange = (value, onChange) => {
     onChange(formatCurrencyInputValue(value))
   }
+  useEffect(() => {
+    const netPayState = form.getFieldState('netPay')
+    const hasManualMismatchError =
+      netPayState.error?.type === 'manual' &&
+      netPayState.error?.message === 'Net pay cannot exceed basic pay'
+
+    if (hasMismatchedPayValues && !hasManualMismatchError) {
+      form.setError('netPay', {
+        type: 'manual',
+        message: 'Net pay cannot exceed basic pay',
+      })
+    } else if (hasManualMismatchError) {
+      form.clearErrors('netPay')
+    }
+  }, [form, hasMismatchedPayValues])
 
   const requestLoanQuote = useCallback(
-    async (payload, { fallbackAmount = 0 } = {}) => {
-      const response = await loanAbilityMutation.mutateAsync(payload)
-      const entry = extractLoanAbilityEntry(response)
-      const resolvedAmount = resolveLoanAmountFromEntry(entry)
-      const fallbackValue = Math.max(0, Math.round(fallbackAmount))
-      const amount =
-        typeof resolvedAmount === 'number' && resolvedAmount > 0
-          ? Math.round(resolvedAmount)
-          : fallbackValue
+    async (payload, { fallbackAmount = 0, silent = false } = {}) => {
+      const payloadKey = buildLoanPayloadKey(payload, payload?.term)
 
-      if (!amount) {
-        throw new Error('Unable to determine your loan eligibility right now.')
+      if (
+        quoteRequestRef.current &&
+        pendingPayloadKeyRef.current === payloadKey
+      ) {
+        return quoteRequestRef.current
       }
 
-      const quote = {
-        amount,
-        payload,
-        serverEntry: entry,
+      if (quoteRequestRef.current) {
+        try {
+          await quoteRequestRef.current
+        } catch {
+          // Ignore previous error; new request will surface feedback
+        }
       }
 
-      setLoanQuote(quote)
-      setQuoteError(null)
-      return quote
+      const promise = (async () => {
+        try {
+          const response = await loanAbilityMutation.mutateAsync(payload)
+          const entry = extractLoanAbilityEntry(response)
+          const resolvedAmount = resolveLoanAmountFromEntry(entry)
+          const fallbackValue = Math.max(0, Math.round(fallbackAmount))
+          const amount =
+            typeof resolvedAmount === 'number' && resolvedAmount > 0
+              ? Math.round(resolvedAmount)
+              : fallbackValue
+
+          if (!amount) {
+            throw new Error(
+              'Unable to determine your loan eligibility right now.',
+            )
+          }
+
+          const quote = {
+            amount,
+            payload,
+            payloadKey,
+            serverEntry: entry,
+          }
+
+          setLoanQuote(quote)
+          setQuoteError(null)
+          return quote
+        } catch (error) {
+          if (silent) {
+            setQuoteError(
+              error?.response?.data?.status?.message ||
+                error?.response?.data?.message ||
+                error?.message ||
+                'Unable to calculate your loan limit. Please try again.',
+            )
+            return null
+          }
+          throw error
+        } finally {
+          quoteRequestRef.current = null
+          pendingPayloadKeyRef.current = null
+        }
+      })()
+
+      quoteRequestRef.current = promise
+      pendingPayloadKeyRef.current = payloadKey
+      return promise
     },
     [loanAbilityMutation],
   )
 
-  const handleCheckLoanLimit = useCallback(async () => {
-    setQuoteError(null)
-    setErrorMessage(null)
-    if (sanitizedBasicPay <= 0 || sanitizedNetPay <= 0) {
-      setQuoteError('Enter valid pay details to check your loan limit.')
+  useEffect(() => {
+    if (!canAutoCheckLoan) {
+      setQuoteError(null)
       return
     }
 
-    try {
-      await requestLoanQuote(currentPayload, { fallbackAmount: loanAmount })
-    } catch (error) {
-      setQuoteError(
-        error?.response?.data?.status?.message ||
-          error?.response?.data?.message ||
-          error?.message ||
-          'Unable to calculate your loan limit. Please try again.',
-      )
+    if (hasQuoteForCurrentValues) {
+      return
     }
+
+    if (loanAbilityMutation.isPending || quoteRequestRef.current) {
+      return
+    }
+
+    const timer = setTimeout(() => {
+      setQuoteError(null)
+      requestLoanQuote(currentPayload, {
+        silent: true,
+        fallbackAmount: loanAmount,
+      })
+    }, AUTO_CHECK_DEBOUNCE_MS)
+
+    return () => clearTimeout(timer)
   }, [
+    canAutoCheckLoan,
     currentPayload,
+    hasQuoteForCurrentValues,
+    loanAbilityMutation.isPending,
     loanAmount,
     requestLoanQuote,
-    sanitizedBasicPay,
-    sanitizedNetPay,
   ])
 
   const onSubmit = async () => {
     setErrorMessage(null)
     try {
-      const payload = {
-        basicPay: sanitizedBasicPay,
-        netPay: sanitizedNetPay,
-        term: currentTenure,
-      }
-
-      if (payload.basicPay <= 0 || payload.netPay <= 0) {
+      if (!canAutoCheckLoan) {
         throw new Error('Enter valid pay details to calculate your loan limit.')
       }
 
-      let quote = loanQuote
+      let quote =
+        hasQuoteForCurrentValues && loanQuote?.amount ? loanQuote : null
 
       if (!quote) {
-        quote = await requestLoanQuote(payload, {
+        quote = await requestLoanQuote(currentPayload, {
           fallbackAmount: loanAmount,
         })
       }
@@ -452,20 +531,6 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                 </div>
               )}
 
-              <div className="flex justify-center">
-                <Button
-                  type="button"
-                  variant="outlineGradient"
-                  onClick={handleCheckLoanLimit}
-                  disabled={loanAbilityMutation.isPending}
-                  className="rounded-3xl px-4 py-2 text-sm font-medium"
-                >
-                  {loanAbilityMutation.isPending
-                    ? 'Checking loan limit...'
-                    : 'Check Loan Limit'}
-                </Button>
-              </div>
-
               {quoteError && (
                 <p className="text-center text-sm font-medium text-red-500">
                   {quoteError}
@@ -495,7 +560,7 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
 
                 <Button
                   type="submit"
-                  disabled={loanAmount <= 0 || loanAbilityMutation.isPending}
+                  disabled={!canAutoCheckLoan || loanAbilityMutation.isPending}
                   className="flex-1 rounded-3xl border border-[#F8971D] bg-gradient-to-b from-[#F8971D] to-[#EE3124] px-4 py-3 text-base font-medium leading-[140%] capitalize text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loanAbilityMutation.isPending
