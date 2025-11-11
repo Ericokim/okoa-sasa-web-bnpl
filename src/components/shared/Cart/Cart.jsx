@@ -3,6 +3,7 @@ import { BreadCrumbs } from '../BreadCrumbs'
 import { CartList } from './CartList'
 import { CartSummary } from './CartSummary'
 import { useStateContext } from '@/context/state-context'
+import { useStickyAffix } from '@/hooks/use-sticky-affix'
 
 export function Cart({ onCheckout }) {
   const { cartProducts, updateCartQuantity, removeFromCart, clearCart } =
@@ -38,6 +39,20 @@ export function Cart({ onCheckout }) {
     return totals
   }, [cartItems])
 
+  const {
+    layoutRef,
+    columnRef,
+    cardRef,
+    cardStyles,
+    placeholderHeight,
+    columnMinHeight,
+    isDesktop,
+  } = useStickyAffix({
+    deps: [cartItems.length, totalItems, subtotal],
+    topOffset: 32,
+    bottomOffset: 48,
+  })
+
   return (
     <div className="flex w-full flex-col items-start gap-6 md:gap-[30px]">
       {/* Breadcrumbs */}
@@ -59,20 +74,44 @@ export function Cart({ onCheckout }) {
       </div>
 
       {/* Cart Content - Responsive Layout */}
-      <div className="flex w-full flex-col gap-5 lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)] lg:items-start lg:gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] xl:gap-6 2xl:grid-cols-[minmax(0,1fr)_minmax(380px,420px)] 2xl:gap-8">
-        <CartList
-          items={cartItems}
-          onQuantityChange={handleQuantityChange}
-          onRemove={handleRemove}
-        />
+      <div
+        ref={layoutRef}
+        className="flex w-full flex-col gap-5 lg:flex-row lg:items-start lg:gap-6 xl:gap-8 2xl:gap-10"
+      >
+        <div className="w-full flex-1">
+          <CartList
+            items={cartItems}
+            onQuantityChange={handleQuantityChange}
+            onRemove={handleRemove}
+          />
+        </div>
 
-        <CartSummary
-          totalItems={totalItems}
-          shippingCost={0}
-          subtotal={subtotal}
-          onCheckout={onCheckout}
-          onClearCart={cartItems.length ? handleClearCart : undefined}
-        />
+        <div
+          ref={columnRef}
+          className="relative w-full lg:w-[320px] xl:w-[360px] 2xl:w-[400px] lg:shrink-0 lg:self-stretch"
+          style={
+            isDesktop && columnMinHeight
+              ? { minHeight: columnMinHeight }
+              : undefined
+          }
+        >
+          {placeholderHeight ? (
+            <div aria-hidden="true" style={{ height: placeholderHeight }} />
+          ) : null}
+          <div
+            ref={cardRef}
+            className="w-full lg:max-w-none"
+            style={cardStyles}
+          >
+            <CartSummary
+              totalItems={totalItems}
+              shippingCost={0}
+              subtotal={subtotal}
+              onCheckout={onCheckout}
+              onClearCart={cartItems.length ? handleClearCart : undefined}
+            />
+          </div>
+        </div>
       </div>
     </div>
   )
