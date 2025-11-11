@@ -118,8 +118,7 @@ export default function OrderSummaryPage({
     if (itemToDelete) {
       removeFromCart(itemToDelete.id)
       enqueueSnackbar('Removed from cart', {
-        variant: 'info',
-        autoHideDuration: 3000,
+        variant: 'success',
       })
       setShowDeleteDialog(false)
       setItemToDelete(null)

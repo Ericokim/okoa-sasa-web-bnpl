@@ -24,8 +24,7 @@ export function Cart({ onCheckout }) {
     )
     removeFromCart?.(id)
     enqueueSnackbar('Removed from cart', {
-      variant: 'info',
-      autoHideDuration: 3000,
+      variant: 'success',
     })
   }
 

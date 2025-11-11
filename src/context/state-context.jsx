@@ -14,6 +14,7 @@ import {
   clearStorageData as clearEncryptedStorage,
   formatCurrency,
 } from '@/lib/utils'
+import { useAccountStore } from '@/data/accountStore'
 
 const StateContext = createContext(null)
 
@@ -228,6 +229,15 @@ export function ContextProvider({ children }) {
     loadCheckoutFormData(),
   )
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
+
+  useEffect(() => {
+    try {
+      const syncPersonalInfo = useAccountStore.getState().syncFromUser
+      syncPersonalInfo?.(user || null)
+    } catch {
+      // ignore syncing issues
+    }
+  }, [user])
 
   useEffect(() => {
     if (!isBrowserEnv) return
