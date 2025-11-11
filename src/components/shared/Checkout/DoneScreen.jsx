@@ -58,7 +58,7 @@ const DoneScreen = () => {
         </p>
       </div>
 
-      <div className="mt-6 w-full max-w-xl rounded-2xl border border-[#F4E7D8] bg-[#FFF9F3] p-4 text-left space-y-3">
+      {/* <div className="mt-6 w-full max-w-xl rounded-2xl border border-[#F4E7D8] bg-[#FFF9F3] p-4 text-left space-y-3">
         <p className="text-sm font-medium text-[#7A4E1D] uppercase tracking-wide">
           Order details
         </p>
@@ -99,7 +99,7 @@ const DoneScreen = () => {
             </span>
           </p>
         )}
-      </div>
+      </div> */}
 
       <div className="h-[46px] w-[344px] mt-6 flex justify-center">
         <Button

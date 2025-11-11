@@ -19,7 +19,10 @@ import { PhoneInput } from '@/components/shared/Inputs/FormPhone'
 import { FormInput } from '@/components/shared/Inputs/FormInputs'
 import { useStateContext } from '@/context/state-context'
 import { useUpdateUser } from '@/lib/queries/user'
-import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import {
+  normalizeKenyanPhoneNumber,
+  isValidKenyanPhoneNumber,
+} from '@/lib/validation'
 
 // Validation schema
 const personalInfoSchema = z.object({
@@ -32,22 +35,9 @@ const personalInfoSchema = z.object({
   phoneNumber: z
     .string()
     .min(1, 'Phone number is required')
-    .refine(
-      (value) => {
-        if (!value || value.trim() === '') return false
-        const cleaned = value.replace(/\s/g, '')
-        if (cleaned.startsWith('+254')) {
-          return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
-        }
-        if (cleaned.startsWith('0')) {
-          return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
-        }
-        return false
-      },
-      {
-        message: 'Please enter a valid Kenyan phone number',
-      },
-    ),
+    .refine(isValidKenyanPhoneNumber, {
+      message: 'Please enter a valid Kenyan phone number',
+    }),
   company: z.string().min(1, 'Company is required'),
   idNumber: z
     .string()
