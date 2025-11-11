@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import {
   FormControl,
   FormField,
@@ -20,7 +20,7 @@ export function FormTextarea({
 }) {
   const textareaRef = useRef(null)
 
-  const autoResize = () => {
+  const autoResize = useCallback(() => {
     const textarea = textareaRef.current
     if (!textarea) return
 
@@ -45,12 +45,12 @@ export function FormTextarea({
       textarea.style.height = `${contentHeight}px`
       textarea.style.overflowY = 'hidden'
     }
-  }
+  }, [maxRows, minRows])
 
   // Auto-resize when component mounts and when value changes
   useEffect(() => {
     autoResize()
-  }, [])
+  }, [autoResize])
 
   const handleInput = (e, field) => {
     autoResize()

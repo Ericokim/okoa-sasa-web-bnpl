@@ -23,6 +23,7 @@ import {
   extractLoanAbilityEntry,
   resolveLoanAmountFromEntry,
 } from '@/lib/utils/loan-ability'
+import { LoanCalculationIndicator } from '@/components/shared/LoanCalculationIndicator'
 
 const TENURE_MIN = 6
 const TENURE_MAX = 24
@@ -30,6 +31,29 @@ const DEFAULT_TENURE = 13
 const AUTO_CHECK_DEBOUNCE_MS = 1000
 const MIN_PAY_AMOUNT = 1000
 const MAX_PAY_AMOUNT = 10000000
+
+const BASIC_PAY_MIN_ERROR = `Basic pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
+  'en-KE',
+)}`
+const BASIC_PAY_MAX_ERROR = `Basic pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
+  'en-KE',
+)}`
+const NET_PAY_MIN_ERROR = `Net pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
+  'en-KE',
+)}`
+const NET_PAY_MAX_ERROR = `Net pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
+  'en-KE',
+)}`
+const NET_PAY_MISMATCH_ERROR = 'Net pay cannot exceed basic pay'
+const BASIC_PAY_MANUAL_ERRORS = new Set([
+  BASIC_PAY_MIN_ERROR,
+  BASIC_PAY_MAX_ERROR,
+])
+const NET_PAY_MANUAL_ERRORS = new Set([
+  NET_PAY_MIN_ERROR,
+  NET_PAY_MAX_ERROR,
+  NET_PAY_MISMATCH_ERROR,
+])
 
 const parseCurrencyValue = (value) => {
   if (!value) return 0
@@ -74,9 +98,7 @@ const loanCalculatorSchema = z
       ctx.addIssue({
         path: ['basicPay'],
         code: z.ZodIssueCode.custom,
-        message: `Basic pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
-          'en-KE',
-        )}`,
+        message: BASIC_PAY_MIN_ERROR,
       })
     }
 
@@ -84,9 +106,7 @@ const loanCalculatorSchema = z
       ctx.addIssue({
         path: ['basicPay'],
         code: z.ZodIssueCode.custom,
-        message: `Basic pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
-          'en-KE',
-        )}`,
+        message: BASIC_PAY_MAX_ERROR,
       })
     }
 
@@ -94,9 +114,7 @@ const loanCalculatorSchema = z
       ctx.addIssue({
         path: ['netPay'],
         code: z.ZodIssueCode.custom,
-        message: `Net pay must be at least KES ${MIN_PAY_AMOUNT.toLocaleString(
-          'en-KE',
-        )}`,
+        message: NET_PAY_MIN_ERROR,
       })
     }
 
@@ -104,9 +122,7 @@ const loanCalculatorSchema = z
       ctx.addIssue({
         path: ['netPay'],
         code: z.ZodIssueCode.custom,
-        message: `Net pay cannot exceed KES ${MAX_PAY_AMOUNT.toLocaleString(
-          'en-KE',
-        )}`,
+        message: NET_PAY_MAX_ERROR,
       })
     }
 
@@ -114,7 +130,7 @@ const loanCalculatorSchema = z
       ctx.addIssue({
         path: ['netPay'],
         code: z.ZodIssueCode.custom,
-        message: 'Net pay cannot exceed basic pay',
+        message: NET_PAY_MISMATCH_ERROR,
       })
     }
   })
@@ -180,12 +196,36 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
   )
   const hasMismatchedPayValues =
     sanitizedBasicPay > 0 && sanitizedNetPay > sanitizedBasicPay
+  const basicPayErrorMessage = useMemo(() => {
+    if (!watchedBasicPay) return null
+    if (sanitizedBasicPay < MIN_PAY_AMOUNT) {
+      return BASIC_PAY_MIN_ERROR
+    }
+    if (sanitizedBasicPay > MAX_PAY_AMOUNT) {
+      return BASIC_PAY_MAX_ERROR
+    }
+    return null
+  }, [sanitizedBasicPay, watchedBasicPay])
+  const netPayErrorMessage = useMemo(() => {
+    if (!watchedNetPay) return null
+    if (hasMismatchedPayValues) {
+      return NET_PAY_MISMATCH_ERROR
+    }
+    if (sanitizedNetPay < MIN_PAY_AMOUNT) {
+      return NET_PAY_MIN_ERROR
+    }
+    if (sanitizedNetPay > MAX_PAY_AMOUNT) {
+      return NET_PAY_MAX_ERROR
+    }
+    return null
+  }, [hasMismatchedPayValues, sanitizedNetPay, watchedNetPay])
   const canAutoCheckLoan =
     sanitizedBasicPay > 0 &&
     sanitizedNetPay > 0 &&
-    !hasMismatchedPayValues &&
     currentTenure >= TENURE_MIN &&
-    currentTenure <= TENURE_MAX
+    currentTenure <= TENURE_MAX &&
+    !basicPayErrorMessage &&
+    !netPayErrorMessage
   const displayLoanAmount = hasQuoteForCurrentValues
     ? loanQuote?.amount ?? null
     : null
@@ -194,20 +234,44 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     onChange(formatCurrencyInputValue(value))
   }
   useEffect(() => {
-    const netPayState = form.getFieldState('netPay')
-    const hasManualMismatchError =
-      netPayState.error?.type === 'manual' &&
-      netPayState.error?.message === 'Net pay cannot exceed basic pay'
+    const state = form.getFieldState('basicPay')
+    if (basicPayErrorMessage) {
+      if (state.error?.message !== basicPayErrorMessage) {
+        form.setError('basicPay', {
+          type: 'manual',
+          message: basicPayErrorMessage,
+        })
+      }
+      return
+    }
 
-    if (hasMismatchedPayValues && !hasManualMismatchError) {
-      form.setError('netPay', {
-        type: 'manual',
-        message: 'Net pay cannot exceed basic pay',
-      })
-    } else if (hasManualMismatchError) {
+    if (
+      state.error?.type === 'manual' &&
+      BASIC_PAY_MANUAL_ERRORS.has(state.error?.message)
+    ) {
+      form.clearErrors('basicPay')
+    }
+  }, [basicPayErrorMessage, form])
+
+  useEffect(() => {
+    const state = form.getFieldState('netPay')
+    if (netPayErrorMessage) {
+      if (state.error?.message !== netPayErrorMessage) {
+        form.setError('netPay', {
+          type: 'manual',
+          message: netPayErrorMessage,
+        })
+      }
+      return
+    }
+
+    if (
+      state.error?.type === 'manual' &&
+      NET_PAY_MANUAL_ERRORS.has(state.error?.message)
+    ) {
       form.clearErrors('netPay')
     }
-  }, [form, hasMismatchedPayValues])
+  }, [form, netPayErrorMessage])
 
   const requestLoanQuote = useCallback(
     async (payload, { fallbackAmount = 0, silent = false } = {}) => {
@@ -315,7 +379,11 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
     setErrorMessage(null)
     try {
       if (!canAutoCheckLoan) {
-        throw new Error('Enter valid pay details to calculate your loan limit.')
+        throw new Error(
+          netPayErrorMessage ||
+            basicPayErrorMessage ||
+            'Enter valid pay details to calculate your loan limit.',
+        )
       }
 
       let quote =
@@ -518,6 +586,8 @@ export function LoanLimitCalculator({ open, onOpenChange, onProceed }) {
                   </FormItem>
                 )}
               />
+
+              {loanAbilityMutation.isPending && <LoanCalculationIndicator />}
 
               {displayLoanAmount > 0 && (
                 <div className="flex items-center gap-2 rounded-xl border border-[#F47120] bg-[#F47120]/8 p-3">

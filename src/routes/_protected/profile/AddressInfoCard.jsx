@@ -52,7 +52,10 @@ const getKey = (type = '') => {
 export function RouteComponent() {
   const { user, login } = useStateContext()
   const [editing, setEditing] = useState(null)
-  const addresses = Array.isArray(user?.addresses) ? user.addresses : []
+  const addresses = useMemo(
+    () => (Array.isArray(user?.addresses) ? user.addresses : []),
+    [user?.addresses],
+  )
 
   const addressesBySection = useMemo(() => {
     return addresses.reduce((acc, addr) => {

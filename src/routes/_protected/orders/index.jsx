@@ -173,7 +173,12 @@ function OrdersPage() {
   const navigate = useNavigate()
   const { data, isPending, isError, refetch } = useGetOrdersList()
 
-  const apiOrders = Array.isArray(data?.data) ? data.data : []
+  const apiOrders = useMemo(() => {
+    if (Array.isArray(data?.data)) {
+      return data.data
+    }
+    return []
+  }, [data?.data])
 
   const orderHistory = useMemo(
     () =>

@@ -1,158 +1,236 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useSnackbar } from 'notistack'
+import bnplApi from '@/lib/api/bnplApi'
 import { bnplQueryKeys } from '@/lib/queryKeys'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { enqueueSnackbar, useSnackbar } from 'notistack'
 
-// Get Profile Information of a User
-export const useGetProfile = (userId) => {
+const buildProfileQueryKey = (userId) => [
+  bnplQueryKeys.profile.PROFILE_GET_BY_ID,
+  userId,
+]
+
+export const useGetProfile = (userId, options = {}) => {
   return useQuery({
-    queryKey: bnplQueryKeys.profile.PROFILE_GET_BY_ID(userId),
-    queryFn: () => api.get(`v1/user/${userId}`).then((res) => res.data),
-    enabled: !!userId,
+    queryKey: buildProfileQueryKey(userId),
+    queryFn: async () => {
+      const { data } = await bnplApi.get(`/user/${userId}`)
+      return data
+    },
+    enabled: Boolean(userId),
+    ...options,
   })
 }
 
-//Update User Details
 export const useUpdateUserDetails = (options = {}) => {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOptions
+  } = options
 
   return useMutation({
-    mutationKey: queryKeys.invoices.update(),
-    mutationFn: async ({ updates }) => {
-      const { data } = await api.put(`/v1/user/edit`, updates)
+    mutationKey: [bnplQueryKeys.profile.UPDATE_USER_DETAILS],
+    mutationFn: async (updates) => {
+      const { data } = await bnplApi.put('/user/edit', updates)
       return data
     },
-    onSuccess: (payload) => {
-      const success =
-        payload.success === true
-          ? payload.message
-          : 'Profile Details updated successfully'
-      enqueueSnackbar(success, {
+    onSuccess: (response, updates, context) => {
+      const message =
+        response?.message ||
+        response?.status?.message ||
+        'Profile details updated successfully'
+
+      enqueueSnackbar(message, {
         variant: 'success',
         autoHideDuration: 4000,
       })
 
-      queryClient.invalidateQueries({
-        queryKey: bnplQueryKeys.profile.PROFILE_GET_BY_ID,
-      })
+      if (updates?.userId) {
+        queryClient.invalidateQueries({
+          queryKey: buildProfileQueryKey(updates.userId),
+        })
+      }
+
+      onSuccessOverride?.(response, updates, context)
     },
-    onError: (error) => {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'Failed to update invoice'
-      enqueueSnackbar(errorMessage, {
+    onError: (error, updates, context) => {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.status?.message ||
+        error?.message ||
+        'Failed to update profile details'
+
+      enqueueSnackbar(errMsg, {
         variant: 'error',
+        autoHideDuration: 4000,
       })
+
+      onErrorOverride?.(error, updates, context)
     },
-    ...options,
+    ...mutationOptions,
   })
 }
 
-//Update User Address
-
-export function useUpdateUserAddress(options) {
+export const useUpdateUserAddress = (options = {}) => {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOptions
+  } = options
+
   return useMutation({
     mutationKey: [bnplQueryKeys.profile.UPDATE_USER_ADDRESS],
-    mutationFn: async (payload) => {
-      const formData = {
-        userId: payload.userId,
-        address: payload.address,
-        type: payload.type,
-      }
-      const { data } = await api.put(`/v1/user/address/edit`, formData)
+    mutationFn: async ({ userId, address, type }) => {
+      const payload = { userId, address, type }
+      const { data } = await bnplApi.put('/user/address/edit', payload)
       return data
     },
-    onSuccess: (payload) => {
-      let success = payload.message.includes('successfully')
-        ? payload.message
-        : payload.message
-      enqueueSnackbar(success, {
+    onSuccess: (response, variables, context) => {
+      const message =
+        response?.message ||
+        response?.status?.message ||
+        'Address updated successfully'
+
+      enqueueSnackbar(message, {
         variant: 'success',
         autoHideDuration: 4000,
       })
-      setTimeout(() => {
-        return queryClient.invalidateQueries({
-          queryKey: [queryKeys.licenses.PROFILE_GET_BY_ID],
+
+      if (variables?.userId) {
+        queryClient.invalidateQueries({
+          queryKey: buildProfileQueryKey(variables.userId),
         })
-      }, 2000)
+      }
+
+      onSuccessOverride?.(response, variables, context)
     },
-    onError: (error, payload, context) => {
-      let err = error.response ? error.response.data?.message : error.message
-      enqueueSnackbar(err, {
+    onError: (error, variables, context) => {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.status?.message ||
+        error?.message ||
+        'Failed to update address'
+
+      enqueueSnackbar(errMsg, {
         variant: 'error',
+        autoHideDuration: 4000,
       })
+
+      onErrorOverride?.(error, variables, context)
     },
-    ...options,
+    ...mutationOptions,
   })
 }
 
-//Update User Notification Preferences
-export function useUpdateNotificationPreferences(options) {
+export const useUpdateNotificationPreferences = (options = {}) => {
   const queryClient = useQueryClient()
   const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOptions
+  } = options
+
   return useMutation({
     mutationKey: [
       bnplQueryKeys.profile.UPDATE_USER_NOTIFICATION_PREFERENCES,
     ],
-    mutationFn: async (payload) => {
-      const formData = {
-        userId: payload.userId,
-        isActive: payload.isActive,
-        type: payload.type,
-      }
-
-      const { data } = await api.put(
-        `/v1/user/notification-preference/edit`,
-        formData,
+    mutationFn: async ({ userId, isActive, type }) => {
+      const payload = { userId, isActive, type }
+      const { data } = await bnplApi.put(
+        '/user/notification-preference/edit',
+        payload,
       )
       return data
     },
-    onSuccess: (payload) => {
-      let success = payload.message.includes('successfully')
-        ? payload.message
-        : payload.message
-      enqueueSnackbar(success, {
+    onSuccess: (response, variables, context) => {
+      const message =
+        response?.message ||
+        response?.status?.message ||
+        'Notification preferences updated successfully'
+
+      enqueueSnackbar(message, {
         variant: 'success',
         autoHideDuration: 4000,
       })
-      setTimeout(() => {
-        return queryClient.invalidateQueries({
-          queryKey: [bnplQueryKeys.profile.PROFILE_GET_BY_ID],
+
+      if (variables?.userId) {
+        queryClient.invalidateQueries({
+          queryKey: buildProfileQueryKey(variables.userId),
         })
-      }, 2000)
+      }
+
+      onSuccessOverride?.(response, variables, context)
     },
-    onError: (error, payload, context) => {
-      let err = error.response ? error.response.data?.message : error.message
-      enqueueSnackbar(err, {
+    onError: (error, variables, context) => {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.status?.message ||
+        error?.message ||
+        'Failed to update notification preferences'
+
+      enqueueSnackbar(errMsg, {
         variant: 'error',
+        autoHideDuration: 4000,
       })
+
+      onErrorOverride?.(error, variables, context)
     },
-    ...options,
+    ...mutationOptions,
   })
 }
 
-//delete user
-
-// Mutation to delete invoice
-export const useDeleteUser = () => {
-  const queryClient = useQueryClient();
+export const useDeleteUser = (options = {}) => {
+  const queryClient = useQueryClient()
+  const { enqueueSnackbar } = useSnackbar()
+  const {
+    onSuccess: onSuccessOverride,
+    onError: onErrorOverride,
+    ...mutationOptions
+  } = options
 
   return useMutation({
-    mutationFn: (userId) =>
-          api.delete(`/v1/user/:${userId}/delete`).then((res) => res.data),
-       onSuccess: (payload) => {
-      let success = payload.message.includes('successfully')
-        ? payload.message
-        : payload.message
-      enqueueSnackbar(success, {
+    mutationKey: [bnplQueryKeys.profile.DELETE_USER],
+    mutationFn: async (userId) => {
+      const { data } = await bnplApi.delete(`/user/${userId}/delete`)
+      return data
+    },
+    onSuccess: (response, userId, context) => {
+      const message =
+        response?.message ||
+        response?.status?.message ||
+        'User deleted successfully'
+
+      enqueueSnackbar(message, {
         variant: 'success',
         autoHideDuration: 4000,
       })
-     
+
+      if (userId) {
+        queryClient.invalidateQueries({
+          queryKey: buildProfileQueryKey(userId),
+        })
+      }
+
+      onSuccessOverride?.(response, userId, context)
     },
-  
-  });
-};
+    onError: (error, userId, context) => {
+      const errMsg =
+        error?.response?.data?.message ||
+        error?.response?.data?.status?.message ||
+        error?.message ||
+        'Failed to delete user'
+
+      enqueueSnackbar(errMsg, {
+        variant: 'error',
+        autoHideDuration: 4000,
+      })
+
+      onErrorOverride?.(error, userId, context)
+    },
+    ...mutationOptions,
+  })
+}

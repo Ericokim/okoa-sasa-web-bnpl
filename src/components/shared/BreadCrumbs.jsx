@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 import { ChevronRight, Home } from 'lucide-react'
 import { HomeIcon } from '@/assets/icons'
+import { logger } from '@/lib/logger'
 
 const PATH_LABELS = {
   '/': 'Home',
@@ -115,7 +116,7 @@ export const BreadCrumbs = ({ title, description, items, className }) => {
       try {
         navigate({ to: crumb.path })
       } catch (error) {
-        console.error('Breadcrumb navigation failed', error)
+        logger.error('Breadcrumb navigation failed', error)
       }
     },
     [navigate],

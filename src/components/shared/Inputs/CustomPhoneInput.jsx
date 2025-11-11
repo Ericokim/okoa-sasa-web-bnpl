@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import * as Pv from "@/components/ui/popover";
 import * as Cmd from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 const PhoneInput = React.forwardRef(
   (
@@ -86,7 +87,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
           (countryCode && countryCode.includes(searchQuery))
         );
       } catch (error) {
-        console.warn(`Invalid country code: ${option.value}`, error);
+        logger.warn(`Invalid country code: ${option.value}`, error);
         return option.label.toLowerCase().includes(searchQuery.toLowerCase());
       }
     });
@@ -94,7 +95,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
 
   const handleSelect = React.useCallback(
     (country) => {
-      console.log("handleSelect called with:", country);
+      logger.info("handleSelect called with:", country);
       onChange(country);
       setOpen(false);
       setSearchQuery(""); // Reset search when closing
@@ -106,7 +107,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
     (e, country) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log("Item clicked:", country);
+      logger.info("Item clicked:", country);
       handleSelect(country);
     },
     [handleSelect],
@@ -227,7 +228,7 @@ const CountrySelect = ({ disabled, value, onChange, options }) => {
                             RPNInput.getCountryCallingCode(option.value) || ""
                           );
                         } catch (error) {
-                          console.warn(
+                          logger.warn(
                             `Invalid country code: ${option.value}`,
                             error,
                           );
