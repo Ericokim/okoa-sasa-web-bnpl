@@ -13,6 +13,7 @@ import { useStateContext } from '@/context/state-context'
 import { useNavigate } from '@tanstack/react-router'
 import { useProductList } from '@/lib/queries/products'
 import { useSyncProductsWithCart } from '@/hooks/use-sync-products-with-cart'
+import { logger } from '@/lib/logger'
 
 const steps = [
   {
@@ -113,7 +114,7 @@ export default function CheckoutPage() {
   const handleFormSubmit = (data) => {
     // Save form data for the current step
     saveCheckoutFormData(currentStep, data)
-    console.log('Form submitted:', data)
+    logger.info('Form submitted:', data)
     handleNext()
   }
 

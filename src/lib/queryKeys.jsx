@@ -198,5 +198,6 @@ export const bnplQueryKeys = {
     UPDATE_USER_ADDRESS: 'updateUserAddress',
     UPDATE_USER_NOTIFICATION_PREFERENCES: 'updateUserNotificationPreferences',
     UPDATE_PROFILE_PHOTO: 'updateProfilePhoto',
-  }
+    DELETE_USER: 'deleteUser',
+  },
 }

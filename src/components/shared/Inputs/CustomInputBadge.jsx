@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { X, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { logger } from "@/lib/logger";
 
 const TagInput = React.forwardRef(
   (
@@ -76,6 +77,11 @@ const TagInput = React.forwardRef(
     const containerRef = useRef(null);
     const debounceRef = useRef(null);
     const inputValidationRef = useRef(null);
+    const validationStateRef = useRef(validationState);
+
+    React.useEffect(() => {
+      validationStateRef.current = validationState;
+    }, [validationState]);
 
     // // Check for duplicates across all fields
     // const checkForDuplicates = useCallback(() => {
@@ -356,7 +362,7 @@ const TagInput = React.forwardRef(
               return newSet;
             });
           } catch (error) {
-            console.error(`Validation error for ${tagValue}:`, error);
+            logger.error(`Validation error for ${tagValue}:`, error);
 
             setValidationState((prev) => ({
               ...prev,
@@ -392,7 +398,6 @@ const TagInput = React.forwardRef(
     // Validate all existing tags when validateNarrative function is available or tags change
     React.useEffect(() => {
       if (validateNarrative && safeValue.length > 0) {
-        // Clean up validation states for tags that no longer exist
         setValidationState((prev) => {
           const cleanedState = {};
           safeValue.forEach((tag) => {
@@ -400,30 +405,53 @@ const TagInput = React.forwardRef(
               cleanedState[tag] = prev[tag];
             }
           });
-          return cleanedState;
+
+          const prevKeys = Object.keys(prev);
+          const cleanedKeys = Object.keys(cleanedState);
+          const isSameLength = prevKeys.length === cleanedKeys.length;
+          const isIdentical =
+            isSameLength &&
+            cleanedKeys.every((key) => prev[key] === cleanedState[key]);
+
+          return isIdentical ? prev : cleanedState;
         });
 
-        // Clean up validating tags set
+        const safeValueSet = new Set(safeValue);
+
         setValidatingTags((prev) => {
-          const newSet = new Set();
+          const next = new Set();
           prev.forEach((tag) => {
-            if (safeValue.includes(tag)) {
-              newSet.add(tag);
+            if (safeValueSet.has(tag)) {
+              next.add(tag);
             }
           });
-          return newSet;
+
+          if (next.size === prev.size) {
+            let identical = true;
+            prev.forEach((tag) => {
+              if (!next.has(tag)) {
+                identical = false;
+              }
+            });
+            if (identical) {
+              return prev;
+            }
+          }
+
+          return next;
         });
 
-        const tagsToValidate = safeValue.filter((tag) => !validationState[tag]);
+        const tagsToValidate = safeValue.filter(
+          (tag) => !validationStateRef.current?.[tag],
+        );
         if (tagsToValidate.length > 0) {
           validateMultipleTags(tagsToValidate);
         }
       } else if (safeValue.length === 0) {
-        // Clear all validation states when no tags exist
-        setValidationState({});
-        setValidatingTags(new Set());
+        setValidationState((prev) => (Object.keys(prev).length ? {} : prev));
+        setValidatingTags((prev) => (prev.size ? new Set() : prev));
       }
-    }, [validateNarrative, safeValue.length, validateMultipleTags]);
+    }, [safeValue, validateNarrative, validateMultipleTags]);
 
     // Validate current input as user types
     React.useEffect(() => {
@@ -450,7 +478,13 @@ const TagInput = React.forwardRef(
         setCurrentInputValidation(null);
         setIsValidatingCurrentInput(false);
       }
-    }, [inputValue, validateNarrative]);
+    }, [
+      inputValue,
+      validateNarrative,
+      currentInputValidation,
+      isValidatingCurrentInput,
+      validateCurrentInput,
+    ]);
 
     // Add multiple tags function
     const addTags = (tagValues, isPaste = false) => {
