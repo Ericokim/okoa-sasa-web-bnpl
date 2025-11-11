@@ -56,14 +56,12 @@ export function useStickyAffix({
       setColumnMinHeight(layoutHeight)
     }
 
-    const cardHeight = cardNode.offsetHeight
-    if (cardHeight && placeholderHeight !== cardHeight) {
-      setPlaceholderHeight(cardHeight)
-    }
+    const cardHeight = cardNode.offsetHeight || 0
 
     const layoutRect = layoutNode.getBoundingClientRect()
     const columnRect = columnNode.getBoundingClientRect()
     const scrollTop = window.scrollY || window.pageYOffset
+    const scrollLeft = window.scrollX || window.pageXOffset || 0
     const layoutTop = scrollTop + layoutRect.top
     const layoutBottom = layoutTop + layoutHeight
     const columnTop = scrollTop + columnRect.top
@@ -73,6 +71,7 @@ export function useStickyAffix({
 
     if (scrollTop <= stickyStart) {
       setAffixMode('relative')
+      setPlaceholderHeight(0)
       setCardStyles({
         position: 'relative',
         top: 0,
@@ -88,6 +87,7 @@ export function useStickyAffix({
         0,
       )
       setAffixMode('absolute')
+      setPlaceholderHeight(0)
       setCardStyles({
         position: 'absolute',
         top: absoluteTop,
@@ -98,17 +98,17 @@ export function useStickyAffix({
     }
 
     setAffixMode('fixed')
+    setPlaceholderHeight(cardHeight)
     setCardStyles({
       position: 'fixed',
       top: topOffset,
-      left: columnRect.left,
+      left: columnRect.left + scrollLeft,
       width: columnRect.width,
       zIndex: 50,
     })
   }, [
     columnMinHeight,
     isDesktop,
-    placeholderHeight,
     resetStickyState,
     bottomOffset,
     topOffset,
@@ -130,8 +130,13 @@ export function useStickyAffix({
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('resize', handleScroll)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDesktop, updateStickyPosition, resetStickyState, ...deps])
+  }, [isDesktop, resetStickyState, updateStickyPosition])
+
+  useEffect(() => {
+    if (!isDesktop) return
+    updateStickyPosition()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDesktop, updateStickyPosition, ...deps])
 
   return {
     layoutRef,
