@@ -18,6 +18,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog'
+import { useSnackbar } from 'notistack'
 
 export default function OrderSummaryPage({
   onNext,
@@ -26,6 +27,7 @@ export default function OrderSummaryPage({
   isLastStep,
 }) {
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
   const {
     cartProducts,
     removeFromCart,
@@ -115,6 +117,9 @@ export default function OrderSummaryPage({
   const confirmDelete = () => {
     if (itemToDelete) {
       removeFromCart(itemToDelete.id)
+      enqueueSnackbar('Removed from cart', {
+        variant: 'success',
+      })
       setShowDeleteDialog(false)
       setItemToDelete(null)
     }
