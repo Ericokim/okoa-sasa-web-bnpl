@@ -4,10 +4,12 @@ import { CartList } from './CartList'
 import { CartSummary } from './CartSummary'
 import { useStateContext } from '@/context/state-context'
 import { useStickyAffix } from '@/hooks/use-sticky-affix'
+import { useSnackbar } from 'notistack'
 
 export function Cart({ onCheckout }) {
   const { cartProducts, updateCartQuantity, removeFromCart, clearCart } =
     useStateContext()
+  const { enqueueSnackbar } = useSnackbar()
 
   const cartItems = useMemo(() => cartProducts ?? [], [cartProducts])
 
@@ -17,7 +19,13 @@ export function Cart({ onCheckout }) {
   }
 
   const handleRemove = (id) => {
+    const removedItem = cartItems.find(
+      (item) => String(item.id) === String(id),
+    )
     removeFromCart?.(id)
+    enqueueSnackbar('Removed from cart', {
+      variant: 'success',
+    })
   }
 
   const handleClearCart = () => {

@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/context/theme-context'
 import { ContextProvider } from '@/context/state-context'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { BrandSnackbar } from '@/components/shared/BrandSnackbar'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,8 +50,11 @@ export function Provider({ children }) {
                 horizontal: 'right',
               }}
               maxSnack={3}
-              autoHideDuration={7000}
+              autoHideDuration={8000}
               preventDuplicate={true}
+              Components={{
+                success: BrandSnackbar,
+              }}
               action={(key) => <CloseButton snackbarKey={key} />}
             >
               {children}

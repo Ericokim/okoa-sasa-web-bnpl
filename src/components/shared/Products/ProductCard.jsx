@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { ShoppingCartIcon } from '@/assets/icons'
 import { useStateContext } from '@/context/state-context'
+import { useSnackbar } from 'notistack'
 
 export function ProductCard({
   id = '1',
@@ -13,6 +14,7 @@ export function ProductCard({
   hasCartButton = false,
 }) {
   const { removeFromCart } = useStateContext()
+  const { enqueueSnackbar } = useSnackbar()
 
   const fallbackImage = '/product.png'
   const imageSrc =
@@ -25,6 +27,9 @@ export function ProductCard({
     event.stopPropagation()
     if (!hasCartButton) return
     removeFromCart?.(id)
+    enqueueSnackbar('Removed from cart', {
+      variant: 'success',
+    })
   }
 
   return (

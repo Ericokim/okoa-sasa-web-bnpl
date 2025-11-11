@@ -16,10 +16,12 @@ import {
 } from '@/assets/icons'
 import { Button } from '@/components/ui/button'
 import { useStateContext } from '@/context/state-context'
+import { useSnackbar } from 'notistack'
 
 export function ProductInfo({ product }) {
   const navigate = useNavigate()
   const { addToCart, updateCartQuantity, cart } = useStateContext()
+  const { enqueueSnackbar } = useSnackbar()
 
   // Local quantity state (separate from cart)
   const [quantity, setQuantity] = useState(1)
@@ -49,13 +51,20 @@ export function ProductInfo({ product }) {
 
   const handleAddToCart = () => {
     if (!product?.id) return
-
     if (isInCart) {
       // Update cart with new total quantity
       updateCartQuantity(product.id, existingQuantity + quantity)
+      enqueueSnackbar('Added to cart', {
+        variant: 'success',
+        autoHideDuration: 3500,
+      })
     } else {
       // Add to cart with selected quantity
       addToCart(product.id, quantity, product)
+      enqueueSnackbar('Added to cart', {
+        variant: 'success',
+        autoHideDuration: 3500,
+      })
     }
 
     // Reset quantity to 1 after adding
