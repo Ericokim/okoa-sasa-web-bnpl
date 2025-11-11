@@ -88,25 +88,50 @@ const sanitizeCartProductSnapshot = (value) => {
 }
 
 const CART_STORAGE_KEY = 'okoa-sasa-cart'
+const CART_STORAGE_VERSION = 1
+
+const normalizeStoredCartEntries = (entries) => {
+  if (!Array.isArray(entries)) return []
+
+  return entries
+    .map((item) => {
+      const productId = normalizeProductId(
+        item?.productId ?? item?.id ?? item?.sku,
+      )
+      if (!productId) return null
+
+      const quantity = Math.max(1, Number(item?.quantity) || 1)
+      const productSnapshot = sanitizeCartProductSnapshot(
+        item?.productSnapshot ?? item?.snapshot ?? null,
+      )
+
+      return productSnapshot
+        ? { productId, quantity, productSnapshot }
+        : { productId, quantity }
+    })
+    .filter(Boolean)
+}
 
 const readStoredCart = () => {
   try {
     const rawValue = safeLocalStorage.getItem(CART_STORAGE_KEY)
     if (!rawValue) return []
     const parsed = JSON.parse(rawValue)
-    if (!Array.isArray(parsed)) return []
-    return parsed
-      .map((item) => {
-        const productId = normalizeProductId(
-          item?.productId ?? item?.id ?? item?.sku,
-        )
-        const quantity = Math.max(1, Number(item?.quantity) || 1)
-        const productSnapshot = sanitizeCartProductSnapshot(
-          item?.productSnapshot ?? item?.snapshot ?? null,
-        )
-        return productId ? { productId, quantity, productSnapshot } : null
-      })
-      .filter(Boolean)
+
+    if (Array.isArray(parsed)) {
+      // Legacy format (just an array)
+      return normalizeStoredCartEntries(parsed)
+    }
+
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      Array.isArray(parsed.items)
+    ) {
+      return normalizeStoredCartEntries(parsed.items)
+    }
+
+    return []
   } catch {
     return []
   }
@@ -114,7 +139,12 @@ const readStoredCart = () => {
 
 const writeStoredCart = (items) => {
   try {
-    safeLocalStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items))
+    const payload = {
+      version: CART_STORAGE_VERSION,
+      updatedAt: Date.now(),
+      items: normalizeStoredCartEntries(items),
+    }
+    safeLocalStorage.setItem(CART_STORAGE_KEY, JSON.stringify(payload))
   } catch {
     // ignore persistence errors
   }
@@ -180,10 +210,13 @@ const loadCheckoutStep = () => {
 }
 
 export function ContextProvider({ children }) {
-  const initialCart = useMemo(() => buildInitialCart(), [])
+  const isBrowserEnv = typeof window !== 'undefined'
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [user, setUser] = useState(null)
-  const [cart, setCart] = useState(initialCart)
+  const [cart, setCart] = useState(() =>
+    isBrowserEnv ? buildInitialCart() : [],
+  )
+  const [hasHydratedCart, setHasHydratedCart] = useState(isBrowserEnv)
   const [products, setProducts] = useState([])
   const [searchTerm, setSearchTermState] = useState('')
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
@@ -197,8 +230,43 @@ export function ContextProvider({ children }) {
   const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
 
   useEffect(() => {
+    if (!isBrowserEnv) return
+
+    let storageArea = null
+    try {
+      storageArea = window.localStorage
+    } catch {
+      storageArea = null
+    }
+
+    if (!storageArea) {
+      setHasHydratedCart(true)
+      return
+    }
+
+    if (!hasHydratedCart) {
+      const storedCart = buildInitialCart()
+      setCart(storedCart)
+      setHasHydratedCart(true)
+    }
+
+    const handleStorage = (event) => {
+      if (event.storageArea !== storageArea || event.key !== CART_STORAGE_KEY) {
+        return
+      }
+      setCart(buildInitialCart())
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+    }
+  }, [isBrowserEnv, hasHydratedCart])
+
+  useEffect(() => {
+    if (!hasHydratedCart) return
     writeStoredCart(cart)
-  }, [cart])
+  }, [cart, hasHydratedCart])
 
   useEffect(() => {
     if (searchDebounceRef.current) {
