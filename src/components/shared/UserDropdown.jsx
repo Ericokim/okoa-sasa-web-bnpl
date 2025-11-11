@@ -189,7 +189,7 @@ const MobileSheet = ({ trigger, onLogout }) => {
         <div className="px-6 py-5 flex items-center gap-3">
           <Avatar className="h-12 w-12 ring-2 ring-white shadow-sm">
             <AvatarImage
-              src={personalInfo.avatar || '/avator.png'}
+              src={personalInfo.avatar || '/profile.png'}
               alt="avatar"
               className="w-full h-full object-cover"
             />
@@ -278,7 +278,7 @@ export function UserDropdown({ isMobile = false }) {
         isMobile ? 'h-9 w-9 ring-2 ring-white ' : 'h-8 w-8 ring-2 ring-white'
       }
     >
-      <AvatarImage src={personalInfo.avatar || '/avator.png'} />
+      <AvatarImage src={personalInfo.avatar || '/profile.png'} />
       <AvatarFallback className="bg-brand-bg-2 text-sm font-medium">
         {personalInfo.firstName?.[0]}
         {personalInfo.lastName?.[0]}
@@ -317,7 +317,7 @@ export function UserDropdown({ isMobile = false }) {
         <div className="flex items-center gap-3 px-2 py-3">
           <div className="h-8 w-8 rounded-full ring-2 ring-white shadow-sm overflow-hidden">
             <img
-              src={personalInfo.avatar || '/avator.png'}
+              src={personalInfo.avatar || '/profile.png'}
               alt="avatar"
               className="w-full h-full object-cover"
             />
