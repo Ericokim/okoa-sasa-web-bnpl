@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { normalizeKenyanPhoneNumber } from '@/lib/validation'
 
 const EMPTY_PERSONAL_INFO = {
   firstName: '',
@@ -62,18 +63,20 @@ const buildPersonalInfoFromUser = (user) => {
     user.photoUrl,
   )
 
+  const rawPhone = preferString(
+    user.phoneNumber,
+    user.phone_number,
+    user.msisdn,
+    user.phone,
+  )
+  const normalizedPhone = normalizeKenyanPhoneNumber(rawPhone) || rawPhone || ''
+
   return {
     ...EMPTY_PERSONAL_INFO,
     firstName: resolvedFirstName,
     lastName: resolvedLastName,
     email: email || '',
-    phone:
-      preferString(
-        user.phoneNumber,
-        user.phone_number,
-        user.msisdn,
-        user.phone,
-      ) || '',
+    phone: normalizedPhone,
     role:
       preferString(
         user.role,

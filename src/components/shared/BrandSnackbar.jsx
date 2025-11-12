@@ -34,7 +34,7 @@ export const BrandSnackbar = forwardRef(function BrandSnackbar(
       style={style}
       role="status"
       className={cn(
-        'pointer-events-auto flex w-full min-w-[240px] max-w-[360px] items-center gap-3 rounded-[999px] bg-gradient-to-r from-[#F8971D] to-[#EE3124] px-5 py-3 text-white shadow-[0_10px_30px_rgba(238,49,36,0.25)]',
+        'pointer-events-auto flex w-full min-w-60 max-w-[360px] items-center gap-3 rounded-[999px] bg-linear-to-r from-[#F8971D] to-[#EE3124] px-5 py-2 text-white shadow-[0_10px_30px_rgba(238,49,36,0.25)]',
         className,
       )}
     >
