@@ -5,7 +5,10 @@ import { AuthDialog } from '../AuthDialog'
 import { useStateContext } from '@/context/state-context'
 import { useCreateOrder } from '@/lib/queries/orders'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import {
+  normalizeKenyanPhoneNumber,
+  formatKenyanMsisdn,
+} from '@/lib/validation'
 import { Spinner } from '@/components/ui/spinner'
 
 export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
@@ -50,11 +53,18 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
       throw new Error('Please accept the terms and conditions before continuing.')
     }
 
+    const customerPhoneInput =
+      step2Data?.apiPayload?.customer?.phoneNumber || step2Data?.phoneNumber || ''
+    const normalizedCustomerPhone =
+      normalizeKenyanPhoneNumber(customerPhoneInput) || customerPhoneInput || ''
+    const customerMsisdn = formatKenyanMsisdn(
+      normalizedCustomerPhone || customerPhoneInput || '',
+    )
+
     const customer = {
       fullName: step2Data?.apiPayload?.customer?.fullName || step2Data?.fullName,
-      phoneNumber: normalizeKenyanPhoneNumber(
-        step2Data?.apiPayload?.customer?.phoneNumber || step2Data?.phoneNumber || '',
-      ),
+      phoneNumber: normalizedCustomerPhone,
+      ...(customerMsisdn ? { msisdn: customerMsisdn } : {}),
       email: step2Data?.apiPayload?.customer?.email || step2Data?.email,
       employer: step2Data?.apiPayload?.customer?.employer || step2Data?.employer,
       employeeNumber:
@@ -75,9 +85,23 @@ export default function AccountOptionPage({ onNext, onPrevious, isFirstStep }) {
     const shippingDetail = { ...(step3Data?.apiPayload?.shippingDetail || {}) }
     const fallbackEmail = customer.email
     shippingDetail.recipientEmail = shippingDetail.recipientEmail || fallbackEmail || ''
-    shippingDetail.recipientPhoneNumber = normalizeKenyanPhoneNumber(
-      shippingDetail.recipientPhoneNumber || customer.phoneNumber || '',
-    )
+    const shippingPhoneInput =
+      shippingDetail.recipientPhoneNumber ||
+      customer.phoneNumber ||
+      customerPhoneInput ||
+      ''
+    const normalizedShippingPhone =
+      normalizeKenyanPhoneNumber(shippingPhoneInput) ||
+      shippingPhoneInput ||
+      ''
+    const shippingMsisdn =
+      formatKenyanMsisdn(
+        normalizedShippingPhone || shippingPhoneInput || customerMsisdn || '',
+      ) || customerMsisdn
+    shippingDetail.recipientPhoneNumber = normalizedShippingPhone
+    if (shippingMsisdn) {
+      shippingDetail.recipientMsisdn = shippingMsisdn
+    }
     if (shippingDetail.type?.toLowerCase() === 'pickup' || shippingDetail.type === 'PickUp') {
       shippingDetail.type = 'PickUp'
     } else {

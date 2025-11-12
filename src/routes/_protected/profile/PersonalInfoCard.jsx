@@ -21,7 +21,7 @@ import { useStateContext } from '@/context/state-context'
 import { useUpdateUser } from '@/lib/queries/user'
 import {
   normalizeKenyanPhoneNumber,
-  isValidKenyanPhoneNumber,
+  buildPhoneNumberSchema,
 } from '@/lib/validation'
 import { logger } from '@/lib/logger'
 
@@ -33,12 +33,10 @@ const personalInfoSchema = z.object({
     .string()
     .min(1, 'Email is required')
     .email('Please enter a valid email address'),
-  phoneNumber: z
-    .string()
-    .min(1, 'Phone number is required')
-    .refine(isValidKenyanPhoneNumber, {
-      message: 'Please enter a valid Kenyan phone number',
-    }),
+  phoneNumber: buildPhoneNumberSchema({
+    requiredMessage: 'Phone number is required',
+    invalidMessage: 'Please enter a valid phone number',
+  }),
   company: z.string().min(1, 'Company is required'),
   idNumber: z
     .string()
@@ -132,7 +130,6 @@ export function RouteComponent() {
       fullName: `${data.firstName} ${data.lastName}`
         .replace(/\s+/g, ' ')
         .trim(),
-      lastName: data.lastName.trim(),
       email: data.email.trim(),
       employer: data.company.trim(),
       employeeNumber: data.employeeNumber.trim(),

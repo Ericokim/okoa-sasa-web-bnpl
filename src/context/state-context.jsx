@@ -14,6 +14,10 @@ import {
   clearStorageData as clearEncryptedStorage,
   formatCurrency,
 } from '@/lib/utils'
+import {
+  normalizeKenyanPhoneNumber,
+  formatKenyanMsisdn,
+} from '@/lib/validation'
 import { useAccountStore } from '@/data/accountStore'
 
 const StateContext = createContext(null)
@@ -26,6 +30,27 @@ const FALLBACK_PRODUCT_IMAGE = '/product.png'
 const toNumber = (value) => {
   const parsed = Number(value)
   return Number.isFinite(parsed) ? parsed : 0
+}
+
+const sanitizeUserPayload = (userData = {}) => {
+  if (!userData || typeof userData !== 'object') {
+    return {}
+  }
+
+  const rawPhone =
+    userData.phoneNumber || userData.phone || userData.msisdn || ''
+  const normalizedPhone = normalizeKenyanPhoneNumber(rawPhone) || ''
+  const msisdn = formatKenyanMsisdn(normalizedPhone || rawPhone || '')
+
+  return {
+    ...userData,
+    ...(normalizedPhone ? { phoneNumber: normalizedPhone } : {}),
+    ...(msisdn
+      ? { msisdn }
+      : userData.msisdn
+        ? { msisdn: userData.msisdn }
+        : {}),
+  }
 }
 
 const buildProductSnapshot = (product) => {
@@ -358,8 +383,9 @@ export function ContextProvider({ children }) {
       if (isSessionValid) {
         setIsAuthenticated(true)
         if (hydratedUser) {
-          setUser(hydratedUser)
-          persistUserSession(hydratedUser)
+          const sanitizedUser = sanitizeUserPayload(hydratedUser)
+          setUser(sanitizedUser)
+          persistUserSession(sanitizedUser)
         }
       }
     } catch {
@@ -369,7 +395,7 @@ export function ContextProvider({ children }) {
 
   const login = useCallback(
     (userData = {}) => {
-      const sanitizedUser = { ...userData }
+      const sanitizedUser = sanitizeUserPayload(userData)
       setIsAuthenticated(true)
       setUser(sanitizedUser)
       persistUserSession(sanitizedUser)

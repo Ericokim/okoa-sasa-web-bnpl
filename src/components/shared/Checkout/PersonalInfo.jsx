@@ -25,7 +25,7 @@ import { useStateContext } from '@/context/state-context'
 import React from 'react'
 import {
   normalizeKenyanPhoneNumber,
-  isValidKenyanPhoneNumber,
+  buildPhoneNumberSchema,
 } from '@/lib/validation'
 
 const personalInfoSchema = z.object({
@@ -42,12 +42,10 @@ const personalInfoSchema = z.object({
     .string()
     .min(1, 'Email is required')
     .email('Please enter a valid email address'),
-  phoneNumber: z
-    .string()
-    .min(1, 'Phone number is required')
-    .refine(isValidKenyanPhoneNumber, {
-      message: 'Please enter a valid kenyan phone number',
-    }),
+  phoneNumber: buildPhoneNumberSchema({
+    requiredMessage: 'Phone number is required',
+    invalidMessage: 'Please enter a valid kenyan phone number',
+  }),
 })
 
 const DEFAULT_COMPANY_OPTIONS = [
