@@ -16,17 +16,22 @@ export function RouteComponent() {
   const nationalId = user?.idNumber || user?.ID
   const company = user?.employer || user?.company || '—'
   const nameParts = useMemo(() => {
-    if (user?.firstName || user?.lastName) {
+    const splitFullName = () => {
+      if (!user?.fullName) return { firstName: '', lastName: '' }
+      const tokens = user.fullName.trim().split(/\s+/)
+      if (tokens.length === 1) {
+        return { firstName: tokens[0] || '', lastName: '' }
+      }
       return {
-        firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
+        firstName: tokens[0] || '',
+        lastName: tokens.slice(1).join(' ').trim(),
       }
     }
-    if (!user?.fullName) return { firstName: '', lastName: '' }
-    const tokens = user.fullName.trim().split(/\s+/)
+
+    const fallback = splitFullName()
     return {
-      firstName: tokens[0] || '',
-      lastName: tokens.slice(1).join(' '),
+      firstName: user?.firstName?.trim() || fallback.firstName,
+      lastName: user?.lastName?.trim() || fallback.lastName,
     }
   }, [user])
 
