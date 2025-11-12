@@ -54,6 +54,8 @@ export function Provider({ children }) {
               preventDuplicate={true}
               Components={{
                 success: BrandSnackbar,
+                error: BrandSnackbar,
+                info: BrandSnackbar,
               }}
               action={(key) => <CloseButton snackbarKey={key} />}
             >

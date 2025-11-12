@@ -40,6 +40,10 @@ const browserLocalStorage = resolveLocalStorage()
 
 export const safeLocalStorage = browserLocalStorage ?? createMemoryStorage()
 
+export const SESSION_FLAG_STORAGE_KEY = 'hasAuthenticatedSession'
+export const LEGACY_AUTH_STORAGE_KEY = 'isAuthenticated'
+export const LEGACY_USER_STORAGE_KEY = 'user'
+
 const createMemoryEncryptStorage = () => {
   const storage = createMemoryStorage()
   return {
@@ -106,6 +110,14 @@ export const clearStorageData = () => {
       // ignore
     }
   })
+
+  try {
+    safeLocalStorage.removeItem(SESSION_FLAG_STORAGE_KEY)
+    safeLocalStorage.removeItem(LEGACY_AUTH_STORAGE_KEY)
+    safeLocalStorage.removeItem(LEGACY_USER_STORAGE_KEY)
+  } catch {
+    // ignore
+  }
 
   // Clear encrypted storage
   try {
