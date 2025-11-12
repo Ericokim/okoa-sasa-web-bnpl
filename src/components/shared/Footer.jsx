@@ -161,52 +161,57 @@ const TikTokIcon = ({ className }) => (
 export function Footer() {
   return (
     <footer className="bg-[#161719] py-10 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
-      <div className="mx-auto w-full space-y-10">
+      <div className="mx-auto w-full space-y-8">
         {/* Header Section with Logo and Social Media */}
         <div className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:items-center lg:justify-between">
           {/* Logo */}
-          <div className="w-[180px] sm:w-[240px] md:w-[300px] lg:w-[335px] xl:w-[395px] h-auto">
+          <div className="w-[176px] sm:w-[170px] md:w-[220px] lg:w-[250px] xl:w-[280px] h-auto">
             <img
               src={logo}
               srcSet={`${logo} 1x, ${logo} 2x`}
               alt="Okoa Sasa Logo"
               loading="lazy"
               decoding="async"
-              className="h-full w-full object-contain"
+              className="h-auto max-h-[80px] w-full object-contain"
             />
           </div>
 
           {/* Social Media Icons */}
           <div className="flex items-center justify-center gap-4 sm:gap-5">
             <a
-              href="#"
-              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              href="https://www.facebook.com/OKOA-SASA-102076565265682/"
+              target="_blank"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[60px] md:h-[60px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <FacebookIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
+              <FacebookIcon className="w-6 sm:w-6 md:w-[34px] h-auto" />
+            </a>
+            <a
+              href="https://twitter.com/okoa_sasa?t=l6l81a2uqV6H41rpPAGhXQ&s=09"
+              target="_blank"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[60px] md:h-[60px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+            >
+              <XIcon className="w-5 sm:w-5 md:w-[32px] h-auto" />
+            </a>
+            <a
+              href="https://instagram.com/okoa_sasa1?utm_medium=copy_link"
+              target="_blank"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[60px] md:h-[60px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+            >
+              <InstagramIcon className="w-6 sm:w-6 md:w-[34px] h-auto" />
+            </a>
+            <a
+              href="https://web.whatsapp.com/send?phone=254794249951&text=Hello"
+              target="_blank"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[60px] md:h-[60px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+            >
+              <WhatsAppIcon className="w-6 sm:w-6 md:w-[34px] h-auto" />
             </a>
             <a
               href="#"
-              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
+              target="_blank"
+              className="w-9 h-9 sm:w-10 sm:h-10 md:w-[60px] md:h-[60px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
             >
-              <XIcon className="w-6 sm:w-[26px] md:w-[35px] h-auto" />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
-            >
-              <InstagramIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
-            >
-              <WhatsAppIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
-            </a>
-            <a
-              href="#"
-              className="w-10 h-10 sm:w-11 sm:h-11 md:w-[63px] md:h-[63px] bg-[rgba(255,255,255,0.1)] rounded-full flex items-center justify-center shadow-[0px_22.483px_33.725px_-6.745px_rgba(0,0,0,0.1),0px_8.993px_13.49px_-8.993px_rgba(0,0,0,0.1)] hover:bg-[rgba(255,255,255,0.2)] transition-colors"
-            >
-              <TikTokIcon className="w-6 sm:w-[26px] md:w-[36px] h-auto" />
+              <TikTokIcon className="w-6 sm:w-6 md:w-[34px] h-auto" />
             </a>
           </div>
         </div>
@@ -275,19 +280,19 @@ export function Footer() {
           </div>
 
           {/* Newsletter Section */}
-          <div className="flex flex-col gap-4 text-left max-w-full">
+          <div className="flex flex-col gap-4 text-left max-w-full w-full">
             <h3 className="text-lg sm:text-xl font-semibold text-white">
               You Can Find Us On!
             </h3>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full">
               <Input
                 type="email"
                 placeholder="Enter Your Email"
-                className="bg-[#2c2d2f] border-none text-base text-brand-mid-gray placeholder:text-brand-mid-gray rounded-[16px] px-6 py-[13px] h-auto flex-1"
+                className="bg-[#2c2d2f] border-none text-base text-brand-mid-gray placeholder:text-brand-mid-gray rounded-2xl px-5 py-3 h-auto flex-1"
               />
               <Button
                 variant="gradient"
-                className="w-full sm:w-auto rounded-[24px] px-6 py-3 text-base font-medium whitespace-nowrap"
+                className="w-full sm:w-24 sm:h-12 sm:text-sm rounded-3xl px-5 py-3 text-base font-medium whitespace-nowrap"
                 size="lg"
               >
                 Contact Us

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { isValidPhoneNumber } from 'libphonenumber-js/min'
+import { isValidPhoneNumber, parsePhoneNumber } from 'libphonenumber-js/min'
 
 const nameRegex = /^[a-zA-Z '.-]*$/
 const numberRegex = /^[0-9]*$/
@@ -16,7 +16,10 @@ const isValidEmail = (value = '') => emailRegex.test(value.trim())
 const sanitizeKenyanPhoneNumber = (value = '') => {
   if (!value) return ''
 
-  const characters = value.split('')
+  const trimmed = String(value).trim()
+  if (!trimmed) return ''
+
+  const characters = trimmed.split('')
   const sanitized = characters.reduce((acc, char) => {
     if (char === '+' && acc.length === 0) {
       acc.push(char)
@@ -33,45 +36,70 @@ const sanitizeKenyanPhoneNumber = (value = '') => {
   return sanitized.join('')
 }
 
-export const isValidKenyanPhoneNumber = (value) => {
+const toParseableKenyanPhone = (value = '') => {
   const sanitized = sanitizeKenyanPhoneNumber(value)
-
-  if (!sanitized) return false
-
-  if (sanitized.startsWith('+254')) {
-    return /^\+254\d{9}$/.test(sanitized)
-  }
-
-  if (sanitized.startsWith('254')) {
-    return /^254\d{9}$/.test(sanitized)
-  }
-
-  if (sanitized.startsWith('0')) {
-    return /^0\d{9}$/.test(sanitized)
-  }
-
-  return false
-}
-
-export const normalizeKenyanPhoneNumber = (value = '') => {
-  const sanitized = sanitizeKenyanPhoneNumber(value)
-
   if (!sanitized) return ''
 
-  if (sanitized.startsWith('+254')) {
-    return `+254${sanitized.slice(4, 13)}`
+  if (sanitized.startsWith('+')) {
+    return sanitized
   }
 
-  if (sanitized.startsWith('254')) {
-    return `+254${sanitized.slice(3, 12)}`
+  if (/^0\d{9}$/.test(sanitized)) {
+    return sanitized
   }
 
-  if (sanitized.startsWith('0')) {
-    return `+254${sanitized.slice(1, 10)}`
+  if (/^254\d{9}$/.test(sanitized)) {
+    return `+${sanitized}`
   }
 
   return sanitized
 }
+
+const parseKenyanPhoneNumber = (value = '') => {
+  const candidate = toParseableKenyanPhone(value)
+  if (!candidate) return null
+
+  try {
+    const parsed = parsePhoneNumber(candidate, 'KE')
+    if (parsed?.isValid() && parsed?.country === 'KE') {
+      return parsed
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+export const isValidKenyanPhoneNumber = (value) =>
+  Boolean(parseKenyanPhoneNumber(value))
+
+export const normalizeKenyanPhoneNumber = (value = '') => {
+  const parsed = parseKenyanPhoneNumber(value)
+  return parsed ? parsed.number : ''
+}
+
+export const formatKenyanMsisdn = (value = '') => {
+  if (!value) return ''
+  const normalized = value.startsWith('+')
+    ? value
+    : normalizeKenyanPhoneNumber(value)
+
+  if (!normalized) return ''
+
+  return normalized.replace(/^\+/, '')
+}
+
+export const buildPhoneNumberSchema = ({
+  requiredMessage = 'Phone number is required',
+  invalidMessage = 'Phone number is not valid',
+} = {}) =>
+  z
+    .string()
+    .trim()
+    .min(1, { message: requiredMessage })
+    .refine(isValidKenyanPhoneNumber, { message: invalidMessage })
+    .transform((value) => normalizeKenyanPhoneNumber(value))
 
 const sanitizeOtpValue = (value = '') =>
   value.replace(/[^0-9]/g, '').slice(0, 6)
@@ -102,7 +130,7 @@ export const LoginSchema = zodResolver(
         (value) => isValidKenyanPhoneNumber(value) || isValidEmail(value),
         {
           message:
-            'Please enter a valid Kenyan phone number or email address.',
+            'Please enter a valid phone number or email address.',
         },
       )
       .transform((value) => {

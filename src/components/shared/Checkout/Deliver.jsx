@@ -22,7 +22,10 @@ import { FormTextarea } from '../Inputs/FormTextarea'
 import { PhoneInput } from '../Inputs/FormPhone'
 import { useStateContext } from '@/context/state-context'
 import { usePickUpPoint, useRegion } from '@/lib/queries/orders'
-import { normalizeKenyanPhoneNumber } from '@/lib/validation'
+import {
+  normalizeKenyanPhoneNumber,
+  buildPhoneNumberSchema,
+} from '@/lib/validation'
 
 const splitUserName = (fullName = '') => {
   if (!fullName) return { firstName: '', lastName: '' }
@@ -36,38 +39,16 @@ const splitUserName = (fullName = '') => {
   }
 }
 
-// Phone validation schema
-const kenyaPhoneSchema = z
-  .string()
-  .min(1, 'Phone number is required')
-  .refine(
-    (value) => {
-      // Remove any spaces for validation
-      const cleaned = value.replace(/\s/g, '')
-
-      // Check if it starts with +254 (should be 13 characters total)
-      if (cleaned.startsWith('+254')) {
-        return cleaned.length === 13 && /^\+254\d{9}$/.test(cleaned)
-      }
-
-      // Check if it starts with 0 (should be 10 characters total)
-      if (cleaned.startsWith('0')) {
-        return cleaned.length === 10 && /^0\d{9}$/.test(cleaned)
-      }
-
-      return false
-    },
-    {
-      message:
-        'Please enter a valid Kenyan phone number',
-    },
-  )
+const recipientPhoneSchema = buildPhoneNumberSchema({
+  requiredMessage: 'Phone number is required',
+  invalidMessage: 'Please enter a valid phone number',
+})
 
 // Base schema for common fields
 const baseSchema = {
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  recipientNumber: kenyaPhoneSchema,
+  recipientNumber: recipientPhoneSchema,
   region: z.string().min(1, 'Please select a region'),
 }
 
