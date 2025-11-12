@@ -13,6 +13,9 @@ import {
   setStorageData as setEncryptedItem,
   clearStorageData as clearEncryptedStorage,
   formatCurrency,
+  SESSION_FLAG_STORAGE_KEY,
+  LEGACY_AUTH_STORAGE_KEY,
+  LEGACY_USER_STORAGE_KEY,
 } from '@/lib/utils'
 import {
   normalizeKenyanPhoneNumber,
@@ -339,8 +342,7 @@ export function ContextProvider({ children }) {
     (userPayload) => {
       if (!userPayload) return
       try {
-        safeLocalStorage.setItem('isAuthenticated', 'true')
-        safeLocalStorage.setItem('user', JSON.stringify(userPayload))
+        safeLocalStorage.setItem(SESSION_FLAG_STORAGE_KEY, 'true')
       } catch {
         // Ignore persistence errors (e.g., private mode)
       }
@@ -365,19 +367,36 @@ export function ContextProvider({ children }) {
   // Check for stored auth on mount
   useEffect(() => {
     try {
-      const storedAuthFlag = safeLocalStorage.getItem('isAuthenticated')
-      const storedUserRaw = safeLocalStorage.getItem('user')
-      let hydratedUser = parseStoredJSON(storedUserRaw)
-      let isSessionValid = storedAuthFlag === 'true'
+      const sessionFlag =
+        safeLocalStorage.getItem(SESSION_FLAG_STORAGE_KEY)
+      let hydratedUser = parseStoredJSON(getEncryptedItem('userInfo'))
+      let isSessionValid = sessionFlag === 'true' || !!hydratedUser
 
-      if (!hydratedUser) {
-        hydratedUser = parseStoredJSON(getEncryptedItem('userInfo'))
+      const legacyUserRaw = safeLocalStorage.getItem(LEGACY_USER_STORAGE_KEY)
+      if (legacyUserRaw) {
+        const legacyUser = parseStoredJSON(legacyUserRaw)
+        if (legacyUser) {
+          const migratedUser = sanitizeUserPayload(legacyUser)
+          hydratedUser = migratedUser
+          setEncryptedItem('userInfo', migratedUser)
+        }
+        safeLocalStorage.removeItem(LEGACY_USER_STORAGE_KEY)
+      }
+
+      const legacyAuthFlag = safeLocalStorage.getItem(LEGACY_AUTH_STORAGE_KEY)
+      if (legacyAuthFlag !== null) {
+        safeLocalStorage.removeItem(LEGACY_AUTH_STORAGE_KEY)
+        if (legacyAuthFlag === 'true' && sessionFlag !== 'true') {
+          safeLocalStorage.setItem(SESSION_FLAG_STORAGE_KEY, 'true')
+          isSessionValid = true
+        }
       }
 
       const encryptedAuth = parseStoredJSON(getEncryptedItem('auth'))
       if (!isSessionValid && encryptedAuth?.token) {
         isSessionValid = true
-        hydratedUser = hydratedUser || encryptedAuth?.user || null
+        hydratedUser =
+          hydratedUser || sanitizeUserPayload(encryptedAuth?.user || {})
       }
 
       if (isSessionValid) {
@@ -387,6 +406,8 @@ export function ContextProvider({ children }) {
           setUser(sanitizedUser)
           persistUserSession(sanitizedUser)
         }
+      } else {
+        safeLocalStorage.removeItem(SESSION_FLAG_STORAGE_KEY)
       }
     } catch {
       // Ignore storage read errors
@@ -407,8 +428,9 @@ export function ContextProvider({ children }) {
     setIsAuthenticated(false)
     setUser(null)
     try {
-      safeLocalStorage.removeItem('isAuthenticated')
-      safeLocalStorage.removeItem('user')
+      safeLocalStorage.removeItem(SESSION_FLAG_STORAGE_KEY)
+      safeLocalStorage.removeItem(LEGACY_AUTH_STORAGE_KEY)
+      safeLocalStorage.removeItem(LEGACY_USER_STORAGE_KEY)
     } catch {
       // Ignore
     }

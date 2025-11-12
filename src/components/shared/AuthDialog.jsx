@@ -30,32 +30,7 @@ import {
 import { CheckCircle2, Loader2, PhoneIcon, XIcon } from 'lucide-react'
 import logo from '@/assets/images/primaryLogoVertical.png'
 
-const extractOtpFromResponse = (response) => {
-  if (!response) return ''
-  const payload = response?.data
-
-  if (Array.isArray(payload)) {
-    const candidate = payload.find(
-      (entry) => typeof entry === 'string' && entry.trim(),
-    )
-    return candidate?.trim() || ''
-  }
-
-  if (typeof payload === 'string') {
-    return payload.trim()
-  }
-
-  if (payload && typeof payload === 'object') {
-    for (const key of ['otp', 'code', 'otpCode', 'verificationCode']) {
-      const value = payload[key]
-      if (typeof value === 'string' && value.trim()) {
-        return value.trim()
-      }
-    }
-  }
-
-  return ''
-}
+const OTP_COUNTDOWN_START = 60
 
 export function AuthDialog({
   open,
@@ -65,7 +40,7 @@ export function AuthDialog({
 }) {
   const [step, setStep] = useState(initialStep)
   const [loginIdentifier, setLoginIdentifier] = useState('')
-  const [countdown, setCountdown] = useState(41)
+  const [countdown, setCountdown] = useState(OTP_COUNTDOWN_START)
   const [isResending, setIsResending] = useState(false)
   const successTimerRef = useRef(null)
   const resetTimerRef = useRef(null)
@@ -104,21 +79,16 @@ export function AuthDialog({
   }, [navigate, onLoginSuccess, onOpenChange])
 
   const loginMutation = useLogin({
-    onSuccess: (response, variables) => {
+    onSuccess: (_response, variables) => {
       const identifier = variables?.phoneNumberOrEmail || ''
-      const resolvedOtp = extractOtpFromResponse(response)
 
       setLoginIdentifier(identifier)
       otpForm.reset({
-        otp: resolvedOtp || '',
+        otp: '',
         phoneNumberOrEmail: identifier,
       })
       setStep('otp')
-      setCountdown(41)
-
-      if (resolvedOtp) {
-        otpForm.clearErrors('otp')
-      }
+      setCountdown(OTP_COUNTDOWN_START)
     },
   })
 
@@ -173,7 +143,7 @@ export function AuthDialog({
       resetTimerRef.current = setTimeout(() => {
         setStep('login')
         setLoginIdentifier('')
-        setCountdown(41)
+        setCountdown(OTP_COUNTDOWN_START)
         setIsResending(false)
         form.reset({ phoneNumberOrEmail: '', rememberMe: false })
         otpForm.reset({ otp: '', phoneNumberOrEmail: '' })
